@@ -151,3 +151,89 @@ def colaborador(
         estado=EstadoColaborador.ACTIVO,
         usuario=Usuario(usuario),
     )
+
+
+# --- escenarios de solicitudes aprobadas, listas para generar tickets ---------------------------
+
+from dataclasses import dataclass, replace  # noqa: E402
+from datetime import timedelta  # noqa: E402
+
+from jml.dominio.catalogo import (  # noqa: E402
+    DatosCambioDepartamento,
+    DatosCambioSucursal,
+    DatosEmergencia,
+    DatosRetiro,
+    DatosVacaciones,
+)
+from jml.dominio.permisos import Actor  # noqa: E402
+from jml.dominio.solicitud import Solicitud  # noqa: E402
+from jml.dominio.tipos import EstadoColaborador, Rol, Subtipo, TipoEvento  # noqa: E402
+from jml.dominio.valores import CampoRestringido, SolicitudId  # noqa: E402
+
+RRHH_ACTOR = Actor("u-rrhh", "col-rrhh", frozenset({Rol.RRHH}))
+SENTINELA = "SENTINELA-RESTRINGIDA-9f3a"
+
+
+@dataclass(frozen=True)
+class Caso:
+    solicitud: Solicitud
+    colaborador: Colaborador
+    actual: PerfilDeAcceso | None
+    nuevo: PerfilDeAcceso | None
+
+
+def caso(
+    tipo: TipoEvento,
+    subtipo: Subtipo | None = None,
+    *,
+    departamento: str = "Finanzas",
+    sede: str = "Bogotá",
+    destino: str = "TI",
+    sede_destino: str = "Cali",
+    vinculacion: TipoDeVinculacion = TipoDeVinculacion.EMPLEADO,
+    requiere_equipo: bool = True,
+    traslada_equipo: bool = False,
+    dias: int = 7,
+    numero: int = 1,
+) -> Caso:
+    """Construye por las reglas reales (emitir_directo) una solicitud aprobada del tipo pedido."""
+    fe = HOY + timedelta(days=dias)
+    sid = SolicitudId.de(2026, numero)
+    c = colaborador(departamento=departamento, sede=sede)
+    actual: PerfilDeAcceso | None = perfil(departamento, sede)
+    nuevo: PerfilDeAcceso | None = None
+    restringido: CampoRestringido | None = None
+    if tipo is TipoEvento.ING:
+        fin = None if vinculacion is TipoDeVinculacion.EMPLEADO else fe + timedelta(days=200)
+        di = datos_ingreso(vinculacion, departamento, sede, requiere_equipo, fecha_fin=fin)
+        c = Colaborador.por_ingresar("col-1", di, fe, Usuario("maria.gomez"))
+        datos: object = di
+        actual, nuevo = None, perfil(departamento, sede)
+    elif tipo is TipoEvento.VAC:
+        datos = DatosVacaciones(fe + timedelta(days=14))
+    elif tipo is TipoEvento.CDP:
+        datos = DatosCambioDepartamento(destino, "Nuevo cargo", "jefe-2")
+        nuevo = perfil(destino, sede)
+    elif tipo is TipoEvento.CSU:
+        datos = DatosCambioSucursal(sede_destino, traslada_equipo)
+        nuevo = perfil(departamento, sede_destino)
+    elif tipo is TipoEvento.RET:
+        datos, restringido = DatosRetiro(), CampoRestringido(SENTINELA)
+    else:
+        fe = HOY
+        datos = DatosEmergencia("Seguridad", AHORA - timedelta(hours=2))
+        restringido = CampoRestringido(SENTINELA)
+    sujeto = c if tipo is TipoEvento.ING else replace(c, estado=EstadoColaborador.ACTIVO)
+    r = Solicitud.emitir_directo(
+        id=sid,
+        actor=RRHH_ACTOR,
+        sujeto=sujeto,
+        tipo=tipo,
+        subtipo=subtipo,
+        fecha_efectiva=fe,
+        datos=datos,  # type: ignore[arg-type]  # `datos` se arma segun el tipo
+        restringido=restringido,
+        justificacion="prueba",
+        ahora=AHORA,
+    )
+    return Caso(r.solicitud, c, actual, nuevo)
