@@ -1,0 +1,17 @@
+secrets/
+.env*
+!.env.example
+*.pem
+*.key
+*.pfx
+__pycache__/
+node_modules/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+htmlcov/
+mutants/
+*.egg-info/

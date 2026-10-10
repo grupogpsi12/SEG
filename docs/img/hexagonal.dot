@@ -1,0 +1,32 @@
+digraph H {
+  graph [rankdir=LR, fontname="Helvetica", nodesep=0.3, ranksep=0.5, pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#555555"];
+  edge [fontname="Helvetica", fontsize=8, color="#555555"];
+
+  subgraph cluster_in { label="Adaptadores de entrada"; style="rounded,filled"; fillcolor="#EAF6EF"; color="#2E8B57";
+    vistas [label="Vistas Django\n(formularios, dashboard)", fillcolor="#D7F0E1"];
+    jobs   [label="Comando worker\n(outbox, sincronización,\nexportación)", fillcolor="#D7F0E1"];
+  }
+  subgraph cluster_core { label="Núcleo (sin Django ni HTTP)"; style="rounded,filled"; fillcolor="#FFF4EC"; color="#D2691E";
+    app [label="Aplicación · casos de uso\nregistrar · aprobar · emitir\nsincronizar · consultar dashboard", fillcolor="#FDE3D1"];
+    dom [label="Dominio\nSolicitud ─1:N─► TicketDeCola\nestados · deduplicación · SLA\nderivación de cuentas · perfiles", fillcolor="#FBD3B8"];
+    app -> dom;
+  }
+  subgraph cluster_ports { label="Puertos de salida"; style="rounded,dashed"; color="#8B7D6B";
+    p1 [label="SistemaDeTickets", shape=component, fillcolor="#F2F0EB"];
+    p2 [label="Repositorios +\nAuditoría", shape=component, fillcolor="#F2F0EB"];
+    p3 [label="ProveedorDeIdentidad", shape=component, fillcolor="#F2F0EB"];
+    p4 [label="Reloj", shape=component, fillcolor="#F2F0EB"];
+    p5 [label="AlmacenDeSoportes", shape=component, fillcolor="#F2F0EB"];
+  }
+  subgraph cluster_out { label="Adaptadores de salida"; style="rounded,filled"; fillcolor="#E3EEF9"; color="#1F6FB2";
+    a1 [label="GLPI 11 (API REST)\n| doble en memoria", fillcolor="#D3E3F5"];
+    a2 [label="ORM Django → Supabase\n| doble en memoria", fillcolor="#D3E3F5"];
+    a3 [label="Supabase Auth\n| doble", fillcolor="#D3E3F5"];
+    a4 [label="Reloj del sistema\n| reloj fijo", fillcolor="#D3E3F5"];
+    a5 [label="Volumen noexec de la VM\n| en memoria", fillcolor="#D3E3F5"];
+  }
+  vistas -> app; jobs -> app;
+  app -> p1; app -> p2; app -> p3; app -> p4; app -> p5;
+  p1 -> a1 [style=dashed, label="implementa"]; p2 -> a2 [style=dashed]; p3 -> a3 [style=dashed]; p4 -> a4 [style=dashed]; p5 -> a5 [style=dashed];
+}

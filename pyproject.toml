@@ -1,0 +1,68 @@
+[project]
+name = "jml"
+version = "0.1.0"
+description = "Sistema integrado de eventos laborales (JML) — núcleo"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest", "pytest-cov", "hypothesis", "mutmut", "ruff", "mypy", "import-linter"]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra --strict-markers --strict-config"
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = ["jml"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+mypy_path = "src"
+files = ["src", "tests"]
+explicit_package_bases = true
+namespace_packages = true
+
+[tool.importlinter]
+root_packages = ["jml"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "dominio solo importa la biblioteca estandar (CA-17)"
+type = "forbidden"
+source_modules = ["jml.dominio"]
+forbidden_modules = ["jml.aplicacion", "jml.adaptadores", "django", "httpx", "psycopg", "requests"]
+
+[[tool.importlinter.contracts]]
+name = "aplicacion solo importa dominio (CA-17)"
+type = "forbidden"
+source_modules = ["jml.aplicacion"]
+forbidden_modules = ["jml.adaptadores", "django", "httpx", "psycopg", "requests"]
+
+[[tool.importlinter.contracts]]
+name = "capas del nucleo"
+type = "layers"
+layers = ["jml.aplicacion", "jml.dominio"]

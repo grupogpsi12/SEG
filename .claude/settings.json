@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./secrets/**)",
+      "Read(./**/.env)",
+      "Read(./**/.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./**/*.pfx)",
+      "Bash(az keyvault secret show:*)",
+      "Bash(git push --force:*)",
+      "Bash(docker compose down -v:*)"
+    ]
+  }
+}
