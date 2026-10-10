@@ -52,6 +52,22 @@ class Actor:
         return rol in self.roles
 
 
+@dataclass(frozen=True, slots=True)
+class UsuarioDelSistema:
+    """Usuario de Django vinculado a Supabase Auth, sin contrasena local (SRS 5.1)."""
+
+    id: UsuarioId
+    colaborador_id: ColaboradorId | None
+    roles: frozenset[Rol]
+    activo: bool = True
+
+    def __post_init__(self) -> None:
+        validar_roles(self.roles)
+
+    def como_actor(self) -> Actor:
+        return Actor(self.id, self.colaborador_id, self.roles)
+
+
 def relacion_con(
     actor: Actor, sujeto_id: ColaboradorId, jefe_del_sujeto: ColaboradorId | None
 ) -> Relacion:
