@@ -17,14 +17,16 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from types import MappingProxyType
+from typing import TypeAlias
 
 from jml.dominio.errores import CampoRestringidoProhibido, DatoInvalido
 from jml.dominio.valores import CampoRestringido, a_utc, texto_no_vacio
 
 HASH_GENESIS = "0" * 64
 
-type Escalar = str | int | bool | None
-type ValorAuditable = Escalar | tuple[Escalar, ...]
+# TypeAlias y no `type X = ...`: mutmut 2 (parso) no entiende la sintaxis de PEP 695.
+Escalar: TypeAlias = str | int | bool | None
+ValorAuditable: TypeAlias = Escalar | tuple[Escalar, ...]
 
 # Nombres que jamas viajan a la auditoria (SRS 6.3 y CLAUDE.md, reglas de seguridad de codigo).
 CLAVES_PROHIBIDAS = frozenset(

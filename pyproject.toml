@@ -36,7 +36,7 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT"]
-ignore = ["RUF001", "RUF002", "RUF003"]
+ignore = ["RUF001", "RUF002", "RUF003", "UP040", "UP047"]  # UP040/UP047: mutmut 2 no entiende PEP 695
 
 [tool.mypy]
 strict = true

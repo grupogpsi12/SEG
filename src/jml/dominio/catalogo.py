@@ -8,6 +8,7 @@ aparte como `CampoRestringido` (RD-05).
 
 from dataclasses import dataclass
 from datetime import date, datetime
+from typing import TypeAlias
 
 from jml.dominio.errores import DatoInvalido
 from jml.dominio.tipos import Subtipo, TipoDeEquipo, TipoDeVinculacion, TipoEvento
@@ -19,8 +20,8 @@ from jml.dominio.valores import (
     texto_no_vacio,
 )
 
-type ColaboradorId = str
-type UsuarioId = str
+ColaboradorId: TypeAlias = str
+UsuarioId: TypeAlias = str
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,7 +95,7 @@ class DatosEmergencia:
         object.__setattr__(self, "hora_del_hecho", a_utc(self.hora_del_hecho, "hora_del_hecho"))
 
 
-type DatosDelEvento = (
+DatosDelEvento: TypeAlias = (
     DatosIngreso
     | DatosVacaciones
     | DatosCambioDepartamento

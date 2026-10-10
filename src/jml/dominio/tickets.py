@@ -9,6 +9,7 @@ para ningun directorio (ADR-019).
 
 from dataclasses import dataclass, replace
 from datetime import date, datetime
+from typing import TypeVar
 
 from jml.dominio.catalogo import DatosCambioSucursal, DatosIngreso, DatosVacaciones
 from jml.dominio.colaborador import Colaborador
@@ -39,6 +40,8 @@ from jml.dominio.tipos import (
     TipoEvento,
 )
 from jml.dominio.valores import CalendarioHabil, Usuario, a_utc, inicio_del_dia
+
+T = TypeVar("T")
 
 COLA_A_SISTEMA: dict[Cola, SistemaDeCuenta | None] = {
     Cola.AD: SistemaDeCuenta.AD,
@@ -264,7 +267,7 @@ def _usuario(c: Colaborador) -> Usuario:
 # --- generacion -------------------------------------------------------------------------------
 
 
-def _como[T](datos: object, clase: type[T]) -> T:
+def _como(datos: object, clase: type[T]) -> T:
     """Estrecha el tipo de los datos del evento; el catalogo ya garantiza que coinciden."""
     if not isinstance(datos, clase):
         raise DatoInvalido("datos", f"se esperaba {clase.__name__}")

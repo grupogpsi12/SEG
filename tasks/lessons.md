@@ -65,3 +65,22 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 18. **Probar solo el camino feliz y confiar en la cobertura de líneas.** Una línea cubierta no es una regla verificada.
     → Cobertura de ramas, pruebas basadas en propiedades y pruebas de mutación sobre `dominio`.
     → Detectar: un mutante superviviente sin explicación en `docs/spikes/mutacion.md`.
+
+19. **Confiar en una propiedad sin probar que detecta el error que debe detectar.** La primera versión de P1 (deduplicación) pasaba con el doble roto: generaba secuencias que cerraban todo de golpe y nunca dejaban una solicitud en `en_ejecucion` o `error` al registrar la siguiente.
+    → Toda propiedad sobre estados se valida con un **mutante conocido** (aquí, quitar `en_ejecucion`, `error` o `aprobada` de los estados abiertos, que es el error n.º 1) antes de darla por buena; y las operaciones aleatorias son granulares (crear tickets, cerrar, caída larga) para alcanzar cada estado intermedio.
+    → Detectar: cambiar el conjunto de estados abiertos en el doble y ver que P1 falla.
+
+20. **Un doble que no cumple el `Protocol` del puerto.** Los atributos de un `Protocol` son invariantes: `UnidadDeTrabajo` con `solicitudes: RepoSolicitudes` no admite un doble que exponga un subtipo.
+    → Los atributos de un puerto se declaran como `@property` de solo lectura, y la fábrica del contrato se tipa contra el `Protocol` (mypy lo comprueba).
+
+21. **Rollback "de mentira" en el doble de la unidad de trabajo.** Si el doble no restaura el estado, la prueba de atomicidad (CA-02) pasa sin probar nada.
+    → El doble toma una instantánea al entrar y la restaura al fallar; la prueba compara el almacén **completo** antes y después (`instantanea() == antes`), incluidos los consecutivos.
+
+22. **Dos requisitos del SRS que no caben juntos** (RD-09 documento único frente a RD-12 «RRHH vuelve a registrar el ingreso», con `error` como estado abierto).
+    → No resolverlo en silencio: se registra como supuesto (S-26, S-19) con las dos opciones y se deja la prueba que cambia si el equipo elige la otra.
+
+23. **Herramientas que reescriben tu código sin avisar.** `ruff --fix` (regla UP017) convirtió `UTC = timezone.utc` en `UTC = UTC`; `mutmut` 3 no corre en Windows (necesita `fork`).
+    → Revisar el diff tras un `--fix` automático; en Windows usar `mutmut` 2.x (o WSL) y **no editar `src/` mientras corre la mutación** (modifica los archivos en su sitio).
+
+24. **Hash de documento en GLPI.** El núcleo verifica el SHA-256 del soporte contra lo que GLPI devuelve (`hash_de_documento`), pero GLPI guarda `sha1sum`, no SHA-256.
+    → Pendiente del spike 0.3: confirmar qué hash expone la API; si es SHA-1, el adaptador lo calcula al subir y el puerto sigue igual (la verificación la hace el adaptador).

@@ -8,6 +8,7 @@ nada, y solo toca la cuenta del sistema del ticket (no depende del orden entre s
 
 from dataclasses import dataclass, replace
 from datetime import datetime
+from typing import TypeAlias
 
 from jml.dominio.auditoria import EventoDeAuditoria
 from jml.dominio.catalogo import ColaboradorId
@@ -43,7 +44,9 @@ ESTADO_MIENTRAS_ESTA_ABIERTO: dict[AccionDeTicket, EstadoDeCuenta | None] = {
     _A.ELIMINACION: _E.DESHABILITADA,
 }
 
-type OrdenDeOrigen = tuple[datetime, datetime]  # (emitido_en, vence_en) del ticket que gobierna
+OrdenDeOrigen: TypeAlias = tuple[
+    datetime, datetime
+]  # (emitido_en, vence_en) del ticket que gobierna
 
 
 @dataclass(frozen=True, slots=True)
