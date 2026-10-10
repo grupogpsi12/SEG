@@ -360,6 +360,14 @@ def test_bandeja_vencidas_solo_pendientes_y_con_fecha_cumplida(entorno: EntornoD
         assert len(u.bandeja.vencidas(AHORA + timedelta(hours=1), 1)) == 1  # respeta el limite
 
 
+def test_bandeja_obtener_por_clave(entorno: EntornoDeContrato) -> None:
+    a = _entradas(1)[0]
+    with uow(entorno) as u:
+        u.bandeja.encolar([a])
+        assert u.bandeja.obtener(a.clave) == a
+        assert u.bandeja.obtener("no-existe") is None
+
+
 def test_bandeja_guardar_actualiza_el_estado(entorno: EntornoDeContrato) -> None:
     a = _entradas(1)[0]
     with uow(entorno) as u:

@@ -300,6 +300,9 @@ class _RepoBandeja:
         listas.sort(key=lambda e: (e.proximo_intento, e.clave))
         return listas[:limite]
 
+    def obtener(self, clave: str) -> EntradaDeBandeja | None:
+        return self.a.bandeja.get(clave)
+
     def de_solicitud(self, solicitud_id: SolicitudId) -> Sequence[EntradaDeBandeja]:
         return sorted(
             (e for e in self.a.bandeja.values() if e.solicitud_id == solicitud_id.valor),
