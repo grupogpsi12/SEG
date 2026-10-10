@@ -139,6 +139,13 @@ def test_cada_celda_estado_x_accion(estado: EstadoSolicitud, accion: Accion) -> 
         assert (e.value.estado, e.value.accion) == (estado.value, accion.value)
 
 
+def test_S_14_en_ejecucion_no_pasa_a_error_porque_el_diagrama_no_lo_trae() -> None:
+    """El prompt menciona `en_ejecucion -> error`, el diagrama no. Se sigue el diagrama (S-14)."""
+    assert (S.EN_EJECUCION, Accion.FALLAR_EMISION) not in TRANSICIONES
+    with pytest.raises(TransicionInvalida):
+        vacaciones(S.EN_EJECUCION).fallar_emision("glpi_500")
+
+
 def test_los_estados_finales_son_absorbentes() -> None:
     for (origen, _), _destino in ESPERADAS.items():
         assert origen not in ESTADOS_FINALES

@@ -330,7 +330,7 @@ def test_cierre_sin_solucion_de_un_alta_sin_cuenta_previa() -> None:
     assert (r.cuenta.estado, r.cuenta.marca) == (E.PENDIENTE_ALTA, M.CIERRE_SIN_SOLUCION)
 
 
-def test_reabierto_devuelve_la_cuenta_al_estado_previo_RF_25() -> None:
+def test_reabierto_devuelve_la_cuenta_al_estado_previo_RF_25_S_24() -> None:
     t = elegir(caso(TipoEvento.RET, Subtipo.RENUNCIA), AD)
     o1, o2, o3 = (
         obs(ET.EN_CURSO, False),

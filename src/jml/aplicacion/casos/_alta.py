@@ -68,7 +68,7 @@ def _sujeto_de_ingreso(
 ) -> Colaborador:
     """S-06: el colaborador se crea al registrar el ingreso, en `por_ingresar`.
 
-    S-06b: si el documento ya pertenece a un `por_ingresar` SIN ingreso abierto (se rechazo o
+    S-26: si el documento ya pertenece a un `por_ingresar` SIN ingreso abierto (se rechazo o
     se cancelo), se reutiliza su registro; es la unica forma de que RD-12 («RRHH vuelve a
     registrar el ingreso») no choque con RD-09 (documento unico).
     """

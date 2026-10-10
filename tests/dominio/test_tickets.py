@@ -263,6 +263,15 @@ def test_EMG_vence_en_1_hora_y_el_posterior_cuenta_desde_la_emision_S_03() -> No
     assert por_cola(ts, AD, POST).vence_en == datetime(2027, 1, 11, 4, 59, 59, tzinfo=UTC)
 
 
+def test_S_22_un_retiro_futuro_crea_la_baja_como_nuevo_con_vencimiento_en_su_fecha() -> None:
+    """Precedente de CA-04 (la suspension de VAC es `Nuevo` aunque las vacaciones sean futuras)."""
+    ts = generar(caso(TipoEvento.RET, Subtipo.RENUNCIA, dias=200))
+    baja = por_cola(ts, AD, I)
+    assert baja.estado_inicial is NUEVO
+    assert baja.activo_desde == baja.emitido_en
+    assert baja.vence_en > baja.emitido_en + timedelta(days=199)
+
+
 def test_los_posteriores_no_bloquean_el_cierre_RF_26() -> None:
     for t in generar(caso(TipoEvento.RET, Subtipo.RENUNCIA)):
         assert t.bloquea_el_cierre is (t.clase is not POST)

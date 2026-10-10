@@ -238,7 +238,7 @@ def test_RD_09_dos_ingresos_del_mismo_documento_en_curso_se_rechazan() -> None:
     assert e.value.existente_id == primero.colaborador_id
 
 
-def test_S_06b_tras_cancelar_se_puede_registrar_de_nuevo_el_mismo_documento() -> None:
+def test_S_26_tras_cancelar_se_puede_registrar_de_nuevo_el_mismo_documento() -> None:
     """RD-12: «RRHH vuelve a registrar el ingreso» sin chocar con el documento unico."""
     m = Mundo.nuevo()
     primero = m.emitir(ingreso())
@@ -249,7 +249,7 @@ def test_S_06b_tras_cancelar_se_puede_registrar_de_nuevo_el_mismo_documento() ->
     assert m.colaborador(segundo.colaborador_id).usuario is not None
 
 
-def test_S_06b_un_retirado_permite_un_reingreso_nuevo() -> None:
+def test_S_26_un_retirado_permite_un_reingreso_nuevo() -> None:
     m = Mundo.nuevo()
     with m.repos.unidad_de_trabajo() as u:
         viejo = m.colaborador("col-9")
@@ -345,7 +345,7 @@ def test_S_08_el_administrador_no_aprueba() -> None:
         m.aprobar("u-admin", r.solicitud_id)
 
 
-def test_S_08b_una_pendiente_propia_de_rrhh_bloquea_la_excepcion_hasta_cancelarla() -> None:
+def test_S_18_una_pendiente_propia_de_rrhh_bloquea_la_excepcion_hasta_cancelarla() -> None:
     m = Mundo.nuevo()
     with m.repos.unidad_de_trabajo() as u:
         u.usuarios.guardar(
