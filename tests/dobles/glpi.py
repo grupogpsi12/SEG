@@ -64,6 +64,7 @@ class SistemaDeTicketsEnMemoria:
     creaciones_reales: dict[str, int] = field(default_factory=dict)
     subidas_reales: int = 0
     llamadas: int = 0
+    corromper_al_subir: bool = False
 
     # --- inyeccion de fallos --------------------------------------------------------------
 
@@ -145,7 +146,8 @@ class SistemaDeTicketsEnMemoria:
                 if doc.hash_guardado == hash_ and doc.contenido == contenido:
                     return doc.id
             doc_id = f"D-{len(self._documentos) + 1:04d}"
-            self._documentos[doc_id] = _Documento(doc_id, nombre.valor, contenido, hash_)
+            hash_guardado = "0" * 64 if self.corromper_al_subir else hash_
+            self._documentos[doc_id] = _Documento(doc_id, nombre.valor, contenido, hash_guardado)
             self.subidas_reales += 1
             return doc_id
 
