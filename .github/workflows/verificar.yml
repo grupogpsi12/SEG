@@ -57,4 +57,6 @@ jobs:
           JML_PG_SSLMODE: disable
           JML_PG_DUENIO_USUARIO: app_owner
           JML_PG_DUENIO_CLAVE: app-owner-solo-ci
-        run: uv run pytest -q --ds tests.integracion.ajustes tests/integracion tests/contratos tests/adaptadores
+        # tests/adaptadores corre en el job `compuertas` (SQLite): con estos ajustes dos de sus pruebas
+        # de configuracion esperan SQLite y fallarian sin ser un error del codigo.
+        run: uv run pytest -q --ds tests.integracion.ajustes tests/integracion tests/contratos

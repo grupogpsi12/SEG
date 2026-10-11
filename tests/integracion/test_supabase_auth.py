@@ -27,7 +27,11 @@ from jml.aplicacion.puertos import CredencialesInvalidas
 
 URL = os.environ.get("JML_SUPABASE_URL", "")
 CLAVE = os.environ.get("JML_SUPABASE_CLAVE_PUBLICA", "")
-SERVICIO = Path(os.environ.get("JML_SECRETOS_DIR", "secrets")) / "supabase_service_role"
+# No usa JML_SECRETOS_DIR: tests/adaptadores/ajustes.py lo redefine a una carpeta temporal (leccion 39).
+SERVICIO = Path(
+    os.environ.get("JML_SERVICE_ROLE_ARCHIVO")
+    or Path(__file__).resolve().parents[2] / "secrets" / "supabase_service_role"
+)
 
 pytestmark = pytest.mark.skipif(not (URL and CLAVE), reason="S-28: sin proyecto de Supabase")
 

@@ -130,3 +130,8 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 38. **Quitarle a `app_backend` la propiedad de tablas con RLS sin políticas.** El dueño se salta RLS; un rol que no es dueño no ve ninguna fila. Corregir H1 sin `BYPASSRLS` habría dejado la aplicación sin datos.
     → Cada vez que cambie quién es dueño de una tabla con RLS, revisar quién queda sin acceso (ADR-028).
+
+39. **Una prueba que lee secretos de `JML_SECRETOS_DIR` bajo pytest-django.** `tests/adaptadores/ajustes.py` redefine esa variable a una carpeta temporal al importarse, así que la prueba de integración creyó que faltaba `supabase_service_role` y se omitió en silencio (aparecía «7 passed, 1 skipped»).
+    → Las pruebas de integración ubican los secretos desde la raíz del repositorio, y se revisa siempre la línea de «skipped» (`-rs`).
+
+40. **La CI de integración no debe correr `tests/adaptadores` con los ajustes de PostgreSQL.** Dos pruebas de configuración (`check_deploy`, `/salud` 503) asumen SQLite; con PostgreSQL fallan sin que haya un error real. Esa carpeta ya corre en el job `compuertas`.
