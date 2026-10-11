@@ -160,6 +160,19 @@ class ProcesarBandeja:
             solicitud = uow.solicitudes.obtener(sid)
             if solicitud is None:
                 raise NoEncontrado("solicitud", sid.valor)
+            if solicitud.estado is not EstadoSolicitud.APROBADA:
+                # R1: se cancelo mientras GLPI creaba el ticket. El ticket YA existe en GLPI:
+                # se registra y se audita como huerfano para que TI lo cierre (la cancelacion se respeta).
+                uow.auditoria.registrar(
+                    ACTOR_DEL_WORKER,
+                    EventoDeAuditoria(
+                        "ticket.huerfano",
+                        entrada.clave,
+                        {"id_externo": id_externo, "solicitud_estado": solicitud.estado.value},
+                    ),
+                )
+                cuenta.creadas += 1
+                return
             actualizada = solicitud.registrar_ticket_creado(entrada.clave)
             uow.auditoria.registrar(
                 ACTOR_DEL_WORKER,

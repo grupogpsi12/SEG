@@ -13,7 +13,9 @@ import pytest
 
 from jml.aplicacion.bandeja import EstadoDeEntrada, espera_de_reintento
 from jml.aplicacion.casos.bandeja import ProcesarBandeja, _Conteo
+from jml.aplicacion.puertos import TicketCreado
 from jml.dominio.errores import DocumentoDuplicado, NoAutorizado, NoEncontrado
+from jml.dominio.tickets import TicketDeCola
 from jml.dominio.tipos import EstadoColaborador, EstadoSolicitud, Subtipo, TipoEvento
 from jml.dominio.valores import SolicitudId
 from tests.mundo import Mundo, emergencia, ingreso, vacaciones
@@ -216,4 +218,30 @@ def test_R2_cualquier_error_de_dominio_en_una_solicitud_se_aisla_y_se_audita(
     assert [(r.objeto, dict(r.datos)) for r in registros] == [
         (a.valor, {"codigo": "dato_invalido"})
     ]
+    assert m.repos.auditoria().verificar().valida
+
+
+def test_R1_un_ticket_creado_mientras_se_cancelaba_la_solicitud_no_se_pierde_de_vista() -> None:
+    """RRHH cancela justo despues de que GLPI crea el primer ticket y antes de confirmarlo."""
+    m = Mundo.nuevo()
+    sid = emitir_vac(m)
+    real = m.glpi.crear_ticket
+
+    def crear_y_cancelar(ticket: TicketDeCola) -> TicketCreado:
+        creado = real(ticket)
+        m.cancelar("u-rrhh", sid, "se cancela en la carrera")  # aun no hay tickets confirmados
+        return creado
+
+    m.glpi.crear_ticket = crear_y_cancelar  # type: ignore[method-assign]  # carrera simulada
+    res = m.bandeja(limite=1)
+    assert res.creadas == 1
+    assert m.solicitud(sid).estado is S.CANCELADA  # la cancelacion se respeta
+    with m.repos.unidad_de_trabajo() as u:
+        huerfanos = [t for t in u.tickets.creados() if t.ticket.solicitud_id == sid.valor]
+        assert len(huerfanos) == 1  # y el ticket existente queda registrado para que TI lo cierre
+        assert huerfanos[0].id_externo is not None
+    assert "ticket.huerfano" in m.acciones_de_auditoria()
+    m.glpi.crear_ticket = real  # type: ignore[method-assign]
+    assert m.bandeja().procesadas == 0  # y no se crea ninguno mas
+    assert len(m.glpi.creaciones_reales) == 1
     assert m.repos.auditoria().verificar().valida
