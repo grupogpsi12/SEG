@@ -162,6 +162,15 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔ CA-18 (parte de la carga): un archivo no PDF renombrado a `.pdf` y uno de más de 20 MB se rechazan; el nombre en disco es aleatorio; la suite de contrato de `AlmacenDeSoportes` pasa.
   ✔ Hecho (adaptador): `AlmacenDeSoportesEnDisco` pasa la suite de contrato sin cambios (fábrica `orm`, sobre `tmp_path`): nombre aleatorio de 32 hex sin extensión, creación exclusiva con 0o600, y un nombre manipulado en la base no sale del volumen. ⏳ Falta el formulario de carga (con 2.7) y el límite en BunkerWeb (2.2).
 
+- [x] **2.10 Ingresos fallidos en la auditoría** (RF-35): contraseña o código TOTP rechazados quedan como `sesion.fallida`, sin la contraseña ni el código.
+  ✔ Prueba: un intento fallido deja un registro y el contenido no incluye la contraseña.
+  ✔✔ `IniciarIngreso` y `CompletarIngreso` auditan `sesion.fallida` (`paso`: `contrasena` o `totp`; objeto: el correo normalizado o el id de Supabase del primer factor). Pruebas en `tests/aplicacion/test_ingreso.py`. El volumen lo acota el límite de BunkerWeb (RS-08).
+- [ ] **2.11 Vista del Auditor** (RF-36, CA-09): consultar la auditoría (paginada) y verificar la cadena desde la interfaz, mostrando el primer registro afectado. Solo el rol Auditor.
+  ✔ 403 para los demás roles; con un registro alterado en la base, la vista muestra la posición del primero afectado.
+- [ ] **2.12 Reintento de emisión** (RF-38): el Administrador ve las solicitudes en `error` y las devuelve a la bandeja. Requiere la consulta `solicitudes.en_error()` (ADR-026).
+  ✔ 403 para los demás; tras el reintento, la solicitud sale de la lista y la bandeja vuelve a intentar.
+- [ ] **2.13 Área de administración** (RF-37): matriz de perfiles, catálogos y roles, solo para el Administrador, con auditoría de cada cambio (RF-35) y validación de incompatibilidades (RF-05). Diseño pendiente: el admin de Django edita los modelos sin pasar por el dominio ni la auditoría, así que se propone una vista propia sobre casos de uso.
+
 ## Fase 3 — Integración con GLPI
 
 - [ ] **3.1 Configuración de GLPI como código:** categorías, 4 grupos más «Revisión manual», reglas de negocio, SLA (incluida la emergencia de 1 h con escalamiento), plantillas de solución por cola, perfil de la cuenta de servicio y doble factor para técnicos.

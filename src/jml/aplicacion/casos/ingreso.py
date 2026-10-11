@@ -19,12 +19,30 @@ from jml.dominio.errores import NoAutorizado, RolesIncompatibles
 ACTOR_DEL_SISTEMA = "sistema:ingreso"
 
 
+@dataclass(frozen=True, slots=True)
+class DependenciasDeIngreso:
+    proveedor: ProveedorDeIdentidad
+    repos: Repositorios
+
+
+def _auditar_fallo(repos: Repositorios, objeto: str, paso: str) -> None:
+    """RF-35: el intento fallido queda en la cadena. Nunca con la contrasena ni el codigo."""
+    with repos.unidad_de_trabajo() as uow:
+        uow.auditoria.registrar(
+            ACTOR_DEL_SISTEMA, EventoDeAuditoria("sesion.fallida", objeto, {"paso": paso})
+        )
+
+
 class IniciarIngreso:
-    def __init__(self, proveedor: ProveedorDeIdentidad) -> None:
-        self._proveedor = proveedor
+    def __init__(self, dependencias: DependenciasDeIngreso) -> None:
+        self._dep = dependencias
 
     def ejecutar(self, correo: str, contrasena: str) -> PrimerFactor:
-        return self._proveedor.autenticar(correo, contrasena)
+        try:
+            return self._dep.proveedor.autenticar(correo, contrasena)
+        except CredencialesInvalidas:
+            _auditar_fallo(self._dep.repos, correo.strip().lower()[:254] or "-", "contrasena")
+            raise
 
 
 class InscribirTotp:
@@ -35,20 +53,19 @@ class InscribirTotp:
         return self._proveedor.inscribir_totp(desafio_id)
 
 
-@dataclass(frozen=True, slots=True)
-class DependenciasDeIngreso:
-    proveedor: ProveedorDeIdentidad
-    repos: Repositorios
-
-
 class CompletarIngreso:
     """Verifica el TOTP y decide si la persona entra. Devuelve el id del usuario."""
 
     def __init__(self, dependencias: DependenciasDeIngreso) -> None:
         self._dep = dependencias
 
-    def ejecutar(self, desafio_id: str, codigo: str) -> UsuarioId:
-        identidad = self._dep.proveedor.verificar_totp(desafio_id, codigo)
+    def ejecutar(self, desafio_id: str, codigo: str, usuario_id: UsuarioId) -> UsuarioId:
+        """`usuario_id` es el que devolvio el primer factor: solo sirve para auditar un fallo."""
+        try:
+            identidad = self._dep.proveedor.verificar_totp(desafio_id, codigo)
+        except CredencialesInvalidas:
+            _auditar_fallo(self._dep.repos, usuario_id, "totp")
+            raise
         if identidad.nivel < 2:
             raise CredencialesInvalidas  # RF-01: solo AAL2 abre una sesion
         uid = identidad.usuario_id

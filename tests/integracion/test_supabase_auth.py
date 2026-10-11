@@ -51,6 +51,21 @@ def test_RS_16_el_registro_abierto_esta_deshabilitado() -> None:
     assert r.json()["disable_signup"] is True, "Supabase: Authentication > Sign In > Allow signups"
 
 
+@pytest.mark.parametrize(
+    "tabla", ["solicitud", "solicitud_restringida", "auditoria", "colaborador"]
+)
+def test_RD_10_la_data_api_no_expone_las_tablas_de_la_aplicacion(tabla: str) -> None:
+    """Spike 0.2: ni por `public` ni pidiendo el esquema `app` se llega a una tabla."""
+    cabeceras = {"apikey": CLAVE}
+    publico = httpx.get(f"{URL}/rest/v1/{tabla}?limit=1", headers=cabeceras, timeout=15)
+    assert publico.status_code == 404
+    app = httpx.get(
+        f"{URL}/rest/v1/{tabla}?limit=1", headers={**cabeceras, "Accept-Profile": "app"}, timeout=15
+    )
+    assert app.status_code >= 400
+    assert app.json()["code"] == "PGRST106"  # Invalid schema: app
+
+
 def test_RS_08_un_correo_inexistente_da_el_error_generico() -> None:
     with pytest.raises(CredencialesInvalidas):
         ProveedorSupabase(URL, CLAVE).autenticar(

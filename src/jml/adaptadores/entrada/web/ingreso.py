@@ -28,6 +28,7 @@ registro = logging.getLogger(__name__)
 
 SESION_DESAFIO = "desafio"
 SESION_INSCRIBIR = "inscribir"
+SESION_CANDIDATO = "candidato"  # id de Supabase tras la contrasena: solo para auditar fallos
 
 ERROR_CREDENCIALES = "Correo o contraseña incorrectos."
 ERROR_CODIGO = "Código incorrecto o vencido. Si persiste, vuelva a ingresar."
@@ -83,6 +84,7 @@ def ingreso(request: HttpRequest) -> HttpResponse:
             request.session.cycle_key()
             request.session[SESION_DESAFIO] = primer.desafio_id
             request.session[SESION_INSCRIBIR] = primer.requiere_inscripcion
+            request.session[SESION_CANDIDATO] = primer.usuario_id
             return redirect("segundo_factor")
     return render(request, "web/ingreso.html", {"formulario": formulario})
 
@@ -99,7 +101,9 @@ def segundo_factor(request: HttpRequest) -> HttpResponse:
     if request.method == "POST" and formulario.is_valid():
         try:
             usuario_id = casos.completar_ingreso.ejecutar(
-                desafio, formulario.cleaned_data["codigo"]
+                desafio,
+                formulario.cleaned_data["codigo"],
+                str(request.session.get(SESION_CANDIDATO, "-")),
             )
         except CredencialesInvalidas:
             formulario.add_error(None, ERROR_CODIGO)
@@ -116,7 +120,7 @@ def segundo_factor(request: HttpRequest) -> HttpResponse:
             formulario.add_error(None, ERROR_SERVICIO)
         else:
             request.session.cycle_key()
-            for clave in (SESION_DESAFIO, SESION_INSCRIBIR):
+            for clave in (SESION_DESAFIO, SESION_INSCRIBIR, SESION_CANDIDATO):
                 request.session.pop(clave, None)
             request.session[SESION_USUARIO] = usuario_id
             request.session[SESION_INICIO] = composicion.reloj().ahora().timestamp()

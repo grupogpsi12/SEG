@@ -116,7 +116,7 @@ def casos() -> Casos:
         buscar_cuentas=BuscarCuentas(consulta),
         exportar_cuentas=ExportarCuentas(consulta),
         ficha=ConsultarFicha(consulta),
-        iniciar_ingreso=IniciarIngreso(identidad),
+        iniciar_ingreso=IniciarIngreso(DependenciasDeIngreso(identidad, repos)),
         inscribir_totp=InscribirTotp(identidad),
         completar_ingreso=CompletarIngreso(DependenciasDeIngreso(identidad, repos)),
     )
