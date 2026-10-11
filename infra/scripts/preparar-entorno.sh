@@ -52,6 +52,11 @@ done
 # admin-usuarios lo monta solo si existe; compose exige el archivo, aunque sea vacio.
 [ -e "$SECRETOS/supabase_service_role" ] || : > "$SECRETOS/supabase_service_role"
 [ -e "$SECRETOS/db_owner_password" ] || : > "$SECRETOS/db_owner_password"  # solo `migrar` (ADR-028)
+# Tokens de la API de GLPI (solo el worker): se crean en GLPI (Configuracion > General > API y el
+# token del usuario de servicio) al configurarlo (item 3.1). Vacios, el worker no arranca.
+for token in glpi_app_token glpi_user_token; do
+  [ -e "$SECRETOS/$token" ] || : > "$SECRETOS/$token"
+done
 
 {
   echo "# Generado por infra/scripts/preparar-entorno.sh: NO versionar (ADR-009)"

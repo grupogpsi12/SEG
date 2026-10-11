@@ -43,7 +43,13 @@ services:
     networks: [app, pg_net]
 
   worker:
-    profiles: [glpi-pendiente]  # sin adaptador de GLPI todavia (item 3.2)
+    # Arranca solo cuando GLPI tenga su API habilitada y los tokens esten en secrets/ (3.1):
+    #   docker compose ... --profile glpi up -d worker
+    profiles: [glpi]
+    environment:
+      <<: *base-local
+      JML_DB_USUARIO: app_backend
+    networks: [app, pg_net]
 
   migrar:
     environment:

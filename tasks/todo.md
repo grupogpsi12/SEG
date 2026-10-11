@@ -190,9 +190,13 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 
 - [ ] **3.1 Configuración de GLPI como código:** categorías, 4 grupos más «Revisión manual», reglas de negocio, SLA (incluida la emergencia de 1 h con escalamiento), plantillas de solución por cola, perfil de la cuenta de servicio y doble factor para técnicos.
   ✔ Script reproducible contra un GLPI limpio.
-- [ ] **3.2 Adaptador de GLPI + worker de la bandeja de salida** (RF-16 a RF-21, RF-40): implementa `SistemaDeTickets`; incluye subir el soporte una sola vez, vincularlo a los tickets de AD y Licencias y borrar la copia local tras verificar el hash.
+- [~] **3.2 Adaptador de GLPI + worker de la bandeja de salida** (RF-16 a RF-21, RF-40): implementa `SistemaDeTickets`; incluye subir el soporte una sola vez, vincularlo a los tickets de AD y Licencias y borrar la copia local tras verificar el hash.
   ✔ **La suite de contrato de `SistemaDeTickets` pasa contra GLPI en contenedor sin cambios** (incluida la idempotencia tras timeout); CA-03, CA-04, CA-07 y CA-18 (parte de GLPI).
-- [ ] **3.3 Sincronización de tickets, activos y licencias** (RF-22 a RF-26) con el comando `worker`.
+  ✔ Escrito sin GLPI real (11/10/2026), **PROVISIONAL hasta el spike 0.3**: `adaptadores/salida/glpi/cliente.py` (`SistemaDeTicketsGlpi`, API REST v1 `apirest.php`). La suite de contrato de `SistemaDeTickets` (17 pruebas) pasa **sin cambios** contra un GLPI simulado sobre HTTP (`tests/dobles/glpi_api.py`, fábrica `glpi_api`), con caída, error antes de escribir, timeout después de escribir y petición duplicada. Además, `tests/adaptadores/test_glpi_cliente.py` (sesión que vence, credenciales, prioridad, categoría, purga de duplicados, búsqueda por subcadena, RF-20). Cobertura 97 %. El worker lo arma con los secretos `glpi_app_token` y `glpi_user_token`, que solo monta él.
+  **Decisiones** (detalle en `docs/spikes/glpi-puerto.md`): la clave va en `externalid`, que GLPI no hace única, así que tras crear se purgan los duplicados; documentos buscados por `sha1sum` antes de subir y SHA-256 calculado descargando (lessons n.º 24, opción a); usuarios por `registration_number` = id del colaborador, sin credenciales; activos = `Computer` del usuario con la entrega de `Infocom` y el acta = documento vinculado; licencias = `SoftwareLicense` con `users_id`.
+  ⏳ Falta: el spike 0.3 contra GLPI 11 real (cada punto marcado «spike 0.3» en el código) y CA-18 de extremo a extremo.
+- [~] **3.3 Sincronización de tickets, activos y licencias** (RF-22 a RF-26) con el comando `worker`.
+  ✔ Los casos `SincronizarTickets` y `SincronizarActivos` (núcleo) corren en el ciclo del worker cada 5 minutos con el adaptador de 3.2; latido para el chequeo de salud. ⏳ Probar contra GLPI real.
   ✔ CA-08; la solicitud se cierra solo con solución y acta.
 - [ ] **3.4 Derivación de cuentas sobre datos reales** (RF-27, §4.7).
   ✔ Los escenarios de 1.12 pasan con el adaptador real de GLPI.

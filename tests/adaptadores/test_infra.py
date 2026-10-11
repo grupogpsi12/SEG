@@ -117,3 +117,15 @@ def test_ADR_028_migrar_es_el_unico_con_la_clave_del_duenio() -> None:
     }
     assert con_clave == {"migrar"}
     assert SERVICIOS["migrar"]["profiles"] == ["admin"]
+
+
+def test_solo_el_worker_tiene_los_tokens_de_glpi() -> None:
+    """CLAUDE.md: el worker es el unico cliente de GLPI; la web nunca lo llama."""
+    con_tokens = {
+        n
+        for n, s in SERVICIOS.items()
+        for x in s.get("secrets", [])
+        if (x if isinstance(x, str) else x["source"]).startswith("glpi_")
+        and x != "glpi_db_password"
+    }
+    assert con_tokens == {"worker"}

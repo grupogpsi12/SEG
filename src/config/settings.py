@@ -101,6 +101,8 @@ JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
 JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # RNF-01
 # Solo para enlazar tickets desde la ficha (RF-33); la web NUNCA llama a GLPI (CLAUDE.md).
 JML_GLPI_URL = os.environ.get("JML_GLPI_URL", "https://glpi.localhost")
+# Solo el worker: API v1 de GLPI por la red interna, sin pasar por el WAF (item 3.2).
+JML_GLPI_API_URL = os.environ.get("JML_GLPI_API_URL", "http://glpi/apirest.php")
 JML_SUPABASE_CLAVE_PUBLICA = os.environ.get("JML_SUPABASE_CLAVE_PUBLICA", "")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

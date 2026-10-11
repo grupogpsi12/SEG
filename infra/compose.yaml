@@ -132,6 +132,11 @@ services:
   worker:
     <<: *app
     command: ["python", "manage.py", "worker"]
+    # Unico cliente de GLPI (CLAUDE.md): solo el worker tiene sus tokens. API interna, sin WAF.
+    secrets: [django_secret_key, db_password, supabase_ca_crt, glpi_app_token, glpi_user_token]
+    environment:
+      <<: *entorno-app
+      JML_GLPI_API_URL: http://glpi/apirest.php
     healthcheck:  # RNF-01: hora de la ultima sincronizacion exitosa
       test: ["CMD", "python", "manage.py", "worker", "--salud"]
       interval: 60s
@@ -210,6 +215,8 @@ secrets:
   supabase_service_role: { file: ../secrets/supabase_service_role }
   glpi_db_password: { file: ../secrets/glpi_db_password }
   db_owner_password: { file: ../secrets/db_owner_password }
+  glpi_app_token: { file: ../secrets/glpi_app_token }
+  glpi_user_token: { file: ../secrets/glpi_user_token }
 
 volumes:
   bw-storage:

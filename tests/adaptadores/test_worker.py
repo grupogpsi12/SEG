@@ -110,6 +110,21 @@ def test_el_comando_de_salud_falla_sin_latido(tmp_path: Path, settings: object) 
         call_command("worker", "--salud")
 
 
-def test_el_worker_no_arranca_sin_el_adaptador_de_glpi() -> None:
-    with pytest.raises(CommandError, match=r"3\.2"):
+def test_el_worker_no_arranca_sin_los_tokens_de_glpi(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("JML_SECRETOS_DIR", str(tmp_path))
+    with pytest.raises(CommandError, match="glpi_app_token"):
         call_command("worker")
+
+
+def test_con_los_tokens_el_worker_arma_el_adaptador_de_glpi(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from jml.adaptadores.entrada.worker.management.commands import worker as comando
+    from jml.adaptadores.salida.glpi.cliente import SistemaDeTicketsGlpi
+
+    for nombre in ("glpi_app_token", "glpi_user_token"):
+        (tmp_path / nombre).write_text("x", encoding="utf-8")
+    monkeypatch.setenv("JML_SECRETOS_DIR", str(tmp_path))
+    assert isinstance(comando.sistema_de_tickets(), SistemaDeTicketsGlpi)

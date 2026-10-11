@@ -1,5 +1,6 @@
 """`python manage.py worker` (ciclo) y `worker --salud` (chequeo del contenedor, RNF-01)."""
 
+import os
 import signal
 import time
 from pathlib import Path
@@ -9,6 +10,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from jml.adaptadores.entrada.worker.ciclo import Worker, esta_sano
+from jml.adaptadores.salida.glpi.cliente import SistemaDeTicketsGlpi
 from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.adaptadores.salida.reloj import RelojDelSistema
 from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
@@ -21,9 +23,26 @@ from jml.aplicacion.casos.sincronizar import (
 from jml.aplicacion.puertos import SistemaDeTickets
 
 
+def _secreto(nombre: str) -> str:
+    """Los tokens de GLPI solo los monta el contenedor worker (CLAUDE.md: unico cliente de GLPI)."""
+    ruta = Path(os.environ.get("JML_SECRETOS_DIR", "/run/secrets")) / nombre
+    try:
+        valor = ruta.read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        valor = ""
+    if not valor:
+        raise CommandError(f"falta el secreto {nombre} (token de la API de GLPI, item 3.1)")
+    return valor
+
+
 def sistema_de_tickets() -> SistemaDeTickets:
-    """El adaptador de GLPI llega con el item 3.2 (despues del spike 0.3)."""
-    raise CommandError("el adaptador de GLPI todavia no existe (item 3.2 de tasks/todo.md)")
+    """Adaptador de la API v1 de GLPI (3.2, PROVISIONAL hasta el spike 0.3)."""
+    return SistemaDeTicketsGlpi(
+        settings.JML_GLPI_API_URL,
+        _secreto("glpi_app_token"),
+        _secreto("glpi_user_token"),
+        RelojDelSistema().ahora,
+    )
 
 
 def construir() -> Worker:

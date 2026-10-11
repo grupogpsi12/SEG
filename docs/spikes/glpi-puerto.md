@@ -42,3 +42,22 @@ Errores: `GlpiNoDisponible` (reintentable), `TiempoAgotado` (la escritura **pudo
 1. Se escribe la fábrica real en `tests/contratos/conftest.py` (`FABRICAS["glpi"]`), con un `Tecnico` que trabaja los tickets por la API y un `InyectorDeFallos` sobre el proxy.
 2. La suite completa de `test_sistema_de_tickets.py` debe pasar **sin modificar una sola prueba**.
 3. Si el punto 9 obliga a cambiar el puerto, se escribe el ADR antes de tocar la firma.
+
+## Adaptador escrito antes del spike (11/10/2026)
+
+`src/jml/adaptadores/salida/glpi/cliente.py` implementa el puerto sobre la API v1 y pasa la suite de contrato contra `tests/dobles/glpi_api.py`, un GLPI simulado que sigue la documentación. **El spike 0.3 debe confirmar** cada supuesto del simulador:
+
+| Punto | Cómo lo resuelve el adaptador | Confirmar en GLPI 11 real |
+|---|---|---|
+| 1 | `initSession` con `App-Token` + `Authorization: user_token`; renueva la sesión si recibe 401 | Que la API v1 siga habilitada en GLPI 11 y que el perfil de servicio alcance; si no, ADR-014 hacia la v2 |
+| 2 | `externalid` = clave; búsqueda con `searchText[externalid]` (por subcadena) y filtro exacto; **purga** de duplicados tras crear | Que `externalid` exista en `Ticket` y se pueda escribir por la API |
+| 3 | Crea directamente con `status: 4` («En espera») y `time_to_resolve` en hora de Bogotá | Que GLPI acepte crear en espera y no lo cambie una regla |
+| 4 | Categoría por `completename`; desconocida → 0 (la regla la manda a «Revisión manual») | Formato del `completename` (`JML > …`) |
+| 5 | Una llamada por ticket más `ITILSolution` y `Document_Item` | Rendimiento con 100 tickets |
+| 6 | 1→Nuevo, 2 y 3→En curso, 4→En espera, 5→Resuelto, 6→Cerrado | — |
+| 7, 8 | Busca por `sha1sum`; si no existe, sube multipart (`uploadManifest` + `filename[0]`) | Que `sha1sum` sea buscable y el límite de subida admita 20 MB |
+| 9 | Descarga con `Accept: application/octet-stream` y calcula SHA-256 | Que la descarga por la API funcione con el perfil de servicio |
+| 10 | Consulta `Document/{id}/Document_Item` antes de crear el vínculo | — |
+| 11 | `registration_number` = id del colaborador; `name` = id; sin contraseña | Que la regla de usuarios no exija credenciales |
+| 12 | `Computer` con `users_id`; `Infocom.delivery_date`; acta = documento vinculado; `SoftwareLicense.users_id` | Dónde registra el equipo de Inventario la fecha de entrega y la asignación de licencias |
+| 14 | El simulador inyecta los fallos en el transporte | Toxiproxy para correr la suite contra GLPI en contenedor |
