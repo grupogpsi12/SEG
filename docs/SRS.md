@@ -9,8 +9,8 @@ lang: es-CO
 | Proyecto | Sistema integrado de eventos laborales con identidad, recursos humanos y accesos automatizados |
 | Documento | Especificación de Requisitos de Software (SRS) |
 | Norma de referencia | ISO/IEC/IEEE 29148:2018, adaptada al alcance académico |
-| Versión | 2.2 — Borrador para revisión |
-| Fecha | 10 de octubre de 2026 |
+| Versión | 2.3 — Borrador para revisión |
+| Fecha | 11 de octubre de 2026 |
 | Autores | Jhinnet Bravo, Carlos Ruiz, Luis Ceron, Jhon Leal y Cristian Caro |
 | Docente | José Eduardo Patiño Santafé |
 | Estado | Pendiente de aprobación por el equipo y el docente |
@@ -21,6 +21,7 @@ lang: es-CO
 | 2.0 | 07/10/2026 | Ajustes tras la revisión del equipo: base de datos en Supabase; sin automatizaciones fuera de GLPI; sin montaje de Samba AD; inicio de sesión con Supabase Auth; dashboard sin tiempo real para técnicos, con búsqueda de cuentas; arquitectura hexagonal con la solicitud y sus tickets como núcleo; Django como framework. Detalle en la sección 3.8. |
 | 2.1 | 07/10/2026 | Soporte de vinculación obligatorio en el ingreso, adjunto a los tickets de GLPI; permisos sobre recursos compartidos con ruta y perfil (Consulta, Edición, Retiro de accesos) dentro de los eventos laborales. Basado en formularios de referencia de sistemas similares. |
 | 2.2 | 10/10/2026 | El proxy inverso pasa a ser BunkerWeb (nginx + ModSecurity + OWASP CRS), tomando como referencia el proyecto `waf-stack` del equipo; se descarta Application Gateway por costo. Reportería de logs del WAF con Fluent Bit, Loki y Grafana. Cloudflare Tunnel + Access queda como propuesta pendiente (ADR-024). El SRS deja de generarse en Word. |
+| 2.3 | 11/10/2026 | Tras una revisión externa (ADR-028): las migraciones las corre un rol dueño separado (`app_owner`) y `app_backend` solo opera, sin poder cambiar permisos ni disparadores (RI-03); el disparador de inmutabilidad valida también las transiciones de estado (RF-14). Sin cambios de alcance. Las consultas nuevas de los puertos para las vistas quedan en ADR-025 a ADR-027. |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -498,7 +499,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 |---|---|---|---|
 | RI-01 | Usuario (web) | Páginas generadas en el servidor, en español y adaptables a distintos tamaños de pantalla: inicio de sesión y MFA, nueva solicitud por tipo, mis solicitudes, bandeja de RRHH, dashboard, búsqueda y ficha de colaborador, auditoría y administración. Sin JavaScript de terceros; los gráficos del dashboard se generan como SVG en el servidor. Cumplimiento de WCAG 2.1 nivel AA en contraste y navegación por teclado. | Debe |
 | RI-02 | GLPI 11 (API REST) | Crear tickets con categoría, prioridad, estado, vencimiento y contenido; subir un documento y vincularlo a varios tickets; leer estado, solución y documentos de un ticket; crear y actualizar usuarios; leer activos y licencias por usuario. El único cliente es el worker, con una cuenta de servicio cuyo perfil de GLPI se limita a esas operaciones. | Debe |
-| RI-03 | Supabase PostgreSQL | Conexión desde web y worker por el *session pooler* (puerto 5432), con TLS y verificación del certificado. El rol `app_backend` tiene solo los permisos de RD-02. Nunca se usan `postgres` ni `service_role` en ejecución normal. | Debe |
+| RI-03 | Supabase PostgreSQL | Conexión desde web y worker por el *session pooler* (puerto 5432), con TLS y verificación del certificado. El rol `app_backend` no es dueño de ningún objeto: tiene solo `SELECT`, `INSERT`, `UPDATE` y `DELETE`, sin modificar ni borrar en las tablas de RD-02, y `BYPASSRLS` porque RLS no tiene políticas. Las migraciones las corre `app_owner`, dueño del esquema, solo desde un contenedor de una sola vez (ADR-028). Nunca se usan `postgres` ni `service_role` en ejecución normal. | Debe |
 | RI-04 | Supabase Auth | Desde el servidor: inicio de sesión con contraseña e inscripción, desafío y verificación de TOTP. La API de administración (creación y desactivación de usuarios) usa la clave `service_role`, disponible solo para el comando de administración, nunca en los contenedores web ni worker. | Debe |
 | RI-05 | Azure Key Vault | La VM lee los secretos con su identidad administrada al arrancar y los entrega a los contenedores como archivos en un sistema de archivos en memoria (tmpfs). | Debe |
 | RI-06 | Azure Blob Storage | Escritura con identidad administrada en dos contenedores: `auditoria` (inmutable) y `respaldos`. | Debe |

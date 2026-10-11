@@ -4,7 +4,7 @@ Proyecto académico (Politécnico Grancolombiano, Gerencia de Proyectos en Segur
 
 ## Antes de cualquier trabajo
 
-1. Lee `docs/SRS.md` (v2.2). Es la fuente de verdad. Si algo que te piden contradice el SRS, di **"Pausa —"**, explica la contradicción y espera una decisión.
+1. Lee `docs/SRS.md` (v2.3) y `docs/estado.md` (estado y traspaso). Es la fuente de verdad. Si algo que te piden contradice el SRS, di **"Pausa —"**, explica la contradicción y espera una decisión.
 2. Lee `tasks/todo.md` y trabaja solo sobre el ítem activo.
 3. Lee `tasks/lessons.md` y no repitas errores registrados.
 4. Las decisiones vigentes están en `docs/decisiones.md`. Los ADR marcados **REEMPLAZADA** no se aplican. Cambiar una decisión vigente exige un ADR nuevo.
@@ -81,9 +81,11 @@ tasks/  todo.md  lessons.md
 
 ```bash
 docker compose -f infra/compose.yaml up -d --build
-docker compose -f infra/compose.yaml exec web python manage.py migrate
+docker compose -f infra/compose.yaml run --rm migrar                          # migraciones como app_owner (ADR-028)
 docker compose -f infra/compose.yaml exec web python manage.py semillas        # datos ficticios
 docker compose -f infra/compose.yaml run --rm admin-usuarios crear --correo X --rol Y   # único uso de service_role
+docker compose -f infra/compose.yaml run --rm configurar-glpi                 # GLPI como código (3.1)
+docker compose -f infra/compose.yaml -f infra/compose.local.yaml up -d       # pruebas del equipo con PostgreSQL local
 make verificar        # ruff + mypy --strict + lint-imports + pytest con cobertura de ramas (núcleo)
 make mutacion         # mutmut sobre dominio (lento; antes del Hito N y en cada cambio de reglas)
 ruff check . && mypy src && lint-imports && pytest -q tests/dominio tests/aplicacion tests/contratos tests/escenarios
