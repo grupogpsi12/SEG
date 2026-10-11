@@ -120,7 +120,18 @@ class RepoSolicitudes:
             actual.save(update_fields=["contenido"])
 
     def obtener(self, solicitud_id: SolicitudId) -> Solicitud | None:
-        fila = m.Solicitud.objects.filter(pk=solicitud_id.valor).first()
+        """Bloquea la fila hasta el fin de la unidad de trabajo (revision externa H3, R1).
+
+        Quien decide, cancela o emite lee y escribe la misma solicitud en una transaccion: sin el
+        bloqueo, dos aprobaciones simultaneas leian `pendiente_aprobacion` y las dos se
+        confirmaban. Con el, la segunda espera y luego ve el estado nuevo (`TransicionInvalida`).
+        `of=("self",)`: solo la solicitud, no las filas relacionadas. En SQLite no tiene efecto.
+        """
+        fila = (
+            m.Solicitud.objects.select_for_update(of=("self",))
+            .filter(pk=solicitud_id.valor)
+            .first()
+        )
         return None if fila is None else _solicitud(fila)
 
     def abiertas_de(self, colaborador_id: ColaboradorId) -> Sequence[Solicitud]:
