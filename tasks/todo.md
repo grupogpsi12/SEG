@@ -2,7 +2,7 @@
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]` recortado.
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
-Ítem activo: **0.0**
+Ítem activo: **1.13** (mutación en curso)
 
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
@@ -49,8 +49,9 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 | `mutmut` | Pruebas de mutación: mide si las pruebas detectan cambios en el código | No existe en la biblioteca estándar | Activo; BSD-3 |
 | `ruff`, `mypy`, `import-linter` | Estilo, tipos estrictos y límites de capas | — | Activos; MIT/BSD |
 
-- [~] **1.1 Esqueleto del núcleo** (sin Django): `pyproject.toml`, `src/jml/{dominio,aplicacion}`, `tests/{dominio,aplicacion,contratos,dobles,escenarios}`, `ruff`, `mypy --strict`, `import-linter` con los contratos de CA-17, cobertura de ramas, CI mínima (`make verificar`).
+- [x] **1.1 Esqueleto del núcleo** (sin Django): `pyproject.toml`, `src/jml/{dominio,aplicacion}`, `tests/{dominio,aplicacion,contratos,dobles,escenarios}`, `ruff`, `mypy --strict`, `import-linter` con los contratos de CA-17, cobertura de ramas, CI mínima (`make verificar`).
   ✔ `lint-imports` falla con un `import django` en `dominio` (test intencional que se revierte); `make verificar` en verde con un test de humo.
+  ✔✔ Evidencia: `lint-imports` rompe con `import django` en `dominio` (probado y revertido); además `tests/dominio/test_pureza.py` rechaza cualquier import fuera de la stdlib y las llamadas `now()`/`uuid4()`/`random`. Commit `2f5c879`.
 
   **Plan de la sesión (1.1 → 1.13).**
   - Entorno: el equipo usa Windows sin `make`; Python local 3.14, el proyecto exige 3.12 → `uv venv --python 3.12` en `.venv/`. El `Makefile` existe (CLAUDE.md) y repite los comandos que yo ejecuto directo. `git init` local (0.1 queda parcial: GitHub, pre-commit y protección de `main` son del equipo).
@@ -58,29 +59,40 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - Fuente de la tabla de transiciones: `docs/img/estados.dot` + tabla §4.2. El diagrama NO tiene `en_ejecucion → error`; el prompt sí. Se sigue el diagrama y se registra S-14 (decisión del equipo).
   - Regla: test primero por cada regla; el ID del requisito va en el nombre del test.
   - Criterio de verificación global: `ruff check . && mypy src tests && lint-imports && pytest` en verde; cobertura de ramas ≥ 95 % dominio / ≥ 90 % aplicación; mutmut ≥ 85 % en dominio.
-- [ ] **1.2 Registro de supuestos** `docs/supuestos-nucleo.md`: toda interpretación que el SRS deje abierta (lista inicial en `PROMPT_EJECUCION.md` §6) con su valor por defecto, su justificación y su prueba.
+- [x] **1.2 Registro de supuestos** `docs/supuestos-nucleo.md`: toda interpretación que el SRS deje abierta (lista inicial en `PROMPT_EJECUCION.md` §6) con su valor por defecto, su justificación y su prueba.
   ✔ Cada supuesto tiene ID `S-nn` y una prueba que lo nombra.
-- [ ] **1.3 Tipos y errores del dominio:** enumeraciones, objetos de valor (identificadores `SOL-AAAA-NNNNNN`, documento, usuario, fecha efectiva, calendario hábil) y jerarquía de errores de dominio tipados.
+  ✔✔ Evidencia: S-01 a S-27 en `docs/supuestos-nucleo.md`; `tests/dominio/test_supuestos.py` verifica que cada ID tiene prueba, que cada prueba citada existe y que no hay IDs huérfanos en el código. 8 supuestos marcados ● para el equipo.
+- [x] **1.3 Tipos y errores del dominio:** enumeraciones, objetos de valor (identificadores `SOL-AAAA-NNNNNN`, documento, usuario, fecha efectiva, calendario hábil) y jerarquía de errores de dominio tipados.
   ✔ Pruebas de construcción válida e inválida de cada objeto de valor; ningún error es `ValueError` genérico.
-- [ ] **1.4 Agregado `Solicitud`** (RF-07 a RF-15, RF-39): máquina de estados con tabla explícita de transiciones, catálogo de campos por tipo (§4.8), reglas de quién registra qué y sobre quién (§4.1), inmutabilidad tras la aprobación, cancelación, rechazo con justificación, EMG por encima de otras abiertas.
+  ✔✔ Evidencia: `tests/dominio/test_valores.py`; `test_ningun_error_de_dominio_es_value_error` y códigos de error únicos.
+- [x] **1.4 Agregado `Solicitud`** (RF-07 a RF-15, RF-39): máquina de estados con tabla explícita de transiciones, catálogo de campos por tipo (§4.8), reglas de quién registra qué y sobre quién (§4.1), inmutabilidad tras la aprobación, cancelación, rechazo con justificación, EMG por encima de otras abiertas.
   ✔ Cada celda de la tabla de transiciones (permitida y prohibida) tiene un test; propiedad: ninguna secuencia aleatoria de operaciones deja una solicitud en un estado inalcanzable ni modifica una aprobada.
-- [ ] **1.5 Perfiles y recursos compartidos** (§4.9, RF-16, ADR-022): `PerfilDeAcceso`, recursos con ruta, serie, perfil y grupo, diferencia entre perfiles, «Retiro de accesos» generado por el dominio.
+  ✔✔ Evidencia: `test_cada_celda_estado_x_accion` (7 estados × 8 acciones = 56 celdas), matriz rol × tipo × sujeto exhaustiva, propiedad P2 (`test_P2_recorridos_aleatorios`).
+- [x] **1.5 Perfiles y recursos compartidos** (§4.9, RF-16, ADR-022): `PerfilDeAcceso`, recursos con ruta, serie, perfil y grupo, diferencia entre perfiles, «Retiro de accesos» generado por el dominio.
   ✔ CA-19 a nivel de dominio; propiedades: `diferencia(a, a)` vacía y `aplicar(diferencia(a, b), a) == b`.
-- [ ] **1.6 Generación de tickets** (RF-16, RF-17, §4.3 a §4.5): matriz evento × cola completa para los 6 tipos y sus subtipos, clases (cierre, programado, posterior), prioridad, SLA con calendario hábil, usuario sugerido (§4.10), contenido mínimo del ticket (RF-20).
+  ✔✔ Evidencia: CA-19 en `test_perfiles_usuarios_soporte_colaborador.py` y `test_tickets.py`; P5 (tres propiedades) y P6 (usuario sugerido).
+- [x] **1.6 Generación de tickets** (RF-16, RF-17, §4.3 a §4.5): matriz evento × cola completa para los 6 tipos y sus subtipos, clases (cierre, programado, posterior), prioridad, SLA con calendario hábil, usuario sugerido (§4.10), contenido mínimo del ticket (RF-20).
   ✔ Una tabla de pruebas parametrizada que reproduce la matriz del SRS celda por celda; propiedad: ningún ticket serializado contiene el valor centinela de un campo restringido ni un campo de contraseña (CA-10 a nivel de dominio).
-- [ ] **1.7 Cierre y derivación de cuentas** (RF-24 a RF-27, §4.7): regla de ticket resuelto, cierre de la solicitud, tabla de derivación completa con «cierre sin solución», «reabierto» y «cambio pendiente».
+  ✔✔ Evidencia: `test_matriz_evento_x_cola_celda_por_celda` (14 variantes), P4 con centinela y patrón de contraseñas, SLA por tipo con calendario hábil.
+- [x] **1.7 Cierre y derivación de cuentas** (RF-24 a RF-27, §4.7): regla de ticket resuelto, cierre de la solicitud, tabla de derivación completa con «cierre sin solución», «reabierto» y «cambio pendiente».
   ✔ Una prueba por fila de la tabla de derivación y por regla complementaria; propiedad: aplicar dos veces la misma observación equivale a aplicarla una; reabrir devuelve el estado anterior al ticket.
-- [ ] **1.8 Auditoría encadenada** (RD-03, RF-35, RF-36): serialización canónica, cálculo de la cadena y verificación que indica el primer registro afectado.
+  ✔✔ Evidencia: `test_fila_de_la_tabla_4_7` (8 filas), reglas complementarias, S-09/S-10/S-11, P7 (idempotencia, reapertura y orden entre sistemas), P9 (cierre), y por reflexión `Cuenta` no expone edición (RD-11).
+- [x] **1.8 Auditoría encadenada** (RD-03, RF-35, RF-36): serialización canónica, cálculo de la cadena y verificación que indica el primer registro afectado.
   ✔ CA-09 a nivel de dominio; propiedad: alterar cualquier campo de cualquier registro, o quitar, duplicar o reordenar registros, rompe la verificación en el primer afectado.
-- [ ] **1.9 Puertos y dobles:** `Repositorios` (con `UnidadDeTrabajo` atómica y la regla de duplicado abierto), `Auditoria`, `SistemaDeTickets` (idempotente por clave, con inyección de fallos), `ProveedorDeIdentidad`, `Reloj` (fijo y avanzable), `AlmacenDeSoportes`. Suite de **pruebas de contrato** parametrizada por implementación, hoy solo con el doble.
+  ✔✔ Evidencia: vector canónico fijo (`test_formato_canonico_golden_RD_03`), CA-09 y P3 (alterar, quitar, duplicar y reordenar).
+- [x] **1.9 Puertos y dobles:** `Repositorios` (con `UnidadDeTrabajo` atómica y la regla de duplicado abierto), `Auditoria`, `SistemaDeTickets` (idempotente por clave, con inyección de fallos), `ProveedorDeIdentidad`, `Reloj` (fijo y avanzable), `AlmacenDeSoportes`. Suite de **pruebas de contrato** parametrizada por implementación, hoy solo con el doble.
   ✔ Los dobles pasan la suite de contrato; la suite está lista para recibir las implementaciones reales sin cambios.
-- [ ] **1.10 Casos de uso** (RF-07 a RF-15, RF-18, RF-22 a RF-27, RF-38, RF-39, RF-40 con dobles): registrar, aprobar, rechazar, emitir (en un solo paso y por excepción), cancelar, procesar la bandeja de salida (reintentos, idempotencia, paso a `error`, reintento del Administrador), sincronizar tickets, sincronizar activos y licencias, consultar contratos por vencer (RF-28).
+  ✔✔ Evidencia: `tests/contratos/` (≈70 pruebas) contra la fábrica `memoria`; mypy comprueba que cada doble cumple su `Protocol`. `SistemaDeTickets` queda PROVISIONAL: ver `docs/spikes/glpi-puerto.md`.
+- [x] **1.10 Casos de uso** (RF-07 a RF-15, RF-18, RF-22 a RF-27, RF-38, RF-39, RF-40 con dobles): registrar, aprobar, rechazar, emitir (en un solo paso y por excepción), cancelar, procesar la bandeja de salida (reintentos, idempotencia, paso a `error`, reintento del Administrador), sincronizar tickets, sincronizar activos y licencias, consultar contratos por vencer (RF-28).
   ✔ CA-01 y CA-02 con dobles; la unidad de trabajo es atómica (si falla la auditoría, no queda decisión ni bandeja de salida).
-- [ ] **1.11 Consultas de lectura** (RF-29 a RF-33): indicadores (a) a (h), búsqueda con filtros y ficha, calculados por el doble en memoria. **El resultado del doble es el oráculo** que después verificará la consulta SQL (CA-15).
+  ✔✔ Evidencia: `tests/aplicacion/` (registro, decisión, bandeja con P8, sincronización, defensas). CA-02: `test_CA_02_si_falla_la_auditoria_no_queda_decision_ni_bandeja` compara el almacén completo antes y después.
+- [x] **1.11 Consultas de lectura** (RF-29 a RF-33): indicadores (a) a (h), búsqueda con filtros y ficha, calculados por el doble en memoria. **El resultado del doble es el oráculo** que después verificará la consulta SQL (CA-15).
   ✔ Con datos de semilla de dominio, cada indicador coincide con una expectativa escrita a mano.
-- [ ] **1.12 Escenarios de extremo a extremo en memoria:** ING, VAC, CDP, CSU, RET y EMG completos desde el registro hasta `cerrada` y la cuenta derivada, con reloj simulado y un GLPI falso con fallos programados (timeout tras crear, 500, caída larga, ticket reabierto, cierre sin solución, Inventario sin acta).
+  ✔✔ Evidencia: `tests/aplicacion/test_consultas.py`, una expectativa escrita a mano por indicador (a)–(h), filtros de búsqueda, ficha auditada y sin campos restringidos.
+- [x] **1.12 Escenarios de extremo a extremo en memoria:** ING, VAC, CDP, CSU, RET y EMG completos desde el registro hasta `cerrada` y la cuenta derivada, con reloj simulado y un GLPI falso con fallos programados (timeout tras crear, 500, caída larga, ticket reabierto, cierre sin solución, Inventario sin acta).
   ✔ CA-05, CA-06 y CA-07 contra dobles; ninguna ejecución duplica un ticket.
-- [ ] **1.13 Compuertas de calidad del núcleo.**
+  ✔✔ Evidencia: `tests/escenarios/test_escenarios.py`, 12 escenarios con un verificador común de invariantes (un ticket por clave, cadena válida, sin centinela, sin duplicados abiertos, cuentas = último historial, cerradas con cierre real).
+- [~] **1.13 Compuertas de calidad del núcleo.**
   - Cobertura de ramas ≥ 95 % en `dominio` y ≥ 90 % en `aplicacion` (el SRS exige 80 % en RNF-11; esta es la meta interna).
   - `mypy --strict` y `ruff` sin avisos; `import-linter` en verde.
   - `mutmut` sobre `dominio`: ≥ 85 % de mutantes eliminados; cada superviviente se revisa y se documenta en `docs/spikes/mutacion.md` (equivalente, o falta una prueba y se agrega).

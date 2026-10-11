@@ -1,0 +1,1659 @@
+{
+ "ING empleado con equipo": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/AD/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).",
+    "Agregar los grupos de AD del perfil: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota.",
+    "Aplicar en cada recurso compartido su perfil mediante el grupo FS-*:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO"
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez\nJML/ING/AD/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).\nAgregar los grupos de AD del perfil: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota.\nAplicar en cada recurso compartido su perfil mediante el grupo FS-*:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO"
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/COMUNICACIONES/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Agregar los grupos de red del perfil: NET-VLAN-Bogota, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez\nJML/ING/COMUNICACIONES/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAgregar los grupos de red del perfil: NET-VLAN-Bogota, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/LICENCIAS/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la identidad en M365 o Entra ID: maria.gomez@andina.example.",
+    "Agregar los grupos de M365 del perfil: M365-Finanzas.",
+    "Registrar en GLPI las licencias del perfil: Software contable, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez\nJML/ING/LICENCIAS/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la identidad en M365 o Entra ID: maria.gomez@andina.example.\nAgregar los grupos de M365 del perfil: M365-Finanzas.\nRegistrar en GLPI las licencias del perfil: Software contable, Suite ofimática."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/ING/INVENTARIO/equipo",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: entrega de equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Asignar el equipo (Escritorio) al usuario en GLPI y adjuntar el acta de entrega firmada."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: entrega de equipo · María José Gómez Ramírez\nJML/ING/INVENTARIO/equipo\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAsignar el equipo (Escritorio) al usuario en GLPI y adjuntar el acta de entrega firmada."
+  }
+ ],
+ "ING contratista con equipo": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/AD/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).",
+    "Agregar los grupos de AD del perfil: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota.",
+    "Aplicar en cada recurso compartido su perfil mediante el grupo FS-*:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO",
+    "Fijar la fecha de expiración de la cuenta: 2027-05-07."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez\nJML/ING/AD/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).\nAgregar los grupos de AD del perfil: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota.\nAplicar en cada recurso compartido su perfil mediante el grupo FS-*:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO\nFijar la fecha de expiración de la cuenta: 2027-05-07."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/COMUNICACIONES/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Agregar los grupos de red del perfil: NET-VLAN-Bogota, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez\nJML/ING/COMUNICACIONES/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAgregar los grupos de red del perfil: NET-VLAN-Bogota, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/LICENCIAS/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la identidad en M365 o Entra ID: maria.gomez@andina.example.",
+    "Agregar los grupos de M365 del perfil: M365-Finanzas.",
+    "Registrar en GLPI las licencias del perfil: Software contable, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez\nJML/ING/LICENCIAS/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la identidad en M365 o Entra ID: maria.gomez@andina.example.\nAgregar los grupos de M365 del perfil: M365-Finanzas.\nRegistrar en GLPI las licencias del perfil: Software contable, Suite ofimática."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/ING/INVENTARIO/equipo",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: entrega de equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Asignar el equipo (Escritorio) al usuario en GLPI y adjuntar el acta de entrega firmada."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: entrega de equipo · María José Gómez Ramírez\nJML/ING/INVENTARIO/equipo\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAsignar el equipo (Escritorio) al usuario en GLPI y adjuntar el acta de entrega firmada."
+  }
+ ],
+ "ING sin equipo": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/AD/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).",
+    "Agregar los grupos de AD del perfil: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota.",
+    "Aplicar en cada recurso compartido su perfil mediante el grupo FS-*:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO"
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez\nJML/ING/AD/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).\nAgregar los grupos de AD del perfil: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota.\nAplicar en cada recurso compartido su perfil mediante el grupo FS-*:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO"
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/COMUNICACIONES/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Agregar los grupos de red del perfil: NET-VLAN-Bogota, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez\nJML/ING/COMUNICACIONES/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAgregar los grupos de red del perfil: NET-VLAN-Bogota, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/LICENCIAS/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la identidad en M365 o Entra ID: maria.gomez@andina.example.",
+    "Agregar los grupos de M365 del perfil: M365-Finanzas.",
+    "Registrar en GLPI las licencias del perfil: Software contable, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez\nJML/ING/LICENCIAS/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la identidad en M365 o Entra ID: maria.gomez@andina.example.\nAgregar los grupos de M365 del perfil: M365-Finanzas.\nRegistrar en GLPI las licencias del perfil: Software contable, Suite ofimática."
+  }
+ ],
+ "ING en Operaciones, Medellin": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/AD/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Medellín",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).",
+    "Agregar los grupos de AD del perfil: FS-Comun-RO, FS-Operaciones-RW, GG-Operaciones, GG-Sede-Medellin.",
+    "Aplicar en cada recurso compartido su perfil mediante el grupo FS-*:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Operaciones | serie: Operaciones | perfil: Edición | grupo: FS-Operaciones-RW"
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: cuenta y accesos · María José Gómez Ramírez\nJML/ING/AD/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Medellín\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la cuenta con el usuario sugerido: maria.gomez (maria.gomez@ad.andina.test).\nAgregar los grupos de AD del perfil: FS-Comun-RO, FS-Operaciones-RW, GG-Operaciones, GG-Sede-Medellin.\nAplicar en cada recurso compartido su perfil mediante el grupo FS-*:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Consulta | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Operaciones | serie: Operaciones | perfil: Edición | grupo: FS-Operaciones-RW"
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/COMUNICACIONES/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Medellín",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Agregar los grupos de red del perfil: NET-VLAN-Medellin, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: grupos de red · María José Gómez Ramírez\nJML/ING/COMUNICACIONES/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Medellín\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAgregar los grupos de red del perfil: NET-VLAN-Medellin, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "alta",
+   "categoria": "JML/ING/LICENCIAS/alta",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": true,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Medellín",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Verificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).",
+    "Crear la identidad en M365 o Entra ID: maria.gomez@andina.example.",
+    "Agregar los grupos de M365 del perfil: M365-Operaciones.",
+    "Registrar en GLPI las licencias del perfil: Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: identidad y licencias · María José Gómez Ramírez\nJML/ING/LICENCIAS/alta\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Medellín\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nVerificar el soporte de vinculación adjunto (acta de inicio firmada si es contratista; acto administrativo de nombramiento o contrato en los demás casos).\nCrear la identidad en M365 o Entra ID: maria.gomez@andina.example.\nAgregar los grupos de M365 del perfil: M365-Operaciones.\nRegistrar en GLPI las licencias del perfil: Suite ofimática."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/ING/INVENTARIO/equipo",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Ingreso: entrega de equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-19T05:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Medellín",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Asignar el equipo (Escritorio) al usuario en GLPI y adjuntar el acta de entrega firmada."
+   ],
+   "texto": "SOL-2026-000001 · Ingreso: entrega de equipo · María José Gómez Ramírez\nJML/ING/INVENTARIO/equipo\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Medellín\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAsignar el equipo (Escritorio) al usuario en GLPI y adjuntar el acta de entrega firmada."
+  }
+ ],
+ "VAC": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "suspension",
+   "categoria": "JML/VAC/AD/suspension",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Vacaciones: suspender cuenta · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Deshabilitar la cuenta maria.gomez al inicio de las vacaciones (2026-10-19).",
+    "No cambiar la contraseña ni quitar los grupos; revocar las sesiones."
+   ],
+   "texto": "SOL-2026-000001 · Vacaciones: suspender cuenta · María José Gómez Ramírez\nJML/VAC/AD/suspension\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nDeshabilitar la cuenta maria.gomez al inicio de las vacaciones (2026-10-19).\nNo cambiar la contraseña ni quitar los grupos; revocar las sesiones."
+  },
+  {
+   "cola": "AD",
+   "clase": "cierre_programado",
+   "accion": "reactivacion",
+   "categoria": "JML/VAC/AD/reactivacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Vacaciones: reactivar cuenta · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-11-03T04:59:59+00:00",
+   "activo_desde": "2026-11-02T05:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_programado:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Habilitar la cuenta maria.gomez en la fecha de regreso (2026-11-02)."
+   ],
+   "texto": "SOL-2026-000001 · Vacaciones: reactivar cuenta · María José Gómez Ramírez\nJML/VAC/AD/reactivacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nHabilitar la cuenta maria.gomez en la fecha de regreso (2026-11-02)."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "suspension",
+   "categoria": "JML/VAC/LICENCIAS/suspension",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Vacaciones: bloquear identidad · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Bloquear el inicio de sesión de maria.gomez@andina.example y revocar sus sesiones."
+   ],
+   "texto": "SOL-2026-000001 · Vacaciones: bloquear identidad · María José Gómez Ramírez\nJML/VAC/LICENCIAS/suspension\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nBloquear el inicio de sesión de maria.gomez@andina.example y revocar sus sesiones."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_programado",
+   "accion": "reactivacion",
+   "categoria": "JML/VAC/LICENCIAS/reactivacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Vacaciones: desbloquear identidad · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-11-03T04:59:59+00:00",
+   "activo_desde": "2026-11-02T05:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_programado:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Desbloquear el inicio de sesión de maria.gomez@andina.example el 2026-11-02, fecha de regreso."
+   ],
+   "texto": "SOL-2026-000001 · Vacaciones: desbloquear identidad · María José Gómez Ramírez\nJML/VAC/LICENCIAS/reactivacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nDesbloquear el inicio de sesión de maria.gomez@andina.example el 2026-11-02, fecha de regreso."
+  }
+ ],
+ "CDP Finanzas->TI": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/AD/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: accesos de AD · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de AD del perfil anterior: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas.",
+    "Agregar los grupos de AD del perfil nuevo: FS-Comun-RW, FS-TI-RW, GG-TI.",
+    "Aplicar el perfil en los recursos compartidos nuevos o modificados:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Edición | grupo: FS-Comun-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\TI | serie: TI | perfil: Edición | grupo: FS-TI-RW",
+    "Aplicar 'Retiro de accesos' en los recursos que ya no corresponden:",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Retiro de accesos | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Retiro de accesos | grupo: FS-Presupuesto-RO"
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: accesos de AD · María José Gómez Ramírez\nJML/CDP/AD/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de AD del perfil anterior: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas.\nAgregar los grupos de AD del perfil nuevo: FS-Comun-RW, FS-TI-RW, GG-TI.\nAplicar el perfil en los recursos compartidos nuevos o modificados:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Edición | grupo: FS-Comun-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\TI | serie: TI | perfil: Edición | grupo: FS-TI-RW\nAplicar 'Retiro de accesos' en los recursos que ya no corresponden:\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Retiro de accesos | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Retiro de accesos | grupo: FS-Presupuesto-RO"
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/COMUNICACIONES/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Agregar los grupos de red: NET-ADMIN, NET-VPN."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: grupos de red · María José Gómez Ramírez\nJML/CDP/COMUNICACIONES/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nAgregar los grupos de red: NET-ADMIN, NET-VPN."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/LICENCIAS/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: grupos y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de M365: M365-Finanzas.",
+    "Agregar los grupos de M365: M365-TI.",
+    "Liberar las licencias en GLPI: Software contable.",
+    "Registrar en GLPI las licencias: Herramientas de soporte."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: grupos y licencias · María José Gómez Ramírez\nJML/CDP/LICENCIAS/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de M365: M365-Finanzas.\nAgregar los grupos de M365: M365-TI.\nLiberar las licencias en GLPI: Software contable.\nRegistrar en GLPI las licencias: Herramientas de soporte."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/CDP/INVENTARIO/equipo",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: cambio de equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Cambiar el equipo Escritorio por Portátil; adjuntar el acta."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: cambio de equipo · María José Gómez Ramírez\nJML/CDP/INVENTARIO/equipo\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nCambiar el equipo Escritorio por Portátil; adjuntar el acta."
+  }
+ ],
+ "CDP Operaciones->Finanzas": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/AD/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: accesos de AD · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de AD del perfil anterior: FS-Operaciones-RW, GG-Operaciones.",
+    "Agregar los grupos de AD del perfil nuevo: FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas.",
+    "Aplicar el perfil en los recursos compartidos nuevos o modificados:",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO",
+    "Aplicar 'Retiro de accesos' en los recursos que ya no corresponden:",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Operaciones | serie: Operaciones | perfil: Retiro de accesos | grupo: FS-Operaciones-RW"
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: accesos de AD · María José Gómez Ramírez\nJML/CDP/AD/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de AD del perfil anterior: FS-Operaciones-RW, GG-Operaciones.\nAgregar los grupos de AD del perfil nuevo: FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas.\nAplicar el perfil en los recursos compartidos nuevos o modificados:\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Edición | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Consulta | grupo: FS-Presupuesto-RO\nAplicar 'Retiro de accesos' en los recursos que ya no corresponden:\n  - \\\\fs01.ad.andina.test\\departamentos\\Operaciones | serie: Operaciones | perfil: Retiro de accesos | grupo: FS-Operaciones-RW"
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/LICENCIAS/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: grupos y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de M365: M365-Operaciones.",
+    "Agregar los grupos de M365: M365-Finanzas.",
+    "Registrar en GLPI las licencias: Software contable."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: grupos y licencias · María José Gómez Ramírez\nJML/CDP/LICENCIAS/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de M365: M365-Operaciones.\nAgregar los grupos de M365: M365-Finanzas.\nRegistrar en GLPI las licencias: Software contable."
+  }
+ ],
+ "CDP Comercial->Operaciones": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/AD/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: accesos de AD · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de AD del perfil anterior: FS-Comercial-RW, GG-Comercial.",
+    "Agregar los grupos de AD del perfil nuevo: FS-Operaciones-RW, GG-Operaciones.",
+    "Aplicar el perfil en los recursos compartidos nuevos o modificados:",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Operaciones | serie: Operaciones | perfil: Edición | grupo: FS-Operaciones-RW",
+    "Aplicar 'Retiro de accesos' en los recursos que ya no corresponden:",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Comercial | serie: Comercial | perfil: Retiro de accesos | grupo: FS-Comercial-RW"
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: accesos de AD · María José Gómez Ramírez\nJML/CDP/AD/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de AD del perfil anterior: FS-Comercial-RW, GG-Comercial.\nAgregar los grupos de AD del perfil nuevo: FS-Operaciones-RW, GG-Operaciones.\nAplicar el perfil en los recursos compartidos nuevos o modificados:\n  - \\\\fs01.ad.andina.test\\departamentos\\Operaciones | serie: Operaciones | perfil: Edición | grupo: FS-Operaciones-RW\nAplicar 'Retiro de accesos' en los recursos que ya no corresponden:\n  - \\\\fs01.ad.andina.test\\departamentos\\Comercial | serie: Comercial | perfil: Retiro de accesos | grupo: FS-Comercial-RW"
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/COMUNICACIONES/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de red: NET-VPN."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: grupos de red · María José Gómez Ramírez\nJML/CDP/COMUNICACIONES/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de red: NET-VPN."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CDP/LICENCIAS/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: grupos y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de M365: M365-Comercial.",
+    "Agregar los grupos de M365: M365-Operaciones.",
+    "Liberar las licencias en GLPI: CRM."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: grupos y licencias · María José Gómez Ramírez\nJML/CDP/LICENCIAS/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de M365: M365-Comercial.\nAgregar los grupos de M365: M365-Operaciones.\nLiberar las licencias en GLPI: CRM."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/CDP/INVENTARIO/equipo",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de departamento: cambio de equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Operaciones / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Cambiar el equipo Portátil por Escritorio; adjuntar el acta."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de departamento: cambio de equipo · María José Gómez Ramírez\nJML/CDP/INVENTARIO/equipo\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Operaciones / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nCambiar el equipo Portátil por Escritorio; adjuntar el acta."
+  }
+ ],
+ "CDP sin diferencia": [],
+ "CSU con traslado": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CSU/AD/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de sucursal: accesos de AD · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Cali",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de AD del perfil anterior: GG-Sede-Bogota.",
+    "Agregar los grupos de AD del perfil nuevo: GG-Sede-Cali."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de sucursal: accesos de AD · María José Gómez Ramírez\nJML/CSU/AD/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Cali\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de AD del perfil anterior: GG-Sede-Bogota.\nAgregar los grupos de AD del perfil nuevo: GG-Sede-Cali."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CSU/COMUNICACIONES/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de sucursal: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Cali",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de red: NET-VLAN-Bogota.",
+    "Agregar los grupos de red: NET-VLAN-Cali."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de sucursal: grupos de red · María José Gómez Ramírez\nJML/CSU/COMUNICACIONES/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Cali\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de red: NET-VLAN-Bogota.\nAgregar los grupos de red: NET-VLAN-Cali."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/CSU/INVENTARIO/equipo",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de sucursal: traslado de equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Cali",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Trasladar el equipo a la sede Cali; adjuntar el acta."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de sucursal: traslado de equipo · María José Gómez Ramírez\nJML/CSU/INVENTARIO/equipo\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Cali\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nTrasladar el equipo a la sede Cali; adjuntar el acta."
+  }
+ ],
+ "CSU sin traslado": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CSU/AD/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de sucursal: accesos de AD · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Cali",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de AD del perfil anterior: GG-Sede-Bogota.",
+    "Agregar los grupos de AD del perfil nuevo: GG-Sede-Cali."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de sucursal: accesos de AD · María José Gómez Ramírez\nJML/CSU/AD/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Cali\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de AD del perfil anterior: GG-Sede-Bogota.\nAgregar los grupos de AD del perfil nuevo: GG-Sede-Cali."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "cambio",
+   "categoria": "JML/CSU/COMUNICACIONES/cambio",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Cambio de sucursal: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-21T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Cali",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar los grupos de red: NET-VLAN-Bogota.",
+    "Agregar los grupos de red: NET-VLAN-Cali."
+   ],
+   "texto": "SOL-2026-000001 · Cambio de sucursal: grupos de red · María José Gómez Ramírez\nJML/CSU/COMUNICACIONES/cambio\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Cali\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar los grupos de red: NET-VLAN-Bogota.\nAgregar los grupos de red: NET-VLAN-Cali."
+  }
+ ],
+ "RET renuncia": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/RET/AD/baja",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: baja de cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Deshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).",
+    "Cambiar la contraseña a un valor aleatorio que no se comunica a nadie.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de AD: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota. Listar en la solución los grupos retirados.",
+    "Aplicar 'Retiro de accesos' en todos los recursos compartidos:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Retiro de accesos | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Retiro de accesos | grupo: FS-Presupuesto-RO",
+    "Mover la cuenta a la OU Deshabilitados.",
+    "Dar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: baja de cuenta y accesos · María José Gómez Ramírez\nJML/RET/AD/baja\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nDeshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).\nCambiar la contraseña a un valor aleatorio que no se comunica a nadie.\nRevocar las sesiones activas.\nQuitar los grupos de AD: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota. Listar en la solución los grupos retirados.\nAplicar 'Retiro de accesos' en todos los recursos compartidos:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Retiro de accesos | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Retiro de accesos | grupo: FS-Presupuesto-RO\nMover la cuenta a la OU Deshabilitados.\nDar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+  },
+  {
+   "cola": "AD",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/RET/AD/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Retiro: eliminar cuenta (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-18T04:59:59+00:00",
+   "activo_desde": "2027-01-17T05:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la cuenta maria.gomez (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: eliminar cuenta (90 días) · María José Gómez Ramírez\nJML/RET/AD/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nEliminar la cuenta maria.gomez (90 días después de la baja)."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/RET/COMUNICACIONES/baja",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar todos los grupos de red: NET-VLAN-Bogota, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: grupos de red · María José Gómez Ramírez\nJML/RET/COMUNICACIONES/baja\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar todos los grupos de red: NET-VLAN-Bogota, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/RET/LICENCIAS/baja",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Bloquear el inicio de sesión de maria.gomez@andina.example.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de M365: M365-Finanzas.",
+    "Liberar las licencias en GLPI: Software contable, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: identidad y licencias · María José Gómez Ramírez\nJML/RET/LICENCIAS/baja\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nBloquear el inicio de sesión de maria.gomez@andina.example.\nRevocar las sesiones activas.\nQuitar los grupos de M365: M365-Finanzas.\nLiberar las licencias en GLPI: Software contable, Suite ofimática."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/RET/LICENCIAS/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Retiro: eliminar identidad (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-18T04:59:59+00:00",
+   "activo_desde": "2027-01-17T05:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: eliminar identidad (90 días) · María José Gómez Ramírez\nJML/RET/LICENCIAS/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nEliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/RET/INVENTARIO/equipo",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: recuperar equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Recibir el equipo con acta de recepción y paz y salvo."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: recuperar equipo · María José Gómez Ramírez\nJML/RET/INVENTARIO/equipo\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nRecibir el equipo con acta de recepción y paz y salvo."
+  }
+ ],
+ "RET fin de contrato": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/RET/AD/baja",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: baja de cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Deshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).",
+    "Cambiar la contraseña a un valor aleatorio que no se comunica a nadie.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de AD: FS-Comun-RW, FS-TI-RW, GG-Sede-Bogota, GG-TI. Listar en la solución los grupos retirados.",
+    "Aplicar 'Retiro de accesos' en todos los recursos compartidos:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\TI | serie: TI | perfil: Retiro de accesos | grupo: FS-TI-RW",
+    "Mover la cuenta a la OU Deshabilitados.",
+    "Dar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: baja de cuenta y accesos · María José Gómez Ramírez\nJML/RET/AD/baja\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nDeshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).\nCambiar la contraseña a un valor aleatorio que no se comunica a nadie.\nRevocar las sesiones activas.\nQuitar los grupos de AD: FS-Comun-RW, FS-TI-RW, GG-Sede-Bogota, GG-TI. Listar en la solución los grupos retirados.\nAplicar 'Retiro de accesos' en todos los recursos compartidos:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\TI | serie: TI | perfil: Retiro de accesos | grupo: FS-TI-RW\nMover la cuenta a la OU Deshabilitados.\nDar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+  },
+  {
+   "cola": "AD",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/RET/AD/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Retiro: eliminar cuenta (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-18T04:59:59+00:00",
+   "activo_desde": "2027-01-17T05:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la cuenta maria.gomez (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: eliminar cuenta (90 días) · María José Gómez Ramírez\nJML/RET/AD/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nEliminar la cuenta maria.gomez (90 días después de la baja)."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/RET/COMUNICACIONES/baja",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Quitar todos los grupos de red: NET-ADMIN, NET-VLAN-Bogota, NET-VPN, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: grupos de red · María José Gómez Ramírez\nJML/RET/COMUNICACIONES/baja\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nQuitar todos los grupos de red: NET-ADMIN, NET-VLAN-Bogota, NET-VPN, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/RET/LICENCIAS/baja",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Bloquear el inicio de sesión de maria.gomez@andina.example.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de M365: M365-TI.",
+    "Liberar las licencias en GLPI: Herramientas de soporte, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: identidad y licencias · María José Gómez Ramírez\nJML/RET/LICENCIAS/baja\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nBloquear el inicio de sesión de maria.gomez@andina.example.\nRevocar las sesiones activas.\nQuitar los grupos de M365: M365-TI.\nLiberar las licencias en GLPI: Herramientas de soporte, Suite ofimática."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/RET/LICENCIAS/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Retiro: eliminar identidad (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-18T04:59:59+00:00",
+   "activo_desde": "2027-01-17T05:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: eliminar identidad (90 días) · María José Gómez Ramírez\nJML/RET/LICENCIAS/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nEliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/RET/INVENTARIO/equipo",
+   "prioridad": "Alta",
+   "titulo": "SOL-2026-000001 · Retiro: recuperar equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-20T04:59:59+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "TI / Bogotá",
+    "fecha_efectiva": "2026-10-19",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Recibir el equipo con acta de recepción y paz y salvo."
+   ],
+   "texto": "SOL-2026-000001 · Retiro: recuperar equipo · María José Gómez Ramírez\nJML/RET/INVENTARIO/equipo\nPrioridad: Alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: TI / Bogotá\nFecha efectiva: 2026-10-19\nSolicitud: SOL-2026-000001\nRecibir el equipo con acta de recepción y paz y salvo."
+  }
+ ],
+ "EMG despido": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/EMG/AD/baja",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: baja de cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Deshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).",
+    "Cambiar la contraseña a un valor aleatorio que no se comunica a nadie.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de AD: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota. Listar en la solución los grupos retirados.",
+    "Aplicar 'Retiro de accesos' en todos los recursos compartidos:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Retiro de accesos | grupo: FS-Finanzas-RW",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Retiro de accesos | grupo: FS-Presupuesto-RO",
+    "Mover la cuenta a la OU Deshabilitados.",
+    "Dar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: baja de cuenta y accesos · María José Gómez Ramírez\nJML/EMG/AD/baja\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nDeshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).\nCambiar la contraseña a un valor aleatorio que no se comunica a nadie.\nRevocar las sesiones activas.\nQuitar los grupos de AD: FS-Comun-RO, FS-Finanzas-RW, FS-Presupuesto-RO, GG-Finanzas, GG-Sede-Bogota. Listar en la solución los grupos retirados.\nAplicar 'Retiro de accesos' en todos los recursos compartidos:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad | serie: Contabilidad | perfil: Retiro de accesos | grupo: FS-Finanzas-RW\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto | serie: Presupuesto | perfil: Retiro de accesos | grupo: FS-Presupuesto-RO\nMover la cuenta a la OU Deshabilitados.\nDar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+  },
+  {
+   "cola": "AD",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/EMG/AD/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Emergencia: eliminar cuenta (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-11T04:59:59+00:00",
+   "activo_desde": "2027-01-10T05:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la cuenta maria.gomez (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: eliminar cuenta (90 días) · María José Gómez Ramírez\nJML/EMG/AD/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEliminar la cuenta maria.gomez (90 días después de la baja)."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/EMG/COMUNICACIONES/baja",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Quitar todos los grupos de red: NET-VLAN-Bogota, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: grupos de red · María José Gómez Ramírez\nJML/EMG/COMUNICACIONES/baja\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nQuitar todos los grupos de red: NET-VLAN-Bogota, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/EMG/LICENCIAS/baja",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Bloquear el inicio de sesión de maria.gomez@andina.example.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de M365: M365-Finanzas.",
+    "Liberar las licencias en GLPI: Software contable, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: identidad y licencias · María José Gómez Ramírez\nJML/EMG/LICENCIAS/baja\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nBloquear el inicio de sesión de maria.gomez@andina.example.\nRevocar las sesiones activas.\nQuitar los grupos de M365: M365-Finanzas.\nLiberar las licencias en GLPI: Software contable, Suite ofimática."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/EMG/LICENCIAS/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Emergencia: eliminar identidad (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-11T04:59:59+00:00",
+   "activo_desde": "2027-01-10T05:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: eliminar identidad (90 días) · María José Gómez Ramírez\nJML/EMG/LICENCIAS/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/EMG/INVENTARIO/equipo",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: recuperar equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Finanzas / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Recuperar el equipo con acta de recepción."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: recuperar equipo · María José Gómez Ramírez\nJML/EMG/INVENTARIO/equipo\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Finanzas / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nRecuperar el equipo con acta de recepción."
+  }
+ ],
+ "EMG fuga": [
+  {
+   "cola": "AD",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/EMG/AD/baja",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: baja de cuenta y accesos · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Gerencia / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Deshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).",
+    "Cambiar la contraseña a un valor aleatorio que no se comunica a nadie.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de AD: FS-Comun-RO, FS-Gerencia-RW, GG-Gerencia, GG-Sede-Bogota. Listar en la solución los grupos retirados.",
+    "Aplicar 'Retiro de accesos' en todos los recursos compartidos:",
+    "  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RO",
+    "  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia | serie: Gerencia | perfil: Retiro de accesos | grupo: FS-Gerencia-RW",
+    "Mover la cuenta a la OU Deshabilitados.",
+    "Dar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: baja de cuenta y accesos · María José Gómez Ramírez\nJML/EMG/AD/baja\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Gerencia / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nDeshabilitar la cuenta maria.gomez (maria.gomez@ad.andina.test).\nCambiar la contraseña a un valor aleatorio que no se comunica a nadie.\nRevocar las sesiones activas.\nQuitar los grupos de AD: FS-Comun-RO, FS-Gerencia-RW, GG-Gerencia, GG-Sede-Bogota. Listar en la solución los grupos retirados.\nAplicar 'Retiro de accesos' en todos los recursos compartidos:\n  - \\\\fs01.ad.andina.test\\comun | serie: Común | perfil: Retiro de accesos | grupo: FS-Comun-RO\n  - \\\\fs01.ad.andina.test\\departamentos\\Gerencia | serie: Gerencia | perfil: Retiro de accesos | grupo: FS-Gerencia-RW\nMover la cuenta a la OU Deshabilitados.\nDar al jefe directo perfil Consulta sobre la carpeta personal por 30 días."
+  },
+  {
+   "cola": "AD",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/EMG/AD/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Emergencia: eliminar cuenta (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-11T04:59:59+00:00",
+   "activo_desde": "2027-01-10T05:00:00+00:00",
+   "clave": "SOL-2026-000001:AD:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Gerencia / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la cuenta maria.gomez (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: eliminar cuenta (90 días) · María José Gómez Ramírez\nJML/EMG/AD/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Gerencia / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEliminar la cuenta maria.gomez (90 días después de la baja)."
+  },
+  {
+   "cola": "COMUNICACIONES",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/EMG/COMUNICACIONES/baja",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: grupos de red · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:COMUNICACIONES:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Gerencia / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Quitar todos los grupos de red: NET-VLAN-Bogota, NET-VPN, NET-WIFI-CORP."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: grupos de red · María José Gómez Ramírez\nJML/EMG/COMUNICACIONES/baja\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Gerencia / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nQuitar todos los grupos de red: NET-VLAN-Bogota, NET-VPN, NET-WIFI-CORP."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "cierre_inmediato",
+   "accion": "baja",
+   "categoria": "JML/EMG/LICENCIAS/baja",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: identidad y licencias · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Gerencia / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Bloquear el inicio de sesión de maria.gomez@andina.example.",
+    "Revocar las sesiones activas.",
+    "Quitar los grupos de M365: M365-Gerencia.",
+    "Liberar las licencias en GLPI: Lector PDF, Suite ofimática."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: identidad y licencias · María José Gómez Ramírez\nJML/EMG/LICENCIAS/baja\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Gerencia / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nBloquear el inicio de sesión de maria.gomez@andina.example.\nRevocar las sesiones activas.\nQuitar los grupos de M365: M365-Gerencia.\nLiberar las licencias en GLPI: Lector PDF, Suite ofimática."
+  },
+  {
+   "cola": "LICENCIAS",
+   "clase": "posterior",
+   "accion": "eliminacion",
+   "categoria": "JML/EMG/LICENCIAS/eliminacion",
+   "prioridad": "Media",
+   "titulo": "SOL-2026-000001 · Emergencia: eliminar identidad (90 días) · María José Gómez Ramírez",
+   "estado_inicial": "En espera",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2027-01-11T04:59:59+00:00",
+   "activo_desde": "2027-01-10T05:00:00+00:00",
+   "clave": "SOL-2026-000001:LICENCIAS:posterior:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Gerencia / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Eliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: eliminar identidad (90 días) · María José Gómez Ramírez\nJML/EMG/LICENCIAS/eliminacion\nPrioridad: Media\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Gerencia / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEliminar la identidad maria.gomez@andina.example (90 días después de la baja)."
+  },
+  {
+   "cola": "INVENTARIO",
+   "clase": "cierre_inmediato",
+   "accion": "equipo",
+   "categoria": "JML/EMG/INVENTARIO/equipo",
+   "prioridad": "Muy alta",
+   "titulo": "SOL-2026-000001 · Emergencia: recuperar equipo · María José Gómez Ramírez",
+   "estado_inicial": "Nuevo",
+   "emitido_en": "2026-10-12T15:00:00+00:00",
+   "vence_en": "2026-10-12T16:00:00+00:00",
+   "activo_desde": "2026-10-12T15:00:00+00:00",
+   "clave": "SOL-2026-000001:INVENTARIO:cierre_inmediato:1",
+   "adjunta_soporte": false,
+   "ordinal": 1,
+   "datos": {
+    "colaborador": "María José Gómez Ramírez",
+    "usuario": "maria.gomez",
+    "perfil": "Gerencia / Bogotá",
+    "fecha_efectiva": "2026-10-12",
+    "solicitud": "SOL-2026-000001"
+   },
+   "lista": [
+    "Emergencia: ejecutar de inmediato.",
+    "Recuperar el equipo con acta de recepción."
+   ],
+   "texto": "SOL-2026-000001 · Emergencia: recuperar equipo · María José Gómez Ramírez\nJML/EMG/INVENTARIO/equipo\nPrioridad: Muy alta\nColaborador: María José Gómez Ramírez\nUsuario: maria.gomez\nPerfil: Gerencia / Bogotá\nFecha efectiva: 2026-10-12\nSolicitud: SOL-2026-000001\nEmergencia: ejecutar de inmediato.\nRecuperar el equipo con acta de recepción."
+  }
+ ]
+}
