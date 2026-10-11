@@ -19,7 +19,9 @@ ENV_SALIDA="${ENV_SALIDA:-$RAIZ/infra/.env}"
 umask 077
 mkdir -p "$SECRETOS"
 
-aleatorio() { python3 -c "import secrets; print(secrets.token_urlsafe($1))"; }
+# Sin Python: en Git Bash de Windows `python3` es el atajo de la Microsoft Store (leccion 41).
+aleatorio() { head -c "$1" /dev/urandom | base64 | tr -d '=
+' | tr '+/' '-_'; echo; }
 
 asegurar() {  # nombre longitud
   if [ ! -s "$SECRETOS/$1" ]; then

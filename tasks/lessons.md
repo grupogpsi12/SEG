@@ -135,3 +135,6 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
     → Las pruebas de integración ubican los secretos desde la raíz del repositorio, y se revisa siempre la línea de «skipped» (`-rs`).
 
 40. **La CI de integración no debe correr `tests/adaptadores` con los ajustes de PostgreSQL.** Dos pruebas de configuración (`check_deploy`, `/salud` 503) asumen SQLite; con PostgreSQL fallan sin que haya un error real. Esa carpeta ya corre en el job `compuertas`.
+
+41. **Scripts de `infra/` que llaman a `python3`.** En Git Bash de Windows `python3` es el atajo de la Microsoft Store y falla; con `set -e` el script se detiene a mitad y deja archivos de secreto vacíos.
+    → Los scripts de infraestructura no dependen de Python (usar `/dev/urandom`, `openssl`, `base64`). Al reintentar, `asegurar` recrea los secretos vacíos.
