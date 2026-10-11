@@ -1,0 +1,70 @@
+# Pruebas del equipo en un equipo propio, SIN la base de Supabase (docs/probar-localmente.md):
+#
+#   JML_MODO=local infra/scripts/preparar-entorno.sh
+#   docker compose -f infra/compose.yaml -f infra/compose.local.yaml up -d --build
+#   docker compose -f infra/compose.yaml -f infra/compose.local.yaml run --rm migrar
+#   docker compose -f infra/compose.yaml -f infra/compose.local.yaml exec web python manage.py semillas
+#
+# Cambia solo la base: PostgreSQL 17 (la version de Supabase) en una red interna, con los mismos
+# roles y el duenio separado (ADR-028). Todo lo demas es igual a produccion: BunkerWeb delante,
+# unico servicio con puertos (invariante 14). El inicio de sesion sigue en Supabase Auth.
+# El worker no arranca hasta que exista el adaptador de GLPI (item 3.2).
+
+x-base-local: &base-local
+  JML_DB_HOST: postgres
+  JML_DB_SSLMODE: disable  # red interna del mismo host; contra Supabase siempre verify-full
+
+services:
+  postgres:
+    image: postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_local_password
+    secrets: [postgres_local_password, db_password, db_owner_password]
+    volumes:
+      - postgres-datos:/var/lib/postgresql/data
+      - ./local/initdb/01-roles.sh:/docker-entrypoint-initdb.d/01-roles.sh:ro
+      # fuera de initdb.d: la imagen ejecutaria el .sql por su cuenta, sin la clave
+      - ./supabase/duenio-separado.sql:/opt/jml/duenio-separado.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      retries: 10
+    mem_limit: 512m
+    networks: [pg_net]
+
+  web:
+    environment:
+      <<: *base-local
+      JML_DB_USUARIO: app_backend
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [app, pg_net]
+
+  worker:
+    profiles: [glpi-pendiente]  # sin adaptador de GLPI todavia (item 3.2)
+
+  migrar:
+    environment:
+      <<: *base-local
+      JML_DB_USUARIO: app_owner
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [app, pg_net]
+
+  admin-usuarios:
+    environment:
+      <<: *base-local
+      JML_DB_USUARIO: app_backend
+    networks: [app, pg_net]
+
+secrets:
+  postgres_local_password: { file: ../secrets/postgres_local_password }
+
+volumes:
+  postgres-datos:
+
+networks:
+  pg_net:
+    internal: true

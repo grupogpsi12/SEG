@@ -25,7 +25,9 @@ x-endurecido: &endurecido
 
 x-app: &app
   <<: *endurecido
-  image: jml-app:local
+  # Local: se construye. Para usar la publicada en GHCR (docs/probar-localmente.md):
+  #   JML_IMAGEN=ghcr.io/<organizacion>/jml-app:ultima docker compose ... up -d --no-build
+  image: ${JML_IMAGEN:-jml-app:local}
   build: { context: .., dockerfile: Dockerfile }
   read_only: true
   tmpfs: ["/tmp:size=64m,noexec,nosuid"]

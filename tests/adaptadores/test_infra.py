@@ -42,7 +42,7 @@ def test_invariante_8_service_role_solo_en_admin_usuarios() -> None:
 def test_RS_18_imagenes_de_terceros_fijadas_por_digest() -> None:
     for nombre, s in SERVICIOS.items():
         imagen = s.get("image", "")
-        if imagen.startswith("jml-app"):
+        if "jml-app" in imagen:  # la propia: se construye aqui o se publica en GHCR
             continue
         assert re.search(r"@sha256:[0-9a-f]{64}$", imagen), nombre
     assert re.search(r"^FROM \S+@sha256:[0-9a-f]{64}$", (RAIZ / "Dockerfile").read_text(), re.M)
@@ -88,3 +88,32 @@ def test_web_y_worker_tienen_chequeo_de_salud_y_corren_sin_root_ni_escritura() -
 def test_ningun_env_con_valores_esta_versionado() -> None:
     assert not (RAIZ / "infra" / ".env").exists() or ".env" in (RAIZ / ".gitignore").read_text()
     assert "infra/.env" in (RAIZ / ".gitignore").read_text()
+
+
+LOCAL: dict[str, Any] = yaml.safe_load(
+    (RAIZ / "infra" / "compose.local.yaml").read_text(encoding="utf-8")
+)
+
+
+def test_el_modo_local_no_publica_puertos_y_su_base_es_interna() -> None:
+    """Invariante 14 tambien en las pruebas del equipo: BunkerWeb sigue siendo la unica entrada."""
+    assert not {n for n, s in LOCAL["services"].items() if s.get("ports")}
+    assert LOCAL["networks"]["pg_net"]["internal"] is True
+    assert re.search(r"@sha256:[0-9a-f]{64}$", LOCAL["services"]["postgres"]["image"])
+    assert LOCAL["services"]["migrar"]["environment"]["JML_DB_USUARIO"] == "app_owner"
+
+
+def test_produccion_nunca_desactiva_tls_hacia_la_base() -> None:
+    texto = (RAIZ / "infra" / "compose.yaml").read_text(encoding="utf-8")
+    assert "JML_DB_SSLMODE" not in texto  # solo el modo local lo cambia
+
+
+def test_ADR_028_migrar_es_el_unico_con_la_clave_del_duenio() -> None:
+    con_clave = {
+        n
+        for n, s in SERVICIOS.items()
+        for x in s.get("secrets", [])
+        if (x if isinstance(x, str) else x["source"]) == "db_owner_password"
+    }
+    assert con_clave == {"migrar"}
+    assert SERVICIOS["migrar"]["profiles"] == ["admin"]

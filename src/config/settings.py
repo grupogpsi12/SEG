@@ -65,7 +65,9 @@ DATABASES = {
         "USER": os.environ.get("JML_DB_USUARIO", "app_backend"),
         "PASSWORD": leer_secreto("db_password"),
         "OPTIONS": {
-            "sslmode": "verify-full",
+            # verify-full siempre contra Supabase. `disable` solo lo usa infra/compose.local.yaml,
+            # cuyo PostgreSQL vive en una red interna del mismo host (pruebas del equipo).
+            "sslmode": os.environ.get("JML_DB_SSLMODE", "verify-full"),
             "sslrootcert": str(ruta_de_secreto("supabase_ca_crt")),
             # Esquema no expuesto en la Data API (RD-10). Una transaccion abandonada (proceso
             # caido a mitad) se corta a los 60 s y no deja filas bloqueadas.

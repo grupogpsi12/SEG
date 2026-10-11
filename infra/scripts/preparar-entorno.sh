@@ -32,8 +32,19 @@ asegurar django_secret_key 50
 asegurar bw_api_token 32
 asegurar glpi_db_password 32
 
+if [ "${JML_MODO:-}" = "local" ]; then
+  # infra/compose.local.yaml: PostgreSQL propio, sin la base de Supabase (docs/probar-localmente.md)
+  asegurar db_password 36
+  asegurar db_owner_password 36
+  asegurar postgres_local_password 36
+  [ -e "$SECRETOS/supabase_ca_crt" ] || : > "$SECRETOS/supabase_ca_crt"  # no se usa: sin TLS local
+  JML_DB_HOST=postgres
+  JML_DB_USUARIO="${JML_DB_USUARIO:-app_backend}"
+  JML_DB_USUARIO_DUENIO=app_owner
+fi
+
 for requerido in db_password supabase_ca_crt; do
-  if [ ! -s "$SECRETOS/$requerido" ]; then
+  if [ ! -e "$SECRETOS/$requerido" ]; then
     echo "falta $SECRETOS/$requerido (ver docs/spikes/supabase.md)" >&2
     exit 1
   fi

@@ -1,0 +1,33 @@
+# Publica la imagen de la aplicacion en GitHub Container Registry para que el equipo la pruebe
+# sin construirla (docs/probar-localmente.md). Solo despues de que `verificar` pase en la rama.
+# Sin acciones de terceros para construir: docker del propio runner (cadena de suministro).
+name: imagen
+
+on:
+  workflow_run:
+    workflows: [verificar]
+    types: [completed]
+    branches: [main, master]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publicar:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Construir y publicar
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          IMAGEN="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/jml-app"
+          echo "$TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker build -t "$IMAGEN:$SHA" -t "$IMAGEN:ultima" .
+          docker push "$IMAGEN:$SHA"
+          docker push "$IMAGEN:ultima"
