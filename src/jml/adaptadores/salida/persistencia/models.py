@@ -32,6 +32,7 @@ class Colaborador(models.Model):
 
     class Meta:
         db_table = "colaborador"
+        indexes = [models.Index(fields=["estado"], name="colaborador_estado")]  # 4.1 (c), (f)
         constraints = [
             # RD-09: el documento es unico entre los colaboradores que no estan retirados (S-26)
             models.UniqueConstraint(
@@ -112,6 +113,10 @@ class Solicitud(models.Model):
 
     class Meta:
         db_table = "solicitud"
+        indexes = [
+            models.Index(fields=["creada_en"], name="solicitud_creada_en"),  # 4.1 (d)
+            models.Index(fields=["estado"], name="solicitud_estado"),  # bandeja de RRHH
+        ]
         constraints = [
             # RD-01 / ADR-006: la deduplicacion la garantiza la base, tambien ante carreras (CA-01)
             models.UniqueConstraint(
@@ -179,7 +184,12 @@ class Ticket(models.Model):
 
     class Meta:
         db_table = "ticket"
-        indexes = [models.Index(fields=["id_externo"], name="ticket_creados")]
+        indexes = [
+            models.Index(fields=["id_externo"], name="ticket_creados"),
+            # 4.1: indicadores (a), (b) y (g) del dashboard filtran por estas fechas
+            models.Index(fields=["activo_desde"], name="ticket_activo_desde"),
+            models.Index(fields=["vence_en"], name="ticket_vence_en"),
+        ]
 
 
 class Cuenta(models.Model):
