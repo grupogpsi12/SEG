@@ -31,8 +31,7 @@ def _vac(numero: int, estado: EstadoSolicitud = EstadoSolicitud.PENDIENTE_APROBA
     )  # fmt: skip
 
 
-@pytest.mark.django_db(transaction=True)
-def test_CA_01_dos_inserciones_concurrentes_solo_una_queda_abierta() -> None:
+def test_CA_01_dos_inserciones_concurrentes_solo_una_queda_abierta(base_con_commit: None) -> None:
     repos = RepositoriosDjango(RelojSimulado())
     with repos.unidad_de_trabajo() as u:
         u.colaboradores.guardar(colaborador())

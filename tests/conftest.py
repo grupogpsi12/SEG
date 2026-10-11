@@ -27,3 +27,8 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         llamada = getattr(item, "callspec", None)
         if llamada is not None and llamada.params.get("entorno") == "orm":
             item.add_marker(pytest.mark.django_db)
+
+
+if os.environ.get("JML_PG_HOST"):
+    # Contra PostgreSQL real no se crean bases (app_backend no puede): se usa el esquema app_test.
+    from tests.integracion.conftest import base_con_commit, django_db_setup  # noqa: F401

@@ -242,6 +242,13 @@ class RepoSolicitudes(Protocol):
         self, colaborador_id: ColaboradorId, tipo: TipoEvento
     ) -> Solicitud | None: ...
 
+    # ADR-025: lecturas para las vistas.
+    def del_solicitante(self, usuario_id: UsuarioId) -> Sequence[Solicitud]:
+        """Las que registro ese usuario (abiertas y finales), por orden de identificador."""
+        ...
+
+    def pendientes_de_aprobacion(self) -> Sequence[Solicitud]: ...
+
 
 class RepoColaboradores(Protocol):
     def guardar(self, colaborador: Colaborador) -> None:
@@ -259,6 +266,10 @@ class RepoColaboradores(Protocol):
     def con_usuario_glpi(self) -> Sequence[Colaborador]: ...
 
     def con_fin_de_contrato(self) -> Sequence[Colaborador]: ...
+
+    def subordinados_de(self, jefe_id: ColaboradorId) -> Sequence[Colaborador]:
+        """ADR-025: subordinados directos que no estan retirados, por identificador."""
+        ...
 
 
 class RepoUsuarios(Protocol):

@@ -28,6 +28,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 022 | Permisos sobre recursos compartidos dentro de los eventos laborales | Aceptada | 07/10/2026 |
 | 023 | BunkerWeb como WAF y proxy inverso (en lugar de nginx y de Application Gateway) | Aceptada | 10/10/2026 |
 | 024 | Cloudflare Tunnel + Access delante de BunkerWeb | **Propuesta** (pendiente del equipo) | 10/10/2026 |
+| 025 | Tres consultas de lectura nuevas en los repositorios para las vistas (2.7) | Aceptada | 10/10/2026 |
 
 ---
 
@@ -319,3 +320,22 @@ Fuentes: prices.azure.com (Application Gateway, eastus) · learn.microsoft.com/a
 **Pendiente.** Decisión del equipo en la tarea 0.7 del plan. Solo afecta al despliegue (fase 5).
 
 Fuentes: developers.cloudflare.com/waf/managed-rules · developers.cloudflare.com/cloudflare-one/connections/connect-networks/routing-to-tunnel · developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare
+
+## ADR-025 — Tres consultas de lectura nuevas en los repositorios para las vistas
+
+**Contexto.** El núcleo se congeló en el Hito N (`nucleo-v1`) con los repositorios de los casos de uso de escritura y de las consultas del dashboard. Al construir las vistas de la sección 2.7 aparecen tres lecturas que ninguno cubría:
+- «Mis solicitudes» (RF-11: el solicitante consulta y cancela las suyas): solicitudes registradas por un usuario.
+- La bandeja de RRHH (RF-12): solicitudes pendientes de aprobación.
+- El jefe elige entre sus subordinados directos al pedir un CDP o un CSU (SRS 3.3, 4.1).
+
+**Decisión.** Se agregan, sin tocar ningún método existente:
+- `RepoSolicitudes.del_solicitante(usuario_id)` y `RepoSolicitudes.pendientes_de_aprobacion()`.
+- `RepoColaboradores.subordinados_de(jefe_id)` (excluye a los retirados).
+
+Cada una tiene su prueba en la suite de contrato, que corre contra el doble y contra el ORM. Las vistas no consultan modelos: usan casos de uso de lectura (`MisSolicitudes`, `PendientesDeAprobacion`, `SubordinadosDe`) que devuelven DTOs sin campos restringidos.
+
+**Alternativas descartadas.**
+- Filtrar en la vista con `de_colaborador` en un bucle: N consultas y lógica de negocio en la vista.
+- Una consulta genérica `buscar_solicitudes(filtro)`: es el «por si acaso» que `CLAUDE.md` prohíbe; hoy hay exactamente tres lecturas.
+
+**Consecuencias.** El contrato crece en tres métodos; los adaptadores existentes (doble y ORM) los implementan en el mismo commit. No cambia ninguna regla del dominio ni de los casos de uso de escritura.

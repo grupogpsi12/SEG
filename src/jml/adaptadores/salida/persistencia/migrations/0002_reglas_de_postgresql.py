@@ -4,7 +4,7 @@ Solo se aplican en PostgreSQL: en SQLite (pruebas sin Docker) la operacion no ha
 pruebas de `tests/integracion` comprueban que, en PostgreSQL, estas reglas se cumplen de verdad.
 
 Supuesto operativo (a confirmar en el spike 0.2): las migraciones las corre `app_backend`, que
-queda como duenio de las tablas. RLS sin politicas no lo bloquea a el (no se usa FORCE), pero si
+queda como duenio de las tablas. Es agnostica de esquema (usa `current_schema()`). RLS sin politicas no lo bloquea a el (no se usa FORCE), pero si
 a `anon` y `authenticated`. El REVOKE se aplica sobre `app_backend` aunque sea el duenio.
 """
 
@@ -59,7 +59,8 @@ BEGIN
         REVOKE UPDATE, DELETE, TRUNCATE ON auditoria, decision, cuenta_historial FROM app_backend;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-        REVOKE ALL ON ALL TABLES IN SCHEMA app FROM anon, authenticated;
+        EXECUTE format('REVOKE ALL ON ALL TABLES IN SCHEMA %I FROM anon, authenticated, service_role',
+                       current_schema());
     END IF;
 END $$;
 """
@@ -76,7 +77,7 @@ def aplicar(apps: StateApps, editor: BaseDatabaseSchemaEditor) -> None:
     if editor.connection.vendor != "postgresql":
         return
     for sql in (INMUTABILIDAD, SOLO_INSERCION, RLS):
-        editor.execute(sql)
+        editor.execute(sql, params=None)  # sin params: el SQL lleva `%` propios de plpgsql
 
 
 class Migration(migrations.Migration):

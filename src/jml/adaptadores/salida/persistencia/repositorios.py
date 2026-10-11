@@ -91,10 +91,7 @@ class RepoSolicitudes:
                     pk=solicitud.id.valor, defaults=mp.solicitud_a_campos(solicitud)
                 )
                 if solicitud.restringido is not None:
-                    m.SolicitudRestringida.objects.update_or_create(
-                        solicitud_id=solicitud.id.valor,
-                        defaults={"contenido": solicitud.restringido.revelar()},
-                    )
+                    self._guardar_restringido(solicitud.id, solicitud.restringido.revelar())
         except IntegrityError:
             existente = (
                 m.Solicitud.objects.filter(
@@ -109,6 +106,19 @@ class RepoSolicitudes:
                 raise  # otra restriccion (p. ej. el colaborador no existe): no es un duplicado
             raise DuplicadoAbierto(SolicitudId(existente.id)) from None
 
+    @staticmethod
+    def _guardar_restringido(solicitud_id: SolicitudId, contenido: str) -> None:
+        """Escribe solo si falta o cambio: PostgreSQL rechaza hasta un UPDATE identico sobre el
+        campo restringido de una solicitud aprobada (RF-14), asi que no se reescribe en vano."""
+        actual = m.SolicitudRestringida.objects.filter(solicitud_id=solicitud_id.valor).first()
+        if actual is None:
+            m.SolicitudRestringida.objects.create(
+                solicitud_id=solicitud_id.valor, contenido=contenido
+            )
+        elif actual.contenido != contenido:
+            actual.contenido = contenido
+            actual.save(update_fields=["contenido"])
+
     def obtener(self, solicitud_id: SolicitudId) -> Solicitud | None:
         fila = m.Solicitud.objects.filter(pk=solicitud_id.valor).first()
         return None if fila is None else _solicitud(fila)
@@ -122,6 +132,14 @@ class RepoSolicitudes:
             _solicitud(f)
             for f in m.Solicitud.objects.filter(colaborador_id=colaborador_id).order_by("id")
         ]
+
+    def del_solicitante(self, usuario_id: UsuarioId) -> Sequence[Solicitud]:
+        filas = m.Solicitud.objects.filter(solicitante_id=usuario_id).order_by("id")
+        return [_solicitud(f) for f in filas]
+
+    def pendientes_de_aprobacion(self) -> Sequence[Solicitud]:
+        filas = m.Solicitud.objects.filter(estado=EstadoSolicitud.PENDIENTE_APROBACION.value)
+        return [_solicitud(f) for f in filas.order_by("id")]
 
     def abierta_de_tipo(self, colaborador_id: ColaboradorId, tipo: TipoEvento) -> Solicitud | None:
         fila = m.Solicitud.objects.filter(
@@ -170,6 +188,11 @@ class RepoColaboradores:
     def con_usuario_glpi(self) -> Sequence[Colaborador]:
         filas = m.Colaborador.objects.exclude(id_usuario_glpi=None).order_by("id")
         return [mp.colaborador_de_modelo(f) for f in filas]
+
+    def subordinados_de(self, jefe_id: ColaboradorId) -> Sequence[Colaborador]:
+        filas = m.Colaborador.objects.filter(jefe_id=jefe_id)
+        filas = filas.exclude(estado=EstadoColaborador.RETIRADO.value)
+        return [mp.colaborador_de_modelo(f) for f in filas.order_by("id")]
 
     def con_fin_de_contrato(self) -> Sequence[Colaborador]:
         return [

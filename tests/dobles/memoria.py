@@ -144,6 +144,20 @@ class _RepoSolicitudes:
     def abierta_de_tipo(self, colaborador_id: ColaboradorId, tipo: TipoEvento) -> Solicitud | None:
         return next((s for s in self.abiertas_de(colaborador_id) if s.tipo is tipo), None)
 
+    def del_solicitante(self, usuario_id: UsuarioId) -> Sequence[Solicitud]:
+        return sorted(
+            (s for s in self.a.solicitudes.values() if s.solicitante_id == usuario_id),
+            key=lambda s: s.id.valor,
+        )
+
+    def pendientes_de_aprobacion(self) -> Sequence[Solicitud]:
+        pendientes = (
+            s
+            for s in self.a.solicitudes.values()
+            if s.estado is EstadoSolicitud.PENDIENTE_APROBACION
+        )
+        return sorted(pendientes, key=lambda s: s.id.valor)
+
 
 class _RepoColaboradores:
     def __init__(self, a: Almacen) -> None:
@@ -179,6 +193,16 @@ class _RepoColaboradores:
     def con_usuario_glpi(self) -> Sequence[Colaborador]:
         return sorted(
             (c for c in self.a.colaboradores.values() if c.id_usuario_glpi), key=lambda c: c.id
+        )
+
+    def subordinados_de(self, jefe_id: ColaboradorId) -> Sequence[Colaborador]:
+        return sorted(
+            (
+                c
+                for c in self.a.colaboradores.values()
+                if c.jefe_id == jefe_id and c.estado is not EstadoColaborador.RETIRADO
+            ),
+            key=lambda c: c.id,
         )
 
     def con_fin_de_contrato(self) -> Sequence[Colaborador]:

@@ -89,7 +89,7 @@ def test_la_base_de_produccion_es_postgresql_con_tls_y_esquema_app(
     db = produccion.DATABASES["default"]
     assert db["ENGINE"] == "django.db.backends.postgresql"
     assert db["PORT"] == "5432"  # session pooler de Supabase (lessons n.9)
-    assert db["USER"] == "app_backend"
+    assert db["USER"] == "app_backend"  # por defecto; el pooler lo cambia por entorno
     opciones = db["OPTIONS"]
     assert isinstance(opciones, dict)
     assert opciones["sslmode"] == "verify-full"

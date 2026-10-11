@@ -20,6 +20,7 @@ from jml.dominio.tipos import (
     EstadoSolicitud,
     MarcaDeCuenta,
     Prioridad,
+    Rol,
     SistemaDeCuenta,
     Subtipo,
     TipoDeVinculacion,
@@ -92,6 +93,36 @@ class ContratoPorVencer:
     nombre_completo: str
     fecha_fin: date
     dias_restantes: int
+
+
+@dataclass(frozen=True, slots=True)
+class FilaDeSolicitud:
+    """Una fila de las listas de las vistas (ADR-025). Sin campos restringidos (RD-05)."""
+
+    id: SolicitudId
+    tipo: TipoEvento
+    estado: EstadoSolicitud
+    fecha_efectiva: date
+    creada_en: datetime
+    colaborador_id: ColaboradorId
+    colaborador_nombre: str
+    para_revision: bool
+    cancelable: bool  # el solicitante puede cancelarla: sigue pendiente (RF-11)
+
+
+@dataclass(frozen=True, slots=True)
+class OpcionDeColaborador:
+    colaborador_id: ColaboradorId
+    nombre: str
+
+
+@dataclass(frozen=True, slots=True)
+class PerfilDeUsuario:
+    """Lo que las vistas necesitan para ofrecer el menu y los formularios correctos."""
+
+    usuario_id: UsuarioId
+    roles: frozenset[Rol]
+    colaborador: OpcionDeColaborador | None
 
 
 # --- lectura: dashboard (RF-29, RF-30) --------------------------------------------------------

@@ -575,3 +575,54 @@ def test_buscar_ordena_y_pagina(entorno: EntornoDeContrato) -> None:
     assert todos.total == 3
     segunda = entorno.repos.buscar_cuentas(FiltroDeCuentas(pagina=2, tamano=2))
     assert [f.colaborador_id for f in segunda.filas] == ["c0"]
+
+
+# --- ADR-025: lecturas para las vistas ---------------------------------------------------------
+
+
+def test_ADR_025_del_solicitante_devuelve_solo_las_que_el_registro(
+    entorno: EntornoDeContrato,
+) -> None:
+    con_colaboradores(entorno)
+    mias = replace(vac(1), solicitante_id="u-ana")
+    de_otro = replace(vac(2, colaborador_id="col-2"), solicitante_id="u-luis")
+    cerrada = replace(vac(3, estado=S.CERRADA), solicitante_id="u-ana")
+    with uow(entorno) as u:
+        for s in (mias, de_otro, cerrada):
+            u.solicitudes.guardar(s)
+        assert [s.id.valor for s in u.solicitudes.del_solicitante("u-ana")] == [
+            "SOL-2026-000001",
+            "SOL-2026-000003",
+        ]  # abiertas y finales, por orden de id
+        assert u.solicitudes.del_solicitante("nadie") == []
+
+
+def test_ADR_025_pendientes_de_aprobacion_solo_las_pendientes(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
+    with uow(entorno) as u:
+        u.solicitudes.guardar(vac(1))  # pendiente
+        u.solicitudes.guardar(vac(2, colaborador_id="col-2", estado=S.APROBADA))
+        u.solicitudes.guardar(vac(3, estado=S.RECHAZADA))
+        assert [s.id.valor for s in u.solicitudes.pendientes_de_aprobacion()] == ["SOL-2026-000001"]
+
+
+def test_ADR_025_subordinados_directos_sin_retirados(entorno: EntornoDeContrato) -> None:
+    def persona(cid: str, jefe: str | None, estado: EstadoColaborador, doc: str) -> object:
+        return replace(
+            colaborador(id=cid, jefe_id=jefe, usuario=f"u{doc}"),
+            documento=Documento(doc),
+            estado=estado,
+        )
+
+    A, R = EstadoColaborador.ACTIVO, EstadoColaborador.RETIRADO
+    with uow(entorno) as u:
+        for c in (
+            persona("jefe", None, A, "80000001"),
+            persona("s2", "jefe", A, "80000002"),
+            persona("s1", "jefe", A, "80000003"),
+            persona("retirado", "jefe", R, "80000004"),
+            persona("de-otro", "otro-jefe", A, "80000005"),
+        ):
+            u.colaboradores.guardar(c)  # type: ignore[arg-type]  # fabrica local
+        assert [c.id for c in u.colaboradores.subordinados_de("jefe")] == ["s1", "s2"]
+        assert u.colaboradores.subordinados_de("s1") == []
