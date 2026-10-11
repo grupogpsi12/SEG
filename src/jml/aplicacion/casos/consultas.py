@@ -8,8 +8,10 @@ from dataclasses import dataclass, replace
 from datetime import timedelta
 
 from jml.aplicacion.dtos import (
+    TAMANO_MAXIMO_DE_PAGINA,
     ContratoPorVencer,
     FichaDeColaborador,
+    FilaDeColaborador,
     FiltroDeCuentas,
     Indicadores,
     PaginaDeCuentas,
@@ -117,3 +119,48 @@ class ConsultarFicha:
                 actor.usuario_id, EventoDeAuditoria("ficha.consultada", colaborador_id, {})
             )
         return ficha
+
+
+MAXIMO_EXPORTADO = 5000  # tope de RF-34: 300 colaboradores esperados (RNF-06), con holgura
+
+
+class ExportarCuentas:
+    """RF-34: todas las filas de una busqueda, para el CSV. Es una consulta masiva (T10): se
+    audita con el filtro usado y la cantidad exportada."""
+
+    def __init__(self, dependencias: DependenciasDeConsulta) -> None:
+        self._dep = dependencias
+
+    def ejecutar(self, usuario_id: str, filtro: FiltroDeCuentas) -> tuple[FilaDeColaborador, ...]:
+        actor = _actor(self._dep, usuario_id)
+        _exigir_tecnico(actor, "exportar_cuentas")
+        filas: list[FilaDeColaborador] = []
+        pagina = 1
+        while len(filas) < MAXIMO_EXPORTADO:
+            p = self._dep.repos.buscar_cuentas(
+                replace(filtro, pagina=pagina, tamano=TAMANO_MAXIMO_DE_PAGINA)
+            )
+            filas.extend(p.filas)
+            if pagina * p.tamano >= p.total:
+                break
+            pagina += 1
+        filas = filas[:MAXIMO_EXPORTADO]
+        usado = {
+            k: str(v)
+            for k, v in (
+                ("nombre", filtro.nombre),
+                ("documento", filtro.documento),
+                ("usuario", filtro.usuario),
+                ("departamento", filtro.departamento),
+                ("sede", filtro.sede),
+                ("sistema", filtro.sistema),
+                ("estado_de_cuenta", filtro.estado_de_cuenta),
+            )
+            if v is not None
+        }
+        with self._dep.repos.unidad_de_trabajo() as uow:
+            uow.auditoria.registrar(
+                actor.usuario_id,
+                EventoDeAuditoria("cuentas.exportadas", "busqueda", {**usado, "filas": len(filas)}),
+            )
+        return tuple(filas)

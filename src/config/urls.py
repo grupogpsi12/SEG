@@ -2,7 +2,7 @@
 
 from django.urls import path, re_path
 
-from jml.adaptadores.entrada.web import ingreso, vistas
+from jml.adaptadores.entrada.web import ingreso, tecnicos, vistas
 
 urlpatterns = [
     path("salud", vistas.salud, name="salud"),
@@ -14,6 +14,10 @@ urlpatterns = [
     path("solicitudes/nueva", vistas.nueva_indice, name="nueva_indice"),
     path("solicitudes/nueva/<str:tipo>", vistas.nueva, name="nueva"),
     path("bandeja", vistas.bandeja, name="bandeja"),
+    path("dashboard", tecnicos.dashboard, name="dashboard"),
+    path("cuentas", tecnicos.cuentas, name="cuentas"),
+    path("cuentas.csv", tecnicos.cuentas_csv, name="cuentas_csv"),
+    path("colaboradores/<str:colaborador>", tecnicos.ficha, name="ficha"),
     re_path(r"^solicitudes/(?P<solicitud>SOL-\d{4}-\d{6})$", vistas.detalle, name="detalle"),
     re_path(
         r"^solicitudes/(?P<solicitud>SOL-\d{4}-\d{6})/(?P<accion>aprobar|rechazar|cancelar)$",

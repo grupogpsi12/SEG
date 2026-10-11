@@ -19,4 +19,11 @@ button.secundario { background: #fff; color: var(--acento); border: 1px solid va
 form.en-linea { display: inline; }
 .salir { margin-left: auto; }
 .clave { font-family: ui-monospace, monospace; font-size: 1.2rem; letter-spacing: 0.1em; word-break: break-all; }
+h2 { font-size: 1.1rem; margin-top: 1.5rem; }
+.grafico { max-width: 40rem; display: block; margin: 0.5rem 0 1rem; font-size: 12px; }
+.grafico .barra { fill: #9fb6d9; }
+.grafico .barra.resaltada { fill: var(--acento); }
+tr.resaltada { background: #e8eefb; font-weight: 600; }
+form.busqueda { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0 1rem; align-items: end; }
+main { overflow-x: auto; }
 input[type=email], input[type=password] { width: 100%; max-width: 32rem; padding: 0.4rem; border: 1px solid var(--borde); border-radius: 4px; font: inherit; }

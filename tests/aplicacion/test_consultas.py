@@ -429,3 +429,23 @@ def test_CA_16_CA_10_ni_el_dashboard_ni_la_busqueda_ni_la_ficha_contienen_el_mot
     assert Subtipo.FUGA_DETECTADA.value not in "".join(
         salidas
     )  # ni siquiera el subtipo de la emergencia
+
+
+def test_RF_34_exportar_devuelve_todas_las_filas_y_audita_la_consulta_masiva() -> None:
+    from jml.aplicacion.casos.consultas import DependenciasDeConsulta, ExportarCuentas
+
+    m, _ = semilla()
+    dep = DependenciasDeConsulta(m.puerto, m.reloj)
+    todas = m.buscar("u-tec-ad", FiltroDeCuentas(tamano=100)).filas
+    exportadas = ExportarCuentas(dep).ejecutar("u-tec-ad", FiltroDeCuentas(tamano=1))
+    assert exportadas == todas  # recorre todas las paginas aunque el filtro pida 1 por pagina
+    filtradas = ExportarCuentas(dep).ejecutar("u-tec-ad", FiltroDeCuentas(departamento="finanzas"))
+    assert {f.departamento for f in filtradas} == {"Finanzas"}
+    exportaciones = [r for r in m.repos.auditoria().registros() if r.accion == "cuentas.exportadas"]
+    assert [dict(r.datos) for r in exportaciones] == [
+        {"filas": len(todas)},
+        {"departamento": "finanzas", "filas": len(filtradas)},
+    ]
+    for usuario in ("u-rrhh", "u-col", "u-aud"):
+        with pytest.raises(NoAutorizado):
+            ExportarCuentas(dep).ejecutar(usuario, FiltroDeCuentas())

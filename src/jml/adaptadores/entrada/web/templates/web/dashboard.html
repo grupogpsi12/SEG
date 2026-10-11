@@ -1,0 +1,54 @@
+{% extends "web/base.html" %}
+{% block titulo %}Dashboard{% endblock %}
+{% block contenido %}
+<h1>Dashboard de TI</h1>
+<p class="aviso">
+  Consultado: {{ ind.generados_en|date:"Y-m-d H:i" }} ·
+  Última sincronización con GLPI:
+  {% if ind.ultima_sincronizacion %}{{ ind.ultima_sincronizacion.fin|date:"Y-m-d H:i" }} ({{ ind.ultima_sincronizacion.resultado }}){% else %}nunca{% endif %}
+  · <a href="{% url 'dashboard' %}">Actualizar</a>
+</p>
+
+<h2>(a) Pendientes por cola y prioridad</h2>
+{{ graficos.pendientes }}
+<table>
+  <thead><tr><th>Cola</th><th>Prioridad</th><th>Tickets</th></tr></thead>
+  <tbody>{% for f in ind.pendientes %}<tr{% if f.cola.value == resaltada %} class="resaltada"{% endif %}><td>{{ f.cola.value }}</td><td>{{ f.prioridad.value }}</td><td>{{ f.cantidad }}</td></tr>{% empty %}<tr><td colspan="3">Sin pendientes</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>(b) Vencidos según SLA</h2>
+<table>
+  <thead><tr><th>Cola</th><th>Tickets</th></tr></thead>
+  <tbody>{% for f in ind.vencidos %}<tr{% if f.cola.value == resaltada %} class="resaltada"{% endif %}><td>{{ f.cola.value }}</td><td>{{ f.cantidad }}</td></tr>{% empty %}<tr><td colspan="2">Ninguno</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>(c) Retiros y emergencias con bajas abiertas</h2>
+<table>
+  <thead><tr><th>Solicitud</th><th>Tipo</th><th>Colaborador</th><th>Bajas abiertas</th><th>Horas de exposición</th></tr></thead>
+  <tbody>{% for f in ind.exposicion %}<tr><td>{{ f.solicitud_id }}</td><td>{{ f.tipo.value }}</td><td><a href="{% url 'ficha' f.colaborador_id %}">{{ f.colaborador_id }}</a></td><td>{{ f.tickets_de_baja_abiertos }}</td><td>{{ f.horas_de_exposicion }}</td></tr>{% empty %}<tr><td colspan="5">Ninguno</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>(d) Solicitudes del mes por estado y tipo</h2>
+<table>
+  <thead><tr><th>Estado</th><th>Tipo</th><th>Cantidad</th></tr></thead>
+  <tbody>{% for f in ind.solicitudes_del_mes %}<tr><td>{{ f.estado.value }}</td><td>{{ f.tipo.value }}</td><td>{{ f.cantidad }}</td></tr>{% empty %}<tr><td colspan="3">Ninguna</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>(e) Cuentas por sistema y estado</h2>
+{{ graficos.cuentas }}
+
+<h2>(f) Equipos</h2>
+<p>Asignados: <strong>{{ ind.equipos.asignados }}</strong> · Pendientes de devolución: <strong>{{ ind.equipos.pendientes_de_devolucion }}</strong></p>
+
+<h2>(g) Programados para los próximos 7 días</h2>
+<table>
+  <thead><tr><th>Ticket</th><th>Cola</th><th>Solicitud</th><th>Desde</th></tr></thead>
+  <tbody>{% for f in ind.programados %}<tr{% if f.cola.value == resaltada %} class="resaltada"{% endif %}><td>{{ f.clave }}</td><td>{{ f.cola.value }}</td><td>{{ f.solicitud_id }}</td><td>{{ f.pendiente_desde|date:"Y-m-d H:i" }}</td></tr>{% empty %}<tr><td colspan="4">Ninguno</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>(h) Cierre incompleto o reabiertos</h2>
+<table>
+  <thead><tr><th>Ticket</th><th>Cola</th><th>Solicitud</th><th>Situación</th></tr></thead>
+  <tbody>{% for f in ind.incompletos %}<tr{% if f.cola.value == resaltada %} class="resaltada"{% endif %}><td>{{ f.clave }}</td><td>{{ f.cola.value }}</td><td>{{ f.solicitud_id }}</td><td>{{ f.motivo }}</td></tr>{% empty %}<tr><td colspan="4">Ninguno</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

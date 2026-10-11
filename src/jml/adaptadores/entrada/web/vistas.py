@@ -37,6 +37,7 @@ from jml.dominio.errores import (
     NoEncontrado,
     RolesIncompatibles,
 )
+from jml.dominio.permisos import puede_ver_dashboard
 from jml.dominio.tipos import EstadoSolicitud, Rol, TipoEvento
 from jml.dominio.valores import SolicitudId, hoy_en_bogota
 
@@ -89,6 +90,7 @@ def _contexto(perfil: PerfilDeUsuario, **extra: Any) -> dict[str, Any]:
     return {
         "perfil": perfil,
         "es_rrhh": Rol.RRHH in perfil.roles,
+        "es_tecnico": puede_ver_dashboard(perfil.roles),
         **extra,
     }
 

@@ -12,6 +12,7 @@
     <a href="{% url 'solicitudes' %}">Mis solicitudes</a>
     <a href="{% url 'nueva_indice' %}">Nueva solicitud</a>
     {% if es_rrhh %}<a href="{% url 'bandeja' %}">Bandeja de RRHH</a>{% endif %}
+    {% if es_tecnico %}<a href="{% url 'dashboard' %}">Dashboard</a> <a href="{% url 'cuentas' %}">Cuentas</a>{% endif %}
     <form class="en-linea salir" method="post" action="{% url 'salir' %}">
       {% csrf_token %}<button class="secundario" type="submit">Salir</button>
     </form>

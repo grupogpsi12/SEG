@@ -1,0 +1,43 @@
+{% extends "web/base.html" %}
+{% block titulo %}{{ f.nombre_completo }}{% endblock %}
+{% block contenido %}
+<h1>{{ f.nombre_completo }}</h1>
+<table><tbody>
+  <tr><th>Documento</th><td>{{ f.documento }}</td></tr>
+  <tr><th>Usuario</th><td>{{ f.usuario|default:"—" }}</td></tr>
+  <tr><th>Vinculación</th><td>{{ f.vinculacion.value }}</td></tr>
+  <tr><th>Departamento / cargo</th><td>{{ f.departamento }} · {{ f.cargo }}</td></tr>
+  <tr><th>Sede</th><td>{{ f.sede }}</td></tr>
+  <tr><th>Estado</th><td>{{ f.estado.value }}</td></tr>
+  <tr><th>Ingreso / fin</th><td>{{ f.fecha_ingreso|date:"Y-m-d" }} · {{ f.fecha_fin|date:"Y-m-d"|default:"—" }}</td></tr>
+</tbody></table>
+
+<h2>Cuentas</h2>
+<table>
+  <thead><tr><th>Sistema</th><th>Estado</th><th>Marca</th><th>Desde</th><th>Ticket de origen</th></tr></thead>
+  <tbody>{% for c in f.cuentas %}<tr><td>{{ c.sistema.value }}</td><td>{{ c.estado.value }}</td><td>{{ c.marca.value|default:"—" }}</td><td>{{ c.desde|date:"Y-m-d H:i" }}</td><td>{{ c.ticket_origen }}</td></tr>{% empty %}<tr><td colspan="5">Sin cuentas</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>Equipos</h2>
+<table>
+  <thead><tr><th>Tipo</th><th>Serie</th><th>Modelo</th><th>Entregado</th><th>Acta</th></tr></thead>
+  <tbody>{% for e in f.equipos %}<tr><td>{{ e.tipo }}</td><td>{{ e.serie }}</td><td>{{ e.modelo }}</td><td>{{ e.asignado_desde|date:"Y-m-d" }}</td><td>{{ e.tiene_acta|yesno:"Sí,No" }}</td></tr>{% empty %}<tr><td colspan="5">Sin equipos</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>Licencias</h2>
+<ul>{% for l in f.licencias %}<li>{{ l.software }} — {{ l.licencia }}</li>{% empty %}<li>Sin licencias</li>{% endfor %}</ul>
+
+<h2>Solicitudes</h2>
+<table>
+  <thead><tr><th>Solicitud</th><th>Tipo</th><th>Estado</th><th>Fecha efectiva</th></tr></thead>
+  <tbody>{% for s in f.solicitudes %}<tr><td>{{ s.id }}</td><td>{{ s.tipo.value }}</td><td>{{ s.estado.value }}</td><td>{{ s.fecha_efectiva|date:"Y-m-d" }}</td></tr>{% empty %}<tr><td colspan="4">Ninguna</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>Tickets</h2>
+<table>
+  <thead><tr><th>Cola</th><th>Acción</th><th>Solicitud</th><th>Estado en GLPI</th><th>GLPI</th></tr></thead>
+  <tbody>{% for t in f.tickets %}<tr><td>{{ t.cola.value }}</td><td>{{ t.accion.value }}</td><td>{{ t.solicitud_id }}</td>
+  <td>{% if t.estado_glpi %}{{ t.estado_glpi.name|lower }}{% else %}sin crear{% endif %}{% if t.reabierto %} (reabierto){% endif %}{% if t.cierre_incompleto %} (cierre incompleto){% endif %}</td>
+  <td>{% if t.id_externo %}<a href="{{ glpi }}/front/ticket.form.php?id={{ t.id_externo|urlencode }}" rel="noopener noreferrer">#{{ t.id_externo }}</a>{% else %}—{% endif %}</td></tr>{% empty %}<tr><td colspan="5">Ninguno</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

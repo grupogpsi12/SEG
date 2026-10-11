@@ -1,0 +1,28 @@
+{% extends "web/base.html" %}
+{% block titulo %}Cuentas{% endblock %}
+{% block contenido %}
+<h1>Búsqueda de cuentas</h1>
+<form method="get" class="busqueda">
+  {{ formulario.as_p }}
+  <p><button type="submit">Buscar</button> <a href="{% url 'cuentas_csv' %}?{{ consulta }}">Exportar CSV</a></p>
+</form>
+<p class="aviso">{{ pagina.total }} colaborador(es) · página {{ pagina.pagina }} de {{ ultima }}</p>
+<table>
+  <thead><tr><th>Colaborador</th><th>Documento</th><th>Usuario</th><th>Departamento</th><th>Sede</th><th>Cuentas</th></tr></thead>
+  <tbody>
+  {% for f in pagina.filas %}
+    <tr>
+      <td><a href="{% url 'ficha' f.colaborador_id %}">{{ f.nombre_completo }}</a></td>
+      <td>{{ f.documento }}</td><td>{{ f.usuario|default:"—" }}</td><td>{{ f.departamento }}</td><td>{{ f.sede }}</td>
+      <td>{% for c in f.cuentas %}{{ c.sistema.value }}: {{ c.estado.value }}{% if not forloop.last %} · {% endif %}{% empty %}—{% endfor %}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Sin resultados</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p>
+  {% if pagina.pagina > 1 %}<a href="?{{ consulta }}&amp;pagina={{ pagina.pagina|add:'-1' }}">Anterior</a>{% endif %}
+  {% if pagina.pagina < ultima %}<a href="?{{ consulta }}&amp;pagina={{ pagina.pagina|add:'1' }}">Siguiente</a>{% endif %}
+</p>
+{% endblock %}

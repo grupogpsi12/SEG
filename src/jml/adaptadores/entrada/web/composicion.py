@@ -17,7 +17,14 @@ from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.adaptadores.salida.reloj import RelojDelSistema
 from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
 from jml.aplicacion.casos._alta import DependenciasDeAlta
-from jml.aplicacion.casos.consultas import ContratosPorVencer, DependenciasDeConsulta
+from jml.aplicacion.casos.consultas import (
+    BuscarCuentas,
+    ConsultarDashboard,
+    ConsultarFicha,
+    ContratosPorVencer,
+    DependenciasDeConsulta,
+    ExportarCuentas,
+)
 from jml.aplicacion.casos.decidir import (
     AprobarSolicitud,
     CancelarSolicitud,
@@ -73,6 +80,10 @@ class Casos:
     consultar_solicitud: ConsultarSolicitud
     colaborador_por_documento: ColaboradorPorDocumento
     contratos_por_vencer: ContratosPorVencer
+    dashboard: ConsultarDashboard
+    buscar_cuentas: BuscarCuentas
+    exportar_cuentas: ExportarCuentas
+    ficha: ConsultarFicha
     iniciar_ingreso: IniciarIngreso
     inscribir_totp: InscribirTotp
     completar_ingreso: CompletarIngreso
@@ -86,6 +97,7 @@ def casos() -> Casos:
     alta = DependenciasDeAlta(repos, soportes, r, calendario, lambda: uuid.uuid4().hex)
     decision = DependenciasDeDecision(repos, r, calendario, soportes)
     identidad = proveedor_de_identidad()
+    consulta = DependenciasDeConsulta(repos, r)
     return Casos(
         registrar=RegistrarSolicitud(alta),
         emitir=EmitirSolicitud(alta),
@@ -99,7 +111,11 @@ def casos() -> Casos:
         mi_perfil=MiPerfil(repos),
         consultar_solicitud=ConsultarSolicitud(repos),
         colaborador_por_documento=ColaboradorPorDocumento(repos),
-        contratos_por_vencer=ContratosPorVencer(DependenciasDeConsulta(repos, r)),
+        contratos_por_vencer=ContratosPorVencer(consulta),
+        dashboard=ConsultarDashboard(consulta),
+        buscar_cuentas=BuscarCuentas(consulta),
+        exportar_cuentas=ExportarCuentas(consulta),
+        ficha=ConsultarFicha(consulta),
         iniciar_ingreso=IniciarIngreso(identidad),
         inscribir_totp=InscribirTotp(identidad),
         completar_ingreso=CompletarIngreso(DependenciasDeIngreso(identidad, repos)),

@@ -172,13 +172,17 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 
 ## Fase 4 — Dashboard y búsqueda
 
-- [ ] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
+- [~] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
   ✔ CA-15: **el resultado SQL es idéntico al oráculo en memoria de 1.11** con los mismos datos; el percentil 95 está por debajo de 2 s con 300 colaboradores (RNF-06).
-- [ ] **4.2 Gráficos SVG en el servidor**, sin JavaScript.
+  ✔✔ Hecho: las consultas del ORM (`persistencia/consultas.py`) dan lo mismo que el oráculo en ~230 instantes con bordes (`test_persistencia_oraculo.py`, SQLite y PostgreSQL). ⏳ Falta: índices y medir el p95 con 300 colaboradores sobre PostgreSQL (necesita una semilla grande; se hace con Docker o contra Supabase).
+- [x] **4.2 Gráficos SVG en el servidor**, sin JavaScript.
   ✔ La CSP estricta no reporta violaciones.
-- [ ] **4.3 Búsqueda de cuentas y ficha del colaborador** (RF-32, RF-33), con auditoría de cada consulta.
+  ✔✔ `web/graficos.py` (barras de (a) y (e), cola propia resaltada): único `mark_safe`, con etiquetas escapadas y valores enteros; sin `<script>` ni recarga (`test_tecnicos_web.py`). La revisión con las herramientas del navegador queda para 5.4.
+- [x] **4.3 Búsqueda de cuentas y ficha del colaborador** (RF-32, RF-33), con auditoría de cada consulta.
   ✔ CA-16.
-- [ ] **4.4 Exportación a CSV** (RF-34) — *primer recorte*.
+  ✔✔ Vistas `/dashboard`, `/cuentas`, `/colaboradores/<id>` (`web/tecnicos.py`): 403 para roles no técnicos (CA-15), filtros y paginación, parámetros manipulados → 404, ficha sin centinela y auditada (`ficha.consultada`), enlaces a GLPI con `JML_GLPI_URL` (la web no llama a GLPI).
+- [x] **4.4 Exportación a CSV** (RF-34) — *primer recorte*.
+  ✔✔ `/cuentas.csv` con el caso `ExportarCuentas` (todas las páginas, tope 5000, auditado como `cuentas.exportadas` con el filtro: T10), BOM para Excel, `no-store` y celdas que empiezan con `= + - @` neutralizadas (inyección CSV).
 
 ## Fase 5 — Flujos completos y entrega
 
