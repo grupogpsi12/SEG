@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "jml.adaptadores.salida.persistencia.apps.PersistenciaConfig",
     "jml.adaptadores.entrada.web.apps.WebConfig",
+    "jml.adaptadores.entrada.worker.apps.WorkerConfig",
 ]
 
 MIDDLEWARE = [
@@ -93,6 +94,7 @@ JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  
 # Supabase Auth (ADR-017). La clave publicable es publica por diseno (no da acceso a datos: el
 # esquema `app` no esta expuesto, RD-10); `service_role` NUNCA se lee aqui (invariante 8).
 JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
+JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # RNF-01
 # Solo para enlazar tickets desde la ficha (RF-33); la web NUNCA llama a GLPI (CLAUDE.md).
 JML_GLPI_URL = os.environ.get("JML_GLPI_URL", "https://glpi.localhost")
 JML_SUPABASE_CLAVE_PUBLICA = os.environ.get("JML_SUPABASE_CLAVE_PUBLICA", "")
