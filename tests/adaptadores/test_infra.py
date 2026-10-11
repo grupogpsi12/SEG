@@ -119,13 +119,18 @@ def test_ADR_028_migrar_es_el_unico_con_la_clave_del_duenio() -> None:
     assert SERVICIOS["migrar"]["profiles"] == ["admin"]
 
 
-def test_solo_el_worker_tiene_los_tokens_de_glpi() -> None:
-    """CLAUDE.md: el worker es el unico cliente de GLPI; la web nunca lo llama."""
-    con_tokens = {
+def _con_secreto(nombre: str) -> set[str]:
+    return {
         n
         for n, s in SERVICIOS.items()
         for x in s.get("secrets", [])
-        if (x if isinstance(x, str) else x["source"]).startswith("glpi_")
-        and x != "glpi_db_password"
+        if (x if isinstance(x, str) else x["source"]) == nombre
     }
-    assert con_tokens == {"worker"}
+
+
+def test_solo_el_worker_opera_glpi_y_solo_el_configurador_lo_administra() -> None:
+    """CLAUDE.md: el worker es el unico cliente de GLPI en operacion; la web nunca lo llama."""
+    assert _con_secreto("glpi_user_token") == {"worker"}
+    assert _con_secreto("glpi_admin_user_token") == {"configurar-glpi"}
+    assert SERVICIOS["configurar-glpi"]["profiles"] == ["admin"]
+    assert "web" not in _con_secreto("glpi_app_token")

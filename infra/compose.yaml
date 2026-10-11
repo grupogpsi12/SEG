@@ -168,6 +168,17 @@ services:
         target: db_password  # settings lee siempre db_password: aqui es la clave del duenio
     volumes: []
 
+  configurar-glpi:  # 3.1: GLPI como codigo, con el token de un administrador de GLPI
+    <<: *app
+    profiles: [admin]
+    restart: "no"
+    command: ["python", "manage.py", "configurar_glpi"]
+    secrets: [django_secret_key, db_password, supabase_ca_crt, glpi_app_token, glpi_admin_user_token]
+    environment:
+      <<: *entorno-app
+      JML_GLPI_API_URL: http://glpi/apirest.php
+    volumes: []
+
   # --- GLPI 11 y su MariaDB ------------------------------------------------------------------
   glpi:
     <<: *endurecido
@@ -217,6 +228,7 @@ secrets:
   db_owner_password: { file: ../secrets/db_owner_password }
   glpi_app_token: { file: ../secrets/glpi_app_token }
   glpi_user_token: { file: ../secrets/glpi_user_token }
+  glpi_admin_user_token: { file: ../secrets/glpi_admin_user_token }
 
 volumes:
   bw-storage:

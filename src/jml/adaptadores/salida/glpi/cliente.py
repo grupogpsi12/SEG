@@ -51,7 +51,10 @@ PRIORIDAD = {Prioridad.MEDIA: 3, Prioridad.ALTA: 4, Prioridad.MUY_ALTA: 5}
 _TODO = {"range": "0-999"}
 
 
-class SistemaDeTicketsGlpi:
+class ClienteGlpiV1:
+    """Sesion, errores y operaciones genericas de la API v1. Lo usan el adaptador del puerto y
+    el configurador de GLPI (3.1)."""
+
     def __init__(
         self,
         url_api: str,
@@ -139,6 +142,21 @@ class SistemaDeTicketsGlpi:
         )
         return str(datos["id"])
 
+    def _asegurar(self, tipo: str, nombre: str, campos: Mapping[str, Any]) -> str:
+        """Idempotente por nombre exacto: crea si falta y devuelve el id."""
+        for item in self._lista(tipo, name=nombre):
+            if item.get("name") == nombre:
+                return str(item["id"])
+        return self._crear(tipo, {"name": nombre, **campos})
+
+    def cerrar(self) -> None:
+        if self._sesion is not None:
+            with contextlib.suppress(GlpiNoDisponible):
+                self._api("GET", "killSession")
+            self._sesion = None
+
+
+class SistemaDeTicketsGlpi(ClienteGlpiV1):
     # --- puerto ------------------------------------------------------------------------------
 
     def asegurar_usuario(self, colaborador: Colaborador) -> str:
@@ -306,9 +324,3 @@ class SistemaDeTicketsGlpi:
                 )
             )
         return licencias
-
-    def cerrar(self) -> None:
-        if self._sesion is not None:
-            with contextlib.suppress(GlpiNoDisponible):
-                self._api("GET", "killSession")
-            self._sesion = None

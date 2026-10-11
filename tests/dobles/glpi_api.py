@@ -167,6 +167,8 @@ class GlpiSimulado:
                 documento = str(entrada["documents_id"])
                 if documento not in self._tabla("Document") or destino not in self._tabla(tipo):
                     return _json(["ERROR_GLPI_ADD", "item inexistente"], 400)
+            if partes[0] == "ITILCategory":  # GLPI calcula el nombre completo (raiz: = nombre)
+                entrada.setdefault("completename", entrada["name"])
             return _json({"id": int(self._agregar(partes[0], entrada)), "message": ""}, 201)
         if p.method == "PUT" and len(partes) == 2:
             item = self._tabla(partes[0]).get(partes[1])
