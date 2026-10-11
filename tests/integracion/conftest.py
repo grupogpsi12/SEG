@@ -10,15 +10,21 @@ import os
 from collections.abc import Generator
 
 import pytest
+from django.conf import settings
 from django.core.management import call_command
-from django.db import connection
+from django.db import connections
 
 ESQUEMA = os.environ.get("JML_PG_ESQUEMA", "app_test")
 
 
+def _alias() -> str:
+    """El duenio migra y limpia (ADR-028); si no esta configurado, app_backend (base vieja)."""
+    return "duenio" if "duenio" in settings.DATABASES else "default"
+
+
 def _vaciar_esquema() -> None:
     """Borra tablas y funciones del esquema de pruebas (el duenio puede, aunque no tenga DELETE)."""
-    with connection.cursor() as c:
+    with connections[_alias()].cursor() as c:
         c.execute(f'SET search_path = "{ESQUEMA}"')
         c.execute("SELECT tablename FROM pg_tables WHERE schemaname = %s", [ESQUEMA])
         for (tabla,) in c.fetchall():
@@ -34,7 +40,7 @@ def _vaciar_esquema() -> None:
 
 def _recrear_esquema() -> None:
     _vaciar_esquema()
-    call_command("migrate", verbosity=0, interactive=False)
+    call_command("migrate", verbosity=0, interactive=False, database=_alias())
 
 
 @pytest.fixture
@@ -56,4 +62,4 @@ def django_db_setup(django_db_blocker: object) -> Generator[None]:
     yield
     with django_db_blocker.unblock():  # type: ignore[attr-defined]
         _vaciar_esquema()
-        connection.close()
+        connections.close_all()

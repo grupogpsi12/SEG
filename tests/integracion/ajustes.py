@@ -34,3 +34,12 @@ DATABASES = {
         },
     }
 }
+
+# ADR-028: las migraciones las corre el duenio (`app_owner`); las pruebas, `app_backend`. Sin
+# estas variables (base sin aprovisionar) todo corre como app_backend y las pruebas H1 fallan.
+if os.environ.get("JML_PG_DUENIO_USUARIO"):
+    DATABASES["duenio"] = {
+        **DATABASES["default"],
+        "USER": os.environ["JML_PG_DUENIO_USUARIO"],
+        "PASSWORD": os.environ["JML_PG_DUENIO_CLAVE"],
+    }

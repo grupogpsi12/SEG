@@ -2,6 +2,7 @@
 #
 #   infra/scripts/preparar-entorno.sh        # crea secretos que falten e infra/.env (no versionado)
 #   docker compose -f infra/compose.yaml up -d --build
+#   docker compose -f infra/compose.yaml run --rm migrar          # migraciones como app_owner
 #   docker compose -f infra/compose.yaml run --rm admin-usuarios crear --correo X --rol Y
 #
 # Reglas que este archivo cumple (CLAUDE.md, SRS):
@@ -145,6 +146,21 @@ services:
     secrets: [django_secret_key, db_password, supabase_ca_crt, supabase_service_role]
     volumes: []
 
+  migrar:  # ADR-028: unico uso de app_owner, duenio del esquema (revision externa H1)
+    <<: *app
+    profiles: [admin]
+    restart: "no"
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    environment:
+      <<: *entorno-app
+      JML_DB_USUARIO: "${JML_DB_USUARIO_DUENIO:?falta JML_DB_USUARIO_DUENIO=app_owner.<ref>}"
+    secrets:
+      - django_secret_key
+      - supabase_ca_crt
+      - source: db_owner_password
+        target: db_password  # settings lee siempre db_password: aqui es la clave del duenio
+    volumes: []
+
   # --- GLPI 11 y su MariaDB ------------------------------------------------------------------
   glpi:
     <<: *endurecido
@@ -191,6 +207,7 @@ secrets:
   supabase_ca_crt: { file: ../secrets/supabase_ca_crt }
   supabase_service_role: { file: ../secrets/supabase_service_role }
   glpi_db_password: { file: ../secrets/glpi_db_password }
+  db_owner_password: { file: ../secrets/db_owner_password }
 
 volumes:
   bw-storage:

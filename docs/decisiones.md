@@ -31,6 +31,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 025 | Tres consultas de lectura nuevas en los repositorios para las vistas (2.7) | Aceptada | 10/10/2026 |
 | 026 | Consulta de solicitudes en `error` para el reintento del Administrador (2.12) | Aceptada | 11/10/2026 |
 | 027 | Matriz y usuarios completos para el área de administración (2.13) | Aceptada | 11/10/2026 |
+| 028 | Dueño del esquema separado de `app_backend`, disparador con transiciones y bloqueo al decidir (revisión externa H1 a H3) | Aceptada | 11/10/2026 |
 
 ---
 
@@ -361,3 +362,28 @@ Cada una tiene su prueba en la suite de contrato, que corre contra el doble y co
 **Alternativas descartadas.** El admin de Django (salta el dominio y la auditoría); cambiar roles solo por línea de comandos (RF-37 pide «área de administración»).
 
 **Consecuencias.** Dos lecturas más en el contrato. Si alguien guarda a mano roles incompatibles en la base, `RepoUsuarios.todos()` falla en lugar de ocultarlo: se corrige con `admin_usuarios`.
+
+## ADR-028 — Dueño separado, disparador con transiciones y bloqueo al decidir (revisión externa H1 a H3)
+
+**Contexto.** Una revisión externa del 11/10/2026 (`docs/spikes/revision-externa-2026-10-11.md`) reprodujo en PostgreSQL tres fallos que dejaban sin efecto los invariantes 3 y 4:
+- **H1:** `app_backend` era dueño del esquema y las tablas. Por eso podía volver a darse `UPDATE` sobre `auditoria` y desactivar el disparador.
+- **H2:** el disparador de RF-14 no validaba el cambio de estado.
+- **H3:** dos decisiones simultáneas se aceptaban.
+
+El equipo aprobó corregirlos (nivel N3).
+
+**Decisión.**
+1. **Dueño separado (H1).** El rol `app_owner` es dueño de los esquemas `app` y `app_test` y de todo lo que contienen, y corre las migraciones desde el contenedor de una sola vez `migrar`, con el secreto `db_owner_password`. `app_backend` queda con `USAGE` en el esquema y `SELECT, INSERT, UPDATE, DELETE` (migración `0004`), sin `CREATE` y sin `UPDATE`, `DELETE` ni `TRUNCATE` en `auditoria`, `decision` y `cuenta_historial`. Como el invariante 8 exige RLS activo **sin políticas** y `app_backend` ya no se beneficia de la exención del dueño, recibe el atributo `BYPASSRLS`, que es la misma exención que tenía. `anon` y `authenticated` siguen bloqueados. El aprovisionamiento es `infra/supabase/duenio-separado.sql` (idempotente; se corre como `postgres`).
+2. **Transiciones en el disparador (H2).** La migración `0003` permite solo los pares del cierre transitivo de `TRANSICIONES` del dominio. Un caso de uso puede encadenar pasos en una transacción (S-05), así que el cierre transitivo hace falta. Con él nunca se vuelve a `pendiente_aprobacion` y un estado final no cambia. `tests/adaptadores/test_migraciones.py` impide que el SQL y el dominio se separen.
+3. **Bloqueo al decidir (H3).** `RepoSolicitudes.obtener` del ORM usa `select_for_update(of=("self",))` dentro de la unidad de trabajo atómica. La segunda decisión espera y luego recibe `TransicionInvalida`. El contrato del puerto no cambia. Cierra el R1 de la revisión del núcleo.
+
+**Alternativas descartadas.**
+- Políticas RLS permisivas para `app_backend`: contradicen «RLS sin políticas» (invariante 8).
+- `skip_locked` en la bandeja (M4): no protege, porque el bloqueo se libera antes de procesar la entrada.
+- Un método nuevo `obtener_para_actualizar`: amplía el puerto sin necesidad, porque toda lectura de una solicitud ocurre en una transacción corta.
+
+**Consecuencias.**
+- Hay un secreto más (`db_owner_password`) y un contenedor `migrar`.
+- Las pruebas de integración migran con el alias `duenio` (`JML_PG_DUENIO_USUARIO` y `JML_PG_DUENIO_CLAVE`) y prueban con `app_backend`.
+- El anclaje externo del último hash (para detectar una reescritura completa de la cadena hecha por alguien con `postgres`) queda en la exportación diaria a Blob (RD-04).
+- Evidencia contra Supabase: `tests/integracion/test_revision_externa.py` y `test_postgresql.py`, 23 pruebas en verde.

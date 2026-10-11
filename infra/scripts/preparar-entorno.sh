@@ -40,6 +40,7 @@ for requerido in db_password supabase_ca_crt; do
 done
 # admin-usuarios lo monta solo si existe; compose exige el archivo, aunque sea vacio.
 [ -e "$SECRETOS/supabase_service_role" ] || : > "$SECRETOS/supabase_service_role"
+[ -e "$SECRETOS/db_owner_password" ] || : > "$SECRETOS/db_owner_password"  # solo `migrar` (ADR-028)
 
 {
   echo "# Generado por infra/scripts/preparar-entorno.sh: NO versionar (ADR-009)"
@@ -50,6 +51,7 @@ done
   echo "SECURITY_MODE=${SECURITY_MODE:-block}"
   echo "JML_DB_HOST=${JML_DB_HOST:-aws-0-us-east-1.pooler.supabase.com}"
   echo "JML_DB_USUARIO=${JML_DB_USUARIO:?defina JML_DB_USUARIO=app_backend.<ref>}"
+  echo "JML_DB_USUARIO_DUENIO=${JML_DB_USUARIO_DUENIO:-app_owner.${JML_DB_USUARIO#*.}}"
   echo "JML_SUPABASE_URL=${JML_SUPABASE_URL:?defina JML_SUPABASE_URL}"
   echo "JML_SUPABASE_CLAVE_PUBLICA=${JML_SUPABASE_CLAVE_PUBLICA:?defina JML_SUPABASE_CLAVE_PUBLICA}"
 } > "$ENV_SALIDA"

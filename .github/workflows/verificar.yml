@@ -46,12 +46,15 @@ jobs:
           create role app_backend login nosuperuser nocreatedb nocreaterole noinherit nobypassrls
             password 'app-backend-solo-ci';
           create schema app_test authorization app_backend;
-          revoke all on schema app_test from public, anon, authenticated, service_role;
           SQL
+          # ADR-028: el mismo aprovisionamiento que en Supabase (duenio separado)
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1             -v clave_duenio="'app-owner-solo-ci'" -f infra/supabase/duenio-separado.sql
       - name: Integracion y contratos contra PostgreSQL
         env:
           JML_PG_HOST: localhost
           JML_PG_USUARIO: app_backend
           JML_PG_CLAVE: app-backend-solo-ci
           JML_PG_SSLMODE: disable
+          JML_PG_DUENIO_USUARIO: app_owner
+          JML_PG_DUENIO_CLAVE: app-owner-solo-ci
         run: uv run pytest -q --ds tests.integracion.ajustes tests/integracion tests/contratos tests/adaptadores
