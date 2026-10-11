@@ -220,8 +220,9 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 
 - [ ] **5.1 Pruebas de extremo a extremo** de ING, VAC, RET y EMG con GLPI en contenedor.
   ✔ CA-05 y CA-06 (los mismos escenarios de 1.12, ahora con los adaptadores reales).
-- [ ] **5.2 Despliegue en Azure:** VM, NSG (80/443 públicos y 22 restringido), DuckDNS, Let's Encrypt emitido por BunkerWeb y Key Vault (bootstrap a tmpfs). Si ADR-024 se acepta: `cloudflared`, dominio en Cloudflare, Access para `glpi.*`, real IP desde `CF-Connecting-IP` y NSG sin 80/443.
+- [~] **5.2 Despliegue en Azure:** VM, NSG (80/443 públicos y 22 restringido), DuckDNS, Let's Encrypt emitido por BunkerWeb y Key Vault (bootstrap a tmpfs). Si ADR-024 se acepta: `cloudflared`, dominio en Cloudflare, Access para `glpi.*`, real IP desde `CF-Connecting-IP` y NSG sin 80/443.
   ✔ Procedimiento de 10 pasos o menos, ejecutado desde cero por un integrante distinto del autor.
+  ✔ Procedimiento escrito (`docs/operacion.md` §3, 10 pasos) **sin ejecutar**: falta Azure.
 - [~] **5.3 Respaldos y restauración** (RD-06, RNF-04).
   ✔ Escrito sin Azure: `infra/scripts/respaldo.sh` (`pg_dump` del esquema `app` como `app_owner` por TLS + `mariadb-dump` de GLPI, subidos a Blob con la identidad de la VM); restauración en `docs/operacion.md`. ⏳ Ejecutarlo y probar la restauración con evidencia (CA-11).
   ✔ CA-11 con evidencia.
@@ -230,7 +231,7 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [ ] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ CA-21.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
-  ✔ Parcial (11/10/2026): `docs/manual-usuario.md` por rol (ingreso con TOTP, solicitante, jefe, RRHH, técnicos, Auditor y Administrador) y `docs/estado.md` (estado y traspaso). ⏳ Faltan las plantillas de solución por cola (dependen de 3.1) y el manual de operación (dependen de 2.2 y 5.2).
+  ✔ Parcial (11/10/2026): `docs/manual-usuario.md` por rol (ingreso con TOTP, solicitante, jefe, RRHH, técnicos, Auditor y Administrador) y `docs/estado.md` (estado y traspaso). ✔ `docs/operacion.md` (manual de operación: piezas y secretos, instalación, despliegue en Azure en 10 pasos, operación diaria, incidentes, restauración y rotación) y `docs/probar-localmente.md`. Plantillas de solución por cola: como código en `configurar_glpi` (3.1). ⏳ Ejecutar y corregir el manual de operación al desplegar (5.2) y actualizar `docs/SRS.md` con lo decidido en las ADR 025 a 028.
 
 ## Orden de recorte (SRS §14)
 

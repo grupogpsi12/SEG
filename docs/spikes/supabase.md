@@ -89,6 +89,6 @@ JML_PG_CLAVE="$(cat secrets/db_password)" JML_PG_CA=secrets/supabase_ca_crt \
 - `app_backend` tiene `BYPASSRLS` (RLS sigue sin políticas: invariante 8), `USAGE` en los esquemas y DML por tabla (migración 0004), sin `CREATE` ni permisos sobre las tablas de solo inserción.
 - Script idempotente: `infra/supabase/duenio-separado.sql` (como `postgres`). Hay que correrlo también en el proyecto de entrega, **antes** de la primera migración.
 - Pruebas de integración: `JML_PG_DUENIO_USUARIO=app_owner.<ref>` y `JML_PG_DUENIO_CLAVE="$(cat secrets/db_owner_password)"` además de las variables de `app_backend`.
-- El esquema `app` de producción **todavía no tiene tablas**: la primera `migrate` real se hace con el contenedor `migrar`.
+- El esquema `app` del proyecto de desarrollo **ya está migrado** (11/10/2026, como `app_owner`, hasta la 0005) y tiene las semillas (18 perfiles y 30 colaboradores ficticios, cargadas como `app_backend`).
 
 Observación pendiente de explicar: una sesión de `app_backend` quedó «idle in transaction» 8 minutos pese a `idle_in_transaction_session_timeout=60000`; quizá el pooler no aplica esa opción. Si se repite, terminarla como `postgres` (`pg_terminate_backend`) o pedir el ajuste por rol (`ALTER ROLE app_backend SET idle_in_transaction_session_timeout = '60s'`, que requiere `postgres`).
