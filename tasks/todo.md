@@ -2,7 +2,7 @@
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]` recortado.
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
-Ítem activo: **2.3** (2.2 necesita Docker)
+Ítem activo: **2.2** (necesita Docker: instalación pendiente del equipo, ver `docs/estado.md`). Estado general y traspaso: **`docs/estado.md`**.
 
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
@@ -12,7 +12,7 @@ Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin e
   ✔ Comentarios incorporados; versión aprobada registrada en "Control del documento".
 - [ ] **0.1 Repositorio base:** GitHub con la estructura de `CLAUDE.md`, `.gitignore`, pre-commit (gitleaks, ruff) y protección de `main`.
   ✔ Un commit con un secreto falso es bloqueado.
-- [ ] **0.2 Spike de Supabase** (SUP-02, ADR-015). *No bloquea el núcleo; se hace antes de la Fase 2.*
+- [~] **0.2 Spike de Supabase** (SUP-02, ADR-015). Hecho lo de la base (`docs/spikes/supabase.md`); falta `pg_dump`/`pg_restore`, la prueba de `/rest/v1` y el proyecto de entrega. *No bloquea el núcleo; se hace antes de la Fase 2.*
   - Crear los proyectos de desarrollo y de entrega en `us-east-1`.
   - Crear el esquema `app` y el rol `app_backend`.
   - Conectarse desde Django por el *session pooler* con TLS.
@@ -22,7 +22,7 @@ Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin e
   ✔ `migrate` funciona; una petición a `/rest/v1/<tabla>` con la clave `anon` falla; `pg_dump` y `pg_restore` funcionan contra un proyecto vacío.
 - [ ] **0.3 Spike de la API de GLPI 11** (SUP-03, SUP-04). **Alimenta el puerto `SistemaDeTickets`: debe estar hecho antes de congelar el núcleo (1.9), o el puerto queda marcado «provisional».** Probar la autenticación de servicio (API v2 con OAuth2 o v1 con tokens); crear un ticket en estado «En espera» con vencimiento; **buscar un ticket por una referencia externa (idempotencia)**; leer estado, solución y documentos; leer activos y licencias por usuario; subir un PDF y vincularlo a dos tickets (R10); ver si se puede exigir la plantilla de solución por categoría.
   ✔ Script que lo demuestra; ADR-014 decidido; hallazgos anotados en `docs/spikes/glpi.md` para ajustar el puerto.
-- [ ] **0.4 Spike de Supabase Auth con MFA desde el servidor** (SUP-05). Inicio de sesión con contraseña → inscripción de TOTP (código QR) → desafío → verificación, desde Python. *Antes de la Fase 2.*
+- [~] **0.4 Spike de Supabase Auth con MFA desde el servidor** (SUP-05). Adaptador hecho y probado contra un GoTrue simulado; contra el real: error genérico ✔, **registro abierto aún habilitado** ✘ y flujo completo pendiente de la clave `service_role` (`docs/spikes/supabase.md`). Inicio de sesión con contraseña → inscripción de TOTP (código QR) → desafío → verificación, desde Python. *Antes de la Fase 2.*
   ✔ Script que llega a AAL2 con un usuario de prueba; registro abierto deshabilitado comprobado.
 - [ ] **0.5 Costos y región en Azure.** Confirmar la región permitida, configurar el apagado automático y una alerta de presupuesto al 50 %. *Antes de la Fase 5.*
   ✔ Capturas de la alerta y del apagado; tabla de costos del SRS actualizada.
@@ -139,8 +139,11 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ⏳ Pendiente (necesita PostgreSQL, Docker o Supabase): correr `tests/integracion` y la suite de contrato con `--ds tests.integracion.ajustes` (CA-01 concurrente, RF-14 por disparador, RD-02 REVOKE, RD-10 RLS).
 - [ ] **2.4 Auditoría encadenada sobre PostgreSQL** (adaptador del puerto `Auditoria`) y verificación desde la base.
   ✔ CA-09 contra PostgreSQL.
-- [ ] **2.5 Autenticación** (RF-01 a RF-06, RS-08, RS-16): adaptador `ProveedorDeIdentidad` (Supabase Auth), vistas de inicio de sesión, inscripción y verificación de TOTP; sesión de Django; grupos como roles; incompatibilidades; comando `admin-usuarios`.
+- [x] **2.5 Autenticación** (RF-01 a RF-06, RS-08, RS-16): adaptador `ProveedorDeIdentidad` (Supabase Auth), vistas de inicio de sesión, inscripción y verificación de TOTP; sesión de Django; grupos como roles; incompatibilidades; comando `admin-usuarios`.
   ✔ CA-14; con roles incompatibles se recibe 403 y queda en auditoría.
+  ✔✔ Evidencia: `ProveedorSupabase` (API REST de GoTrue con `httpx`) pasa la suite de contrato del puerto sin cambios contra un GoTrue simulado; 21 pruebas propias (token AAL1 solo en memoria 5 min y 5 intentos —S-29—, logout de Supabase al llegar a AAL2, sin inscribir un segundo factor con solo la contraseña, comprobación de `aal2`, errores de red sin detalles). Caso de uso `CompletarIngreso` audita `sesion.iniciada` / `sesion.denegada` (RF-05 probado con grupos incompatibles en la base). Vistas `/ingreso`, `/ingreso/segundo-factor` y `/salir`: 13 pruebas de extremo a extremo (CA-14 sin código no hay sesión, RF-02 inscripción con clave manual —S-30—, error genérico, id de sesión rotado, sin tokens en la sesión, `no-store`, 8 h máximo y 30 min de inactividad —RF-04—). Comando `admin_usuarios crear|desactivar` (RF-06, S-31): 7 pruebas, incluida la compensación si la base falla. Suite: 1349 pruebas, cobertura 98 %.
+  ⏳ Contra el Supabase real falta: deshabilitar el registro abierto y crear `secrets/supabase_service_role` (acciones del equipo, `docs/spikes/supabase.md`). CA-14 «el sexto intento en un minuto se bloquea» es de BunkerWeb (2.2).
+  **Dependencia nueva:** `httpx` 0.28 (BSD-3, muy activo; ya en la tabla del stack para GLPI). Resuelve HTTP con timeouts y un transporte simulable en pruebas (`MockTransport`); `urllib` no permite simular el servidor sin parchear y exigiría más de 30 líneas de manejo de errores.
 - [x] **2.6 Semillas** (RD-07): 3 sedes, 6 departamentos, la matriz de perfiles con sus recursos compartidos (§4.9) y 30 colaboradores.
   ✔ Comando idempotente.
   ✔✔ Evidencia: `python manage.py semillas` crea 18 perfiles y 30 colaboradores con 48 eventos de auditoría; la segunda corrida cambia 0 y no audita nada. La matriz de las semillas coincide celda por celda con la transcripción independiente de `tests/fabricas.py`. **Decisión:** no siembra cuentas (invariante 6: solo nacen de tickets resueltos) ni usuarios (los crea `admin-usuarios`, RF-06); 10 contratistas con fin escalonado alimentan RF-28.

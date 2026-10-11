@@ -1,7 +1,7 @@
 """Vistas. Solo validan el formulario, verifican el rol y llaman a un caso de uso (CLAUDE.md).
 
-La identidad llega en la sesion de Django (`usuario_id`), que la autenticacion (item 2.5) crea
-despues de verificar el TOTP. Sin sesion se redirige al ingreso.
+La identidad llega en la sesion de Django (`usuario_id`), que `ingreso.py` crea solo despues de
+verificar el TOTP (AAL2). Sin sesion, o con una sesion vencida, se redirige al ingreso.
 """
 
 import logging
@@ -30,13 +30,14 @@ from jml.aplicacion.dtos import (
     ResultadoDeDecision,
     SolicitudRegistrada,
 )
-from jml.dominio.errores import DatoInvalido, ErrorDeDominio, NoAutorizado
+from jml.dominio.errores import DatoInvalido, ErrorDeDominio, NoAutorizado, RolesIncompatibles
 from jml.dominio.tipos import EstadoSolicitud, Rol, TipoEvento
 from jml.dominio.valores import SolicitudId, hoy_en_bogota
 
 registro = logging.getLogger(__name__)
 
 SESION_USUARIO = "usuario_id"
+SESION_INICIO = "inicio"  # epoch del ingreso: RF-04, 8 horas como maximo
 EMISORES = frozenset({Rol.RRHH, Rol.ADMINISTRADOR})  # RRHH emite; el Administrador, por excepcion
 
 type VistaConPerfil = Callable[..., HttpResponse]
@@ -62,11 +63,15 @@ def con_sesion(vista: VistaConPerfil) -> VistaConPerfil:
     @wraps(vista)
     def envoltura(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         usuario_id = request.session.get(SESION_USUARIO)
-        if not usuario_id:
+        inicio = request.session.get(SESION_INICIO)
+        if not usuario_id or not isinstance(inicio, int | float):
+            return redirect(settings.LOGIN_URL)
+        if composicion.reloj().ahora().timestamp() - inicio > settings.JML_SESION_MAXIMA_S:
+            request.session.flush()  # RF-04: 8 horas de duracion total
             return redirect(settings.LOGIN_URL)
         try:
             perfil = composicion.casos().mi_perfil.ejecutar(usuario_id)
-        except NoAutorizado:  # el usuario se desactivo: la sesion ya no vale
+        except (NoAutorizado, RolesIncompatibles):  # desactivado o roles cambiados: RF-05
             request.session.flush()
             return redirect(settings.LOGIN_URL)
         return vista(request, perfil, *args, **kwargs)

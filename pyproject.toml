@@ -3,7 +3,11 @@ name = "jml"
 version = "0.1.0"
 description = "Sistema integrado de eventos laborales (JML) — núcleo"
 requires-python = ">=3.12"
-dependencies = ["django>=5.2,<5.3", "psycopg[binary]>=3.2,<4"]
+dependencies = [
+    "django>=5.2,<5.3",
+    "httpx>=0.28,<0.29",
+    "psycopg[binary]>=3.2,<4",
+]
 
 [dependency-groups]
 dev = [

@@ -105,3 +105,12 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 30. **Redirigir tras una acción denegada a una página que también la deniega.** Un POST de aprobación hecho por un colaborador mostraba «sin permiso» pero redirigía a la bandeja de RRHH, que respondía 403 y ocultaba el mensaje.
     → El destino de la redirección depende del rol de quien actúa; probar el flujo con el rol que NO debe poder.
 
+
+31. **Usar `motivo` como clave de datos de auditoría.** `motivo` está en las claves prohibidas (RD-05: es el campo restringido del retiro) y el evento lo rechaza o lo filtra.
+    → Para la razón técnica de un rechazo usar `causa`. Antes de nombrar una clave de auditoría o de log, revisar `CLAVES_PROHIBIDAS` (`dominio/auditoria.py`).
+
+32. **Agregar un supuesto S-nn sin actualizar sus pruebas de control.** `tests/dominio/test_supuestos.py` exige que el registro no tenga huecos, que cada ID esté nombrado en una prueba y que la columna «Prueba» cite funciones que existen.
+    → Al agregar S-nn: subir el rango esperado, nombrar el ID en el docstring de la prueba y citar la función entre comillas invertidas en la fila.
+
+33. **Instalar Docker Desktop desde una sesión sin privilegios.** `winget install Docker.DockerDesktop` falla (código 4294967291) si nadie acepta la elevación, y además Docker necesita WSL2, que exige reiniciar.
+    → Pedírselo al equipo: PowerShell como administrador → `wsl --install` → reiniciar → `winget install -e --id Docker.DockerDesktop` → abrir Docker Desktop una vez.

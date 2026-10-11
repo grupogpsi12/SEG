@@ -1,0 +1,12 @@
+{% extends "web/base.html" %}
+{% block titulo %}Ingreso{% endblock %}
+{% block contenido %}
+<h1>Ingreso</h1>
+{% if error %}<p class="mensaje error" role="alert">{{ error }}</p>{% endif %}
+<form method="post">
+  {% csrf_token %}
+  {{ formulario.as_p }}
+  <button type="submit">Continuar</button>
+</form>
+<p class="aviso">Después de la contraseña se le pedirá el código de su aplicación autenticadora.</p>
+{% endblock %}

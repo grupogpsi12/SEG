@@ -75,9 +75,14 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-LOGIN_URL = "/ingreso"  # la pantalla de inicio de sesion llega con 2.5
+LOGIN_URL = "/ingreso"
 LOGIN_REDIRECT_URL = "/"
 JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  # volumen noexec
+
+# Supabase Auth (ADR-017). La clave publicable es publica por diseno (no da acceso a datos: el
+# esquema `app` no esta expuesto, RD-10); `service_role` NUNCA se lee aqui (invariante 8).
+JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
+JML_SUPABASE_CLAVE_PUBLICA = os.environ.get("JML_SUPABASE_CLAVE_PUBLICA", "")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- seguridad (RS-04, RS-07) -----------------------------------------------------------------
@@ -86,6 +91,12 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
+# RF-04: 30 min de inactividad (la cookie se renueva en cada peticion) y 8 h de duracion total,
+# que verifica `vistas.con_sesion` con la marca `inicio` guardada al ingresar.
+SESSION_COOKIE_AGE = 30 * 60
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+JML_SESION_MAXIMA_S = 8 * 3600
 CSRF_COOKIE_SAMESITE = "Lax"
 X_FRAME_OPTIONS = "DENY"
 # HSTS, Referrer-Policy y X-Content-Type-Options las pone BunkerWeb: una sola fuente por cabecera.

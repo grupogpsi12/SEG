@@ -56,19 +56,25 @@ def fabrica_memoria(directorio: Path) -> EntornoDeContrato:
 
 
 def fabrica_orm(directorio: Path) -> EntornoDeContrato:
-    """Adaptadores reales: repositorios sobre el ORM y soportes en disco (`tmp_path`).
+    """Adaptadores reales: repositorios sobre el ORM, soportes en disco (`tmp_path`) e identidad
+    sobre la API de Supabase Auth (contra un GoTrue simulado; la prueba real esta en integracion).
 
-    GLPI, identidad y reloj siguen siendo dobles hasta los spikes 0.3 y 0.4.
+    GLPI y reloj siguen siendo dobles hasta el spike 0.3.
 
     Sin Docker corre sobre SQLite en memoria (tests/adaptadores/ajustes.py). Las reglas
     exclusivas de PostgreSQL (disparador, REVOKE, concurrencia) estan en tests/integracion.
     """
+    from jml.adaptadores.salida.identidad.supabase import ProveedorSupabase
     from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
     from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
+    from tests.dobles.gotrue import CLAVE_PUBLICA, GoTrueSimulado
 
     base = fabrica_memoria(directorio)
     base.repos = RepositoriosDjango(base.reloj)
     base.soportes = AlmacenDeSoportesEnDisco(directorio)
+    gotrue = GoTrueSimulado()
+    base.identidad = ProveedorSupabase("https://x.supabase.co", CLAVE_PUBLICA, gotrue.cliente())
+    base.registrar_credenciales = gotrue.registrar
     return base
 
 

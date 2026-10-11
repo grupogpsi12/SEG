@@ -34,6 +34,7 @@ def como(usuario: str | None, **opciones: bool) -> Client:
     if usuario is not None:
         sesion = cliente.session
         sesion["usuario_id"] = usuario
+        sesion["inicio"] = AHORA.timestamp()  # RF-04: ingreso reciente
         sesion.save()
     return cliente
 

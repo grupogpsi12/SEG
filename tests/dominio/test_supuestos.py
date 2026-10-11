@@ -21,8 +21,8 @@ def _ids_citados(texto: str) -> set[str]:
     return {f"S-{n}" for n in ID.findall(texto)}
 
 
-def test_el_registro_tiene_los_supuestos_S_01_a_S_27_sin_huecos() -> None:
-    esperados = {f"S-{n:02d}" for n in range(1, 28)}
+def test_el_registro_tiene_los_supuestos_sin_huecos() -> None:
+    esperados = {f"S-{n:02d}" for n in range(1, 32)}
     assert _ids_del_registro() == esperados
 
 

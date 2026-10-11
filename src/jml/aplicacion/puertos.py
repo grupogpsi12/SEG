@@ -94,6 +94,10 @@ class CredencialesInvalidas(ErrorDePuerto):
         super().__init__("credenciales invalidas")
 
 
+class IdentidadNoDisponible(ErrorDePuerto):
+    """El proveedor de identidad no respondio o respondio algo inesperado (red, 5xx)."""
+
+
 # --- Reloj ------------------------------------------------------------------------------------
 
 
