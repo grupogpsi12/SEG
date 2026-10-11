@@ -21,6 +21,8 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 | 4. Dashboard y búsqueda | 4.2 a 4.4 hechos. 4.1: índices puestos; falta medir el p95 |
 | 5. Entrega | Escritos el manual de usuario, el manual de operación, el despliegue en Azure y los scripts de respaldo, todo sin ejecutar |
 
+**CI en GitHub** (`grupogpsi12/SEG`, 11/10/2026): `verificar` y `imagen` en verde en `776a24b`.
+
 **Pruebas locales** (SQLite, sin Docker): **1570 pasan**. Cobertura de ramas: 98 %. `ruff`, `mypy --strict` e `import-linter` limpios.
 
 **Contra Supabase real** (11/10/2026):
@@ -75,7 +77,7 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 
 ### A. Acciones del equipo
 1. **Supabase**: contraseña mínima de 12 en el Dashboard y correr el asesor de seguridad antes de la entrega (RS-16). El registro abierto y la clave `service_role` ya están hechos.
-2. **Docker** (en pausa por decisión del equipo): en PowerShell como administrador, `wsl --install`, reiniciar y luego `winget install -e --id Docker.DockerDesktop`.
+2. **Docker en el equipo de desarrollo**: Docker Desktop ya está instalado, pero no arranca con *«Virtual Machine Platform not enabled»*. La virtualización del firmware está activa; falta habilitar la característica de Windows: en PowerShell como administrador `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`, igual con `Microsoft-Windows-Subsystem-Linux`, `wsl --update`, **reiniciar** y abrir Docker Desktop (aceptar los términos). `docker.exe` no está en el PATH de Git Bash: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`.
 3. **GitHub** (0.1): el repositorio existe (`grupogpsi12/SEG`) y tiene todo el trabajo hasta `d906d30`. Falta la protección de `main`/`master` y un pre-commit con gitleaks. La CI corre; la imagen se publica en GHCR cuando `verificar` pase.
 4. Decisiones: 0.0 (aprobar el SRS v2.3), 0.7 (Cloudflare), los supuestos **S-28 a S-33**, y revisar ADR-025 a ADR-028.
 5. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
