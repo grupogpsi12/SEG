@@ -48,6 +48,8 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 | `hypothesis` | Pruebas basadas en propiedades (máquina de estados, cadena de hashes, outbox, diferencia de perfiles) | Generar secuencias aleatorias de operaciones a mano son cientos de líneas y no minimizan el contraejemplo | Muy activo; MPL-2.0 |
 | `mutmut` | Pruebas de mutación: mide si las pruebas detectan cambios en el código | No existe en la biblioteca estándar | Activo; BSD-3 |
 | `ruff`, `mypy`, `import-linter` | Estilo, tipos estrictos y límites de capas | — | Activos; MIT/BSD |
+| `mutmut` **2.5.1** (no 3.x) | La versión 3 no corre en Windows (necesita `fork`); el equipo trabaja en Windows | — | Mantenido; BSD-3. Obliga a no usar `type X = …` (PEP 695) en `dominio` |
+| `pytest-timeout` (solo desarrollo) | Corta los mutantes que entran en bucle infinito; sin él mutmut 2 se queda colgado en Windows | Un `signal.alarm` no existe en Windows; reimplementarlo con hilos son más de 30 líneas frágiles | Activo; MIT |
 
 - [x] **1.1 Esqueleto del núcleo** (sin Django): `pyproject.toml`, `src/jml/{dominio,aplicacion}`, `tests/{dominio,aplicacion,contratos,dobles,escenarios}`, `ruff`, `mypy --strict`, `import-linter` con los contratos de CA-17, cobertura de ramas, CI mínima (`make verificar`).
   ✔ `lint-imports` falla con un `import django` en `dominio` (test intencional que se revierte); `make verificar` en verde con un test de humo.
