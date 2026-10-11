@@ -190,7 +190,7 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 
 - [~] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
   ✔ CA-15: **el resultado SQL es idéntico al oráculo en memoria de 1.11** con los mismos datos; el percentil 95 está por debajo de 2 s con 300 colaboradores (RNF-06).
-  ✔✔ Hecho: las consultas del ORM (`persistencia/consultas.py`) dan lo mismo que el oráculo en ~230 instantes con bordes (`test_persistencia_oraculo.py`, SQLite y PostgreSQL). ⏳ Falta: índices y medir el p95 con 300 colaboradores sobre PostgreSQL (necesita una semilla grande; se hace con Docker o contra Supabase).
+  ✔✔ Hecho: las consultas del ORM (`persistencia/consultas.py`) dan lo mismo que el oráculo en ~230 instantes con bordes (`test_persistencia_oraculo.py`, SQLite y PostgreSQL). ⏳ Falta: índices y medir el p95 con 300 colaboradores sobre PostgreSQL (necesita una semilla grande). **No medir contra Supabase desde Colombia**: la latencia de red (~150 ms por consulta) domina el resultado; medir con PostgreSQL 17 local en Docker o desde la VM de Azure (misma región que Supabase).
 - [x] **4.2 Gráficos SVG en el servidor**, sin JavaScript.
   ✔ La CSP estricta no reporta violaciones.
   ✔✔ `web/graficos.py` (barras de (a) y (e), cola propia resaltada): único `mark_safe`, con etiquetas escapadas y valores enteros; sin `<script>` ni recarga (`test_tecnicos_web.py`). La revisión con las herramientas del navegador queda para 5.4.
@@ -212,7 +212,8 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔ CA-12, CA-13 y CA-20; informes adjuntos.
 - [ ] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ CA-21.
-- [ ] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
+- [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
+  ✔ Parcial (11/10/2026): `docs/manual-usuario.md` por rol (ingreso con TOTP, solicitante, jefe, RRHH, técnicos, Auditor y Administrador) y `docs/estado.md` (estado y traspaso). ⏳ Faltan las plantillas de solución por cola (dependen de 3.1) y el manual de operación (dependen de 2.2 y 5.2).
 
 ## Orden de recorte (SRS §14)
 
