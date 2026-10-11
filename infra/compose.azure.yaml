@@ -1,0 +1,22 @@
+# Ajustes para la VM de Azure (item 5.2), encima de compose.yaml:
+#   docker compose -f infra/compose.yaml -f infra/compose.azure.yaml up -d
+#
+# - Let's Encrypt real en lugar del certificado autofirmado (RS-01).
+# - Soportes en transito en un sistema de archivos del host montado con noexec,nosuid,nodev
+#   (RS-17, ADR-021). /srv/jml/soportes debe estar en /etc/fstab con esas opciones; el paso esta
+#   en el procedimiento de despliegue.
+
+services:
+  bw-scheduler:
+    environment:
+      - GENERATE_SELF_SIGNED_SSL=no
+      - AUTO_LETS_ENCRYPT=yes
+      - EMAIL_LETS_ENCRYPT=${EMAIL_LETS_ENCRYPT:?falta EMAIL_LETS_ENCRYPT}
+
+volumes:
+  soportes:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/jml/soportes

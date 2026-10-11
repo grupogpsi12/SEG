@@ -1,0 +1,207 @@
+# Sistema integrado de eventos laborales: borde, aplicacion y GLPI (item 2.2, ADR-002, ADR-023).
+#
+#   infra/scripts/preparar-entorno.sh        # crea secretos que falten e infra/.env (no versionado)
+#   docker compose -f infra/compose.yaml up -d --build
+#   docker compose -f infra/compose.yaml run --rm admin-usuarios crear --correo X --rol Y
+#
+# Reglas que este archivo cumple (CLAUDE.md, SRS):
+# - Solo `bunkerweb` publica puertos (RS-02, invariante 14). Ningun otro servicio tiene `ports`.
+# - `db_net` es interna (RS-03). `bw-universe` solo une bunkerweb y su scheduler (RS-19).
+# - `service_role` solo se monta en admin-usuarios (invariante 8).
+# - Secretos como archivos en /run/secrets (ADR-009); infra/.env solo trae lo que una imagen de
+#   terceros exige como variable (API_TOKEN de BunkerWeb y la clave de MariaDB para GLPI).
+# - Imagenes por digest (RS-18).
+#
+# Sin verificar todavia contra Docker (pendiente en tasks/todo.md 2.2 y spike 0.6): los nombres de
+# ajustes de BunkerWeb salen de la documentacion de 1.6.15 y de waf-stack (commit 87a5f62).
+
+name: jml
+
+x-endurecido: &endurecido
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+
+x-app: &app
+  <<: *endurecido
+  image: jml-app:local
+  build: { context: .., dockerfile: Dockerfile }
+  read_only: true
+  tmpfs: ["/tmp:size=64m,noexec,nosuid"]
+  environment: &entorno-app
+    DJANGO_ALLOWED_HOSTS: "${APP_DOMINIO:-app.localhost}"
+    JML_PROXIES_CONFIABLES: "10.20.40.2"
+    JML_DB_HOST: "${JML_DB_HOST:?falta JML_DB_HOST}"
+    JML_DB_USUARIO: "${JML_DB_USUARIO:?falta JML_DB_USUARIO}"
+    JML_SUPABASE_URL: "${JML_SUPABASE_URL:?falta JML_SUPABASE_URL}"
+    JML_SUPABASE_CLAVE_PUBLICA: "${JML_SUPABASE_CLAVE_PUBLICA:?falta la clave publicable}"
+    JML_GLPI_URL: "https://${GLPI_DOMINIO:-glpi.localhost}"
+    JML_SOPORTES_DIR: /var/lib/jml/soportes
+    JML_LATIDO_WORKER: /tmp/jml-worker-latido
+  volumes:
+    - soportes:/var/lib/jml/soportes
+  secrets: [django_secret_key, db_password, supabase_ca_crt]
+  networks: [app]
+
+services:
+  # --- Borde: BunkerWeb (nginx + ModSecurity + OWASP CRS 4) -----------------------------------
+  bunkerweb:
+    <<: *endurecido
+    image: bunkerity/bunkerweb:1.6.15@sha256:1b96f672660cc32bfae93604ac297371222dc9039b2b09b8eee5e40ba9d35c35
+    cap_drop: []  # la imagen ya corre sin root; nginx necesita sus capacidades por defecto
+    ports:
+      - "80:8080/tcp"
+      - "443:8443/tcp"
+    environment:
+      API_WHITELIST_IP: "127.0.0.0/8 10.20.30.0/24"
+      API_TOKEN: "${BW_API_TOKEN:?falta BW_API_TOKEN (preparar-entorno.sh)}"
+    mem_limit: 512m
+    networks:
+      bw-universe:
+      app:
+        ipv4_address: 10.20.40.2  # la unica IP en la que confia Django (RS-05)
+
+  bw-scheduler:
+    <<: *endurecido
+    image: bunkerity/bunkerweb-scheduler:1.6.15@sha256:321867d8db44d3a4ca1edfa3ff2c5b50163d3ebd5c67ed0d107161319d5ee860
+    cap_drop: []
+    depends_on: [bunkerweb]
+    environment:
+      - BUNKERWEB_INSTANCES=bunkerweb
+      - API_WHITELIST_IP=127.0.0.0/8 10.20.30.0/24
+      - API_TOKEN=${BW_API_TOKEN:?falta BW_API_TOKEN}
+      - TZ=America/Bogota
+      # Sin interfaz ni MariaDB propia: el scheduler usa SQLite (ADR-023, RS-19).
+      - MULTISITE=yes
+      - SERVER_NAME=${APP_DOMINIO:-app.localhost} ${GLPI_DOMINIO:-glpi.localhost}
+      # HTTPS: autofirmado en local; Let's Encrypt en Azure (compose.azure.yaml, RS-01)
+      - GENERATE_SELF_SIGNED_SSL=${GENERATE_SELF_SIGNED_SSL:-yes}
+      - AUTO_LETS_ENCRYPT=${AUTO_LETS_ENCRYPT:-no}
+      - EMAIL_LETS_ENCRYPT=${EMAIL_LETS_ENCRYPT:-}
+      - REDIRECT_HTTP_TO_HTTPS=yes
+      # WAF en bloqueo en ambos sitios (invariante 14, RS-18)
+      - SECURITY_MODE=${SECURITY_MODE:-block}
+      - USE_MODSECURITY=yes
+      - USE_MODSECURITY_CRS=yes
+      - MODSECURITY_CRS_VERSION=4
+      # Limites (RS-08): 2 r/s por IP en general; 5 r/min en ingreso y TOTP; ban de 1 hora
+      - USE_LIMIT_REQ=yes
+      - LIMIT_REQ_RATE=2r/s
+      - USE_BAD_BEHAVIOR=yes
+      - BAD_BEHAVIOR_BAN_TIME=3600
+      # Cabeceras (RS-07): BunkerWeb pone HSTS, Referrer-Policy y nosniff, y quita Server
+      - STRICT_TRANSPORT_SECURITY=max-age=31536000; includeSubDomains
+      - REFERRER_POLICY=strict-origin-when-cross-origin
+      - X_CONTENT_TYPE_OPTIONS=nosniff
+      - REMOVE_HEADERS=Server X-Powered-By X-AspNet-Version X-AspNetMvc-Version
+      # --- app.*: Django ---
+      - ${APP_DOMINIO:-app.localhost}_USE_REVERSE_PROXY=yes
+      - ${APP_DOMINIO:-app.localhost}_REVERSE_PROXY_URL=/
+      - ${APP_DOMINIO:-app.localhost}_REVERSE_PROXY_HOST=http://web:8000
+      - ${APP_DOMINIO:-app.localhost}_MAX_CLIENT_SIZE=21m
+      - ${APP_DOMINIO:-app.localhost}_KEEP_UPSTREAM_HEADERS=Content-Security-Policy X-Frame-Options
+      - ${APP_DOMINIO:-app.localhost}_CONTENT_SECURITY_POLICY=
+      - ${APP_DOMINIO:-app.localhost}_X_FRAME_OPTIONS=
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_1=^/ingreso
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_1=5r/m
+      # --- glpi.*: GLPI (CSP por defecto de BunkerWeb, RS-07) ---
+      - ${GLPI_DOMINIO:-glpi.localhost}_USE_REVERSE_PROXY=yes
+      - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_URL=/
+      - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_HOST=http://glpi:80
+    volumes:
+      - bw-storage:/data
+      # Exclusiones puntuales del CRS, una por archivo con ruta, regla y motivo (RS-18)
+      - ./bunkerweb/configs:/data/configs:ro
+    mem_limit: 384m
+    networks: [bw-universe]
+
+  # --- Aplicacion ----------------------------------------------------------------------------
+  web:
+    <<: *app
+    healthcheck:  # RNF-01: /salud verifica tambien Supabase
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/salud', headers={'Host': '${APP_DOMINIO:-app.localhost}'}), timeout=5)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 20s
+    mem_limit: 512m
+
+  worker:
+    <<: *app
+    command: ["python", "manage.py", "worker"]
+    healthcheck:  # RNF-01: hora de la ultima sincronizacion exitosa
+      test: ["CMD", "python", "manage.py", "worker", "--salud"]
+      interval: 60s
+      timeout: 20s
+      retries: 2
+      start_period: 120s
+    mem_limit: 384m
+
+  admin-usuarios:  # RF-06: unico uso de service_role (invariante 8)
+    <<: *app
+    profiles: [admin]
+    restart: "no"
+    entrypoint: ["python", "manage.py", "admin_usuarios"]
+    secrets: [django_secret_key, db_password, supabase_ca_crt, supabase_service_role]
+    volumes: []
+
+  # --- GLPI 11 y su MariaDB ------------------------------------------------------------------
+  glpi:
+    <<: *endurecido
+    image: glpi/glpi:11.0.11@sha256:45572164994cbd12bedd99bf6dd954b7962076dd3b529f0fdc4a84131f30a32a
+    cap_drop: []  # apache necesita cambiar de usuario; se revisa en el spike 0.3
+    depends_on:
+      mariadb: { condition: service_healthy }
+    environment:
+      GLPI_DB_HOST: mariadb
+      GLPI_DB_PORT: "3306"
+      GLPI_DB_NAME: glpi
+      GLPI_DB_USER: glpi
+      GLPI_DB_PASSWORD: "${GLPI_DB_PASSWORD:?falta GLPI_DB_PASSWORD (preparar-entorno.sh)}"
+      TZ: America/Bogota
+    volumes:
+      - glpi-datos:/var/glpi
+    mem_limit: 768m
+    networks: [app, db_net]
+
+  mariadb:
+    <<: *endurecido
+    image: mariadb:11.4@sha256:1292844148b311e4ed4300022a996d39083f415a963e970cf47cad1b3b18e3a6
+    cap_drop: []
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: glpi
+      MARIADB_USER: glpi
+      MARIADB_PASSWORD_FILE: /run/secrets/glpi_db_password
+    secrets: [glpi_db_password]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - mariadb-datos:/var/lib/mysql
+    mem_limit: 512m
+    networks: [db_net]
+
+secrets:
+  django_secret_key: { file: ../secrets/django_secret_key }
+  db_password: { file: ../secrets/db_password }
+  supabase_ca_crt: { file: ../secrets/supabase_ca_crt }
+  supabase_service_role: { file: ../secrets/supabase_service_role }
+  glpi_db_password: { file: ../secrets/glpi_db_password }
+
+volumes:
+  bw-storage:
+  soportes:  # en Azure, compose.azure.yaml lo monta desde un sistema de archivos noexec (RS-17)
+  glpi-datos:
+  mariadb-datos:
+
+networks:
+  bw-universe:
+    ipam: { config: [{ subnet: 10.20.30.0/24 }] }
+  app:
+    ipam: { config: [{ subnet: 10.20.40.0/24 }] }
+  db_net:
+    internal: true  # RS-03

@@ -13,8 +13,18 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest", "pytest-cov", "pytest-django", "pytest-timeout", "hypothesis", "mutmut<3",
-    "ruff", "mypy", "django-stubs>=5.2,<5.3", "import-linter",
+    "pytest",
+    "pytest-cov",
+    "pytest-django",
+    "pytest-timeout",
+    "hypothesis",
+    "mutmut<3",
+    "ruff",
+    "mypy",
+    "django-stubs>=5.2,<5.3",
+    "import-linter",
+    "pyyaml>=6,<7",
+    "types-pyyaml>=6.0.12.20260906",
 ]
 
 [build-system]

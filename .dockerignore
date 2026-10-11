@@ -1,0 +1,15 @@
+.git
+.venv
+secrets
+infra/.env
+**/__pycache__
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.hypothesis
+mutants
+htmlcov
+staticfiles
+tests
+docs
+tasks
