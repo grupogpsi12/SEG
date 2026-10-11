@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.staticfiles",
+    "jml.adaptadores.salida.persistencia.apps.PersistenciaConfig",
 ]
 
 MIDDLEWARE = [

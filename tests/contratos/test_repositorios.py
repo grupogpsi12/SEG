@@ -23,7 +23,7 @@ from jml.dominio.cuentas import CambioDeCuenta, Cuenta
 from jml.dominio.permisos import UsuarioDelSistema
 from jml.dominio.solicitud import Decision, Solicitud, TipoDeDecision
 from jml.dominio.soporte import Soporte, validar_soporte
-from jml.dominio.tickets import Observacion, TicketSeguido
+from jml.dominio.tickets import Observacion, TicketDeCola, TicketSeguido, generar_tickets
 from jml.dominio.tipos import (
     ESTADOS_ABIERTOS,
     ESTADOS_FINALES,
@@ -36,7 +36,7 @@ from jml.dominio.tipos import (
     Subtipo,
     TipoEvento,
 )
-from jml.dominio.valores import CampoRestringido, Documento, SolicitudId
+from jml.dominio.valores import CalendarioHabil, CampoRestringido, Documento, SolicitudId
 from tests.contratos.conftest import EntornoDeContrato
 from tests.fabricas import AHORA, HOY, SENTINELA, Caso, caso, colaborador, perfil
 
@@ -64,6 +64,29 @@ def uow(e: EntornoDeContrato) -> UnidadDeTrabajo:
     return e.repos.unidad_de_trabajo()
 
 
+# --- datos padre: una base real exige integridad referencial (claves foraneas) -----------------
+
+
+def con_colaboradores(e: EntornoDeContrato) -> None:
+    """col-1 y col-2, con documentos que no chocan con los de las pruebas de RD-09."""
+    with uow(e) as u:
+        for i, cid in enumerate(("col-1", "col-2")):
+            base = colaborador(id=cid, usuario=f"base.{i}")
+            u.colaboradores.guardar(replace(base, documento=Documento(f"9000000{i}")))
+
+
+def con_retiro(e: EntornoDeContrato) -> tuple[TicketDeCola, ...]:
+    """El RET SOL-2026-000001 de `caso()`, con su colaborador y sus tickets ya guardados."""
+    c = caso(TipoEvento.RET, Subtipo.RENUNCIA)
+    ts = generar_tickets(c.solicitud, c.actual, c.nuevo, c.colaborador, CalendarioHabil(), AHORA)
+    with uow(e) as u:
+        u.colaboradores.guardar(c.colaborador)
+        u.solicitudes.guardar(c.solicitud)
+        for t in ts:
+            u.tickets.guardar(TicketSeguido(t))
+    return ts
+
+
 # --- consecutivos y ciclo basico --------------------------------------------------------------
 
 
@@ -77,6 +100,7 @@ def test_los_consecutivos_son_por_anio(entorno: EntornoDeContrato) -> None:
 def test_guardar_y_obtener_devuelve_lo_mismo_incluido_el_restringido(
     entorno: EntornoDeContrato,
 ) -> None:
+    con_retiro(entorno)
     c = caso(TipoEvento.RET, Subtipo.RENUNCIA)
     with uow(entorno) as u:
         u.solicitudes.guardar(c.solicitud)
@@ -96,6 +120,7 @@ def test_guardar_y_obtener_devuelve_lo_mismo_incluido_el_restringido(
 def test_RD_01_un_estado_abierto_bloquea_el_duplicado(
     entorno: EntornoDeContrato, estado: EstadoSolicitud
 ) -> None:
+    con_colaboradores(entorno)
     """lessons n.1: pendiente, aprobada, en_ejecucion y error son ABIERTOS."""
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1, estado=estado))
@@ -108,6 +133,7 @@ def test_RD_01_un_estado_abierto_bloquea_el_duplicado(
 def test_RD_01_un_estado_final_no_bloquea(
     entorno: EntornoDeContrato, estado: EstadoSolicitud
 ) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1, estado=estado))
         u.solicitudes.guardar(vac(2))
@@ -115,6 +141,7 @@ def test_RD_01_un_estado_final_no_bloquea(
 
 
 def test_RD_01_al_cerrarse_la_primera_se_puede_registrar_otra(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1, estado=S.EN_EJECUCION))
         with pytest.raises(DuplicadoAbierto):
@@ -124,6 +151,7 @@ def test_RD_01_al_cerrarse_la_primera_se_puede_registrar_otra(entorno: EntornoDe
 
 
 def test_RD_01_otro_tipo_u_otro_colaborador_no_bloquean(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
     emg = caso(TipoEvento.EMG, Subtipo.FUGA_DETECTADA, numero=9).solicitud
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1))
@@ -136,6 +164,7 @@ def test_RD_01_otro_tipo_u_otro_colaborador_no_bloquean(entorno: EntornoDeContra
 
 
 def test_actualizar_la_misma_solicitud_no_es_un_duplicado(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1))
         u.solicitudes.guardar(replace(vac(1), estado=S.APROBADA))
@@ -143,6 +172,7 @@ def test_actualizar_la_misma_solicitud_no_es_un_duplicado(entorno: EntornoDeCont
 
 
 def test_abiertas_y_de_colaborador(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1, estado=S.CERRADA))
         u.solicitudes.guardar(vac(2))
@@ -159,6 +189,7 @@ def test_abiertas_y_de_colaborador(entorno: EntornoDeContrato) -> None:
 
 
 def test_RF_14_no_se_cambia_el_contenido_de_una_aprobada(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1, estado=S.APROBADA))
         with pytest.raises(ContenidoDeSolicitudModificado):
@@ -173,6 +204,7 @@ def test_RF_14_no_se_cambia_el_contenido_de_una_aprobada(entorno: EntornoDeContr
 def test_RF_14_lo_que_no_es_contenido_si_cambia(
     entorno: EntornoDeContrato, estado: EstadoSolicitud
 ) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1, estado=estado))
         u.solicitudes.guardar(replace(vac(1, estado=estado), tickets=("k",), para_revision=True))
@@ -259,6 +291,7 @@ def test_perfiles(entorno: EntornoDeContrato) -> None:
 
 
 def test_tickets(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     c = caso(TipoEvento.RET, Subtipo.RENUNCIA)
     from jml.dominio.tickets import generar_tickets
     from jml.dominio.valores import CalendarioHabil
@@ -302,6 +335,7 @@ def test_cuentas_e_historial(entorno: EntornoDeContrato) -> None:
 
 
 def test_decisiones_solo_se_agregan(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     sid = SolicitudId.de(2026, 1)
     d1 = Decision(sid, TipoDeDecision.APROBAR, None, "u1", AHORA)
     d2 = Decision(sid, TipoDeDecision.CANCELAR, "x", "u1", AHORA)
@@ -313,6 +347,7 @@ def test_decisiones_solo_se_agregan(entorno: EntornoDeContrato) -> None:
 
 
 def test_soportes(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     sid = SolicitudId.de(2026, 1)
     s = Soporte.pendiente(sid, validar_soporte(b"%PDF-1.4 xx", "a.pdf"), "alea-1")
     with uow(entorno) as u:
@@ -338,6 +373,7 @@ def _entradas(n: int = 3) -> list[EntradaDeBandeja]:
 
 
 def test_bandeja_encolar_es_idempotente_por_clave(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     es = _entradas()
     with uow(entorno) as u:
         u.bandeja.encolar(es)
@@ -347,6 +383,7 @@ def test_bandeja_encolar_es_idempotente_por_clave(entorno: EntornoDeContrato) ->
 
 
 def test_bandeja_vencidas_solo_pendientes_y_con_fecha_cumplida(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     a, b, c = _entradas()
     with uow(entorno) as u:
         u.bandeja.encolar([a, replace(b, proximo_intento=AHORA + timedelta(minutes=5)), c])
@@ -361,6 +398,7 @@ def test_bandeja_vencidas_solo_pendientes_y_con_fecha_cumplida(entorno: EntornoD
 
 
 def test_bandeja_obtener_por_clave(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     a = _entradas(1)[0]
     with uow(entorno) as u:
         u.bandeja.encolar([a])
@@ -369,6 +407,7 @@ def test_bandeja_obtener_por_clave(entorno: EntornoDeContrato) -> None:
 
 
 def test_bandeja_guardar_actualiza_el_estado(entorno: EntornoDeContrato) -> None:
+    con_retiro(entorno)
     a = _entradas(1)[0]
     with uow(entorno) as u:
         u.bandeja.encolar([a])
@@ -419,6 +458,8 @@ def _escribir_todo_y_caer(entorno: EntornoDeContrato, c: Caso) -> None:
         u.colaboradores.guardar(c.colaborador)
         u.solicitudes.guardar(c.solicitud)
         u.decisiones.agregar(Decision(c.solicitud.id, TipoDeDecision.EMITIR, "j", "u", AHORA))
+        for e in _entradas(2):
+            u.tickets.guardar(TicketSeguido(e.ticket))
         u.bandeja.encolar(_entradas(2))
         u.auditoria.registrar("u", EventoDeAuditoria("a.b", "o", {}))
         u.cuentas.guardar(
@@ -452,6 +493,7 @@ def test_CA_02_la_unidad_de_trabajo_es_atomica(entorno: EntornoDeContrato) -> No
 
 
 def test_la_unidad_de_trabajo_confirma_si_no_hay_error(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
     with uow(entorno) as u:
         u.solicitudes.guardar(vac(1))
     with uow(entorno) as u:

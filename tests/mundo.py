@@ -4,8 +4,9 @@ Arma todos los casos de uso sobre los dobles en memoria. Las pruebas de aplicaci
 escenarios de extremo a extremo se escriben contra esto, sin red ni disco (CLAUDE.md).
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from jml.aplicacion.casos._alta import DependenciasDeAlta
 from jml.aplicacion.casos.bandeja import DependenciasDeBandeja, ProcesarBandeja, ReintentarEmision
@@ -42,6 +43,7 @@ from jml.aplicacion.dtos import (
     ResultadoDeSincronizacion,
     SolicitudRegistrada,
 )
+from jml.aplicacion.puertos import Repositorios
 from jml.dominio.catalogo import (
     DatosCambioDepartamento,
     DatosCambioSucursal,
@@ -107,19 +109,29 @@ def _persona(id_: str, nombres: str, apellidos: str, doc: str, depto: str, usuar
 @dataclass
 class Mundo:
     reloj: RelojSimulado
-    repos: RepositoriosEnMemoria
+    puerto: Repositorios  # la implementacion que usan los casos de uso (doble u ORM)
     glpi: SistemaDeTicketsEnMemoria
     soportes: AlmacenDeSoportesEnMemoria
     calendario: CalendarioHabil
 
     # --- construccion ------------------------------------------------------------------------
 
+    @property
+    def repos(self) -> RepositoriosEnMemoria:
+        """El doble en memoria, para las pruebas que inspeccionan su almacen directamente."""
+        assert isinstance(self.puerto, RepositoriosEnMemoria), "este Mundo no usa el doble"
+        return self.puerto
+
     @classmethod
-    def nuevo(cls, calendario: CalendarioHabil | None = None) -> "Mundo":
+    def nuevo(
+        cls,
+        calendario: CalendarioHabil | None = None,
+        repositorios: Callable[[RelojSimulado], Repositorios] = RepositoriosEnMemoria,
+    ) -> "Mundo":
         reloj = RelojSimulado(AHORA)
         m = cls(
             reloj=reloj,
-            repos=RepositoriosEnMemoria(reloj),
+            puerto=repositorios(reloj),
             glpi=SistemaDeTicketsEnMemoria(reloj),
             soportes=AlmacenDeSoportesEnMemoria(),
             calendario=calendario or CalendarioHabil(),
@@ -128,7 +140,7 @@ class Mundo:
         return m
 
     def _sembrar(self) -> None:
-        with self.repos.unidad_de_trabajo() as u:
+        with self.puerto.unidad_de_trabajo() as u:
             for depto in MATRIZ:
                 for sede in SEDES:
                     u.perfiles.guardar(perfil(depto, sede))
@@ -153,24 +165,24 @@ class Mundo:
     @property
     def _alta(self) -> DependenciasDeAlta:
         return DependenciasDeAlta(
-            self.repos, self.soportes, self.reloj, self.calendario, self._nuevo_id
+            self.puerto, self.soportes, self.reloj, self.calendario, self._nuevo_id
         )
 
     @property
     def _decision(self) -> DependenciasDeDecision:
-        return DependenciasDeDecision(self.repos, self.reloj, self.calendario, self.soportes)
+        return DependenciasDeDecision(self.puerto, self.reloj, self.calendario, self.soportes)
 
     @property
     def _bandeja(self) -> DependenciasDeBandeja:
-        return DependenciasDeBandeja(self.repos, self.glpi, self.soportes, self.reloj)
+        return DependenciasDeBandeja(self.puerto, self.glpi, self.soportes, self.reloj)
 
     @property
     def _sync(self) -> DependenciasDeSincronizacion:
-        return DependenciasDeSincronizacion(self.repos, self.glpi, self.reloj)
+        return DependenciasDeSincronizacion(self.puerto, self.glpi, self.reloj)
 
     @property
     def _consulta(self) -> DependenciasDeConsulta:
-        return DependenciasDeConsulta(self.repos, self.reloj)
+        return DependenciasDeConsulta(self.puerto, self.reloj)
 
     # --- casos de uso ------------------------------------------------------------------------
 
@@ -202,7 +214,7 @@ class Mundo:
         return ProcesarBandeja(self._bandeja).ejecutar(limite)
 
     def reintentar(self, usuario: str, sid: SolicitudId) -> None:
-        ReintentarEmision(self.repos, self.reloj).ejecutar(usuario, sid)
+        ReintentarEmision(self.puerto, self.reloj).ejecutar(usuario, sid)
 
     def sincronizar(self) -> ResultadoDeSincronizacion:
         return SincronizarTickets(self._sync).ejecutar()
@@ -225,19 +237,20 @@ class Mundo:
     # --- ayudas de lectura -------------------------------------------------------------------
 
     def solicitud(self, sid: SolicitudId) -> Solicitud:
-        with self.repos.unidad_de_trabajo() as u:
+        with self.puerto.unidad_de_trabajo() as u:
             s = u.solicitudes.obtener(sid)
         assert s is not None
         return s
 
     def colaborador(self, colaborador_id: str) -> Colaborador:
-        with self.repos.unidad_de_trabajo() as u:
+        with self.puerto.unidad_de_trabajo() as u:
             c = u.colaboradores.obtener(colaborador_id)
         assert c is not None
         return c
 
     def acciones_de_auditoria(self) -> list[str]:
-        return [r.accion for r in self.repos.auditoria().registros()]
+        with self.puerto.unidad_de_trabajo() as u:
+            return [r.accion for r in u.auditoria.registros()]
 
     def avanzar(self, delta: timedelta) -> None:
         self.reloj.avanzar(delta)
@@ -248,16 +261,15 @@ class Mundo:
         """Procesa la bandeja y deja correr el reloj (para las esperas) hasta que no queda nada."""
         for _ in range(maximo):
             self.bandeja()
-            pendientes = [
-                e for e in self.repos.almacen.bandeja.values() if e.estado.value == "pendiente"
-            ]
+            with self.puerto.unidad_de_trabajo() as u:
+                pendientes = u.bandeja.vencidas(datetime.max.replace(tzinfo=UTC), 1)
             if not pendientes:
                 return
             self.avanzar(paso)
 
     def tecnico_resuelve_todo(self, sid: SolicitudId, *, con_acta: bool = True) -> None:
         """Todos los tickets creados de la solicitud: resueltos con solucion (y acta en Inventario)."""
-        with self.repos.unidad_de_trabajo() as u:
+        with self.puerto.unidad_de_trabajo() as u:
             tickets = list(u.tickets.de_solicitud(sid))
         for t in tickets:
             if t.id_externo is not None:

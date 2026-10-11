@@ -12,6 +12,7 @@ Semilla (lunes 12-oct-2026, 10:00 Bogota; se consulta 3 h 30 min despues):
 
 import dataclasses
 import json
+from collections.abc import Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 
@@ -27,6 +28,7 @@ from jml.aplicacion.dtos import (
     FiltroDeCuentas,
     IndicadorDeEquipos,
 )
+from jml.aplicacion.puertos import Repositorios
 from jml.dominio.activos import ActivoAsignado, LicenciaAsignada
 from jml.dominio.cuentas import Cuenta
 from jml.dominio.errores import DatoInvalido, NoAutorizado, NoEncontrado
@@ -41,6 +43,8 @@ from jml.dominio.tipos import (
     TipoEvento,
 )
 from jml.dominio.valores import SolicitudId
+from tests.dobles.memoria import RepositoriosEnMemoria
+from tests.dobles.reloj import RelojSimulado
 from tests.fabricas import AHORA, HOY, SENTINELA
 from tests.mundo import Mundo, emergencia, ingreso, retiro, vacaciones
 
@@ -49,9 +53,12 @@ MEDIA, ALTA, MUY_ALTA = Prioridad.MEDIA, Prioridad.ALTA, Prioridad.MUY_ALTA
 E = EstadoDeCuenta
 
 
-def semilla() -> tuple[Mundo, dict[str, SolicitudId]]:
-    m = Mundo.nuevo()
-    with m.repos.unidad_de_trabajo() as u:
+def semilla(
+    repositorios: Callable[[RelojSimulado], Repositorios] = RepositoriosEnMemoria,
+) -> tuple[Mundo, dict[str, SolicitudId]]:
+    """Tambien la usa la prueba CA-15 del ORM: el mismo mundo sobre otra implementacion."""
+    m = Mundo.nuevo(repositorios=repositorios)
+    with m.puerto.unidad_de_trabajo() as u:
         for sistema in SistemaDeCuenta:
             u.cuentas.guardar(
                 Cuenta(
@@ -69,7 +76,7 @@ def semilla() -> tuple[Mundo, dict[str, SolicitudId]]:
         "emg": m.emitir(emergencia(colaborador="jefe-1")).solicitud_id,
     }
     m.correr_bandeja_hasta_vaciar()
-    with m.repos.unidad_de_trabajo() as u:
+    with m.puerto.unidad_de_trabajo() as u:
         u.activos.reemplazar(
             "col-1", [ActivoAsignado("A1", "Portátil", "SN-1", "ThinkPad", HOY, True)], []
         )

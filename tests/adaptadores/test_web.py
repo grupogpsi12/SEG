@@ -4,6 +4,8 @@ import pytest
 from django.db import OperationalError
 from django.test import Client
 
+from jml.adaptadores.entrada.web import vistas
+
 CSP = "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
 
 
@@ -17,12 +19,13 @@ def test_salud_responde_200_si_la_base_responde() -> None:
 def test_salud_responde_503_generico_si_la_base_no_responde(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from django.db import connections
+    class _Caida:
+        def ensure_connection(self) -> None:
+            raise OperationalError("could not connect to server: SECRETO-INTERNO")
 
-    def caida() -> None:
-        raise OperationalError("could not connect to server: SECRETO-INTERNO")
-
-    monkeypatch.setattr(connections["default"], "ensure_connection", caida)
+    # Se reemplaza la referencia que usa la vista, NO la conexion compartida: al restaurar un
+    # atributo de la instancia, monkeypatch dejaria fijo el bloqueo de pytest-django.
+    monkeypatch.setattr(vistas, "connections", {"default": _Caida()})
     r = Client().get("/salud")
     assert r.status_code == 503
     assert r.json() == {"estado": "no_disponible"}

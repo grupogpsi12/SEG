@@ -54,7 +54,20 @@ def fabrica_memoria() -> EntornoDeContrato:
     )
 
 
-FABRICAS = {"memoria": fabrica_memoria}
+def fabrica_orm() -> EntornoDeContrato:
+    """Repositorios reales (ORM de Django); los demas puertos siguen siendo dobles.
+
+    Sin Docker corre sobre SQLite en memoria (tests/adaptadores/ajustes.py). Las reglas
+    exclusivas de PostgreSQL (disparador, REVOKE, concurrencia) estan en tests/integracion.
+    """
+    from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
+
+    base = fabrica_memoria()
+    base.repos = RepositoriosDjango(base.reloj)
+    return base
+
+
+FABRICAS = {"memoria": fabrica_memoria, "orm": fabrica_orm}
 
 
 @pytest.fixture(params=sorted(FABRICAS))

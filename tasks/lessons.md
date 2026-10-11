@@ -87,3 +87,14 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 25. **Duplicar una cabecera de seguridad en Django y en BunkerWeb**, o «arreglar» los avisos de `check --deploy` activando lo que ya hace el borde.
     → Una sola fuente por cabecera (RS-07). Los avisos que cubre BunkerWeb se silencian con su motivo en `SILENCED_SYSTEM_CHECKS`, y una prueba fija la lista exacta, de modo que cualquier aviso nuevo de `check --deploy` falla la CI.
+
+26. **`monkeypatch` sobre una conexión de Django en una prueba sin `django_db`.** Al restaurar, `monkeypatch` deja fijado en la instancia el método bloqueante de pytest-django y todas las pruebas siguientes fallan con «Database access not allowed», pero solo según el orden de ejecución.
+    → Parchear la referencia que usa el código bajo prueba (p. ej. `vistas.connections`), nunca el objeto conexión compartido.
+    → Detectar: correr la suite completa en distinto orden (`tests/adaptadores tests/contratos` frente a la inversa).
+
+27. **Pruebas de contrato con datos huérfanos.** El doble aceptaba un soporte sin solicitud o una entrada de bandeja sin ticket; la base, con claves foráneas, no. Las expectativas no estaban mal, los datos de partida sí.
+    → Las pruebas de contrato siembran los datos padre como lo harían los casos de uso. Cambiar los datos de partida no es cambiar el contrato; cambiar una expectativa sí lo sería.
+    → Además: pytest-django no prepara la base si la pide un fixture parametrizado con `getfixturevalue`; se marca `django_db` en la colección (`tests/conftest.py`).
+
+28. **Comparar con el oráculo solo en instantes «normales».** La comparación ORM ↔ oráculo pasaba con un `<` cambiado por `<=` porque ningún dato caía justo en el borde.
+    → Barrer instantes que incluyan los bordes exactos de cada ticket (emisión, activación, vencimiento, ±1 s, y −7 días para la ventana del indicador g) y los límites de mes. Validar la prueba introduciendo esos cambios a propósito.
