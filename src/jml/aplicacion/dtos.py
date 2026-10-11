@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 
 from jml.dominio.activos import ActivoAsignado, LicenciaAsignada
+from jml.dominio.auditoria import RegistroDeAuditoria
 from jml.dominio.catalogo import ColaboradorId, DatosDelEvento, UsuarioId
 from jml.dominio.errores import DatoInvalido
 from jml.dominio.tipos import (
@@ -307,3 +308,13 @@ class DetalleDeSolicitud:
     subtipo: Subtipo | None
     datos: tuple[tuple[str, str], ...]  # (campo, valor) de los datos del evento
     restringido: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class PaginaDeAuditoria:
+    """RF-36: registros del mas reciente al mas antiguo."""
+
+    registros: tuple[RegistroDeAuditoria, ...]
+    total: int
+    pagina: int
+    tamano: int

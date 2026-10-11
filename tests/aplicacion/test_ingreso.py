@@ -68,6 +68,9 @@ def test_RF_35_una_contrasena_rechazada_queda_auditada_sin_la_contrasena() -> No
         ("sesion.fallida", "nadie@andina.example", {"paso": "contrasena"}),
     ]
     assert "clave-mala-123" not in repr(m.repos.auditoria().registros())
+    with pytest.raises(CredencialesInvalidas):
+        IniciarIngreso(DependenciasDeIngreso(proveedor, m.puerto)).ejecutar("x" * 300, "y")
+    assert len(acciones(m)[-1][1]) == 80  # cabe en la columna de la base
 
 
 def test_quien_existe_en_supabase_pero_no_tiene_alta_activa_no_entra() -> None:

@@ -26,7 +26,10 @@ class DependenciasDeIngreso:
 
 
 def _auditar_fallo(repos: Repositorios, objeto: str, paso: str) -> None:
-    """RF-35: el intento fallido queda en la cadena. Nunca con la contrasena ni el codigo."""
+    """RF-35: el intento fallido queda en la cadena. Nunca con la contrasena ni el codigo.
+
+    El objeto se corta a 80 caracteres: es el largo de la columna `auditoria.objeto`.
+    """
     with repos.unidad_de_trabajo() as uow:
         uow.auditoria.registrar(
             ACTOR_DEL_SISTEMA, EventoDeAuditoria("sesion.fallida", objeto, {"paso": paso})
@@ -41,7 +44,7 @@ class IniciarIngreso:
         try:
             return self._dep.proveedor.autenticar(correo, contrasena)
         except CredencialesInvalidas:
-            _auditar_fallo(self._dep.repos, correo.strip().lower()[:254] or "-", "contrasena")
+            _auditar_fallo(self._dep.repos, correo.strip().lower()[:80] or "-", "contrasena")
             raise
 
 

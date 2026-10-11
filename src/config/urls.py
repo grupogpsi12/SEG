@@ -15,6 +15,7 @@ urlpatterns = [
     path("solicitudes/nueva/<str:tipo>", vistas.nueva, name="nueva"),
     path("bandeja", vistas.bandeja, name="bandeja"),
     path("dashboard", tecnicos.dashboard, name="dashboard"),
+    path("auditoria", vistas.auditoria, name="auditoria"),
     path("cuentas", tecnicos.cuentas, name="cuentas"),
     path("cuentas.csv", tecnicos.cuentas_csv, name="cuentas_csv"),
     path("colaboradores/<str:colaborador>", tecnicos.ficha, name="ficha"),

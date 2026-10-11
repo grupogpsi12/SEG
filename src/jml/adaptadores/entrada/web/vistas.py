@@ -37,7 +37,7 @@ from jml.dominio.errores import (
     NoEncontrado,
     RolesIncompatibles,
 )
-from jml.dominio.permisos import puede_ver_dashboard
+from jml.dominio.permisos import puede_consultar_auditoria, puede_ver_dashboard
 from jml.dominio.tipos import EstadoSolicitud, Rol, TipoEvento
 from jml.dominio.valores import SolicitudId, hoy_en_bogota
 
@@ -91,6 +91,8 @@ def _contexto(perfil: PerfilDeUsuario, **extra: Any) -> dict[str, Any]:
         "perfil": perfil,
         "es_rrhh": Rol.RRHH in perfil.roles,
         "es_tecnico": puede_ver_dashboard(perfil.roles),
+        "es_auditor": puede_consultar_auditoria(perfil.roles),
+        "es_admin": Rol.ADMINISTRADOR in perfil.roles,
         **extra,
     }
 
@@ -262,3 +264,28 @@ def decidir(
         hecho = {"aprobar": "aprobada", "rechazar": "rechazada", "cancelar": "cancelada"}[accion]
         messages.success(request, f"Solicitud {solicitud_id} {hecho}.")
     return redirect(destino)
+
+
+@require_http_methods(["GET", "POST"])
+@con_sesion
+def auditoria(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
+    """RF-36: GET consulta (paginada); POST verifica la cadena completa (CA-09)."""
+    casos = composicion.casos()
+    try:
+        pagina = int(request.GET.get("pagina", "1"))
+        verificacion = (
+            casos.verificar_auditoria.ejecutar(perfil.usuario_id)
+            if request.method == "POST"
+            else None
+        )
+        p = casos.auditoria.ejecutar(perfil.usuario_id, pagina)
+    except NoAutorizado:
+        raise PermissionDenied from None
+    except (ValueError, DatoInvalido):
+        raise Http404 from None
+    ultima = max(1, -(-p.total // p.tamano))
+    return render(
+        request,
+        "web/auditoria.html",
+        _contexto(perfil, p=p, ultima=ultima, verificacion=verificacion),
+    )

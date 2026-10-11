@@ -17,6 +17,7 @@ from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.adaptadores.salida.reloj import RelojDelSistema
 from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
 from jml.aplicacion.casos._alta import DependenciasDeAlta
+from jml.aplicacion.casos.auditoria import ConsultarAuditoria, VerificarAuditoria
 from jml.aplicacion.casos.consultas import (
     BuscarCuentas,
     ConsultarDashboard,
@@ -84,6 +85,8 @@ class Casos:
     buscar_cuentas: BuscarCuentas
     exportar_cuentas: ExportarCuentas
     ficha: ConsultarFicha
+    auditoria: ConsultarAuditoria
+    verificar_auditoria: VerificarAuditoria
     iniciar_ingreso: IniciarIngreso
     inscribir_totp: InscribirTotp
     completar_ingreso: CompletarIngreso
@@ -116,6 +119,8 @@ def casos() -> Casos:
         buscar_cuentas=BuscarCuentas(consulta),
         exportar_cuentas=ExportarCuentas(consulta),
         ficha=ConsultarFicha(consulta),
+        auditoria=ConsultarAuditoria(repos),
+        verificar_auditoria=VerificarAuditoria(repos),
         iniciar_ingreso=IniciarIngreso(DependenciasDeIngreso(identidad, repos)),
         inscribir_totp=InscribirTotp(identidad),
         completar_ingreso=CompletarIngreso(DependenciasDeIngreso(identidad, repos)),
