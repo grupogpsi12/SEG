@@ -17,3 +17,11 @@ os.environ.setdefault("DJANGO_ALLOWED_HOSTS", "testserver,app.localhost")
 from config.settings import *  # noqa: E402, F403
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
+# Las pruebas no corren `collectstatic`: el almacen con manifiesto se prueba en el contenedor.
+STORAGES = {
+    **STORAGES,  # noqa: F405
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+JML_PROXIES_CONFIABLES = ["10.20.40.2"]
+WHITENOISE_USE_FINDERS = True  # sin collectstatic; en el contenedor sirve desde STATIC_ROOT
+STATIC_ROOT = Path(tempfile.mkdtemp(prefix="jml-static-"))

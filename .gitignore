@@ -17,3 +17,5 @@ mutants/
 *.egg-info/
 .mutmut-cache
 *.bak
+staticfiles/
+infra/.env

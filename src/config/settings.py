@@ -22,8 +22,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "jml.adaptadores.entrada.web.middleware.proxy_confiable",
     "jml.adaptadores.entrada.web.middleware.correlacion",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # estaticos sin nginx (ADR-023)
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -75,6 +77,15 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+# RS-05: IP fija de bunkerweb en la red `app` (infra/compose.yaml). Vacio = no se confia en nadie.
+JML_PROXIES_CONFIABLES = lista_de_entorno("JML_PROXIES_CONFIABLES")
+# Detras de BunkerWeb todo llega por HTTPS; Django no redirige (lo hace BunkerWeb, RS-01).
+CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS]
 LOGIN_URL = "/ingreso"
 LOGIN_REDIRECT_URL = "/"
 JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  # volumen noexec
