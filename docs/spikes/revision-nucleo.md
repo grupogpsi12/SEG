@@ -4,7 +4,7 @@ Revisión hecha leyendo el código confirmado en git, sin ejecutarlo (la mutaci�
 
 ## Hallazgos
 
-### R1 · Carrera entre cancelar y crear el primer ticket (media)
+### R1 · Carrera entre cancelar y crear el primer ticket (media) — CORREGIDO en el núcleo, bloqueo pendiente en la Fase 2
 
 `CancelarSolicitud` permite a RRHH cancelar una aprobada mientras `solicitud.tickets` esté vacío. El worker (`ProcesarBandeja`) lee la solicitud, **sale de la transacción**, llama a GLPI y luego confirma en otra transacción. Si RRHH cancela entre la creación en GLPI y la confirmación:
 
@@ -16,19 +16,19 @@ Con dobles en memoria y un solo hilo no se reproduce. **Qué hacer:**
 - En la Fase 2, el adaptador de PostgreSQL bloquea la fila de la solicitud (`SELECT … FOR UPDATE`) en `CancelarSolicitud` y en `_cargar`/`_confirmar`.
 - Además, si `_confirmar` encuentra la solicitud cancelada, el ticket ya existe: debería registrarse igualmente y auditarse como «ticket de una solicitud cancelada» para que TI lo cierre a mano.
 
-Requiere una prueba de contrato de concurrencia en la Fase 2 (igual que CA-01).
+**Estado:** el núcleo ya no pierde el ticket: si la solicitud se cancela mientras GLPI lo crea, se registra y se audita como `ticket.huerfano` (`test_R1_…`). El bloqueo de la fila (`SELECT … FOR UPDATE`) sigue pendiente en la Fase 2, con una prueba de contrato de concurrencia (igual que CA-01).
 
-### R2 · Una excepción inesperada detiene toda la sincronización (baja)
+### R2 · Una excepción inesperada detiene toda la sincronización (baja) — CORREGIDO
 
 `SincronizarTickets.ejecutar` aísla por solicitud solo `NoEncontrado` y `OperacionNoPermitida`. Cualquier otro `ErrorDeDominio` en una solicitud (por ejemplo, `DatoInvalido` al aplicar un CDP con datos corruptos) corta la sincronización de **todas** las siguientes, y no se registra la ejecución fallida.
 
 **Qué hacer:** capturar `ErrorDeDominio` por solicitud, contar el error y auditarlo. Requiere prueba primero.
 
-### R3 · Rama inalcanzable en la sincronización (cosmética)
+### R3 · Rama inalcanzable en la sincronización (cosmética) — CORREGIDO
 
 En `SincronizarTickets._ticket`, `actual = observado.observacion` nunca es `None` después de `observar(nueva)`. La rama `if actual is None: return` es inalcanzable (aparece en el informe de cobertura). La variable `assert_id` tiene un nombre engañoso. **Qué hacer:** simplificarlo en un commit de refactor aparte.
 
-### R4 · `_Conteo` con listas opcionales (cosmética)
+### R4 · `_Conteo` con listas opcionales (cosmética) — CORREGIDO
 
 `ProcesarBandeja._Conteo` declara `en_error` y `en_ejecucion` como `list | None` y luego comprueba `is not None` en cada uso. Las dos ramas `None` nunca ocurren. **Qué hacer:** `field(default_factory=list)` en un commit de refactor aparte.
 
