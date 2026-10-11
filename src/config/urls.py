@@ -2,7 +2,7 @@
 
 from django.urls import path, re_path
 
-from jml.adaptadores.entrada.web import ingreso, tecnicos, vistas
+from jml.adaptadores.entrada.web import administracion, ingreso, tecnicos, vistas
 
 urlpatterns = [
     path("salud", vistas.salud, name="salud"),
@@ -17,6 +17,14 @@ urlpatterns = [
     path("dashboard", tecnicos.dashboard, name="dashboard"),
     path("auditoria", vistas.auditoria, name="auditoria"),
     path("errores", vistas.en_error, name="en_error"),
+    path("administracion/perfiles", administracion.perfiles, name="admin_perfiles"),
+    path("administracion/perfil", administracion.editar_perfil, name="admin_perfil"),
+    path("administracion/usuarios", administracion.usuarios, name="admin_usuarios"),
+    path(
+        "administracion/usuarios/<str:usuario>/roles",
+        administracion.cambiar_roles,
+        name="admin_roles",
+    ),
     re_path(
         r"^solicitudes/(?P<solicitud>SOL-\d{4}-\d{6})/reintentar$",
         vistas.reintentar,

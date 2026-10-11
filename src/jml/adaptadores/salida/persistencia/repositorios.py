@@ -219,6 +219,20 @@ class RepoUsuarios:
             usuario=cuenta, defaults={"colaborador_id": usuario.colaborador_id}
         )
 
+    def todos(self) -> Sequence[UsuarioDelSistema]:
+        """Roles incompatibles guardados a mano en la base hacen fallar la lista (RF-05): se
+        corrigen con `admin_usuarios`, nunca se ocultan."""
+        colaboradores = dict(m.PerfilDeUsuario.objects.values_list("usuario_id", "colaborador_id"))
+        return [
+            UsuarioDelSistema(
+                c.username,
+                colaboradores.get(c.pk),
+                frozenset(Rol(g.name) for g in c.groups.all()),  # usa el prefetch
+                c.is_active,
+            )
+            for c in User.objects.order_by("username").prefetch_related("groups")
+        ]
+
     @staticmethod
     def _roles(cuenta: User) -> frozenset[Rol]:
         return frozenset(Rol(n) for n in cuenta.groups.values_list("name", flat=True))
@@ -268,6 +282,10 @@ class RepoPerfiles:
     def obtener(self, departamento: str, sede: str) -> PerfilDeAcceso | None:
         fila = m.PerfilDeAcceso.objects.filter(departamento=departamento, sede=sede).first()
         return None if fila is None else mp.perfil_de_modelo(fila)
+
+    def todos(self) -> Sequence[PerfilDeAcceso]:
+        filas = m.PerfilDeAcceso.objects.order_by("departamento", "sede")
+        return [mp.perfil_de_modelo(f) for f in filas]
 
 
 class RepoTickets:

@@ -1,0 +1,11 @@
+{% extends "web/base.html" %}
+{% block titulo %}Perfil de acceso{% endblock %}
+{% block contenido %}
+<h1>Perfil de acceso</h1>
+<p class="aviso">Los cambios aplican a los eventos que se emitan desde ahora; los tickets ya creados no cambian. «Retiro de accesos» no se configura aquí: lo genera el sistema (ADR-022).</p>
+<form method="post" action="{% url 'admin_perfil' %}">
+  {% csrf_token %}
+  {{ formulario.as_p }}
+  <button type="submit">Guardar</button> <a href="{% url 'admin_perfiles' %}">Volver</a>
+</form>
+{% endblock %}

@@ -30,6 +30,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 024 | Cloudflare Tunnel + Access delante de BunkerWeb | **Propuesta** (pendiente del equipo) | 10/10/2026 |
 | 025 | Tres consultas de lectura nuevas en los repositorios para las vistas (2.7) | Aceptada | 10/10/2026 |
 | 026 | Consulta de solicitudes en `error` para el reintento del Administrador (2.12) | Aceptada | 11/10/2026 |
+| 027 | Matriz y usuarios completos para el área de administración (2.13) | Aceptada | 11/10/2026 |
 
 ---
 
@@ -350,3 +351,13 @@ Cada una tiene su prueba en la suite de contrato, que corre contra el doble y co
 **Alternativas descartadas.** Pedir el id a mano (el Administrador no tiene forma de saberlo); reutilizar el indicador (d) del dashboard (solo da conteos y es de los técnicos).
 
 **Consecuencias.** El contrato crece en un método de lectura; no cambia ninguna regla.
+
+## ADR-027 — Matriz y usuarios completos para el área de administración (RF-37)
+
+**Contexto.** RF-37 pide que el Administrador mantenga la matriz de perfiles y los roles desde un área restringida. Los repositorios solo permiten obtener un perfil por (departamento, sede) y un actor activo por id; no hay forma de listar.
+
+**Decisión.** Se agregan `RepoPerfiles.todos()` (por departamento y sede) y `RepoUsuarios.todos()` (activos e inactivos, por id), con su prueba de contrato en el doble y el ORM. El área de administración es propia (vistas sobre casos de uso), **no** el admin de Django: el admin editaría los modelos sin pasar por el dominio (validación de la matriz, incompatibilidad de roles, RF-05) ni por la auditoría (RF-35).
+
+**Alternativas descartadas.** El admin de Django (salta el dominio y la auditoría); cambiar roles solo por línea de comandos (RF-37 pide «área de administración»).
+
+**Consecuencias.** Dos lecturas más en el contrato. Si alguien guarda a mano roles incompatibles en la base, `RepoUsuarios.todos()` falla en lugar de ocultarlo: se corrige con `admin_usuarios`.

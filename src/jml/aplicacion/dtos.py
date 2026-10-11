@@ -318,3 +318,13 @@ class PaginaDeAuditoria:
     total: int
     pagina: int
     tamano: int
+
+
+@dataclass(frozen=True, slots=True)
+class FilaDeUsuario:
+    """RF-37: un usuario en el area de administracion. El correo vive solo en Supabase Auth."""
+
+    usuario_id: UsuarioId
+    colaborador_nombre: str | None
+    roles: tuple[Rol, ...]
+    activo: bool

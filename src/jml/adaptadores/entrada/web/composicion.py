@@ -17,6 +17,12 @@ from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.adaptadores.salida.reloj import RelojDelSistema
 from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
 from jml.aplicacion.casos._alta import DependenciasDeAlta
+from jml.aplicacion.casos.administracion import (
+    CambiarRoles,
+    ConsultarMatriz,
+    ConsultarUsuarios,
+    GuardarPerfil,
+)
 from jml.aplicacion.casos.auditoria import ConsultarAuditoria, VerificarAuditoria
 from jml.aplicacion.casos.bandeja import ReintentarEmision
 from jml.aplicacion.casos.consultas import (
@@ -91,6 +97,10 @@ class Casos:
     verificar_auditoria: VerificarAuditoria
     en_error: SolicitudesEnError
     reintentar: ReintentarEmision
+    matriz: ConsultarMatriz
+    guardar_perfil: GuardarPerfil
+    usuarios: ConsultarUsuarios
+    cambiar_roles: CambiarRoles
     iniciar_ingreso: IniciarIngreso
     inscribir_totp: InscribirTotp
     completar_ingreso: CompletarIngreso
@@ -127,6 +137,10 @@ def casos() -> Casos:
         verificar_auditoria=VerificarAuditoria(repos),
         en_error=SolicitudesEnError(repos),
         reintentar=ReintentarEmision(repos, r),
+        matriz=ConsultarMatriz(repos),
+        guardar_perfil=GuardarPerfil(repos),
+        usuarios=ConsultarUsuarios(repos),
+        cambiar_roles=CambiarRoles(repos),
         iniciar_ingreso=IniciarIngreso(DependenciasDeIngreso(identidad, repos)),
         inscribir_totp=InscribirTotp(identidad),
         completar_ingreso=CompletarIngreso(DependenciasDeIngreso(identidad, repos)),

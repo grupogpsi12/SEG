@@ -283,6 +283,10 @@ class RepoColaboradores(Protocol):
 class RepoUsuarios(Protocol):
     def guardar(self, usuario: UsuarioDelSistema) -> None: ...
 
+    def todos(self) -> Sequence[UsuarioDelSistema]:
+        """ADR-027: activos e inactivos, por id, para el area de administracion (RF-37)."""
+        ...
+
     def actor_de(self, usuario_id: UsuarioId) -> Actor | None:
         """None si no existe o esta inactivo."""
         ...
@@ -294,6 +298,10 @@ class RepoPerfiles(Protocol):
     def guardar(self, perfil: PerfilDeAcceso) -> None: ...
 
     def obtener(self, departamento: str, sede: str) -> PerfilDeAcceso | None: ...
+
+    def todos(self) -> Sequence[PerfilDeAcceso]:
+        """ADR-027: la matriz completa, por (departamento, sede), para el area de administracion."""
+        ...
 
 
 class RepoTickets(Protocol):

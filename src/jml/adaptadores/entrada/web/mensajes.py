@@ -14,6 +14,8 @@ from jml.dominio.errores import (
     JustificacionRequerida,
     NoAutorizado,
     NoEncontrado,
+    OperacionNoPermitida,
+    RolesIncompatibles,
     SolicitudDuplicada,
     SoporteInvalido,
     TransicionInvalida,
@@ -52,6 +54,10 @@ def texto_del_error(error: ErrorDeDominio) -> str:
             return "Ya no se puede cancelar: se creó al menos un ticket en la mesa de servicio."
         case TransicionInvalida():
             return "La solicitud ya no está en un estado que permita esa acción."
+        case RolesIncompatibles():
+            return f"Esos roles no pueden combinarse: «{error.uno}» y «{error.otro}» (RF-05)."
+        case OperacionNoPermitida():
+            return f"Operación no permitida: {error.motivo}."
         case NoEncontrado():
             return "No se encontró lo que buscaba."
         case DatoInvalido():

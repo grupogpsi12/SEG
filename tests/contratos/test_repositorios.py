@@ -290,6 +290,24 @@ def test_perfiles(entorno: EntornoDeContrato) -> None:
         assert u.perfiles.obtener("TI", "Bogotá") is None
 
 
+def test_ADR_027_la_matriz_y_los_usuarios_completos_en_orden(entorno: EntornoDeContrato) -> None:
+    with uow(entorno) as u:
+        for depto, sede in (("TI", "Cali"), ("Finanzas", "Medellín"), ("Finanzas", "Bogotá")):
+            u.perfiles.guardar(perfil(depto, sede))
+        assert [(p.departamento, p.sede) for p in u.perfiles.todos()] == [
+            ("Finanzas", "Bogotá"),
+            ("Finanzas", "Medellín"),
+            ("TI", "Cali"),
+        ]
+        assert u.perfiles.todos()[2] == perfil("TI", "Cali")
+        u.usuarios.guardar(UsuarioDelSistema("u2", None, frozenset({Rol.AUDITOR}), activo=False))
+        u.usuarios.guardar(UsuarioDelSistema("u1", "c1", frozenset({Rol.RRHH, Rol.SOLICITANTE})))
+        assert list(u.usuarios.todos()) == [
+            UsuarioDelSistema("u1", "c1", frozenset({Rol.RRHH, Rol.SOLICITANTE})),
+            UsuarioDelSistema("u2", None, frozenset({Rol.AUDITOR}), activo=False),
+        ]
+
+
 def test_tickets(entorno: EntornoDeContrato) -> None:
     con_retiro(entorno)
     c = caso(TipoEvento.RET, Subtipo.RENUNCIA)

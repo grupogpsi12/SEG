@@ -1,0 +1,33 @@
+{% extends "web/base.html" %}
+{% block titulo %}Usuarios y roles{% endblock %}
+{% block contenido %}
+<h1>Usuarios y roles</h1>
+<p class="aviso">Las cuentas se crean y desactivan con el comando <code>admin_usuarios</code> (RF-06). Aquí solo se cambian los roles; las combinaciones incompatibles se rechazan (RF-05) y cada cambio queda en la auditoría.</p>
+<table>
+  <thead><tr><th>Usuario</th><th>Colaborador</th><th>Estado</th><th>Roles</th></tr></thead>
+  <tbody>
+  {% for f in filas %}
+    <tr>
+      <td class="aviso">{{ f.usuario_id }}</td>
+      <td>{{ f.colaborador_nombre|default:"—" }}</td>
+      <td>{{ f.activo|yesno:"activo,inactivo" }}</td>
+      <td>
+        {% if f.usuario_id == perfil.usuario_id %}
+          {% for r in f.roles %}{{ r.value }}{% if not forloop.last %}, {% endif %}{% endfor %} <span class="aviso">(usted)</span>
+        {% else %}
+        <form method="post" action="{% url 'admin_roles' f.usuario_id %}" class="roles">
+          {% csrf_token %}
+          {% for r in todos %}
+          <label class="en-linea"><input type="checkbox" name="roles" value="{{ r.value }}"{% if r in f.roles %} checked{% endif %}> {{ r.value }}</label>
+          {% endfor %}
+          <button class="secundario" type="submit">Guardar roles</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4">No hay usuarios.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

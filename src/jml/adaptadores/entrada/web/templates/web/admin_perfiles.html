@@ -1,0 +1,21 @@
+{% extends "web/base.html" %}
+{% block titulo %}Matriz de perfiles{% endblock %}
+{% block contenido %}
+<h1>Matriz de perfiles</h1>
+<p><a href="{% url 'admin_perfil' %}">Agregar un perfil</a> · <a href="{% url 'admin_usuarios' %}">Usuarios y roles</a></p>
+<table>
+  <thead><tr><th>Departamento</th><th>Sede</th><th>Grupos de AD</th><th>Licencias</th><th>Equipo</th><th>Recursos</th><th></th></tr></thead>
+  <tbody>
+  {% for p in matriz %}
+    <tr>
+      <td>{{ p.departamento }}</td><td>{{ p.sede }}</td>
+      <td>{{ p.grupos_ad|join:", " }}</td><td>{{ p.licencias|join:", " }}</td><td>{{ p.tipo_equipo.value }}</td>
+      <td>{{ p.recursos|length }}</td>
+      <td><a href="{% url 'admin_perfil' %}?departamento={{ p.departamento|urlencode }}&amp;sede={{ p.sede|urlencode }}">Editar</a></td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7">La matriz está vacía. Cargue las semillas o agregue un perfil.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

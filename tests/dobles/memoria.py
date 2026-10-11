@@ -223,6 +223,9 @@ class _RepoUsuarios:
     def guardar(self, usuario: UsuarioDelSistema) -> None:
         self.a.usuarios[usuario.id] = usuario
 
+    def todos(self) -> Sequence[UsuarioDelSistema]:
+        return sorted(self.a.usuarios.values(), key=lambda u: u.id)
+
     def actor_de(self, usuario_id: UsuarioId) -> Actor | None:
         u = self.a.usuarios.get(usuario_id)
         return u.como_actor() if u is not None and u.activo else None
@@ -244,6 +247,9 @@ class _RepoPerfiles:
 
     def obtener(self, departamento: str, sede: str) -> PerfilDeAcceso | None:
         return self.a.perfiles.get((departamento, sede))
+
+    def todos(self) -> Sequence[PerfilDeAcceso]:
+        return [self.a.perfiles[k] for k in sorted(self.a.perfiles)]
 
 
 class _RepoTickets:
