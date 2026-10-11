@@ -175,10 +175,10 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [x] **2.13 Área de administración** (RF-37): matriz de perfiles, catálogos y roles, solo para el Administrador, con auditoría de cada cambio (RF-35) y validación de incompatibilidades (RF-05).
   ✔✔ ADR-027 (`RepoPerfiles.todos()` y `RepoUsuarios.todos()`, con contrato en doble y ORM) y área propia, no el admin de Django: casos `ConsultarMatriz`, `GuardarPerfil` (audita `perfil.actualizado`), `ConsultarUsuarios` y `CambiarRoles` (RF-05 por el dominio, audita `usuario.roles_cambiados`; nadie cambia sus propios roles). Vistas `/administracion/perfiles`, `/administracion/perfil` y `/administracion/usuarios`. Pruebas: `tests/aplicacion/test_administracion.py` (10) y `tests/adaptadores/test_administracion_web.py` (11). Catálogos = la matriz (S-32). Crear y desactivar cuentas sigue en el comando `admin_usuarios` (RF-06).
 
-- [~] **2.14 Revisión externa del 11/10/2026** (sobre `693f51c`; texto completo en `docs/spikes/revision-externa-2026-10-11.md`).
-  - [ ] **H1 (alta)** `app_backend` es dueño de las tablas: puede volver a darse UPDATE sobre `auditoria` y desactivar el disparador (invariantes 3, 4 y 8). **Pausa: decisión N3 pendiente** (ver propuesta en el documento).
-  - [ ] **H2 (media)** El disparador de inmutabilidad no valida transiciones de estado: volver a `pendiente_aprobacion`, editar y cerrar pasa (invariante 3). **Pausa: decisión N3 pendiente.**
-  - [ ] **H3 (media)** `RepoSolicitudes.obtener` sin `select_for_update`: dos aprobaciones simultáneas dejan dos decisiones y dos eventos de auditoría (cierra R1). **Pausa: decisión N3 pendiente.**
+- [x] **2.14 Revisión externa del 11/10/2026** (sobre `693f51c`; texto completo en `docs/spikes/revision-externa-2026-10-11.md`).
+  - [x] **H1 (alta)** `app_backend` era dueño de las tablas. ✔✔ ADR-028: `app_owner` es dueño y migra (contenedor `migrar`); `app_backend` con permisos mínimos (migración 0004) y `BYPASSRLS`; aprovisionado en Supabase con `infra/supabase/duenio-separado.sql`. Pruebas H1 en verde contra Supabase.
+  - [x] **H2 (media)** El disparador no validaba transiciones. ✔✔ Migración 0003 con el cierre transitivo de `TRANSICIONES`; `test_migraciones.py` impide que se separen; pruebas H2 en verde contra Supabase.
+  - [x] **H3 (media)** Dos aprobaciones simultáneas se aceptaban. ✔✔ `select_for_update(of=("self",))` en `RepoSolicitudes.obtener`; pruebas concurrentes (dos aprobadores; aprobar contra cancelar) en verde contra Supabase. Cierra R1.
   - [x] M1 el filtro de logs recorre listas y tuplas (`test_M1_tambien_dentro_de_listas_y_tuplas`).
   - [x] M2 `Makefile` para Windows y Linux.
   - [x] M3 CI en `.github/workflows/verificar.yml`: compuertas + integración contra `postgres:17` (acciones por SHA). Se activa cuando exista el repositorio en GitHub (0.1).

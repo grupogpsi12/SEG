@@ -1,6 +1,6 @@
 # Revisión externa del 11/10/2026 y propuesta para H1 a H3
 
-Revisión hecha por una persona del equipo sobre el commit `693f51c`, de solo lectura, con PostgreSQL 16 local. Este documento resume sus hallazgos, los verifica contra el código actual y propone cómo cerrarlos. **H1 a H3 tocan los invariantes 3, 4 y 8: según `CLAUDE.md` esperan una decisión N3 del equipo antes de implementarse.**
+Revisión hecha por una persona del equipo sobre el commit `693f51c`, de solo lectura, con PostgreSQL 16 local. Este documento resume sus hallazgos, los verifica contra el código actual y propone cómo cerrarlos. **Estado (11/10/2026): H1, H2 y H3 corregidos con la aprobación del equipo (ADR-028); M1, M2, M3 y M6 corregidos; M4 justificado; M5 ya estaba hecho.** Evidencia: `tests/integracion/test_revision_externa.py` (16 pruebas) y `test_postgresql.py`, en verde contra Supabase.
 
 ## Verificación contra el código actual (`b85ebe2`)
 

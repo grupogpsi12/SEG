@@ -121,3 +121,12 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 35. **Editar el código mientras una suite larga corre en segundo plano.** La suite importa módulos a medida que los necesita: 14 pruebas fallaron con `AttributeError` por una vista agregada a mitad de corrida.
     → Mientras corre una suite en segundo plano, solo se edita documentación. Los resultados de esa corrida valen para el commit en el que empezó.
+
+36. **Probar un GRANT denegado esperando un error.** En PostgreSQL, un `GRANT` de alguien sin la opción de concesión no falla: solo avisa «no privileges were granted». La prueba no lanzaba la excepción y parecía que el permiso se concedía.
+    → Probar el efecto (que la operación protegida siga negada), no el código de retorno del `GRANT`.
+
+37. **Cambiar de dueño una secuencia ligada a una columna.** `ALTER SEQUENCE … OWNER` falla si la secuencia pertenece a una columna identity o serial: se mueve sola con su tabla.
+    → Al reasignar dueños, recorrer solo tablas, vistas y funciones.
+
+38. **Quitarle a `app_backend` la propiedad de tablas con RLS sin políticas.** El dueño se salta RLS; un rol que no es dueño no ve ninguna fila. Corregir H1 sin `BYPASSRLS` habría dejado la aplicación sin datos.
+    → Cada vez que cambie quién es dueño de una tabla con RLS, revisar quién queda sin acceso (ADR-028).

@@ -10,6 +10,7 @@ Ningún secreto está en este documento ni en el repositorio. Los secretos local
 | `supabase_ca_crt` | CA de Supabase para `sslmode=verify-full` (Dashboard → Database → SSL) | web, worker, admin-usuarios |
 | `django_secret_key` | Clave de Django | web, worker, admin-usuarios |
 | `supabase_service_role` | Clave secreta `sb_secret_…` (Dashboard → API Keys) | **solo** admin-usuarios (invariante 8). **Pendiente: el equipo debe crearla localmente.** |
+| `db_owner_password` | Contraseña de `app_owner`, dueño del esquema (ADR-028) | **solo** `migrar` |
 
 Variables de entorno no secretas: `JML_DB_HOST=aws-0-us-east-1.pooler.supabase.com`, `JML_DB_USUARIO=app_backend.tzxziubxwzgqdbmfkdiq`, `JML_SUPABASE_URL=https://tzxziubxwzgqdbmfkdiq.supabase.co`, `JML_SUPABASE_CLAVE_PUBLICA=sb_publishable_…` (la clave publicable es pública por diseño: el esquema `app` no está expuesto).
 
@@ -80,3 +81,14 @@ JML_PG_CLAVE="$(cat secrets/db_password)" JML_PG_CA=secrets/supabase_ca_crt \
 4. API Keys → crear una clave secreta y guardarla en `secrets/supabase_service_role`; luego correr `tests/integracion/test_supabase_auth.py` completo.
 5. Rotar la contraseña de `postgres` (se compartió en una conversación) al terminar el desarrollo.
 6. Correr el asesor de seguridad de Supabase sin hallazgos antes de la entrega (RS-16, CA-12).
+
+## Dueño separado (ADR-028, revisión externa H1) — aplicado el 11/10/2026
+
+`app_backend` ya **no** es dueño. Desde el 11/10/2026 en el proyecto de desarrollo:
+- `app_owner` (LOGIN, `connection limit 3`, clave en `secrets/db_owner_password`) es dueño de `app` y `app_test` y de su contenido; corre `migrate`.
+- `app_backend` tiene `BYPASSRLS` (RLS sigue sin políticas: invariante 8), `USAGE` en los esquemas y DML por tabla (migración 0004), sin `CREATE` ni permisos sobre las tablas de solo inserción.
+- Script idempotente: `infra/supabase/duenio-separado.sql` (como `postgres`). Hay que correrlo también en el proyecto de entrega, **antes** de la primera migración.
+- Pruebas de integración: `JML_PG_DUENIO_USUARIO=app_owner.<ref>` y `JML_PG_DUENIO_CLAVE="$(cat secrets/db_owner_password)"` además de las variables de `app_backend`.
+- El esquema `app` de producción **todavía no tiene tablas**: la primera `migrate` real se hace con el contenedor `migrar`.
+
+Observación pendiente de explicar: una sesión de `app_backend` quedó «idle in transaction» 8 minutos pese a `idle_in_transaction_session_timeout=60000`; quizá el pooler no aplica esa opción. Si se repite, terminarla como `postgres` (`pg_terminate_backend`) o pedir el ajuste por rol (`ALTER ROLE app_backend SET idle_in_transaction_session_timeout = '60s'`, que requiere `postgres`).

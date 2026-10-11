@@ -41,7 +41,7 @@ JML_SUPABASE_URL=https://tzxziubxwzgqdbmfkdiq.supabase.co JML_SUPABASE_CLAVE_PUB
   .venv/Scripts/python.exe -m pytest tests/integracion/test_supabase_auth.py
 ```
 
-Secretos que la otra máquina necesita en `secrets/` (pedírselos al equipo **por un canal seguro**; nunca por el repositorio ni por el chat): `db_password` y `supabase_ca_crt`, y para `admin_usuarios` también `supabase_service_role`. `infra/scripts/preparar-entorno.sh` genera los aleatorios que falten (`django_secret_key`, `bw_api_token`, `glpi_db_password`).
+Secretos que la otra máquina necesita en `secrets/` (pedírselos al equipo **por un canal seguro**; nunca por el repositorio ni por el chat): `db_password` y `supabase_ca_crt`; para migrar, `db_owner_password` (ADR-028); y para `admin_usuarios`, `supabase_service_role`. `infra/scripts/preparar-entorno.sh` genera los aleatorios que falten (`django_secret_key`, `bw_api_token`, `glpi_db_password`).
 
 ## 3. Qué hay construido (mapa rápido)
 
@@ -62,7 +62,6 @@ Rutas web: `/ingreso`, `/ingreso/segundo-factor`, `/salir`, `/solicitudes`, `/so
 ## 4. Lo que falta, en orden
 
 ### A. Acciones del equipo (bloquean pruebas reales)
-0. **Decidir H1, H2 y H3 de la revisión externa** (`docs/spikes/revision-externa-2026-10-11.md`, nivel N3, invariantes 3, 4 y 8). Son fallos reales de la capa PostgreSQL; la propuesta está escrita y espera aprobación. Los menores M1 a M6 ya están atendidos.
 1. **Instalar Docker** en el equipo de desarrollo. En PowerShell **como administrador**: `wsl --install`, **reiniciar**, `winget install -e --id Docker.DockerDesktop`, abrir Docker Desktop una vez. Dos intentos automáticos fallaron por falta de elevación (lección 33).
 2. **Supabase (RS-16)**, en el Dashboard: desactivar *Allow new users to sign up* (hoy está activo: lo detecta `test_RS_16_…`), contraseña mínima de 12, confirmar TOTP habilitado y crear la clave secreta en `secrets/supabase_service_role`.
 3. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
@@ -94,6 +93,7 @@ Rutas web: `/ingreso`, `/ingreso/segundo-factor`, `/salir`, `/solicitudes`, `/so
 - **Detalle de solicitud**: el campo restringido lo ve solo RRHH, con la consulta auditada (`restringido.consultado`). A los demás se les responde 404.
 - **Auditoría de ingresos** (RF-35): `sesion.iniciada`, `sesion.denegada` (con `causa`) y `sesion.fallida` (con `paso`), nunca con la contraseña ni el código.
 - **Administración** (ADR-027): es un área propia sobre casos de uso, **no el admin de Django**, porque el admin se saltaría el dominio (RF-05) y la auditoría (RF-35). Nadie cambia sus propios roles. Los «catálogos» son la matriz de perfiles (S-32).
+- **Revisión externa (ADR-028)**: `app_owner` es dueño del esquema y migra; `app_backend` solo opera (con `BYPASSRLS`); el disparador valida transiciones; decidir bloquea la fila. Ver `docs/spikes/revision-externa-2026-10-11.md`.
 - **Conexión a PostgreSQL**: `idle_in_transaction_session_timeout=60000` evita que una corrida cortada deje bloqueos (lección 34).
 
 ## 6. Contenido de `infra/.env.example`
