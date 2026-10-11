@@ -2,7 +2,7 @@
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]` recortado.
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
-Ítem activo: **1.13** (mutación en curso)
+Ítem activo: **1.14** (Hito N: lo cierra el equipo)
 
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
@@ -92,13 +92,16 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [x] **1.12 Escenarios de extremo a extremo en memoria:** ING, VAC, CDP, CSU, RET y EMG completos desde el registro hasta `cerrada` y la cuenta derivada, con reloj simulado y un GLPI falso con fallos programados (timeout tras crear, 500, caída larga, ticket reabierto, cierre sin solución, Inventario sin acta).
   ✔ CA-05, CA-06 y CA-07 contra dobles; ninguna ejecución duplica un ticket.
   ✔✔ Evidencia: `tests/escenarios/test_escenarios.py`, 12 escenarios con un verificador común de invariantes (un ticket por clave, cadena válida, sin centinela, sin duplicados abiertos, cuentas = último historial, cerradas con cierre real).
-- [~] **1.13 Compuertas de calidad del núcleo.**
+- [x] **1.13 Compuertas de calidad del núcleo.**
   - Cobertura de ramas ≥ 95 % en `dominio` y ≥ 90 % en `aplicacion` (el SRS exige 80 % en RNF-11; esta es la meta interna).
   - `mypy --strict` y `ruff` sin avisos; `import-linter` en verde.
   - `mutmut` sobre `dominio`: ≥ 85 % de mutantes eliminados; cada superviviente se revisa y se documenta en `docs/spikes/mutacion.md` (equivalente, o falta una prueba y se agrega).
   - Cero pruebas omitidas (`skip`/`xfail`) sin ID de supuesto.
 
   ✔ Informes de cobertura y mutación adjuntos en `docs/spikes/`.
+  ✔✔ Evidencia (ver `docs/spikes/mutacion.md`): 1080 pruebas, 0 omitidas · `mypy --strict` y `ruff` sin avisos · `import-linter` 3 contratos cumplidos · cobertura de ramas **dominio 99 %** (meta 95), **aplicacion 99 %** (meta 90), total 99 % · mutación (mutmut 2.5.1, 1340 mutantes): **93,6 % eliminados** (meta 85), 86 supervivientes clasificados: 27 equivalentes y 59 con prueba agregada. **Pendiente de medir:** la tasa tras agregar `test_supervivientes.py` (3.ª corrida interrumpida por decisión del equipo).
+  Hallazgos de la revisión del núcleo (`docs/spikes/revision-nucleo.md`): R1 y R2 corregidos con su prueba; R3 y R4 simplificados; R5, R6 y R7 quedan para decisión del equipo.
+
 - [ ] **1.14 Hito N — núcleo congelado.** Revisión del equipo de `docs/supuestos-nucleo.md` y de los puertos; etiqueta `nucleo-v1`.
   ✔ Supuestos aprobados o corregidos; spike 0.3 hecho o puerto `SistemaDeTickets` marcado provisional. A partir de aquí, un cambio en `dominio` o en un puerto exige su test primero y, si cambia un contrato, un ADR.
 
