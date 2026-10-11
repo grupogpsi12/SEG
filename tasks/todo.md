@@ -2,7 +2,7 @@
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]` recortado.
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
-Ítem activo: **1.14** (Hito N: lo cierra el equipo)
+Ítem activo: **2.1**
 
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
@@ -104,8 +104,9 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔✔ Evidencia (ver `docs/spikes/mutacion.md`): 1080 pruebas, 0 omitidas · `mypy --strict` y `ruff` sin avisos · `import-linter` 3 contratos cumplidos · cobertura de ramas **dominio 99 %** (meta 95), **aplicacion 99 %** (meta 90), total 99 % · mutación (mutmut 2.5.1, 1340 mutantes): **93,6 % eliminados** (meta 85), 86 supervivientes clasificados: 27 equivalentes y 59 con prueba agregada. **Pendiente de medir:** la tasa tras agregar `test_supervivientes.py` (3.ª corrida interrumpida por decisión del equipo).
   Hallazgos de la revisión del núcleo (`docs/spikes/revision-nucleo.md`): R1 y R2 corregidos con su prueba; R3 y R4 simplificados; R5, R6 y R7 quedan para decisión del equipo.
 
-- [ ] **1.14 Hito N — núcleo congelado.** Revisión del equipo de `docs/supuestos-nucleo.md` y de los puertos; etiqueta `nucleo-v1`.
+- [x] **1.14 Hito N — núcleo congelado.** Revisión del equipo de `docs/supuestos-nucleo.md` y de los puertos; etiqueta `nucleo-v1`.
   ✔ Supuestos aprobados o corregidos; spike 0.3 hecho o puerto `SistemaDeTickets` marcado provisional. A partir de aquí, un cambio en `dominio` o en un puerto exige su test primero y, si cambia un contrato, un ADR.
+  ✔✔ Evidencia: el equipo aprobó los supuestos S-01 a S-27 con los valores adoptados (10-oct-2026); etiqueta `nucleo-v1`; `SistemaDeTickets` queda PROVISIONAL hasta el spike 0.3 (`docs/spikes/glpi-puerto.md`). Pendiente: repetir `make mutacion` para medir la tasa final.
 
 ## Fase 2 — Adaptadores base y seguridad (solo tras el Hito N)
 

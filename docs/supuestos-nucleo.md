@@ -2,6 +2,8 @@
 
 Todo lo que el SRS v2.2 deja abierto y que el núcleo (`dominio` + `aplicacion`) tuvo que interpretar para poder construirse. Ninguno se decidió en silencio (lessons.md n.º 17): cada uno tiene un ID `S-nn`, el valor adoptado, su justificación y **la prueba que lo fija** (si el supuesto cambia, esa prueba falla). `tests/dominio/test_supuestos.py` comprueba que cada ID de esta tabla es nombrado por alguna prueba y que ningún ID citado en el código falta aquí.
 
+**Estado: APROBADOS en el Hito N (10-oct-2026)** con los valores adoptados de esta tabla, incluidos los marcados ●. Cambiar uno exige su prueba primero y, si toca un puerto, un ADR.
+
 La columna **Equipo** marca con **●** los supuestos que **requieren decisión del equipo** en el Hito N.
 
 S-01 a S-13 vienen de la propuesta de `PROMPT_EJECUCION.md` §6; S-14 a S-27 son hallazgos de la construcción.
