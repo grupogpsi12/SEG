@@ -17,7 +17,7 @@ COPY pyproject.toml manage.py ./
 COPY src ./src
 RUN pip install --no-deps . \
     && useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin jml \
-    && install -d -o jml -m 0700 /var/lib/jml/soportes
+    && install -d -o jml -m 0700 /var/lib/jml/soportes /var/lib/jml/exportes
 
 # collectstatic necesita importar los ajustes, que leen secretos: se usan valores de un solo uso
 # que no quedan en la imagen (el directorio se borra en la misma capa).

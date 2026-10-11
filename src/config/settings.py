@@ -99,6 +99,8 @@ JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  
 # esquema `app` no esta expuesto, RD-10); `service_role` NUNCA se lee aqui (invariante 8).
 JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
 JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # RNF-01
+# RD-04: el worker deja aqui la exportacion diaria; el host la sube a Blob inmutable.
+JML_EXPORTES_DIR = os.environ.get("JML_EXPORTES_DIR", "/var/lib/jml/exportes")
 # Solo para enlazar tickets desde la ficha (RF-33); la web NUNCA llama a GLPI (CLAUDE.md).
 JML_GLPI_URL = os.environ.get("JML_GLPI_URL", "https://glpi.localhost")
 # Solo el worker: API v1 de GLPI por la red interna, sin pasar por el WAF (item 3.2).

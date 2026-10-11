@@ -137,6 +137,10 @@ services:
     environment:
       <<: *entorno-app
       JML_GLPI_API_URL: http://glpi/apirest.php
+      JML_EXPORTES_DIR: /var/lib/jml/exportes
+    volumes:
+      - soportes:/var/lib/jml/soportes
+      - exportes:/var/lib/jml/exportes  # RD-04: lo sube a Blob infra/scripts/subir-exportes.sh
     healthcheck:  # RNF-01: hora de la ultima sincronizacion exitosa
       test: ["CMD", "python", "manage.py", "worker", "--salud"]
       interval: 60s
@@ -232,6 +236,7 @@ secrets:
 
 volumes:
   bw-storage:
+  exportes:  # auditoria diaria + ancla (RD-04); en Azure, un directorio del host
   soportes:  # en Azure, compose.azure.yaml lo monta desde un sistema de archivos noexec (RS-17)
   glpi-datos:
   mariadb-datos:

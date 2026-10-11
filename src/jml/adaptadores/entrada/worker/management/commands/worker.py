@@ -10,10 +10,12 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from jml.adaptadores.entrada.worker.ciclo import Worker, esta_sano
+from jml.adaptadores.entrada.worker.exportacion import exportar_ayer
 from jml.adaptadores.salida.glpi.cliente import SistemaDeTicketsGlpi
 from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.adaptadores.salida.reloj import RelojDelSistema
 from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
+from jml.aplicacion.casos.auditoria import ExportarAuditoria
 from jml.aplicacion.casos.bandeja import DependenciasDeBandeja, ProcesarBandeja
 from jml.aplicacion.casos.sincronizar import (
     DependenciasDeSincronizacion,
@@ -53,7 +55,13 @@ def construir() -> Worker:
     sync = DependenciasDeSincronizacion(repos, glpi, reloj)
     return Worker(
         bandeja=ProcesarBandeja(DependenciasDeBandeja(repos, glpi, soportes, reloj)).ejecutar,
-        sincronizaciones=(SincronizarTickets(sync).ejecutar, SincronizarActivos(sync).ejecutar),
+        sincronizaciones=(
+            SincronizarTickets(sync).ejecutar,
+            SincronizarActivos(sync).ejecutar,
+            lambda: exportar_ayer(
+                ExportarAuditoria(repos), Path(settings.JML_EXPORTES_DIR), reloj.ahora()
+            ),
+        ),
         latido=Path(settings.JML_LATIDO_WORKER),
     )
 

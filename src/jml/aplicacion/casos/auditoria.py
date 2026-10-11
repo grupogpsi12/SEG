@@ -1,10 +1,15 @@
-"""RF-36: el Auditor consulta la auditoria y verifica la cadena (CA-09). Solo el rol Auditor."""
+"""RF-36: el Auditor consulta y verifica la cadena (CA-09); RD-04: exportacion diaria."""
+
+import json
+from dataclasses import dataclass
+from datetime import date
 
 from jml.aplicacion.dtos import PaginaDeAuditoria
 from jml.aplicacion.puertos import Repositorios
-from jml.dominio.auditoria import EventoDeAuditoria, ResultadoDeVerificacion
+from jml.dominio.auditoria import HASH_GENESIS, EventoDeAuditoria, ResultadoDeVerificacion
 from jml.dominio.errores import DatoInvalido, NoAutorizado
 from jml.dominio.permisos import puede_consultar_auditoria
+from jml.dominio.valores import hoy_en_bogota
 
 TAMANO_DE_PAGINA = 50
 
@@ -50,3 +55,50 @@ class VerificarAuditoria:
                 ),
             )
         return resultado
+
+
+@dataclass(frozen=True, slots=True)
+class ExportacionDeAuditoria:
+    """RD-04: lo que el worker escribe cada dia para la copia inmutable en Blob.
+
+    `lineas` son los registros del dia en su forma canonica con sus hashes (verificables sin la
+    base); `ancla_*` es la cabeza de TODA la cadena en el momento de exportar. Guardada fuera de la
+    base, el ancla delata una reescritura completa de la cadena (revision externa H1, punto 3).
+    """
+
+    dia: date
+    lineas: tuple[str, ...]
+    ancla_secuencia: int
+    ancla_hash: str
+    cadena_valida: bool
+
+
+class ExportarAuditoria:
+    def __init__(self, repos: Repositorios) -> None:
+        self._repos = repos
+
+    def ejecutar(self, dia: date) -> ExportacionDeAuditoria:
+        with self._repos.unidad_de_trabajo() as uow:
+            registros = uow.auditoria.registros()
+            verificacion = uow.auditoria.verificar()
+        del_dia = [r for r in registros if hoy_en_bogota(r.fecha) == dia]
+        lineas = tuple(
+            json.dumps(
+                {
+                    "registro": json.loads(r.contenido()),
+                    "hash_anterior": r.hash_anterior,
+                    "hash": r.hash,
+                },
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+            for r in del_dia
+        )
+        ultimo = registros[-1] if registros else None
+        return ExportacionDeAuditoria(
+            dia,
+            lineas,
+            ultimo.secuencia if ultimo else 0,
+            ultimo.hash if ultimo else HASH_GENESIS,
+            verificacion.valida,
+        )
