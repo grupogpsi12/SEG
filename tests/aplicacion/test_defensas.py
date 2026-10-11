@@ -87,7 +87,7 @@ def test_una_entrada_que_ya_no_esta_pendiente_no_se_procesa() -> None:
     with m.repos.unidad_de_trabajo() as u:
         entrada = u.bandeja.de_solicitud(sid)[0]
         u.bandeja.guardar(entrada.enviada())
-    conteo = _Conteo(en_error=[], en_ejecucion=[])
+    conteo = _Conteo()
     ProcesarBandeja(m._bandeja)._procesar(entrada.clave, conteo)
     ProcesarBandeja(m._bandeja)._procesar("no-existe", conteo)
     assert conteo.procesadas == 0
@@ -185,3 +185,35 @@ def test_RF_10_aprobar_una_emergencia_pendiente_tambien_marca_las_otras() -> Non
     assert m.solicitud(vac).para_revision
     assert m.solicitud(e).tipo is TipoEvento.EMG
     assert m.solicitud(e).subtipo is Subtipo.FUGA_DETECTADA
+
+
+def test_R2_cualquier_error_de_dominio_en_una_solicitud_se_aisla_y_se_audita(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un dato corrupto en una solicitud no detiene la sincronizacion de las demas."""
+    from jml.aplicacion.casos.sincronizar import SincronizarTickets
+    from jml.dominio.errores import DatoInvalido
+
+    m = Mundo.nuevo()
+    a = emitir_vac(m)
+    b = m.emitir(ingreso()).solicitud_id
+    m.correr_bandeja_hasta_vaciar()
+    m.tecnico_resuelve_todo(b)
+    original = SincronizarTickets._solicitud
+
+    def con_fallo(self: SincronizarTickets, sid: SolicitudId, obs: dict) -> None:  # type: ignore[type-arg]  # firma del metodo privado
+        if sid == a:
+            raise DatoInvalido("dato", "corrupto")
+        original(self, sid, obs)
+
+    monkeypatch.setattr(SincronizarTickets, "_solicitud", con_fallo)
+    res = m.sincronizar()
+    assert (res.resultado, res.errores) == ("error", 1)
+    assert m.solicitud(b).estado is S.CERRADA  # la otra se proceso
+    registros = [
+        r for r in m.repos.auditoria().registros() if r.accion == "sincronizacion.solicitud_fallida"
+    ]
+    assert [(r.objeto, dict(r.datos)) for r in registros] == [
+        (a.valor, {"codigo": "dato_invalido"})
+    ]
+    assert m.repos.auditoria().verificar().valida

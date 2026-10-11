@@ -6,7 +6,7 @@ transaccion mientras se espera la red). Como `crear_ticket` es idempotente por c
 timeout tras crear solo obliga a reintentar: nunca duplica.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from jml.aplicacion.bandeja import EntradaDeBandeja, EstadoDeEntrada
 from jml.aplicacion.casos._emision import registrar_eventos
@@ -45,8 +45,8 @@ class _Conteo:
     procesadas: int = 0
     creadas: int = 0
     reintentos: int = 0
-    en_error: list[SolicitudId] | None = None
-    en_ejecucion: list[SolicitudId] | None = None
+    en_error: list[SolicitudId] = field(default_factory=list)
+    en_ejecucion: list[SolicitudId] = field(default_factory=list)
 
 
 class ProcesarBandeja:
@@ -57,15 +57,15 @@ class ProcesarBandeja:
         dep = self._dep
         with dep.repos.unidad_de_trabajo() as uow:
             claves = [e.clave for e in uow.bandeja.vencidas(dep.reloj.ahora(), limite)]
-        cuenta = _Conteo(en_error=[], en_ejecucion=[])
+        cuenta = _Conteo()
         for clave in claves:
             self._procesar(clave, cuenta)
         return ResultadoDeBandeja(
             cuenta.procesadas,
             cuenta.creadas,
             cuenta.reintentos,
-            tuple(cuenta.en_error or ()),
-            tuple(cuenta.en_ejecucion or ()),
+            tuple(cuenta.en_error),
+            tuple(cuenta.en_ejecucion),
         )
 
     # --- una entrada -----------------------------------------------------------------------
@@ -174,8 +174,7 @@ class ProcesarBandeja:
                 r = actualizada.iniciar_ejecucion(esperadas)
                 actualizada = r.solicitud
                 registrar_eventos(uow, ACTOR_DEL_WORKER, r.eventos)
-                if cuenta.en_ejecucion is not None:
-                    cuenta.en_ejecucion.append(sid)
+                cuenta.en_ejecucion.append(sid)
             uow.solicitudes.guardar(actualizada)
         cuenta.creadas += 1
 
@@ -205,8 +204,7 @@ class ProcesarBandeja:
         r = solicitud.fallar_emision(codigo)
         uow.solicitudes.guardar(r.solicitud)
         registrar_eventos(uow, ACTOR_DEL_WORKER, r.eventos)
-        if cuenta.en_error is not None:
-            cuenta.en_error.append(sid)
+        cuenta.en_error.append(sid)
 
 
 class ReintentarEmision:

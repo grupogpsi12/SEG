@@ -21,7 +21,7 @@ from jml.dominio.auditoria import EventoDeAuditoria
 from jml.dominio.catalogo import DatosCambioDepartamento, DatosCambioSucursal
 from jml.dominio.colaborador import Colaborador
 from jml.dominio.cuentas import derivar_cuenta
-from jml.dominio.errores import NoEncontrado, OperacionNoPermitida
+from jml.dominio.errores import ErrorDeDominio, NoEncontrado, OperacionNoPermitida
 from jml.dominio.resolucion import (
     cierre_incompleto,
     estado_derivado_del_colaborador,
@@ -69,11 +69,23 @@ class SincronizarTickets:
         for sid in solicitudes:
             try:
                 self._solicitud(sid, observaciones)
-            except (NoEncontrado, OperacionNoPermitida):
+            except ErrorDeDominio as error:
+                # Un dato corrupto en una solicitud no detiene a las demas (R2). Su transaccion
+                # ya se deshizo; el fallo queda en la auditoria con su codigo estable.
                 errores += 1
+                self._auditar_fallo(sid, error)
         return self._registrar(
             inicio, "ok" if errores == 0 else "error", len(observaciones), errores
         )
+
+    def _auditar_fallo(self, sid: SolicitudId, error: ErrorDeDominio) -> None:
+        with self._dep.repos.unidad_de_trabajo() as uow:
+            uow.auditoria.registrar(
+                ACTOR_DEL_WORKER,
+                EventoDeAuditoria(
+                    "sincronizacion.solicitud_fallida", sid.valor, {"codigo": error.codigo}
+                ),
+            )
 
     def _registrar(
         self, inicio: datetime, resultado: str, leidos: int, errores: int
@@ -113,14 +125,13 @@ class SincronizarTickets:
         observaciones: dict[str, Observacion],
         ahora: datetime,
     ) -> None:
-        assert_id = seguido.id_externo
-        nueva = observaciones.get(assert_id) if assert_id is not None else None
+        nueva = observaciones.get(seguido.id_externo or "")
         if nueva is None:
             return
         anterior = seguido.observacion
         observado = seguido.observar(nueva)
         actual = observado.observacion
-        if actual is None:
+        if actual is None:  # pragma: no cover - observar() siempre deja una observacion
             return
         if _contenido(anterior) != _contenido(actual) or observado.reabierto != seguido.reabierto:
             uow.tickets.guardar(observado)  # solo si cambio algo: sin churn cada 5 minutos
