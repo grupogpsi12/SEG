@@ -1,0 +1,57 @@
+# CI (revision externa M3; items 0.1 y 1.1): las compuertas del repositorio en cada push y PR,
+# y las pruebas de integracion contra PostgreSQL 17 (la version de Supabase, spike 0.2).
+# Acciones y servicio fijados por SHA/digest (cadena de suministro, RS-18).
+name: verificar
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compuertas:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e  # v6.8.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen
+      - run: make verificar
+
+  integracion:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+        env:
+          POSTGRES_PASSWORD: postgres-solo-ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-retries 10
+    env:
+      PGPASSWORD: postgres-solo-ci
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e  # v6.8.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen
+      - name: Roles como en Supabase (docs/spikes/supabase.md)
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 <<'SQL'
+          create role anon; create role authenticated; create role service_role;
+          create role app_backend login nosuperuser nocreatedb nocreaterole noinherit nobypassrls
+            password 'app-backend-solo-ci';
+          create schema app_test authorization app_backend;
+          revoke all on schema app_test from public, anon, authenticated, service_role;
+          SQL
+      - name: Integracion y contratos contra PostgreSQL
+        env:
+          JML_PG_HOST: localhost
+          JML_PG_USUARIO: app_backend
+          JML_PG_CLAVE: app-backend-solo-ci
+          JML_PG_SSLMODE: disable
+        run: uv run pytest -q --ds tests.integracion.ajustes tests/integracion tests/contratos tests/adaptadores

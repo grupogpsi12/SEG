@@ -1,11 +1,17 @@
-PY ?= .venv/Scripts/python.exe
+# Windows (el equipo) y Linux (CI): el venv guarda los ejecutables en carpetas distintas.
+ifeq ($(OS),Windows_NT)
+BIN ?= .venv/Scripts
+else
+BIN ?= .venv/bin
+endif
+PY ?= $(BIN)/python
 .PHONY: verificar mutacion
 # Compuertas del nucleo (Fase 1, item 1.13): estilo, tipos estrictos, capas, pruebas y
 # cobertura de ramas por capa (dominio >= 95 %, aplicacion >= 90 %).
 verificar:
 	$(PY) -m ruff check .
 	$(PY) -m mypy
-	.venv/Scripts/lint-imports.exe
+	$(BIN)/lint-imports
 	$(PY) -m pytest -q --cov=jml --cov-branch tests/dominio tests/aplicacion tests/contratos tests/escenarios tests/adaptadores
 	$(PY) -m coverage report --include="src/jml/dominio/*" --fail-under=95
 	$(PY) -m coverage report --include="src/jml/aplicacion/*" --fail-under=90

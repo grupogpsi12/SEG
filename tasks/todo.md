@@ -175,6 +175,17 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [x] **2.13 Área de administración** (RF-37): matriz de perfiles, catálogos y roles, solo para el Administrador, con auditoría de cada cambio (RF-35) y validación de incompatibilidades (RF-05).
   ✔✔ ADR-027 (`RepoPerfiles.todos()` y `RepoUsuarios.todos()`, con contrato en doble y ORM) y área propia, no el admin de Django: casos `ConsultarMatriz`, `GuardarPerfil` (audita `perfil.actualizado`), `ConsultarUsuarios` y `CambiarRoles` (RF-05 por el dominio, audita `usuario.roles_cambiados`; nadie cambia sus propios roles). Vistas `/administracion/perfiles`, `/administracion/perfil` y `/administracion/usuarios`. Pruebas: `tests/aplicacion/test_administracion.py` (10) y `tests/adaptadores/test_administracion_web.py` (11). Catálogos = la matriz (S-32). Crear y desactivar cuentas sigue en el comando `admin_usuarios` (RF-06).
 
+- [~] **2.14 Revisión externa del 11/10/2026** (sobre `693f51c`; texto completo en `docs/spikes/revision-externa-2026-10-11.md`).
+  - [ ] **H1 (alta)** `app_backend` es dueño de las tablas: puede volver a darse UPDATE sobre `auditoria` y desactivar el disparador (invariantes 3, 4 y 8). **Pausa: decisión N3 pendiente** (ver propuesta en el documento).
+  - [ ] **H2 (media)** El disparador de inmutabilidad no valida transiciones de estado: volver a `pendiente_aprobacion`, editar y cerrar pasa (invariante 3). **Pausa: decisión N3 pendiente.**
+  - [ ] **H3 (media)** `RepoSolicitudes.obtener` sin `select_for_update`: dos aprobaciones simultáneas dejan dos decisiones y dos eventos de auditoría (cierra R1). **Pausa: decisión N3 pendiente.**
+  - [x] M1 el filtro de logs recorre listas y tuplas (`test_M1_tambien_dentro_de_listas_y_tuplas`).
+  - [x] M2 `Makefile` para Windows y Linux.
+  - [x] M3 CI en `.github/workflows/verificar.yml`: compuertas + integración contra `postgres:17` (acciones por SHA). Se activa cuando exista el repositorio en GitHub (0.1).
+  - [-] M4 `skip_locked` en `vencidas()`: **no se aplica**. `vencidas()` corre en una unidad de trabajo corta y cada entrada se procesa en otra, así que el bloqueo se libera antes de procesar y no protegería a dos workers. Hay un solo worker por diseño y la clave de idempotencia evita duplicar en GLPI. Si algún día hay más de uno, hace falta un arriendo de la entrada (estado «en proceso» con vencimiento).
+  - [x] M5 ya estaba resuelto en 2.5 (30 minutos y 8 horas).
+  - [x] M6 `mensajes.py` al 100 % (`tests/adaptadores/test_mensajes.py`).
+
 ## Fase 3 — Integración con GLPI
 
 - [ ] **3.1 Configuración de GLPI como código:** categorías, 4 grupos más «Revisión manual», reglas de negocio, SLA (incluida la emergencia de 1 h con escalamiento), plantillas de solución por cola, perfil de la cuenta de servicio y doble factor para técnicos.

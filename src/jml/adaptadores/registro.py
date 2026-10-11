@@ -26,6 +26,8 @@ def _prohibida(clave: str) -> bool:
 def _limpiar(valor: object) -> object:
     if isinstance(valor, dict):
         return {k: FILTRADO if _prohibida(str(k)) else _limpiar(v) for k, v in valor.items()}
+    if isinstance(valor, list | tuple | set | frozenset):
+        return [_limpiar(v) for v in valor]  # revision externa M1: las listas tambien
     return valor
 
 

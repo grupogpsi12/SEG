@@ -71,6 +71,15 @@ def test_tambien_se_filtran_dentro_de_diccionarios_anidados() -> None:
     }
 
 
+def test_M1_tambien_dentro_de_listas_y_tuplas() -> None:
+    """Revision externa M1: una lista de diccionarios salia en claro."""
+    d = _formatear(
+        "evento",
+        datos=[{"password": SENTINELA}, ({"token": SENTINELA}, "visible")],
+    )
+    assert d["datos"] == [{"password": "[filtrado]"}, [{"token": "[filtrado]"}, "visible"]]
+
+
 def test_un_campo_restringido_nunca_se_imprime() -> None:
     d = _formatear("retiro %s", CampoRestringido(SENTINELA), dato=CampoRestringido(SENTINELA))
     assert d["mensaje"] == "retiro CampoRestringido(<oculto>)"

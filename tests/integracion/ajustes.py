@@ -23,8 +23,10 @@ DATABASES = {
         "USER": os.environ.get("JML_PG_USUARIO", "app_backend"),
         "PASSWORD": os.environ["JML_PG_CLAVE"],
         "OPTIONS": {
-            "sslmode": "verify-full",
-            "sslrootcert": os.environ["JML_PG_CA"],
+            # Supabase: verify-full con su CA. La CI usa un PostgreSQL local en el mismo runner
+            # (JML_PG_SSLMODE=disable); nunca se desactiva TLS contra un servidor remoto.
+            "sslmode": os.environ.get("JML_PG_SSLMODE", "verify-full"),
+            "sslrootcert": os.environ.get("JML_PG_CA", ""),
             # Si la red corta una corrida, el servidor cierra la transaccion huerfana sola y no
             # deja bloqueado app_test para la siguiente (docs/spikes/supabase.md).
             "options": f"-c search_path={os.environ.get('JML_PG_ESQUEMA', 'app_test')}"
