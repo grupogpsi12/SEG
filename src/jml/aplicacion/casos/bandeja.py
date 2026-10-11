@@ -162,7 +162,7 @@ class ProcesarBandeja:
                 raise NoEncontrado("solicitud", sid.valor)
             if solicitud.estado is not EstadoSolicitud.APROBADA:
                 # R1: se cancelo mientras GLPI creaba el ticket. El ticket YA existe en GLPI:
-                # se registra y se audita como huerfano para que TI lo cierre; se respeta la cancelacion.
+                # se registra y se audita como huerfano para que TI lo cierre.
                 uow.auditoria.registrar(
                     ACTOR_DEL_WORKER,
                     EventoDeAuditoria(
