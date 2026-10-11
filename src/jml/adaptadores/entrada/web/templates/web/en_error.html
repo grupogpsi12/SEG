@@ -1,0 +1,20 @@
+{% extends "web/base.html" %}
+{% load web_extras %}
+{% block titulo %}Solicitudes en error{% endblock %}
+{% block contenido %}
+<h1>Solicitudes en error</h1>
+<p class="aviso">La emisión a GLPI agotó sus reintentos. Revise que GLPI esté disponible antes de reintentar; el reintento no duplica tickets (idempotencia).</p>
+<table>
+  <thead><tr><th>Solicitud</th><th>Evento</th><th>Colaborador</th><th>Fecha efectiva</th><th></th></tr></thead>
+  <tbody>
+  {% for f in filas %}
+    <tr>
+      <td>{{ f.id }}</td><td>{{ f.tipo|etiqueta }}</td><td>{{ f.colaborador_nombre }}</td><td>{{ f.fecha_efectiva|date:"Y-m-d" }}</td>
+      <td><form class="en-linea" method="post" action="{% url 'reintentar' f.id %}">{% csrf_token %}<button type="submit">Reintentar</button></form></td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">No hay solicitudes en error.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

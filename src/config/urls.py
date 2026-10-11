@@ -16,6 +16,12 @@ urlpatterns = [
     path("bandeja", vistas.bandeja, name="bandeja"),
     path("dashboard", tecnicos.dashboard, name="dashboard"),
     path("auditoria", vistas.auditoria, name="auditoria"),
+    path("errores", vistas.en_error, name="en_error"),
+    re_path(
+        r"^solicitudes/(?P<solicitud>SOL-\d{4}-\d{6})/reintentar$",
+        vistas.reintentar,
+        name="reintentar",
+    ),
     path("cuentas", tecnicos.cuentas, name="cuentas"),
     path("cuentas.csv", tecnicos.cuentas_csv, name="cuentas_csv"),
     path("colaboradores/<str:colaborador>", tecnicos.ficha, name="ficha"),

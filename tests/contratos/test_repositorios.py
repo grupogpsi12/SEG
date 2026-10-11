@@ -606,6 +606,18 @@ def test_ADR_025_pendientes_de_aprobacion_solo_las_pendientes(entorno: EntornoDe
         assert [s.id.valor for s in u.solicitudes.pendientes_de_aprobacion()] == ["SOL-2026-000001"]
 
 
+def test_ADR_026_en_error_solo_las_que_esperan_reintento(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
+    with uow(entorno) as u:
+        u.solicitudes.guardar(vac(3, estado=S.ERROR))
+        u.solicitudes.guardar(vac(1, estado=S.ERROR, colaborador_id="col-2"))
+        u.solicitudes.guardar(vac(2, estado=S.CERRADA))
+        assert [s.id.valor for s in u.solicitudes.en_error()] == [
+            "SOL-2026-000001",
+            "SOL-2026-000003",
+        ]
+
+
 def test_ADR_025_subordinados_directos_sin_retirados(entorno: EntornoDeContrato) -> None:
     def persona(cid: str, jefe: str | None, estado: EstadoColaborador, doc: str) -> object:
         return replace(

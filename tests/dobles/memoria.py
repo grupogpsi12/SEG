@@ -158,6 +158,10 @@ class _RepoSolicitudes:
         )
         return sorted(pendientes, key=lambda s: s.id.valor)
 
+    def en_error(self) -> Sequence[Solicitud]:
+        en_error = (s for s in self.a.solicitudes.values() if s.estado is EstadoSolicitud.ERROR)
+        return sorted(en_error, key=lambda s: s.id.valor)
+
 
 class _RepoColaboradores:
     def __init__(self, a: Almacen) -> None:

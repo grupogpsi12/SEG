@@ -289,3 +289,27 @@ def auditoria(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
         "web/auditoria.html",
         _contexto(perfil, p=p, ultima=ultima, verificacion=verificacion),
     )
+
+
+@require_GET
+@con_sesion
+def en_error(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
+    """RF-38: solicitudes cuya emision a GLPI agoto los reintentos."""
+    try:
+        filas = composicion.casos().en_error.ejecutar(perfil.usuario_id)
+    except NoAutorizado:
+        raise PermissionDenied from None
+    return render(request, "web/en_error.html", _contexto(perfil, filas=filas))
+
+
+@require_POST
+@con_sesion
+def reintentar(request: HttpRequest, perfil: PerfilDeUsuario, solicitud: str) -> HttpResponse:
+    try:
+        composicion.casos().reintentar.ejecutar(perfil.usuario_id, SolicitudId(solicitud))
+    except ErrorDeDominio as e:
+        messages.error(request, texto_del_error(e))
+    else:
+        messages.success(request, f"Solicitud {solicitud} devuelta a la bandeja de salida.")
+    # lecciones n.30: quien no es Administrador no vuelve a una pagina que tambien le niega
+    return redirect("en_error" if Rol.ADMINISTRADOR in perfil.roles else "solicitudes")

@@ -114,3 +114,10 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 33. **Instalar Docker Desktop desde una sesión sin privilegios.** `winget install Docker.DockerDesktop` falla (código 4294967291) si nadie acepta la elevación, y además Docker necesita WSL2, que exige reiniciar.
     → Pedírselo al equipo: PowerShell como administrador → `wsl --install` → reiniciar → `winget install -e --id Docker.DockerDesktop` → abrir Docker Desktop una vez.
+
+34. **Una corrida contra Supabase cortada por la red deja una transacción huérfana.** La sesión quedó «idle in transaction» con bloqueos sobre `app_test`, y la corrida siguiente falló entera con `statement timeout` (187 errores que no eran del código).
+    → Las conexiones llevan `idle_in_transaction_session_timeout=60000` (pruebas y producción): el servidor corta solo al huérfano.
+    → Si vuelve a pasar: listar `pg_stat_activity` del rol `app_backend` y `pg_terminate_backend` solo de las sesiones propias en «idle in transaction» cuando no corre ninguna otra suite.
+
+35. **Editar el código mientras una suite larga corre en segundo plano.** La suite importa módulos a medida que los necesita: 14 pruebas fallaron con `AttributeError` por una vista agregada a mitad de corrida.
+    → Mientras corre una suite en segundo plano, solo se edita documentación. Los resultados de esa corrida valen para el commit en el que empezó.

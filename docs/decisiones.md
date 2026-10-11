@@ -29,6 +29,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 023 | BunkerWeb como WAF y proxy inverso (en lugar de nginx y de Application Gateway) | Aceptada | 10/10/2026 |
 | 024 | Cloudflare Tunnel + Access delante de BunkerWeb | **Propuesta** (pendiente del equipo) | 10/10/2026 |
 | 025 | Tres consultas de lectura nuevas en los repositorios para las vistas (2.7) | Aceptada | 10/10/2026 |
+| 026 | Consulta de solicitudes en `error` para el reintento del Administrador (2.12) | Aceptada | 11/10/2026 |
 
 ---
 
@@ -339,3 +340,13 @@ Cada una tiene su prueba en la suite de contrato, que corre contra el doble y co
 - Una consulta genérica `buscar_solicitudes(filtro)`: es el «por si acaso» que `CLAUDE.md` prohíbe; hoy hay exactamente tres lecturas.
 
 **Consecuencias.** El contrato crece en tres métodos; los adaptadores existentes (doble y ORM) los implementan en el mismo commit. No cambia ninguna regla del dominio ni de los casos de uso de escritura.
+
+## ADR-026 — Consulta de solicitudes en `error` para el reintento (RF-38)
+
+**Contexto.** RF-38 exige que el Administrador reintente la emisión de una solicitud en `error`. El caso de uso `ReintentarEmision` existe desde el núcleo, pero ningún repositorio lista las solicitudes en ese estado, de modo que la interfaz no puede mostrarlas.
+
+**Decisión.** Se agrega `RepoSolicitudes.en_error()` (por id), con su prueba en la suite de contrato, implementada en el doble y en el ORM en el mismo commit. La vista usa el caso de lectura `SolicitudesEnError`, solo para el Administrador.
+
+**Alternativas descartadas.** Pedir el id a mano (el Administrador no tiene forma de saberlo); reutilizar el indicador (d) del dashboard (solo da conteos y es de los técnicos).
+
+**Consecuencias.** El contrato crece en un método de lectura; no cambia ninguna regla.

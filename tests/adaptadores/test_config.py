@@ -93,7 +93,7 @@ def test_la_base_de_produccion_es_postgresql_con_tls_y_esquema_app(
     opciones = db["OPTIONS"]
     assert isinstance(opciones, dict)
     assert opciones["sslmode"] == "verify-full"
-    assert opciones["options"] == "-c search_path=app"
+    assert opciones["options"] == "-c search_path=app -c idle_in_transaction_session_timeout=60000"
     assert str(opciones["sslrootcert"]).endswith("supabase_ca_crt")
     assert db["PASSWORD"] == "no-se-usa-en-pruebas"  # tambien viene de /run/secrets
 

@@ -141,6 +141,10 @@ class RepoSolicitudes:
         filas = m.Solicitud.objects.filter(estado=EstadoSolicitud.PENDIENTE_APROBACION.value)
         return [_solicitud(f) for f in filas.order_by("id")]
 
+    def en_error(self) -> Sequence[Solicitud]:
+        filas = m.Solicitud.objects.filter(estado=EstadoSolicitud.ERROR.value)
+        return [_solicitud(f) for f in filas.order_by("id")]
+
     def abierta_de_tipo(self, colaborador_id: ColaboradorId, tipo: TipoEvento) -> Solicitud | None:
         fila = m.Solicitud.objects.filter(
             colaborador_id=colaborador_id, tipo=tipo.value, estado__in=_ABIERTOS

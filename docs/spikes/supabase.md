@@ -47,7 +47,7 @@ JML_PG_CLAVE="$(cat secrets/db_password)" JML_PG_CA=secrets/supabase_ca_crt \
   pytest --ds tests.integracion.ajustes tests/integracion
 ```
 
-**Cuidado:** nunca correr dos sesiones de pruebas contra `app_test` a la vez (comparten esquema; la segunda se queda esperando bloqueos y falla con `statement timeout`).
+**Cuidado:** nunca correr dos sesiones de pruebas contra `app_test` a la vez (comparten esquema; la segunda se queda esperando bloqueos y falla con `statement timeout`). Si la red corta una corrida, su transacción queda huérfana: desde el 11/10/2026 la conexión lleva `idle_in_transaction_session_timeout=60000`, así que el servidor la corta al minuto (lecciones 34 y 35).
 
 **Pendiente de 0.2**: `pg_dump`/`pg_restore` contra un proyecto vacío; comprobar que la petición `/rest/v1/<tabla>` con la clave publicable falla; procedimiento de reactivación si el proyecto se pausa.
 

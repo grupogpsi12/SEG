@@ -169,8 +169,9 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [x] **2.11 Vista del Auditor** (RF-36, CA-09): consultar la auditoría (paginada) y verificar la cadena desde la interfaz, mostrando el primer registro afectado. Solo el rol Auditor.
   ✔ 403 para los demás roles; con un registro alterado en la base, la vista muestra la posición del primero afectado.
   ✔✔ Casos `ConsultarAuditoria` (50 por página, del más reciente) y `VerificarAuditoria` (la verificación queda auditada como `auditoria.verificada`). Vista `/auditoria` (GET consulta, POST verifica). `tests/adaptadores/test_auditor_web.py`: 403 para RRHH, Administrador, técnico y solicitante; un `UPDATE` directo sobre `auditoria` hace que la vista informe «cadena ROTA, posición 1» (CA-09 por la interfaz).
-- [ ] **2.12 Reintento de emisión** (RF-38): el Administrador ve las solicitudes en `error` y las devuelve a la bandeja. Requiere la consulta `solicitudes.en_error()` (ADR-026).
+- [x] **2.12 Reintento de emisión** (RF-38): el Administrador ve las solicitudes en `error` y las devuelve a la bandeja. Requiere la consulta `solicitudes.en_error()` (ADR-026).
   ✔ 403 para los demás; tras el reintento, la solicitud sale de la lista y la bandeja vuelve a intentar.
+  ✔✔ ADR-026 (`RepoSolicitudes.en_error()`, con su prueba de contrato en doble y ORM), caso `SolicitudesEnError`, vistas `/errores` y `POST /solicitudes/<id>/reintentar` (usa `ReintentarEmision` del núcleo). `tests/adaptadores/test_reintento_web.py`: el Administrador reintenta un ingreso en `error` y desaparece de la lista; los demás roles reciben 403 y el mensaje de «sin permiso» (lección 30).
 - [ ] **2.13 Área de administración** (RF-37): matriz de perfiles, catálogos y roles, solo para el Administrador, con auditoría de cada cambio (RF-35) y validación de incompatibilidades (RF-05). Diseño pendiente: el admin de Django edita los modelos sin pasar por el dominio ni la auditoría, así que se propone una vista propia sobre casos de uso.
 
 ## Fase 3 — Integración con GLPI

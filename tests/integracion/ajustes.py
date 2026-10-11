@@ -25,7 +25,10 @@ DATABASES = {
         "OPTIONS": {
             "sslmode": "verify-full",
             "sslrootcert": os.environ["JML_PG_CA"],
-            "options": f"-c search_path={os.environ.get('JML_PG_ESQUEMA', 'app_test')}",
+            # Si la red corta una corrida, el servidor cierra la transaccion huerfana sola y no
+            # deja bloqueado app_test para la siguiente (docs/spikes/supabase.md).
+            "options": f"-c search_path={os.environ.get('JML_PG_ESQUEMA', 'app_test')}"
+            " -c idle_in_transaction_session_timeout=60000",
         },
     }
 }

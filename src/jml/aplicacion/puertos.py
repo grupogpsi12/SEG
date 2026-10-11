@@ -253,6 +253,10 @@ class RepoSolicitudes(Protocol):
 
     def pendientes_de_aprobacion(self) -> Sequence[Solicitud]: ...
 
+    def en_error(self) -> Sequence[Solicitud]:
+        """ADR-026: las que esperan el reintento del Administrador (RF-38), por id."""
+        ...
+
 
 class RepoColaboradores(Protocol):
     def guardar(self, colaborador: Colaborador) -> None:

@@ -67,7 +67,9 @@ DATABASES = {
         "OPTIONS": {
             "sslmode": "verify-full",
             "sslrootcert": str(ruta_de_secreto("supabase_ca_crt")),
-            "options": "-c search_path=app",  # esquema no expuesto en la Data API (RD-10)
+            # Esquema no expuesto en la Data API (RD-10). Una transaccion abandonada (proceso
+            # caido a mitad) se corta a los 60 s y no deja filas bloqueadas.
+            "options": "-c search_path=app -c idle_in_transaction_session_timeout=60000",
         },
     }
 }

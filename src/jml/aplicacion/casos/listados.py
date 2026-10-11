@@ -18,7 +18,7 @@ from jml.aplicacion.dtos import (
 from jml.aplicacion.puertos import Repositorios, UnidadDeTrabajo
 from jml.dominio.auditoria import EventoDeAuditoria
 from jml.dominio.errores import DatoInvalido, NoAutorizado, NoEncontrado
-from jml.dominio.permisos import Actor, puede_ver_restringidos
+from jml.dominio.permisos import Actor, puede_reintentar_emision, puede_ver_restringidos
 from jml.dominio.solicitud import Solicitud
 from jml.dominio.tipos import EstadoSolicitud, Rol
 from jml.dominio.valores import BOGOTA, Documento, SolicitudId
@@ -164,3 +164,16 @@ class ConsultarSolicitud:
                 )
             datos = tuple((f.name, _como_texto(getattr(s.datos, f.name))) for f in fields(s.datos))
             return DetalleDeSolicitud(_fila(uow, s, usuario_id), s.subtipo, datos, restringido)
+
+
+class SolicitudesEnError:
+    """RF-38: las que esperan el reintento del Administrador (ADR-026)."""
+
+    def __init__(self, repos: Repositorios) -> None:
+        self._repos = repos
+
+    def ejecutar(self, usuario_id: str) -> tuple[FilaDeSolicitud, ...]:
+        with self._repos.unidad_de_trabajo() as uow:
+            if not puede_reintentar_emision(_actor(uow, usuario_id).roles):
+                raise NoAutorizado("solicitudes_en_error", "solo el Administrador reintenta")
+            return tuple(_fila(uow, s, usuario_id) for s in uow.solicitudes.en_error())
