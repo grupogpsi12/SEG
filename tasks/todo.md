@@ -141,8 +141,9 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔ CA-09 contra PostgreSQL.
 - [ ] **2.5 Autenticación** (RF-01 a RF-06, RS-08, RS-16): adaptador `ProveedorDeIdentidad` (Supabase Auth), vistas de inicio de sesión, inscripción y verificación de TOTP; sesión de Django; grupos como roles; incompatibilidades; comando `admin-usuarios`.
   ✔ CA-14; con roles incompatibles se recibe 403 y queda en auditoría.
-- [ ] **2.6 Semillas** (RD-07): 3 sedes, 6 departamentos, la matriz de perfiles con sus recursos compartidos (§4.9) y 30 colaboradores.
+- [x] **2.6 Semillas** (RD-07): 3 sedes, 6 departamentos, la matriz de perfiles con sus recursos compartidos (§4.9) y 30 colaboradores.
   ✔ Comando idempotente.
+  ✔✔ Evidencia: `python manage.py semillas` crea 18 perfiles y 30 colaboradores con 48 eventos de auditoría; la segunda corrida cambia 0 y no audita nada. La matriz de las semillas coincide celda por celda con la transcripción independiente de `tests/fabricas.py`. **Decisión:** no siembra cuentas (invariante 6: solo nacen de tickets resueltos) ni usuarios (los crea `admin-usuarios`, RF-06); 10 contratistas con fin escalonado alimentan RF-28.
 - [ ] **2.7 Vistas web:** nueva solicitud, mis solicitudes, bandeja de RRHH y contratos por vencer (RF-28). Solo validan el formulario, verifican el rol y llaman al caso de uso.
   ✔ Pruebas de extremo a extremo por rol.
 - [ ] **2.8 Campos restringidos en la persistencia y las vistas** (RD-05).
