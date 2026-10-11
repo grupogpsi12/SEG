@@ -62,6 +62,7 @@ Rutas web: `/ingreso`, `/ingreso/segundo-factor`, `/salir`, `/solicitudes`, `/so
 ## 4. Lo que falta, en orden
 
 ### A. Acciones del equipo (bloquean pruebas reales)
+0. **Decidir H1, H2 y H3 de la revisión externa** (`docs/spikes/revision-externa-2026-10-11.md`, nivel N3, invariantes 3, 4 y 8). Son fallos reales de la capa PostgreSQL; la propuesta está escrita y espera aprobación. Los menores M1 a M6 ya están atendidos.
 1. **Instalar Docker** en el equipo de desarrollo. En PowerShell **como administrador**: `wsl --install`, **reiniciar**, `winget install -e --id Docker.DockerDesktop`, abrir Docker Desktop una vez. Dos intentos automáticos fallaron por falta de elevación (lección 33).
 2. **Supabase (RS-16)**, en el Dashboard: desactivar *Allow new users to sign up* (hoy está activo: lo detecta `test_RS_16_…`), contraseña mínima de 12, confirmar TOTP habilitado y crear la clave secreta en `secrets/supabase_service_role`.
 3. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
