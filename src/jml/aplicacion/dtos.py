@@ -297,3 +297,13 @@ class FichaDeColaborador:
     licencias: tuple[LicenciaAsignada, ...]
     solicitudes: tuple[ResumenDeSolicitud, ...]
     tickets: tuple[ResumenDeTicket, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class DetalleDeSolicitud:
+    """Detalle para la vista (2.8). `restringido` solo viene lleno para RRHH (RD-05, CA-10)."""
+
+    fila: FilaDeSolicitud
+    subtipo: Subtipo | None
+    datos: tuple[tuple[str, str], ...]  # (campo, valor) de los datos del evento
+    restringido: str | None

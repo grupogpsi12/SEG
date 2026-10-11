@@ -30,7 +30,13 @@ from jml.aplicacion.dtos import (
     ResultadoDeDecision,
     SolicitudRegistrada,
 )
-from jml.dominio.errores import DatoInvalido, ErrorDeDominio, NoAutorizado, RolesIncompatibles
+from jml.dominio.errores import (
+    DatoInvalido,
+    ErrorDeDominio,
+    NoAutorizado,
+    NoEncontrado,
+    RolesIncompatibles,
+)
 from jml.dominio.tipos import EstadoSolicitud, Rol, TipoEvento
 from jml.dominio.valores import SolicitudId, hoy_en_bogota
 
@@ -196,6 +202,22 @@ def _enviar(
     return (
         f"Solicitud {r.solicitud_id} emitida: se enviaron {r.tickets_encolados} tickets a la cola."
     )
+
+
+@require_GET
+@con_sesion
+def detalle(request: HttpRequest, perfil: PerfilDeUsuario, solicitud: str) -> HttpResponse:
+    """2.8: el campo restringido solo llega lleno para RRHH; la pagina no se guarda en cache."""
+    try:
+        d = composicion.casos().consultar_solicitud.ejecutar(
+            perfil.usuario_id, SolicitudId(solicitud)
+        )
+    except (DatoInvalido, NoEncontrado):
+        raise Http404 from None
+    respuesta = render(request, "web/detalle.html", _contexto(perfil, d=d))
+    if d.restringido is not None:
+        respuesta["Cache-Control"] = "no-store"
+    return respuesta
 
 
 @require_GET

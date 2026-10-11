@@ -14,6 +14,7 @@ urlpatterns = [
     path("solicitudes/nueva", vistas.nueva_indice, name="nueva_indice"),
     path("solicitudes/nueva/<str:tipo>", vistas.nueva, name="nueva"),
     path("bandeja", vistas.bandeja, name="bandeja"),
+    re_path(r"^solicitudes/(?P<solicitud>SOL-\d{4}-\d{6})$", vistas.detalle, name="detalle"),
     re_path(
         r"^solicitudes/(?P<solicitud>SOL-\d{4}-\d{6})/(?P<accion>aprobar|rechazar|cancelar)$",
         vistas.decidir,

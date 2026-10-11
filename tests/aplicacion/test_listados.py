@@ -108,3 +108,52 @@ def test_rrhh_encuentra_a_una_persona_por_su_documento() -> None:
     for usuario in ("u-col", "u-jefe", "u-tec-ad"):
         with pytest.raises(NoAutorizado):
             buscar.ejecutar(usuario, "10203040")
+
+
+def test_rrhh_ve_el_restringido_en_el_detalle_y_queda_auditado() -> None:
+    from jml.aplicacion.casos.listados import ConsultarSolicitud
+
+    m = Mundo.nuevo()
+    r = m.emitir(retiro(restringido=SENTINELA))
+    d = ConsultarSolicitud(m.puerto).ejecutar("u-rrhh", r.solicitud_id)
+    assert d.restringido == SENTINELA
+    consultas = [x for x in m.repos.auditoria().registros() if x.accion == "restringido.consultado"]
+    assert [(x.actor, x.objeto) for x in consultas] == [("u-rrhh", r.solicitud_id.valor)]
+    assert SENTINELA not in repr(m.repos.auditoria().registros())
+
+
+def test_quien_registro_ve_el_detalle_pero_nunca_el_restringido() -> None:
+    from jml.aplicacion.casos.listados import ConsultarSolicitud
+
+    m = Mundo.nuevo()
+    r = m.registrar(retiro(usuario="u-col", restringido=SENTINELA))
+    d = ConsultarSolicitud(m.puerto).ejecutar("u-col", r.solicitud_id)
+    assert d.restringido is None
+    assert SENTINELA not in repr(d)
+    assert d.subtipo is not None
+
+
+@pytest.mark.parametrize("usuario", ["u-jefe", "u-otro", "u-tec-ad", "u-aud", "u-admin"])
+def test_los_demas_no_saben_si_la_solicitud_existe(usuario: str) -> None:
+    from jml.aplicacion.casos.listados import ConsultarSolicitud
+    from jml.dominio.errores import NoEncontrado
+    from jml.dominio.valores import SolicitudId
+
+    m = Mundo.nuevo()
+    r = m.registrar(vacaciones())
+    for sid in (r.solicitud_id, SolicitudId("SOL-2026-999999")):
+        with pytest.raises(NoEncontrado):
+            ConsultarSolicitud(m.puerto).ejecutar(usuario, sid)
+
+
+def test_el_detalle_traduce_los_datos_a_texto() -> None:
+    from jml.aplicacion.casos.listados import ConsultarSolicitud
+    from tests.mundo import cambio_de_sucursal, emergencia
+
+    m = Mundo.nuevo()
+    csu = m.registrar(cambio_de_sucursal())
+    d = dict(ConsultarSolicitud(m.puerto).ejecutar("u-rrhh", csu.solicitud_id).datos)
+    assert d == {"sede_nueva": "Cali", "traslada_equipo": "Sí"}
+    emg = m.emitir(emergencia())
+    d = dict(ConsultarSolicitud(m.puerto).ejecutar("u-rrhh", emg.solicitud_id).datos)
+    assert d["hora_del_hecho"] == "2026-10-12 09:00"  # en hora de Bogota

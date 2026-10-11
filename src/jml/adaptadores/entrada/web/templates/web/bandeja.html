@@ -9,7 +9,7 @@
   <tbody>
   {% for f in filas %}
     <tr>
-      <td>{{ f.id }}</td>
+      <td><a href="{% url 'detalle' f.id %}">{{ f.id }}</a></td>
       <td>{{ f.tipo|etiqueta }}</td>
       <td>{{ f.colaborador_nombre }}</td>
       <td>{{ f.fecha_efectiva|date:"Y-m-d" }}</td>

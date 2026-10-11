@@ -5,14 +5,23 @@ una vista que olvide el chequeo no abre la informacion (RF-03).
 """
 
 from collections.abc import Sequence
+from dataclasses import fields
+from datetime import datetime
+from enum import Enum
 
-from jml.aplicacion.dtos import FilaDeSolicitud, OpcionDeColaborador, PerfilDeUsuario
+from jml.aplicacion.dtos import (
+    DetalleDeSolicitud,
+    FilaDeSolicitud,
+    OpcionDeColaborador,
+    PerfilDeUsuario,
+)
 from jml.aplicacion.puertos import Repositorios, UnidadDeTrabajo
-from jml.dominio.errores import DatoInvalido, NoAutorizado
-from jml.dominio.permisos import Actor
+from jml.dominio.auditoria import EventoDeAuditoria
+from jml.dominio.errores import DatoInvalido, NoAutorizado, NoEncontrado
+from jml.dominio.permisos import Actor, puede_ver_restringidos
 from jml.dominio.solicitud import Solicitud
 from jml.dominio.tipos import EstadoSolicitud, Rol
-from jml.dominio.valores import Documento
+from jml.dominio.valores import BOGOTA, Documento, SolicitudId
 
 
 def _actor(uow: UnidadDeTrabajo, usuario_id: str) -> Actor:
@@ -117,3 +126,41 @@ class ColaboradorPorDocumento:
                 return None  # un documento invalido no es un error: no hay nadie con ese numero
             c = uow.colaboradores.por_documento(clave)
             return None if c is None else OpcionDeColaborador(c.id, c.nombre_completo)
+
+
+def _como_texto(valor: object) -> str:
+    if valor is None:
+        return "—"
+    if isinstance(valor, bool):
+        return "Sí" if valor else "No"
+    if isinstance(valor, datetime):
+        return valor.astimezone(BOGOTA).strftime("%Y-%m-%d %H:%M")
+    if isinstance(valor, Enum):
+        return str(valor.value)
+    return str(valor)
+
+
+class ConsultarSolicitud:
+    """El detalle lo ven RRHH y quien la registro; el campo restringido, solo RRHH (RD-05).
+
+    A quien no puede verla se le responde «no encontrada»: no se confirma que el id exista.
+    Cada vez que RRHH ve un campo restringido queda en la auditoria (RF-35).
+    """
+
+    def __init__(self, repos: Repositorios) -> None:
+        self._repos = repos
+
+    def ejecutar(self, usuario_id: str, solicitud_id: SolicitudId) -> DetalleDeSolicitud:
+        with self._repos.unidad_de_trabajo() as uow:
+            actor = _actor(uow, usuario_id)
+            s = uow.solicitudes.obtener(solicitud_id)
+            es_rrhh = puede_ver_restringidos(actor.roles)
+            if s is None or not (es_rrhh or s.solicitante_id == usuario_id):
+                raise NoEncontrado("solicitud", solicitud_id.valor)
+            restringido = s.restringido.revelar() if es_rrhh and s.restringido else None
+            if restringido is not None:
+                uow.auditoria.registrar(
+                    usuario_id, EventoDeAuditoria("restringido.consultado", s.id.valor, {})
+                )
+            datos = tuple((f.name, _como_texto(getattr(s.datos, f.name))) for f in fields(s.datos))
+            return DetalleDeSolicitud(_fila(uow, s, usuario_id), s.subtipo, datos, restringido)

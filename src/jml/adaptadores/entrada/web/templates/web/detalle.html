@@ -1,0 +1,22 @@
+{% extends "web/base.html" %}
+{% load web_extras %}
+{% block titulo %}{{ d.fila.id }}{% endblock %}
+{% block contenido %}
+<h1>{{ d.fila.id }} · {{ d.fila.tipo|etiqueta }}</h1>
+<table>
+  <tbody>
+    <tr><th>Colaborador</th><td>{{ d.fila.colaborador_nombre }}</td></tr>
+    <tr><th>Estado</th><td>{{ d.fila.estado|etiqueta }}{% if d.fila.para_revision %} <span class="aviso">(para revisión)</span>{% endif %}</td></tr>
+    <tr><th>Fecha efectiva</th><td>{{ d.fila.fecha_efectiva|date:"Y-m-d" }}</td></tr>
+    <tr><th>Registrada</th><td>{{ d.fila.creada_en|date:"Y-m-d H:i" }}</td></tr>
+    {% if d.subtipo %}<tr><th>Subtipo</th><td>{{ d.subtipo.value }}</td></tr>{% endif %}
+    {% for campo, valor in d.datos %}
+    <tr><th>{{ campo|capfirst }}</th><td>{{ valor }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if d.restringido %}
+<h2>Información restringida (solo RRHH)</h2>
+<p class="restringido">{{ d.restringido|linebreaksbr }}</p>
+{% endif %}
+{% endblock %}

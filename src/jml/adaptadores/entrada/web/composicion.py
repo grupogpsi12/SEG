@@ -33,6 +33,7 @@ from jml.aplicacion.casos.ingreso import (
 )
 from jml.aplicacion.casos.listados import (
     ColaboradorPorDocumento,
+    ConsultarSolicitud,
     MiPerfil,
     MisSolicitudes,
     PendientesDeAprobacion,
@@ -69,6 +70,7 @@ class Casos:
     pendientes: PendientesDeAprobacion
     subordinados: SubordinadosDe
     mi_perfil: MiPerfil
+    consultar_solicitud: ConsultarSolicitud
     colaborador_por_documento: ColaboradorPorDocumento
     contratos_por_vencer: ContratosPorVencer
     iniciar_ingreso: IniciarIngreso
@@ -95,6 +97,7 @@ def casos() -> Casos:
         pendientes=PendientesDeAprobacion(repos),
         subordinados=SubordinadosDe(repos),
         mi_perfil=MiPerfil(repos),
+        consultar_solicitud=ConsultarSolicitud(repos),
         colaborador_por_documento=ColaboradorPorDocumento(repos),
         contratos_por_vencer=ContratosPorVencer(DependenciasDeConsulta(repos, r)),
         iniciar_ingreso=IniciarIngreso(identidad),
