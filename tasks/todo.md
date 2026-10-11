@@ -148,8 +148,9 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔ Pruebas de extremo a extremo por rol.
 - [ ] **2.8 Campos restringidos en la persistencia y las vistas** (RD-05).
   ✔ CA-10 completo (logs, respuestas, fichas).
-- [ ] **2.9 Carga del soporte de vinculación** (RF-39, RD-12, RS-17): formulario con archivo, adaptador `AlmacenDeSoportes` sobre el volumen `noexec`, validación de firma y tamaño, y límite en BunkerWeb.
+- [~] **2.9 Carga del soporte de vinculación** (RF-39, RD-12, RS-17): formulario con archivo, adaptador `AlmacenDeSoportes` sobre el volumen `noexec`, validación de firma y tamaño, y límite en BunkerWeb.
   ✔ CA-18 (parte de la carga): un archivo no PDF renombrado a `.pdf` y uno de más de 20 MB se rechazan; el nombre en disco es aleatorio; la suite de contrato de `AlmacenDeSoportes` pasa.
+  ✔ Hecho (adaptador): `AlmacenDeSoportesEnDisco` pasa la suite de contrato sin cambios (fábrica `orm`, sobre `tmp_path`): nombre aleatorio de 32 hex sin extensión, creación exclusiva con 0o600, y un nombre manipulado en la base no sale del volumen. ⏳ Falta el formulario de carga (con 2.7) y el límite en BunkerWeb (2.2).
 
 ## Fase 3 — Integración con GLPI
 

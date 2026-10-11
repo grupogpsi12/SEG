@@ -7,6 +7,7 @@ Si un adaptador necesita cambiar una prueba de contrato, el puerto esta mal.
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
@@ -37,7 +38,7 @@ class EntornoDeContrato:
     codigo_totp_valido: str
 
 
-def fabrica_memoria() -> EntornoDeContrato:
+def fabrica_memoria(directorio: Path) -> EntornoDeContrato:
     reloj = RelojSimulado()
     glpi = SistemaDeTicketsEnMemoria(reloj)
     identidad = ProveedorDeIdentidadEnMemoria()
@@ -54,16 +55,20 @@ def fabrica_memoria() -> EntornoDeContrato:
     )
 
 
-def fabrica_orm() -> EntornoDeContrato:
-    """Repositorios reales (ORM de Django); los demas puertos siguen siendo dobles.
+def fabrica_orm(directorio: Path) -> EntornoDeContrato:
+    """Adaptadores reales: repositorios sobre el ORM y soportes en disco (`tmp_path`).
+
+    GLPI, identidad y reloj siguen siendo dobles hasta los spikes 0.3 y 0.4.
 
     Sin Docker corre sobre SQLite en memoria (tests/adaptadores/ajustes.py). Las reglas
     exclusivas de PostgreSQL (disparador, REVOKE, concurrencia) estan en tests/integracion.
     """
     from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
+    from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
 
-    base = fabrica_memoria()
+    base = fabrica_memoria(directorio)
     base.repos = RepositoriosDjango(base.reloj)
+    base.soportes = AlmacenDeSoportesEnDisco(directorio)
     return base
 
 
@@ -71,5 +76,5 @@ FABRICAS = {"memoria": fabrica_memoria, "orm": fabrica_orm}
 
 
 @pytest.fixture(params=sorted(FABRICAS))
-def entorno(request: pytest.FixtureRequest) -> EntornoDeContrato:
-    return FABRICAS[request.param]()
+def entorno(request: pytest.FixtureRequest, tmp_path: Path) -> EntornoDeContrato:
+    return FABRICAS[request.param](tmp_path)
