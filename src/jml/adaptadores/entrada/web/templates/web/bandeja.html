@@ -1,0 +1,49 @@
+{% extends "web/base.html" %}
+{% load web_extras %}
+{% block titulo %}Bandeja de RRHH{% endblock %}
+{% block contenido %}
+<h1>Pendientes de aprobación</h1>
+{% if filas %}
+<table>
+  <thead><tr><th>Solicitud</th><th>Evento</th><th>Colaborador</th><th>Fecha efectiva</th><th>Decisión</th></tr></thead>
+  <tbody>
+  {% for f in filas %}
+    <tr>
+      <td>{{ f.id }}</td>
+      <td>{{ f.tipo|etiqueta }}</td>
+      <td>{{ f.colaborador_nombre }}</td>
+      <td>{{ f.fecha_efectiva|date:"Y-m-d" }}</td>
+      <td>
+        {# Dos formularios por fila: aprobar no exige justificacion; rechazar si. #}
+        <form class="en-linea" method="post" action="{% url 'decidir' f.id 'aprobar' %}">
+          {% csrf_token %}<button type="submit">Aprobar</button>
+        </form>
+        <form method="post" action="{% url 'decidir' f.id 'rechazar' %}">
+          {% csrf_token %}
+          <label for="j-{{ f.id }}" class="aviso">Justificación del rechazo</label>
+          <input type="text" id="j-{{ f.id }}" name="justificacion" maxlength="500">
+          <button class="secundario" type="submit">Rechazar</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No hay solicitudes pendientes.</p>
+{% endif %}
+
+<h1>Contratos por vencer (7 días)</h1>
+{% if contratos %}
+<table>
+  <thead><tr><th>Colaborador</th><th>Fin de contrato</th><th>Días</th></tr></thead>
+  <tbody>
+  {% for c in contratos %}
+    <tr><td>{{ c.nombre_completo }}</td><td>{{ c.fecha_fin|date:"Y-m-d" }}</td><td>{{ c.dias_restantes }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Ningún contrato vence en los próximos 7 días.</p>
+{% endif %}
+{% endblock %}

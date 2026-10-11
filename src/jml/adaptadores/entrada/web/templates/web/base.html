@@ -1,0 +1,22 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Eventos laborales{% endblock %} · Andina Servicios</title>
+  <link rel="stylesheet" href="{% static 'web/estilo.css' %}">
+</head>
+<body>
+  <header>
+    <a href="{% url 'solicitudes' %}">Mis solicitudes</a>
+    <a href="{% url 'nueva_indice' %}">Nueva solicitud</a>
+    {% if es_rrhh %}<a href="{% url 'bandeja' %}">Bandeja de RRHH</a>{% endif %}
+  </header>
+  <main>
+    {% for m in messages %}
+      <p class="mensaje{% if m.level_tag == 'error' %} error{% endif %}" role="status">{{ m }}</p>
+    {% endfor %}
+    {% block contenido %}{% endblock %}
+  </main>
+</body>
+</html>

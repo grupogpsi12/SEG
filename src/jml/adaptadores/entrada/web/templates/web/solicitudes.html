@@ -1,0 +1,31 @@
+{% extends "web/base.html" %}
+{% load web_extras %}
+{% block titulo %}Mis solicitudes{% endblock %}
+{% block contenido %}
+<h1>Mis solicitudes</h1>
+{% if filas %}
+<table>
+  <thead><tr><th>Solicitud</th><th>Evento</th><th>Colaborador</th><th>Fecha efectiva</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+  {% for f in filas %}
+    <tr>
+      <td>{{ f.id }}</td>
+      <td>{{ f.tipo|etiqueta }}</td>
+      <td>{{ f.colaborador_nombre }}</td>
+      <td>{{ f.fecha_efectiva|date:"Y-m-d" }}</td>
+      <td>{{ f.estado|etiqueta }}{% if f.para_revision %} <span class="aviso">(para revisión)</span>{% endif %}</td>
+      <td>
+        {% if f.cancelable %}
+        <form class="en-linea" method="post" action="{% url 'decidir' f.id 'cancelar' %}">
+          {% csrf_token %}<button class="secundario" type="submit">Cancelar</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Todavía no ha registrado solicitudes.</p>
+{% endif %}
+{% endblock %}

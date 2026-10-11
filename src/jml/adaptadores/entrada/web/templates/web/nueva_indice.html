@@ -1,0 +1,14 @@
+{% extends "web/base.html" %}
+{% block titulo %}Nueva solicitud{% endblock %}
+{% block contenido %}
+<h1>Nueva solicitud</h1>
+{% if tipos %}
+<ul>
+  {% for valor, nombre in tipos %}
+  <li><a href="{% url 'nueva' valor %}">{{ nombre }}</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Su perfil no permite registrar solicitudes.</p>
+{% endif %}
+{% endblock %}

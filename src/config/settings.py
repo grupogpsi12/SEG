@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
     "django.contrib.sessions",
+    "django.contrib.messages",
     "django.contrib.staticfiles",
     "jml.adaptadores.salida.persistencia.apps.PersistenciaConfig",
     "jml.adaptadores.entrada.web.apps.WebConfig",
@@ -24,6 +25,7 @@ MIDDLEWARE = [
     "jml.adaptadores.entrada.web.middleware.correlacion",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -38,7 +40,13 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
         "APP_DIRS": True,
-        "OPTIONS": {"context_processors": ["django.template.context_processors.request"]},
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
+        },
     }
 ]
 
@@ -50,7 +58,8 @@ DATABASES = {
         "HOST": os.environ.get("JML_DB_HOST", ""),
         "PORT": "5432",
         "NAME": os.environ.get("JML_DB_NAME", "postgres"),
-        "USER": "app_backend",
+        # El pooler de Supabase (Supavisor) exige el usuario como `app_backend.<proyecto>`.
+        "USER": os.environ.get("JML_DB_USUARIO", "app_backend"),
         "PASSWORD": leer_secreto("db_password"),
         "OPTIONS": {
             "sslmode": "verify-full",
@@ -66,6 +75,9 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+LOGIN_URL = "/ingreso"  # la pantalla de inicio de sesion llega con 2.5
+LOGIN_REDIRECT_URL = "/"
+JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  # volumen noexec
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- seguridad (RS-04, RS-07) -----------------------------------------------------------------

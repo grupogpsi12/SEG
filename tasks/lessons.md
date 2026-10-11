@@ -98,3 +98,10 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 28. **Comparar con el oráculo solo en instantes «normales».** La comparación ORM ↔ oráculo pasaba con un `<` cambiado por `<=` porque ningún dato caía justo en el borde.
     → Barrer instantes que incluyan los bordes exactos de cada ticket (emisión, activación, vencimiento, ±1 s, y −7 días para la ventana del indicador g) y los límites de mes. Validar la prueba introduciendo esos cambios a propósito.
+
+29. **Escribir archivos con heredocs de bash que contienen comillas.** Un comando largo con varios heredocs y apóstrofes falló antes de ejecutarse («unexpected EOF») y no se aplicó nada.
+    → Para crear o editar archivos usar Write/Edit; reservar Bash para ejecutar. Tras un fallo así, comprobar qué se aplicó antes de repetir.
+
+30. **Redirigir tras una acción denegada a una página que también la deniega.** Un POST de aprobación hecho por un colaborador mostraba «sin permiso» pero redirigía a la bandeja de RRHH, que respondía 403 y ocultaba el mensaje.
+    → El destino de la redirección depende del rol de quien actúa; probar el flujo con el rol que NO debe poder.
+

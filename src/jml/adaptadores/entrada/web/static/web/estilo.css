@@ -1,0 +1,19 @@
+:root { --fondo: #f6f7f9; --texto: #1d2733; --acento: #1f5fbf; --borde: #d5dbe3; --error: #a4262c; --ok: #1e6b3a; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, sans-serif; background: var(--fondo); color: var(--texto); }
+header { background: #fff; border-bottom: 1px solid var(--borde); padding: 0.75rem 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+header a { color: var(--acento); text-decoration: none; font-weight: 600; }
+main { max-width: 60rem; margin: 1.5rem auto; padding: 0 1rem; }
+h1 { font-size: 1.4rem; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--borde); vertical-align: top; }
+form p { margin: 0.75rem 0; }
+label { display: block; font-weight: 600; }
+input[type=text], input[type=date], input[type=datetime-local], select, textarea { width: 100%; max-width: 32rem; padding: 0.4rem; border: 1px solid var(--borde); border-radius: 4px; font: inherit; }
+button { padding: 0.45rem 0.9rem; border: 0; border-radius: 4px; background: var(--acento); color: #fff; font: inherit; cursor: pointer; }
+button.secundario { background: #fff; color: var(--acento); border: 1px solid var(--acento); }
+.mensaje { padding: 0.6rem 0.9rem; border-radius: 4px; margin: 0 0 1rem; background: #fff; border-left: 4px solid var(--ok); }
+.mensaje.error { border-left-color: var(--error); color: var(--error); }
+.errorlist { color: var(--error); list-style: none; padding: 0; margin: 0.25rem 0; }
+.aviso { font-size: 0.9rem; color: #52606d; }
+form.en-linea { display: inline; }
