@@ -138,3 +138,17 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 41. **Scripts de `infra/` que llaman a `python3`.** En Git Bash de Windows `python3` es el atajo de la Microsoft Store y falla; con `set -e` el script se detiene a mitad y deja archivos de secreto vacíos.
     → Los scripts de infraestructura no dependen de Python (usar `/dev/urandom`, `openssl`, `base64`). Al reintentar, `asegurar` recrea los secretos vacíos.
+
+
+42. **Archivos de datos fuera del paquete.** La imagen instala el proyecto con `pip install .` y setuptools solo empaqueta `.py`: en el contenedor faltaban las plantillas y el CSS y `/ingreso` daba 500, aunque las 1570 pruebas pasaban (corren desde el código fuente). Además, una prueba de empaquetado hecha sobre mi carpeta pasaba sin merecerlo, porque `src/jml.egg-info/SOURCES.txt` (residuo de la instalación editable) hace que setuptools incluya archivos.
+    → Los datos del paquete se declaran en `pyproject.toml` (`package-data`). `test_empaquetado.py` construye desde una **copia limpia**, sin `*.egg-info`, y se comprobó que falla sin el arreglo.
+    → Regla general: una prueba nueva se prueba también contra el defecto que dice vigilar.
+
+43. **Probar un WAF con ráfagas.** El límite de peticiones (429) y el CRS (403) bloquean ambos; sin pausa entre peticiones, los ataques reciben 429 y la prueba «pasa» sin demostrar nada del CRS. Además el baneo es por sitio, y `curl -I` (HEAD) a una ruta que no lo acepta devuelve la página de error de BunkerWeb con su propia CSP.
+    → `pruebas.sh` espera 1 s entre peticiones. Para revisar cabeceras usar `curl -D - -o /dev/null`, no `-I`.
+
+44. **Montar de solo lectura un directorio que el servicio también escribe.** `bw-scheduler` crea subcarpetas en `/data/configs` y se reiniciaba en bucle con `Read-only file system`.
+    → Se montan de solo lectura solo las subcarpetas que la configuración controla (`modsec-crs/`, `modsec/`).
+
+45. **Heredocs de bash con comillas, otra vez.** Un comando largo con varios heredocs falló al analizarse y no se aplicó nada (lección 29).
+    → Los scripts de edición de más de unas pocas líneas se escriben con la herramienta de archivos y se ejecutan aparte.

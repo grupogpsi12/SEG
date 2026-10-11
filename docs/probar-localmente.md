@@ -43,7 +43,7 @@ docker compose -f infra/compose.yaml -f infra/compose.local.yaml exec web python
 2. Abra `https://app.localhost`. El certificado es autofirmado: acepte la advertencia del navegador.
 3. Ingrese con la cuenta que le dio el Administrador. La primera vez se inscribe el TOTP (ver `docs/manual-usuario.md`).
 
-**Cuentas.** Las crea el Administrador, con la clave `service_role` en `secrets/supabase_service_role`:
+**Cuentas.** Las crea el Administrador, con la clave `service_role` en `secrets/supabase_service_role`. Para el equipo ya existen cuatro (administrador, rrhh, tecnico.ad y auditor, todas `@andina.example`); sus contraseñas iniciales están en `secrets/cuentas-de-prueba.txt` (no se versiona). Cada persona inscribe **su propio** TOTP la primera vez. Para crear más:
 
 ```bash
 docker compose -f infra/compose.yaml -f infra/compose.local.yaml run --rm admin-usuarios \
@@ -56,12 +56,12 @@ Los colaboradores de las semillas van de `col-001` a `col-030` (`col-006` a `col
 
 | Funciona | Pendiente |
 |---|---|
-| Ingreso con TOTP, solicitudes, bandeja de RRHH, detalle, dashboard, cuentas, ficha y CSV, Auditor, área de administración, reintento | **Creación de tickets en GLPI**: el worker no arranca hasta que exista el adaptador de GLPI (ítem 3.2). Las solicitudes aprobadas quedan en la bandeja de salida |
+| Ingreso con TOTP, solicitudes, bandeja de RRHH, detalle, dashboard, cuentas, ficha y CSV, Auditor, área de administración, reintento, subida de PDF de hasta 20 MB | **Creación de tickets en GLPI**: el worker no arranca (perfil `glpi`) hasta que GLPI tenga la API habilitada y los tokens en `secrets/` (ítem 3.1 y spike 0.3). Las solicitudes aprobadas quedan en la bandeja de salida. En la base local ya hay una solicitud de ingreso de la prueba del WAF (`Prueba Subida`) |
 | GLPI 11 en `https://glpi.localhost` (se instala solo la primera vez) | Configuración de GLPI como código (3.1) |
 | El WAF bloquea los ataques: `infra/waf/pruebas.sh app.localhost` | Exclusiones del CRS (spike 0.6): si algo legítimo da 403, avise con la ruta |
 
 ## 5. Problemas comunes
 
-- **Todo da 403 después de probar ataques**: su IP quedó baneada 1 hora. Desbloquéela con `docker compose -f infra/compose.yaml exec bw-scheduler bwcli unban 172.17.0.1` (o con su IP).
+- **Todo da 403 después de probar ataques**: su IP quedó baneada 1 hora, **solo en ese sitio**. Desde Docker Desktop el cliente se ve como `10.20.40.1`. Vea los baneos con `… exec bw-scheduler bwcli bans` y desbloquee con `… exec bw-scheduler bwcli unban 10.20.40.1`.
 - **`web` no queda *healthy***: revise `docker compose ... logs web`. Casi siempre falta `migrar` o la clave publicable.
 - **Empezar de cero**: `docker compose -f infra/compose.yaml -f infra/compose.local.yaml down -v` (borra la base local).

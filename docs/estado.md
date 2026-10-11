@@ -21,6 +21,8 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 | 4. Dashboard y búsqueda | 4.2 a 4.4 hechos. 4.1: índices puestos; falta medir el p95 |
 | 5. Entrega | Escritos el manual de usuario, el manual de operación, el despliegue en Azure y los scripts de respaldo, todo sin ejecutar |
 
+**Stack con Docker en el equipo de desarrollo** (11/10/2026): 6 servicios sanos, `pruebas.sh` en verde en los dos sitios, ingreso real de extremo a extremo (HTTPS + WAF + Supabase Auth + TOTP), PDF de 20 MB aceptado y de 22 MB cortado (413). Detalle en `docs/spikes/bunkerweb.md`. Cuentas de prueba: `secrets/cuentas-de-prueba.txt`.
+
 **CI en GitHub** (`grupogpsi12/SEG`, 11/10/2026): `verificar` y `imagen` en verde en `776a24b`.
 
 **Pruebas locales** (SQLite, sin Docker): **1570 pasan**. Cobertura de ramas: 98 %. `ruff`, `mypy --strict` e `import-linter` limpios.
@@ -77,13 +79,13 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 
 ### A. Acciones del equipo
 1. **Supabase**: contraseña mínima de 12 en el Dashboard y correr el asesor de seguridad antes de la entrega (RS-16). El registro abierto y la clave `service_role` ya están hechos.
-2. **Docker en el equipo de desarrollo**: Docker Desktop ya está instalado, pero no arranca con *«Virtual Machine Platform not enabled»*. La virtualización del firmware está activa; falta habilitar la característica de Windows: en PowerShell como administrador `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`, igual con `Microsoft-Windows-Subsystem-Linux`, `wsl --update`, **reiniciar** y abrir Docker Desktop (aceptar los términos). `docker.exe` no está en el PATH de Git Bash: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`.
+2. **Docker en el equipo de desarrollo**: ya funciona (se habilitó la plataforma de máquina virtual y se reinició). `docker.exe` no está en el PATH de Git Bash: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`. Para probar: `docs/probar-localmente.md`. Falta agregar `127.0.0.1 app.localhost glpi.localhost` al archivo `hosts` para usar el navegador.
 3. **GitHub** (0.1): el repositorio existe (`grupogpsi12/SEG`) y tiene todo el trabajo hasta `d906d30`. Falta la protección de `main`/`master` y un pre-commit con gitleaks. La CI corre; la imagen se publica en GHCR cuando `verificar` pase.
 4. Decisiones: 0.0 (aprobar el SRS v2.3), 0.7 (Cloudflare), los supuestos **S-28 a S-33**, y revisar ADR-025 a ADR-028.
 5. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
 
 ### B. Con Docker
-6. **2.2**: levantar el stack y dejar todo *healthy*; correr `infra/waf/pruebas.sh` en ambos sitios. Confirmar los nombres de ajustes de BunkerWeb (spike 0.6) y versionar las exclusiones del CRS.
+6. **GLPI real** (lo que sigue): habilitar la API REST y crear el cliente de API y los tokens (`docs/operacion.md` §2), correr `configurar_glpi` y arrancar el worker (`--profile glpi`). Luego **0.3**: hacer pasar la suite de contrato de `SistemaDeTickets` contra GLPI en contenedor sin cambios, y recorrer GLPI en modo `detect` (cierra el spike 0.6).
 7. **0.3 Spike de GLPI 11**: confirmar cada punto marcado «spike 0.3» en `adaptadores/salida/glpi/` (tabla en `docs/spikes/glpi-puerto.md`). La suite de contrato debe pasar **sin cambios** contra GLPI en contenedor (Toxiproxy para los fallos). Correr `configurar_glpi` contra un GLPI limpio.
 8. **2.9 / CA-18 / CA-20**: subir un PDF de 20 MB a través del WAF, hasta GLPI.
 9. **5.1**: flujos ING, VAC, RET y EMG de extremo a extremo; **4.1**: p95 con 300 colaboradores.

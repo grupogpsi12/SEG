@@ -34,6 +34,11 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# Plantillas y estaticos de la capa web: sin esto la imagen (pip install .) arranca sin ellas y
+# /ingreso responde 500 (leccion 42). Lo vigila tests/adaptadores/test_empaquetado.py.
+[tool.setuptools.package-data]
+"jml.adaptadores.entrada.web" = ["templates/**/*", "static/**/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # tests/integracion necesita PostgreSQL y GLPI reales: se corre explicitamente (ver su ajustes.py)

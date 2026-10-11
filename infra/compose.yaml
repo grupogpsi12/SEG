@@ -114,7 +114,10 @@ services:
     volumes:
       - bw-storage:/data
       # Exclusiones puntuales del CRS, una por archivo con ruta, regla y motivo (RS-18)
-      - ./bunkerweb/configs:/data/configs:ro
+      # Solo las carpetas de exclusiones van de solo lectura: el scheduler crea sus propias
+      # subcarpetas en /data/configs y fallaba si toda la raiz era de solo lectura (spike 0.6).
+      - ./bunkerweb/configs/modsec-crs:/data/configs/modsec-crs:ro
+      - ./bunkerweb/configs/modsec:/data/configs/modsec:ro
     mem_limit: 384m
     networks: [bw-universe]
 

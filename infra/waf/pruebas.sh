@@ -21,6 +21,9 @@ FALLOS=0
 probar() {  # esperados(separados por |) descripcion curl-args...
   local esperados="$1" descripcion="$2"; shift 2
   local codigo
+  # 1 s entre peticiones: el limite de BunkerWeb es 2 por segundo (RS-08). Sin pausa, los ataques
+  # reciben 429 del limite y no 403 del CRS, y la prueba no demuestra que el CRS los detecte.
+  sleep "${PAUSA:-1}"
   codigo=$("${CURL[@]}" "$@")
   if [[ "|$esperados|" == *"|$codigo|"* ]]; then
     printf "  %s%-4s%s %-46s (esperado %s)\n" "$VERDE" "$codigo" "$NORMAL" "$descripcion" "$esperados"
@@ -65,15 +68,28 @@ for puerto in 8000 3306 5000; do
   fi
 done
 
-if [ "$IP" = "127.0.0.1" ] && command -v docker > /dev/null; then
+if command -v docker > /dev/null && [ -n "$(docker ps -q --filter name=bw-scheduler 2> /dev/null)" ]; then
   echo
-  echo "API interna de BunkerWeb sin token (RS-19): debe rechazarse"
-  codigo=$(docker compose -f "$(dirname "$0")/../compose.yaml" exec -T bw-scheduler \
-    sh -c 'curl -s -o /dev/null -w "%{http_code}" http://bunkerweb:5000/ping' 2>/dev/null || echo "?")
-  if [ "$codigo" = "401" ] || [ "$codigo" = "403" ]; then
-    printf "  %s%s%s  sin API_TOKEN rechazada\n" "$VERDE" "$codigo" "$NORMAL"
+  echo "API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token"
+  # Desde el scheduler (IP en la lista blanca): si rechaza sin token pero acepta con el, el
+  # rechazo es por el API_TOKEN. BunkerWeb rechaza CERRANDO la conexion (sin codigo HTTP).
+  resultado=$(docker exec "$(docker ps -q --filter name=bw-scheduler | head -1)" python3 -c "
+import os, urllib.request as u, urllib.error as e
+def codigo(cab):
+    try:
+        return str(u.urlopen(u.Request('http://bunkerweb:5000/ping', headers={'Host': 'bwapi', **cab}), timeout=5).status)
+    except e.HTTPError as x:
+        return str(x.code)
+    except Exception:
+        return 'cerrada'
+print(codigo({}), codigo({'Authorization': 'Bearer malo'}), codigo({'Authorization': 'Bearer ' + os.environ['API_TOKEN']}))" 2> /dev/null || echo "? ? ?")
+  read -r sin malo con <<< "$resultado"
+  if [[ "$sin" =~ ^(401|403|cerrada)$ && "$malo" =~ ^(401|403|cerrada)$ && "$con" = "200" ]]; then
+    printf "  %sOK%s   sin token: %s · token malo: %s · token correcto: %s
+" "$VERDE" "$NORMAL" "$sin" "$malo" "$con"
   else
-    printf "  %s%s%s  sin API_TOKEN NO rechazada (confirmar puerto y ruta en el spike 0.6)\n" "$ROJO" "$codigo" "$NORMAL"
+    printf "  %sFALLA%s sin token: %s · token malo: %s · token correcto: %s
+" "$ROJO" "$NORMAL" "$sin" "$malo" "$con"
     FALLOS=$((FALLOS + 1))
   fi
 fi

@@ -19,3 +19,4 @@ mutants/
 *.bak
 staticfiles/
 infra/.env
+build/
