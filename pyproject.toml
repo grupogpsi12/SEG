@@ -3,10 +3,13 @@ name = "jml"
 version = "0.1.0"
 description = "Sistema integrado de eventos laborales (JML) — núcleo"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["django>=5.2,<5.3", "psycopg[binary]>=3.2,<4"]
 
 [dependency-groups]
-dev = ["pytest", "pytest-cov", "hypothesis", "mutmut", "ruff", "mypy", "import-linter"]
+dev = [
+    "pytest", "pytest-cov", "pytest-django", "pytest-timeout", "hypothesis", "mutmut<3",
+    "ruff", "mypy", "django-stubs>=5.2,<5.3", "import-linter",
+]
 
 [build-system]
 requires = ["setuptools>=75"]
@@ -20,6 +23,7 @@ testpaths = ["tests"]
 pythonpath = ["src", "."]
 addopts = "-ra --strict-markers --strict-config"
 xfail_strict = true
+DJANGO_SETTINGS_MODULE = "tests.adaptadores.ajustes"
 
 [tool.coverage.run]
 branch = true
@@ -45,27 +49,33 @@ mypy_path = "src"
 files = ["src", "tests"]
 explicit_package_bases = true
 namespace_packages = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "tests.adaptadores.ajustes"
 
 [tool.importlinter]
-root_packages = ["jml"]
+root_packages = ["jml", "config"]
 include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "dominio solo importa la biblioteca estandar (CA-17)"
 type = "forbidden"
 source_modules = ["jml.dominio"]
-forbidden_modules = ["jml.aplicacion", "jml.adaptadores", "django", "httpx", "psycopg", "requests"]
+forbidden_modules = [
+    "jml.aplicacion", "jml.adaptadores", "config", "django", "httpx", "psycopg", "requests",
+]
 
 [[tool.importlinter.contracts]]
 name = "aplicacion solo importa dominio (CA-17)"
 type = "forbidden"
 source_modules = ["jml.aplicacion"]
-forbidden_modules = ["jml.adaptadores", "django", "httpx", "psycopg", "requests"]
+forbidden_modules = ["jml.adaptadores", "config", "django", "httpx", "psycopg", "requests"]
 
 [[tool.importlinter.contracts]]
 name = "capas del nucleo"
 type = "layers"
-layers = ["jml.aplicacion", "jml.dominio"]
+layers = ["config", "jml.adaptadores", "jml.aplicacion", "jml.dominio"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["E501"]

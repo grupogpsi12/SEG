@@ -84,3 +84,6 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 24. **Hash de documento en GLPI.** El núcleo verifica el SHA-256 del soporte contra lo que GLPI devuelve (`hash_de_documento`), pero GLPI guarda `sha1sum`, no SHA-256.
     → Pendiente del spike 0.3: confirmar qué hash expone la API; si es SHA-1, el adaptador lo calcula al subir y el puerto sigue igual (la verificación la hace el adaptador).
+
+25. **Duplicar una cabecera de seguridad en Django y en BunkerWeb**, o «arreglar» los avisos de `check --deploy` activando lo que ya hace el borde.
+    → Una sola fuente por cabecera (RS-07). Los avisos que cubre BunkerWeb se silencian con su motivo en `SILENCED_SYSTEM_CHECKS`, y una prueba fija la lista exacta, de modo que cualquier aviso nuevo de `check --deploy` falla la CI.

@@ -2,7 +2,7 @@
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]` recortado.
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
-Ítem activo: **2.1**
+Ítem activo: **2.3** (2.2 necesita Docker)
 
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
@@ -110,8 +110,18 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 
 ## Fase 2 — Adaptadores base y seguridad (solo tras el Hito N)
 
-- [ ] **2.1 Proyecto Django** con `src/jml/adaptadores`, `config` que lee `/run/secrets`, logging JSON con filtro de campos prohibidos y `/salud`.
+- [x] **2.1 Proyecto Django** con `src/jml/adaptadores`, `config` que lee `/run/secrets`, logging JSON con filtro de campos prohibidos y `/salud`.
   ✔ `lint-imports` sigue en verde; el log filtra los campos prohibidos.
+
+  **Plan (sin Docker: SQLite en memoria solo en las pruebas; PostgreSQL llega en 2.3).**
+  - Dependencias de esta fase, ya en la tabla del stack de CLAUDE.md: `django` 5.2 LTS, `django-stubs` 5.2 y `pytest-django`.
+  - `src/config/`: `secretos.py` (lee `/run/secrets/<nombre>`; nombre validado contra recorrido de rutas; error que nombra el secreto, nunca su valor), `settings.py`, `urls.py`, `wsgi.py`; `manage.py` en la raíz.
+  - Seguridad que es solo configuración: `DEBUG` falso por defecto, `ALLOWED_HOSTS` explícito, cookies `Secure`/`HttpOnly`/`SameSite=Lax`, `X-Frame-Options: DENY` y la CSP de RS-07 desde Django. **No** se duplican HSTS, `Referrer-Policy` ni `nosniff`, que pone BunkerWeb (RS-07).
+  - Logging JSON con `correlation_id` y filtro de campos prohibidos (`password`, `token`, `totp`, `secret`, `motivo`, `descripcion`), en `jml/adaptadores/registro.py`.
+  - `/salud`: 200 si la base responde, 503 genérico si no (RNF-01), sin detalles internos.
+  - `import-linter`: `config` → `adaptadores` → `aplicacion` → `dominio`; el núcleo no puede importar `config` ni `adaptadores`.
+  - Fuera de 2.1 (a propósito): confianza en `X-Forwarded-*` solo desde BunkerWeb y WhiteNoise (2.2); sesión de 8 horas máximo (2.5).
+  ✔✔ Evidencia: 1129 pruebas (49 de adaptadores); `mypy --strict` con `django-stubs` y `ruff` limpios; `import-linter` cumple y **rompe** si `aplicacion` importa `config` o si `dominio` importa `jml.adaptadores` (probado y revertido); los logs filtran `password`, `token`, `totp`, `secret`, `motivo` y `descripcion` (también anidados) y un `CampoRestringido` se imprime `<oculto>`; `/salud` responde 200 o 503 genérico; la CSP y `X-Frame-Options` salen de Django y las demás cabeceras no se duplican; `manage.py check --deploy` sin avisos (solo se silencian los cuatro que resuelve BunkerWeb). Cobertura de `config` + `adaptadores`: 97 % (`wsgi.py` se prueba en 2.2 con gunicorn). Nueva dependencia: `psycopg[binary]` 3 (driver de PostgreSQL, ya en la tabla de herramientas del SRS).
 - [ ] **2.2 `infra/compose.yaml`:** bunkerweb, bw-scheduler, web, worker, glpi y mariadb, más el servicio `admin-usuarios` (perfil aparte). Redes `bw-universe` (aislada), `app` y `db_net` (interna). BunkerWeb en multisitio con `API_TOKEN`, CRS en bloqueo, `MAX_CLIENT_SIZE=21m` en `app.*`, límites (RS-08) y real IP. Django con WhiteNoise, `SECURE_PROXY_SSL_HEADER` y confianza en `X-Forwarded-For` solo desde BunkerWeb. Chequeos de salud, límites de memoria e imágenes por digest.
   ✔ Todo en healthy; `docker port` solo muestra `bunkerweb`; `service_role` no aparece en web ni worker; `pruebas.sh` en verde contra `app.localhost` y `glpi.localhost`; una petición a la API interna sin token es rechazada.
 - [ ] **2.3 Persistencia** (RD-01 a RD-03, RD-09 a RD-11, RF-14): modelos, migraciones y repositorios que implementan los puertos; restricción parcial, documento único, disparador de inmutabilidad, `REVOKE` y RLS por `RunSQL`.
