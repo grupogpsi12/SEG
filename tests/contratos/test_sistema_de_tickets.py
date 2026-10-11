@@ -88,7 +88,10 @@ def test_leer_tickets_refleja_lo_que_hace_el_tecnico_RF_22(entorno: EntornoDeCon
     t = un_ticket()
     gid = entorno.glpi.crear_ticket(t).id_externo
     obs = entorno.glpi.leer_tickets([gid])[gid]
-    assert (obs.estado, obs.tiene_solucion, obs.documentos) == (EstadoDeTicket.NUEVO, False, 0)
+    # S-34: en GLPI la regla de enrutamiento asigna el grupo y el ticket pasa de «Nuevo» a
+    # «En curso». El nucleo solo distingue «antes» y «desde» Resuelto (RF-24).
+    assert obs.estado in (EstadoDeTicket.NUEVO, EstadoDeTicket.EN_CURSO)
+    assert (obs.tiene_solucion, obs.documentos) == (False, 0)
     assert obs.observada_en == entorno.reloj.ahora()
     entorno.tecnico.resolver(gid, con_solucion=True, documentos=2)
     resuelto = entorno.glpi.leer_tickets([gid])[gid]
@@ -183,8 +186,9 @@ def test_leer_activos_y_licencias(entorno: EntornoDeContrato) -> None:
     assert list(entorno.glpi.leer_activos(uid)) == []
     activo = ActivoAsignado("A1", "Portátil", "SN-1", "ThinkPad", HOY - timedelta(days=3), True)
     lic = LicenciaAsignada("L1", "Suite ofimática", "K-001")
-    entorno.tecnico.asignar_activo(uid, activo)
-    entorno.tecnico.asignar_licencia(uid, lic)
+    # GLPI real asigna sus propios ids: la expectativa (lo leido == lo asignado) no cambia.
+    activo = entorno.tecnico.asignar_activo(uid, activo)
+    lic = entorno.tecnico.asignar_licencia(uid, lic)
     assert list(entorno.glpi.leer_activos(uid)) == [activo]
     assert list(entorno.glpi.leer_licencias(uid)) == [lic]
     assert list(entorno.glpi.leer_activos("otro")) == []

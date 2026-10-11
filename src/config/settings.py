@@ -149,5 +149,7 @@ LOGGING = {
             "filters": ["correlacion", "prohibidos"],
         }
     },
+    # httpx registra a INFO cada URL pedida (con claves de busqueda): se deja en WARNING.
+    "loggers": {"httpx": {"level": "WARNING"}, "httpcore": {"level": "WARNING"}},
     "root": {"handlers": ["consola"], "level": os.environ.get("JML_NIVEL_DE_LOG", "INFO")},
 }

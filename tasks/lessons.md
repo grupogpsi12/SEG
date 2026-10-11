@@ -152,3 +152,18 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 45. **Heredocs de bash con comillas, otra vez.** Un comando largo con varios heredocs falló al analizarse y no se aplicó nada (lección 29).
     → Los scripts de edición de más de unas pocas líneas se escriben con la herramienta de archivos y se ejecutan aparte.
+
+
+46. **Escribir un adaptador sin probarlo contra el sistema real.** El adaptador de GLPI pasaba 17 pruebas contra un simulador y, contra GLPI real, descubrimos cinco cosas que el simulador no podía saber: GLPI ignora `priority` y `time_to_resolve` al crear; responde 200 con una lista a `Ticket/no-existe`; acepta vincular a un documento 0; guarda los tokens cifrados; y trabaja en UTC.
+    → Un simulador solo refleja lo que su autor creyó. Mientras no exista la suite contra el sistema real, el adaptador es provisional. Después, el simulador se actualiza con lo aprendido para que siga siendo útil.
+
+47. **Probar contra un sistema con estado.** GLPI conserva los tickets entre pruebas y la suite esperaba empezar vacía: fallaban pruebas por residuos de corridas anteriores, no por el código.
+    → El ayudante real limpia lo suyo al empezar (`limpiar()`), y solo si se declara que es un GLPI de pruebas (`JML_GLPI_DE_PRUEBAS=si`), porque las claves de prueba (`SOL-2026-000001`) podrían chocar con las de datos reales.
+
+48. **Derechos de GLPI que no avisan.** Sin el bit 256 del derecho `slm`, GLPI ignora en silencio el vencimiento que se le envía (responde 200). Se halló por bisección automática sobre los 100 derechos que diferían del Super-Admin.
+    → Ante un valor que «no se guarda» sin error, comparar contra una cuenta con todos los derechos y bisectar.
+
+49. **Límites en cadena.** El WAF (21 MB), Django (20 MB) y GLPI (PHP con unos pocos MB) deben coincidir: GLPI respondía 413 al subir el soporte de 20 MB aunque todo lo anterior lo aceptaba.
+    → Los límites de subida se declaran juntos (BunkerWeb, Django, `infra/glpi/php-jml.ini` y `document_max_size`) y se prueban con el archivo del tamaño máximo.
+
+50. **Código que depende de la hora del servidor.** Se enviaba el vencimiento en hora de Bogotá a un GLPI que guarda UTC: quedaba 5 horas corrido. → Enviar siempre en la zona del servidor receptor (UTC) y documentar la conversión para quien lo lee (S-35).

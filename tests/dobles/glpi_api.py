@@ -169,6 +169,15 @@ class GlpiSimulado:
                     return _json(["ERROR_GLPI_ADD", "item inexistente"], 400)
             if partes[0] == "ITILCategory":  # GLPI calcula el nombre completo (raiz: = nombre)
                 entrada.setdefault("completename", entrada["name"])
+            if (
+                partes[0] == "Ticket"
+            ):  # spike 0.3: GLPI recalcula la prioridad y ignora el vencimiento
+                entrada.pop("priority", None)
+                entrada.pop("time_to_resolve", None)
+                entrada["urgency"] = entrada.get("urgency", 3)
+                entrada["impact"] = entrada.get("impact", 3)
+                entrada["priority"] = max(entrada["urgency"], entrada["impact"])
+                entrada.setdefault("slas_id_ttr", 0)
             return _json({"id": int(self._agregar(partes[0], entrada)), "message": ""}, 201)
         if p.method == "PUT" and len(partes) == 2:
             item = self._tabla(partes[0]).get(partes[1])
@@ -256,7 +265,7 @@ class GlpiSimulado:
                 return int(id_)
         return int(self._agregar(tipo, {"name": nombre, "completename": nombre}))
 
-    def asignar_activo(self, id_usuario: str, activo: ActivoAsignado) -> None:
+    def asignar_activo(self, id_usuario: str, activo: ActivoAsignado) -> ActivoAsignado:
         self._agregar(
             "Computer",
             {
@@ -284,8 +293,9 @@ class GlpiSimulado:
                 "Document_Item",
                 {"documents_id": int(doc), "itemtype": "Computer", "items_id": activo.id_glpi},
             )
+        return activo
 
-    def asignar_licencia(self, id_usuario: str, licencia: LicenciaAsignada) -> None:
+    def asignar_licencia(self, id_usuario: str, licencia: LicenciaAsignada) -> LicenciaAsignada:
         self._agregar(
             "SoftwareLicense",
             {
@@ -296,6 +306,7 @@ class GlpiSimulado:
             },
             licencia.id_glpi,
         )
+        return licencia
 
     def creaciones(self, clave: str) -> int:
         return sum(1 for t in self._tabla("Ticket").values() if t.get("externalid") == clave)

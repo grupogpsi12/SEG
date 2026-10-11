@@ -17,9 +17,11 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 |---|---|
 | 1. Núcleo (`dominio` + `aplicacion`) | **Congelado** en el Hito N (etiqueta `nucleo-v1`). Cobertura de ramas: 99 %; mutación del dominio: 93,6 % (el dominio no cambió desde entonces) |
 | 2. Adaptadores base y seguridad | Hechos 2.1, 2.3, 2.5 a 2.8 y 2.10 a 2.14. 2.4 hecho salvo subir a Blob (Azure). 2.2 escrito y probado sin Docker. 2.9 falta probarlo a través del WAF |
-| 3. GLPI | 3.1 y 3.2 **escritos y provisionales**: probados contra un GLPI simulado sobre HTTP; falta el spike 0.3 contra GLPI real. 3.3: el worker sincroniza con el adaptador |
+| 3. GLPI | **3.1, 3.2 y 3.3 hechos y verificados contra GLPI 11.0.11 real** (spike 0.3 cerrado). El ingreso (ING) funciona de punta a punta. 3.4 y 5.1: faltan VAC, RET y EMG |
 | 4. Dashboard y búsqueda | 4.2 a 4.4 hechos. 4.1: índices puestos; falta medir el p95 |
 | 5. Entrega | Escritos el manual de usuario, el manual de operación, el despliegue en Azure y los scripts de respaldo, todo sin ejecutar |
+
+**GLPI real** (11/10/2026): la suite de contrato de `SistemaDeTickets` y 9 pruebas de integración (26 en total) pasan contra GLPI 11.0.11 reconstruido desde cero con `infra/glpi/preparar-glpi.sh` y `configurar-glpi`. Flujo **ING completo** verificado: emisión por RRHH con PDF de 20 MB → tickets en las 4 colas → soporte vinculado a AD y Licencias con el hash correcto y copia local borrada → técnicos resuelven → sincronización cierra la solicitud y activa las 3 cuentas. Detalle en `docs/spikes/glpi.md`.
 
 **Stack con Docker en el equipo de desarrollo** (11/10/2026): 6 servicios sanos, `pruebas.sh` en verde en los dos sitios, ingreso real de extremo a extremo (HTTPS + WAF + Supabase Auth + TOTP), PDF de 20 MB aceptado y de 22 MB cortado (413). Detalle en `docs/spikes/bunkerweb.md`. Cuentas de prueba: `secrets/cuentas-de-prueba.txt`.
 
@@ -85,8 +87,8 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 5. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
 
 ### B. Con Docker
-6. **GLPI real** (lo que sigue): habilitar la API REST y crear el cliente de API y los tokens (`docs/operacion.md` §2), correr `configurar_glpi` y arrancar el worker (`--profile glpi`). Luego **0.3**: hacer pasar la suite de contrato de `SistemaDeTickets` contra GLPI en contenedor sin cambios, y recorrer GLPI en modo `detect` (cierra el spike 0.6).
-7. **0.3 Spike de GLPI 11**: confirmar cada punto marcado «spike 0.3» en `adaptadores/salida/glpi/` (tabla en `docs/spikes/glpi-puerto.md`). La suite de contrato debe pasar **sin cambios** contra GLPI en contenedor (Toxiproxy para los fallos). Correr `configurar_glpi` contra un GLPI limpio.
+6. **VAC, RET y EMG de extremo a extremo** con GLPI real (CA-04, CA-06 con el escalamiento al vencer, CA-07 con GLPI detenido) y pasar esos flujos a pruebas automáticas versionadas. Además, correr la suite real de GLPI en la CI. El ING ya está verificado.
+7. **(hecho)** ~~0.3 Spike de GLPI 11~~: confirmar cada punto marcado «spike 0.3» en `adaptadores/salida/glpi/` (tabla en `docs/spikes/glpi-puerto.md`). La suite de contrato debe pasar **sin cambios** contra GLPI en contenedor (Toxiproxy para los fallos). Correr `configurar_glpi` contra un GLPI limpio.
 8. **2.9 / CA-18 / CA-20**: subir un PDF de 20 MB a través del WAF, hasta GLPI.
 9. **5.1**: flujos ING, VAC, RET y EMG de extremo a extremo; **4.1**: p95 con 300 colaboradores.
 

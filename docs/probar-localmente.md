@@ -56,7 +56,7 @@ Los colaboradores de las semillas van de `col-001` a `col-030` (`col-006` a `col
 
 | Funciona | Pendiente |
 |---|---|
-| Ingreso con TOTP, solicitudes, bandeja de RRHH, detalle, dashboard, cuentas, ficha y CSV, Auditor, área de administración, reintento, subida de PDF de hasta 20 MB | **Creación de tickets en GLPI**: el worker no arranca (perfil `glpi`) hasta que GLPI tenga la API habilitada y los tokens en `secrets/` (ítem 3.1 y spike 0.3). Las solicitudes aprobadas quedan en la bandeja de salida. En la base local ya hay una solicitud de ingreso de la prueba del WAF (`Prueba Subida`) |
+| Ingreso con TOTP, solicitudes, bandeja de RRHH, detalle, dashboard, cuentas, ficha y CSV, Auditor, área de administración, reintento, subida de PDF de hasta 20 MB | **Creación de tickets en GLPI**: el worker está en el perfil `glpi`. Prepare GLPI con `COMPOSE="-f infra/compose.yaml -f infra/compose.local.yaml" infra/glpi/preparar-glpi.sh`, luego `… run --rm configurar-glpi` y `… --profile glpi up -d worker`. Las solicitudes aprobadas crean sus tickets en `https://glpi.localhost` (la clave del administrador de GLPI está en `secrets/glpi_admin_password`). En la base local ya hay una solicitud de ingreso de la prueba del WAF (`Prueba Subida`) |
 | GLPI 11 en `https://glpi.localhost` (se instala solo la primera vez) | Configuración de GLPI como código (3.1) |
 | El WAF bloquea los ataques: `infra/waf/pruebas.sh app.localhost` | Exclusiones del CRS (spike 0.6): si algo legítimo da 403, avise con la ruta |
 

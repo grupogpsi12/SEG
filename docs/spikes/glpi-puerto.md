@@ -1,6 +1,8 @@
 # Puerto `SistemaDeTickets`: qué debe confirmar el spike 0.3 antes de congelarlo
 
-**Estado del puerto:** PROVISIONAL. El núcleo y su suite de contrato (`tests/contratos/test_sistema_de_tickets.py`) están hechos contra un doble en memoria. El puerto se congela en el Hito N solo si el spike 0.3 confirma cada punto de esta lista contra GLPI 11 real. Si un punto falla, se cambia el **adaptador**, no el puerto, salvo donde se indica.
+**Estado del puerto (11/10/2026): CONFIRMADO contra GLPI 11.0.11 real**; el resultado del spike está en `docs/spikes/glpi.md`. Lo que sigue es el texto original, que listaba lo que había que confirmar.
+
+**Estado original del puerto:** PROVISIONAL. El núcleo y su suite de contrato (`tests/contratos/test_sistema_de_tickets.py`) están hechos contra un doble en memoria. El puerto se congela en el Hito N solo si el spike 0.3 confirma cada punto de esta lista contra GLPI 11 real. Si un punto falla, se cambia el **adaptador**, no el puerto, salvo donde se indica.
 
 ## Firma actual
 

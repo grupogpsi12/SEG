@@ -5,6 +5,7 @@ una fabrica aqui y TODAS las pruebas de contrato corren contra ella SIN modifica
 Si un adaptador necesita cambiar una prueba de contrato, el puerto esta mal.
 """
 
+import os
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -92,7 +93,33 @@ def fabrica_glpi_api(directorio: Path) -> EntornoDeContrato:
     return base
 
 
+def fabrica_glpi_real(directorio: Path) -> EntornoDeContrato:
+    """El adaptador REAL contra un GLPI REAL (spike 0.3). Solo se registra si estan las variables
+    de entorno: se corre dentro de la red de Docker (docs/spikes/glpi-puerto.md)."""
+    import httpx
+
+    from jml.adaptadores.salida.glpi.cliente import SistemaDeTicketsGlpi
+    from tests.dobles.glpi_real import TecnicoGlpiReal, TransporteConFallos
+
+    url, app = os.environ["JML_GLPI_API_URL"], os.environ["JML_GLPI_APP_TOKEN"]
+    base = fabrica_memoria(directorio)
+    transporte = TransporteConFallos(httpx.HTTPTransport())
+    base.glpi = SistemaDeTicketsGlpi(
+        url,
+        app,
+        os.environ["JML_GLPI_USER_TOKEN"],
+        base.reloj.ahora,
+        httpx.Client(transport=transporte, timeout=60.0),
+    )
+    base.tecnico = TecnicoGlpiReal(url, app, os.environ["JML_GLPI_ADMIN_TOKEN"])
+    base.tecnico.limpiar()
+    base.inyector = transporte
+    return base
+
+
 FABRICAS = {"memoria": fabrica_memoria, "orm": fabrica_orm, "glpi_api": fabrica_glpi_api}
+if "JML_GLPI_API_URL" in os.environ:
+    FABRICAS["glpi_real"] = fabrica_glpi_real
 
 
 @pytest.fixture(params=sorted(FABRICAS))

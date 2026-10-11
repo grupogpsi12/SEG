@@ -30,14 +30,20 @@ docker compose -f infra/compose.yaml exec web python manage.py semillas       # 
 2. `infra/supabase/duenio-separado.sql`: crear `app_owner` y aplicar el dueño separado.
 3. En el Dashboard: registro abierto desactivado, contraseña mínima de 12 y TOTP habilitado (RS-16).
 
-**GLPI, una vez (manual y luego como código):**
-1. Entrar a `https://glpi.<dominio>` con la cuenta inicial de GLPI y cambiar su contraseña.
-2. *Configuración > General > API*: habilitar la API REST y crear un **cliente de API**. Su *App-Token* va a `secrets/glpi_app_token`.
-3. Crear el usuario de servicio `jml-servicio` con un perfil limitado a tickets, documentos, usuarios, equipos y licencias, sin acceso a la interfaz (T2). Su *token de API* (en *Preferencias*) va a `secrets/glpi_user_token`.
-4. El token de API de un **administrador** de GLPI va a `secrets/glpi_admin_user_token`. Solo lo usa el paso siguiente.
-5. `docker compose -f infra/compose.yaml run --rm configurar-glpi`, que es idempotente.
-6. Exigir el doble factor a los técnicos en *Configuración > Autenticación* (SRS 3.1).
-7. Reiniciar el worker: `docker compose -f infra/compose.yaml up -d worker`.
+**GLPI, una vez** (probado el 11/10/2026 contra un GLPI limpio; ver `docs/spikes/glpi.md`):
+
+```bash
+infra/glpi/preparar-glpi.sh                              # API, cliente de API, perfil y usuario de servicio, tokens
+docker compose -f infra/compose.yaml run --rm configurar-glpi   # categorías, reglas, SLA y plantillas
+docker compose -f infra/compose.yaml up -d worker               # (en compose.local.yaml: --profile glpi)
+```
+
+Los dos primeros son idempotentes. `preparar-glpi.sh` escribe en `secrets/` los tres tokens y la clave del administrador de GLPI (`glpi_admin_password`), y **deshabilita las cuentas de demostración** de GLPI. En Azure, `JML_SECRETOS` apunta al tmpfs y los secretos pasan a Key Vault.
+
+Pasos que **siguen siendo manuales**:
+1. Doble factor para los técnicos (*Configuración > Autenticación*, SRS 3.1).
+2. Zona horaria de los técnicos en sus preferencias de GLPI (S-35): GLPI guarda UTC. Requiere `php bin/console database:enable_timezones` y que el usuario `glpi` de MariaDB tenga `SELECT` sobre `mysql.time_zone_name`.
+3. Crear las cuentas de los técnicos con su perfil (el de servicio es solo del worker).
 
 ## 3. Despliegue en Azure (ítem 5.2) **(sin verificar)**
 

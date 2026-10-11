@@ -20,7 +20,7 @@ import contextlib
 import hashlib
 import json
 from collections.abc import Callable, Mapping, Sequence
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 import httpx
@@ -35,7 +35,7 @@ from jml.dominio.activos import ActivoAsignado, LicenciaAsignada
 from jml.dominio.colaborador import Colaborador
 from jml.dominio.tickets import Observacion, TicketDeCola
 from jml.dominio.tipos import EstadoDeTicket, EstadoInicialDeTicket, Prioridad
-from jml.dominio.valores import BOGOTA, NombreDeSoporteSaneado, Sha256
+from jml.dominio.valores import NombreDeSoporteSaneado, Sha256
 
 # GLPI: 1 Nuevo, 2 En curso (asignado), 3 En curso (planificado), 4 En espera, 5 Resuelto,
 # 6 Cerrado. El nucleo solo necesita el orden «>= Resuelto» (RF-24). Spike 0.3, punto 6.
@@ -47,7 +47,21 @@ DE_GLPI = {
     5: EstadoDeTicket.RESUELTO,
     6: EstadoDeTicket.CERRADO,
 }
-PRIORIDAD = {Prioridad.MEDIA: 3, Prioridad.ALTA: 4, Prioridad.MUY_ALTA: 5}
+
+
+def _numerico(id_: str) -> bool:
+    """GLPI responde 200 con una LISTA a `Ticket/no-existe` y acepta vincular a un documento 0
+    (spike 0.3): un identificador que no sea un entero se trata como inexistente antes de
+    pedirlo. Tambien impide que un valor raro altere la ruta (`../`)."""
+    return id_.isascii() and id_.isdigit()
+
+
+# Spike 0.3: GLPI IGNORA `priority` al crear y la recalcula desde urgencia x impacto. Con urgencia =
+# impacto = n la matriz de GLPI da prioridad n (3, 4 y 5), y con 5 salta la regla del SLA de la
+# emergencia (3.1, CA-06).
+URGENCIA_E_IMPACTO = {Prioridad.MEDIA: 3, Prioridad.ALTA: 4, Prioridad.MUY_ALTA: 5}
+# GLPI guarda las fechas en la zona del servidor, que en su imagen es UTC (spike 0.3).
+FORMATO_DE_FECHA = "%Y-%m-%d %H:%M:%S"
 _TODO = {"range": "0-999"}
 
 
@@ -130,6 +144,8 @@ class ClienteGlpiV1:
         return list(datos) if isinstance(datos, list) else []
 
     def _existe(self, tipo: str, id_: str) -> bool:
+        if not _numerico(id_):
+            return False
         r = self._api("GET", f"{tipo}/{id_}")
         if r.status_code in (400, 404):
             return False
@@ -209,8 +225,11 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
         clave = ticket.clave_de_idempotencia
         existente = self._sin_duplicados(clave)
         if existente is not None:
+            # Si un timeout corto la primera vez entre crear y fijar el vencimiento, se completa.
+            self._asegurar_vencimiento(existente, ticket)
             return TicketCreado(existente, ya_existia=True)
         en_espera = ticket.estado_inicial is EstadoInicialDeTicket.EN_ESPERA
+        nivel = URGENCIA_E_IMPACTO[ticket.prioridad]
         self._crear(
             "Ticket",
             {
@@ -218,15 +237,28 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
                 "content": ticket.como_texto(),  # solo datos tecnicos (RF-20)
                 "externalid": clave,
                 "status": 4 if en_espera else 1,
-                "priority": PRIORIDAD[ticket.prioridad],
+                "urgency": nivel,
+                "impact": nivel,
                 "itilcategories_id": self._categoria(ticket.categoria),
-                "time_to_resolve": ticket.vence_en.astimezone(BOGOTA).strftime("%Y-%m-%d %H:%M:%S"),
             },
         )
         conservado = self._sin_duplicados(clave)
         if conservado is None:  # pragma: no cover - acabamos de crearlo
             raise GlpiRechazo("ticket creado y no encontrado")
+        self._asegurar_vencimiento(conservado, ticket)
         return TicketCreado(conservado, ya_existia=False)
+
+    def _asegurar_vencimiento(self, id_ticket: str, ticket: TicketDeCola) -> None:
+        """GLPI ignora `time_to_resolve` al crear: se fija con un PUT (derecho `slm` del perfil de
+        servicio, spike 0.3). Si el SLA del ticket ya lo calculo (la emergencia), no se toca."""
+        actual = self._exigir(self._api("GET", f"Ticket/{id_ticket}"), "leer Ticket")
+        if int(actual.get("slas_id_ttr") or 0) or actual.get("time_to_resolve"):
+            return
+        vence = ticket.vence_en.astimezone(UTC).strftime(FORMATO_DE_FECHA)
+        self._exigir(
+            self._api("PUT", f"Ticket/{id_ticket}", json={"input": {"time_to_resolve": vence}}),
+            "fijar vencimiento",
+        )
 
     def subir_documento(self, nombre: NombreDeSoporteSaneado, contenido: bytes) -> str:
         sha1 = hashlib.sha1(contenido).hexdigest()
@@ -243,6 +275,8 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
         return str(self._exigir(r, "subir Document")["id"])
 
     def hash_de_documento(self, id_documento: str) -> Sha256:
+        if not _numerico(id_documento):
+            raise GlpiRechazo(f"documento inexistente: {id_documento}")
         r = self._api(
             "GET", f"Document/{id_documento}", cabeceras={"Accept": "application/octet-stream"}
         )
@@ -253,6 +287,8 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
     def vincular_documento(self, id_documento: str, id_ticket: str) -> None:
         if not self._existe("Ticket", id_ticket):
             raise GlpiRechazo(f"ticket inexistente: {id_ticket}")
+        if not self._existe("Document", id_documento):
+            raise GlpiRechazo(f"documento inexistente: {id_documento}")
         r = self._api("GET", f"Document/{id_documento}/Document_Item", params=_TODO)
         vinculos = self._exigir(r, "leer vinculos") or []
         if any(
@@ -272,6 +308,8 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
         ahora = self._reloj()
         resultado: dict[str, Observacion] = {}
         for id_ in ids:
+            if not _numerico(id_):
+                continue  # desconocido: se omite (contrato)
             r = self._api("GET", f"Ticket/{id_}")
             if r.status_code in (400, 404):
                 continue  # desconocido: se omite (contrato)

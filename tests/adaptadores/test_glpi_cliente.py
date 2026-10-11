@@ -4,6 +4,7 @@ PROVISIONAL hasta el spike 0.3: el GLPI simulado sigue la documentacion de la AP
 """
 
 from dataclasses import replace
+from datetime import UTC
 
 import httpx
 import pytest
@@ -33,6 +34,7 @@ def tickets(
 
 
 def test_el_ticket_lleva_titulo_contenido_tecnico_prioridad_categoria_y_vencimiento() -> None:
+    """S-35: el vencimiento viaja en UTC."""
     glpi = GlpiSimulado()
     t = tickets()[0]
     cat = glpi.agregar_categoria(t.categoria)
@@ -40,12 +42,35 @@ def test_el_ticket_lleva_titulo_contenido_tecnico_prioridad_categoria_y_vencimie
     assert creado["name"] == t.titulo
     assert creado["content"] == t.como_texto()
     assert creado["externalid"] == t.clave_de_idempotencia
-    assert (
-        creado["priority"]
-        == {Prioridad.MEDIA: 3, Prioridad.ALTA: 4, Prioridad.MUY_ALTA: 5}[t.prioridad]
-    )
+    nivel = {Prioridad.MEDIA: 3, Prioridad.ALTA: 4, Prioridad.MUY_ALTA: 5}[t.prioridad]
+    # Spike 0.3: GLPI ignora `priority`; la prioridad sale de urgencia = impacto.
+    assert (creado["urgency"], creado["impact"], creado["priority"]) == (nivel, nivel, nivel)
     assert creado["itilcategories_id"] == cat
-    assert len(creado["time_to_resolve"]) == 19  # "AAAA-MM-DD HH:MM:SS" en hora de Bogota
+    # Y el vencimiento se fija en UTC (la zona de GLPI), con un PUT posterior.
+    assert creado["time_to_resolve"] == t.vence_en.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def test_si_un_timeout_corto_antes_de_fijar_el_vencimiento_el_reintento_lo_completa() -> None:
+    glpi = GlpiSimulado()
+    cliente = armar(glpi)
+    t = tickets()[0]
+    id_ = cliente.crear_ticket(t).id_externo
+    glpi.ticket(id_).pop("time_to_resolve")  # como si el PUT se hubiera perdido
+    reintento = cliente.crear_ticket(t)
+    assert reintento.ya_existia is True
+    assert glpi.ticket(id_)["time_to_resolve"] == t.vence_en.astimezone(UTC).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+
+def test_un_ticket_con_sla_conserva_el_vencimiento_que_calculo_glpi() -> None:
+    glpi = GlpiSimulado()
+    cliente = armar(glpi)
+    t = tickets()[0]
+    id_ = cliente.crear_ticket(t).id_externo
+    glpi.ticket(id_).update({"slas_id_ttr": 1, "time_to_resolve": "2030-01-01 00:00:00"})
+    cliente.crear_ticket(t)
+    assert glpi.ticket(id_)["time_to_resolve"] == "2030-01-01 00:00:00"  # no se pisa
 
 
 def test_RF_20_ningun_campo_restringido_llega_a_glpi() -> None:

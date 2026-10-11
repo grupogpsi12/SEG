@@ -211,11 +211,13 @@ class SistemaDeTicketsEnMemoria:
     def adjuntar(self, id_externo: str, cantidad: int = 1) -> None:
         self._remotos[id_externo].documentos += cantidad
 
-    def asignar_activo(self, id_usuario: str, activo: ActivoAsignado) -> None:
+    def asignar_activo(self, id_usuario: str, activo: ActivoAsignado) -> ActivoAsignado:
         self._activos.setdefault(id_usuario, []).append(activo)
+        return activo
 
-    def asignar_licencia(self, id_usuario: str, licencia: LicenciaAsignada) -> None:
+    def asignar_licencia(self, id_usuario: str, licencia: LicenciaAsignada) -> LicenciaAsignada:
         self._licencias.setdefault(id_usuario, []).append(licencia)
+        return licencia
 
     def corromper_documento(self, id_documento: str) -> None:
         self._documentos[id_documento].hash_guardado = "0" * 64

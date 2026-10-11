@@ -202,6 +202,8 @@ services:
       TZ: America/Bogota
     volumes:
       - glpi-datos:/var/glpi
+      # Limites de subida de PHP para el soporte de 20 MB (RS-17): sin esto GLPI responde 413.
+      - ./glpi/php-jml.ini:/usr/local/etc/php/conf.d/zz-jml.ini:ro
     mem_limit: 768m
     networks: [app, db_net]
 

@@ -20,3 +20,4 @@ mutants/
 staticfiles/
 infra/.env
 build/
+.contrato-tmp/
