@@ -158,12 +158,23 @@ class ClienteGlpiV1:
         )
         return str(datos["id"])
 
+    def _unico(self, tipo: str, nombre: str) -> str | None:
+        """El id del unico `tipo` con ese nombre exacto, o None si no hay ninguno.
+
+        Dos corridas simultaneas del configurador dejan duplicados (cada una busca, no encuentra y
+        crea). Con dos grupos o reglas del mismo nombre el enrutamiento queda ambiguo: se detiene
+        y dice cuales son, para borrar los sobrantes en GLPI (auditoria del 12/10/2026).
+        """
+        ids = sorted(
+            int(i["id"]) for i in self._lista(tipo, name=nombre) if i.get("name") == nombre
+        )
+        if len(ids) > 1:
+            raise GlpiRechazo(f"{tipo} '{nombre}' duplicado en GLPI (ids {ids}): deje uno")
+        return str(ids[0]) if ids else None
+
     def _asegurar(self, tipo: str, nombre: str, campos: Mapping[str, Any]) -> str:
         """Idempotente por nombre exacto: crea si falta y devuelve el id."""
-        for item in self._lista(tipo, name=nombre):
-            if item.get("name") == nombre:
-                return str(item["id"])
-        return self._crear(tipo, {"name": nombre, **campos})
+        return self._unico(tipo, nombre) or self._crear(tipo, {"name": nombre, **campos})
 
     def cerrar(self) -> None:
         if self._sesion is not None:

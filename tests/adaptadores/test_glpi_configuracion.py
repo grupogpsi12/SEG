@@ -2,6 +2,8 @@
 
 from collections import Counter
 
+import pytest
+
 from jml.adaptadores.salida.glpi.cliente import SistemaDeTicketsGlpi
 from jml.adaptadores.salida.glpi.configuracion import (
     GRUPOS,
@@ -9,6 +11,7 @@ from jml.adaptadores.salida.glpi.configuracion import (
     ConfiguradorGlpi,
     categorias,
 )
+from jml.aplicacion.puertos import GlpiRechazo
 from jml.dominio.tickets import generar_tickets
 from jml.dominio.tipos import Subtipo, TipoEvento
 from jml.dominio.valores import CalendarioHabil
@@ -37,6 +40,17 @@ def test_es_idempotente() -> None:
     antes = Counter({tipo: len(filas) for tipo, filas in glpi.items.items()})
     configurador(glpi).configurar()
     assert Counter({tipo: len(filas) for tipo, filas in glpi.items.items()}) == antes
+
+
+def test_con_duplicados_se_detiene_y_dice_cuales_son() -> None:
+    """Dos corridas a la vez dejan duplicados (busca, no encuentra y crea, cada una). Con dos
+    grupos del mismo nombre el enrutamiento queda ambiguo: se detiene en vez de elegir uno
+    (auditoria del 12/10/2026)."""
+    glpi = GlpiSimulado()
+    configurador(glpi).configurar()
+    glpi._agregar("Group", {"name": GRUPOS[next(iter(GRUPOS))], "is_assign": 1})
+    with pytest.raises(GlpiRechazo, match="duplicad"):
+        configurador(glpi).configurar()
 
 
 def test_cubre_todas_las_categorias_que_genera_el_dominio() -> None:

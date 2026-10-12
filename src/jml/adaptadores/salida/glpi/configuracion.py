@@ -106,7 +106,7 @@ class ConfiguradorGlpi(ClienteGlpiV1):
         self, nombre: str, rango: int, criterio: tuple[str, int, str], campo: str, valor: str
     ) -> int:
         """Crea la regla con su criterio y su accion solo si no existe (idempotente)."""
-        if any(r.get("name") == nombre for r in self._lista("RuleTicket", name=nombre)):
+        if self._unico("RuleTicket", nombre) is not None:
             return 1
         regla = self._crear(
             "RuleTicket",
@@ -143,7 +143,7 @@ class ConfiguradorGlpi(ClienteGlpiV1):
             {"slms_id": slm, "type": 0, "number_time": 1, "definition_time": "hour"},
         )
         nivel = "JML - Escalar emergencia vencida"
-        if not any(n.get("name") == nivel for n in self._lista("SlaLevel", name=nivel)):
+        if self._unico("SlaLevel", nivel) is None:
             id_nivel = self._crear(
                 "SlaLevel",
                 {
