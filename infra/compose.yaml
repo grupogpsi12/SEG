@@ -104,6 +104,9 @@ services:
       - ${APP_DOMINIO:-app.localhost}_KEEP_UPSTREAM_HEADERS=Content-Security-Policy X-Frame-Options
       - ${APP_DOMINIO:-app.localhost}_CONTENT_SECURITY_POLICY=
       - ${APP_DOMINIO:-app.localhost}_X_FRAME_OPTIONS=
+      # Django devuelve 403 CON su mensaje («sin acceso», «no autorizado» en un formulario): BunkerWeb
+      # solo reemplaza los errores de disponibilidad. Sus propios bloqueos (CRS, limites) no cambian.
+      - ${APP_DOMINIO:-app.localhost}_INTERCEPTED_ERROR_CODES=502 503 504
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_1=^/ingreso
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_1=5r/m
       # --- glpi.*: GLPI (CSP por defecto de BunkerWeb, RS-07) ---
