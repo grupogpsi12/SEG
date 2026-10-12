@@ -43,6 +43,9 @@ if [[ "$DOMINIO" == app.* ]]; then
   probar "200" "Estatico servido por WhiteNoise"         "$BASE/static/web/estilo.css"
 else
   probar "200|302" "Pagina principal de GLPI"            "$BASE/"
+  # La API es solo del worker, por la red interna: desde fuera, 403 (auditoria del 12/10/2026).
+  probar 403 "API v1 de GLPI cerrada desde fuera"      "$BASE/apirest.php/initSession"
+  probar 403 "API v2 de GLPI cerrada desde fuera"      "$BASE/api.php/v2.0/"
 fi
 probar "301|302|308" "HTTP redirige a HTTPS" --resolve "$DOMINIO:80:$IP" "http://$DOMINIO/"
 

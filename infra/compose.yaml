@@ -13,8 +13,8 @@
 #   terceros exige como variable (API_TOKEN de BunkerWeb y la clave de MariaDB para GLPI).
 # - Imagenes por digest (RS-18).
 #
-# Sin verificar todavia contra Docker (pendiente en tasks/todo.md 2.2 y spike 0.6): los nombres de
-# ajustes de BunkerWeb salen de la documentacion de 1.6.15 y de waf-stack (commit 87a5f62).
+# Verificado con Docker (spikes 0.3 y 0.6, auditoria del 12/10/2026): infra/waf/pruebas.sh en ambos
+# sitios y la suite contra GLPI real (infra/scripts/contrato-glpi.sh).
 
 name: jml
 
@@ -51,7 +51,7 @@ services:
   bunkerweb:
     <<: *endurecido
     image: bunkerity/bunkerweb:1.6.15@sha256:1b96f672660cc32bfae93604ac297371222dc9039b2b09b8eee5e40ba9d35c35
-    cap_drop: []  # la imagen ya corre sin root; nginx necesita sus capacidades por defecto
+    # Corre como `nginx` sin capacidades efectivas: hereda cap_drop ALL (auditoria del 12/10/2026).
     ports:
       - "80:8080/tcp"
       - "443:8443/tcp"
@@ -67,7 +67,6 @@ services:
   bw-scheduler:
     <<: *endurecido
     image: bunkerity/bunkerweb-scheduler:1.6.15@sha256:321867d8db44d3a4ca1edfa3ff2c5b50163d3ebd5c67ed0d107161319d5ee860
-    cap_drop: []
     depends_on: [bunkerweb]
     environment:
       - BUNKERWEB_INSTANCES=bunkerweb
@@ -111,6 +110,10 @@ services:
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_REVERSE_PROXY=yes
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_URL=/
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_HOST=http://glpi:80
+      # La API de GLPI (v1 y v2) es solo del worker, por la red interna: desde fuera no existe.
+      # Su inicio de sesion no pide el doble factor de la interfaz (auditoria del 12/10/2026).
+      - ${GLPI_DOMINIO:-glpi.localhost}_USE_BLACKLIST=yes
+      - ${GLPI_DOMINIO:-glpi.localhost}_BLACKLIST_URI=^/api(rest)?\.php
     volumes:
       - bw-storage:/data
       # Exclusiones puntuales del CRS, una por archivo con ruta, regla y motivo (RS-18)
@@ -190,7 +193,9 @@ services:
   glpi:
     <<: *endurecido
     image: glpi/glpi:11.0.11@sha256:45572164994cbd12bedd99bf6dd954b7962076dd3b529f0fdc4a84131f30a32a
-    cap_drop: []  # apache necesita cambiar de usuario; se revisa en el spike 0.3
+    # Corre como www-data. Su apache2 trae la capacidad de archivo NET_BIND_SERVICE (puerto 80):
+    # sin ella el binario no arranca. Es la unica que se le deja (auditoria del 12/10/2026).
+    cap_add: ["NET_BIND_SERVICE"]
     depends_on:
       mariadb: { condition: service_healthy }
     environment:
@@ -210,7 +215,7 @@ services:
   mariadb:
     <<: *endurecido
     image: mariadb:11.4@sha256:1292844148b311e4ed4300022a996d39083f415a963e970cf47cad1b3b18e3a6
-    cap_drop: []
+    cap_drop: []  # la entrada corre como root al iniciar el volumen (chown) antes de bajar a mysql
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: "yes"
       MARIADB_DATABASE: glpi

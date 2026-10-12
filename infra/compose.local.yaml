@@ -8,7 +8,7 @@
 # Cambia solo la base: PostgreSQL 17 (la version de Supabase) en una red interna, con los mismos
 # roles y el duenio separado (ADR-028). Todo lo demas es igual a produccion: BunkerWeb delante,
 # unico servicio con puertos (invariante 14). El inicio de sesion sigue en Supabase Auth.
-# El worker no arranca hasta que exista el adaptador de GLPI (item 3.2).
+# El worker esta en el perfil `glpi`: arranca despues de preparar GLPI (docs/probar-localmente.md).
 
 x-base-local: &base-local
   JML_DB_HOST: postgres

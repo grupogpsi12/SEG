@@ -23,27 +23,31 @@ $_SESSION['glpi_currenttime'] = date('Y-m-d H:i:s');
 const LEER = 1; const ACTUALIZAR = 2; const CREAR = 4; const BORRAR = 8; const PURGAR = 16;
 $clave = new GLPIKey();
 
-// 1. API REST habilitada, con inicio de sesion por token de usuario.
+// 1. API REST habilitada, SOLO con token de usuario. El inicio de sesion por usuario y clave en la
+// API no pide el doble factor de la interfaz: queda apagado (auditoria del 12/10/2026).
 Config::setConfigurationValues('core', [
     'enable_api' => 1,
-    'enable_api_login_credentials' => 1,
+    'enable_api_login_credentials' => 0,
     'enable_api_login_external_token' => 1,
 ]);
 
 // Tamano maximo de un documento en GLPI: el soporte de vinculacion puede pesar 20 MB (RS-17).
 Config::setConfigurationValues('core', ['document_max_size' => 20]);
 
-// 2. Cliente de API para el worker: solo la red interna `app` de compose.
+// 2. Cliente de API para el worker: la red interna `app` de compose SIN la puerta de enlace
+// (10.20.40.1) ni bunkerweb (10.20.40.2): lo que llega por el WAF no entra aunque traiga los
+// tokens. Se reaplica en cada corrida (auditoria del 12/10/2026).
+$rango = ['ipv4_range_start' => '10.20.40.3', 'ipv4_range_end' => '10.20.40.254'];
 $cliente = new APIClient();
 $existente = $cliente->find(['name' => 'JML worker']);
 if ($existente) {
     $cid = (int) array_key_first($existente);
+    $cliente->update(['id' => $cid] + $rango);
 } else {
     $cid = $cliente->add([
         'name' => 'JML worker', 'is_active' => 1, 'entities_id' => 0,
-        'ipv4_range_start' => '10.20.40.0', 'ipv4_range_end' => '10.20.40.255',
-        'comment' => 'worker y configurador (red app de compose)', '_reset_app_token' => 1,
-    ]);
+        'comment' => 'worker y configurador (red app de compose, sin el WAF)', '_reset_app_token' => 1,
+    ] + $rango);
 }
 $cliente->getFromDB($cid);
 $app = $clave->decrypt($cliente->fields['app_token']);
