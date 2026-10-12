@@ -28,6 +28,7 @@ Para quién: el equipo del proyecto y quien evalúe la entrega. Resume qué se r
 | A-07 | Baja (funcional) | El Administrador veía el formulario de ingreso con el campo del PDF, aunque el núcleo siempre lo rechaza: la persona no existe aún, así que no es de RRHH (S-08), y el soporte solo lo sube RRHH (invariante 12) | La interfaz no le ofrece el ingreso y responde 403 a la URL | `8638323`. `test_el_administrador_no_ve_el_ingreso_ni_su_soporte` |
 | A-10 | Media (funcional) | Un integrante que prueba con su PostgreSQL local no podía usar las cuentas del Supabase compartido: `crear` guarda los roles en la base de quien lo ejecuta, y en las demás bases el ingreso respondía «sin acceso» | Subcomando `admin-usuarios vincular --usuario <id> --rol …`: registra los roles en la base local, sin `service_role`. Un id inventado no da acceso: la sesión solo se crea si Supabase autentica ese id con TOTP | `732c2dc`. 6 pruebas nuevas y prueba real desde un clon: «sin acceso» → `vincular` → ingreso con TOTP → bandeja de RRHH |
 | A-11 | Media (funcional) | BunkerWeb reemplazaba **todos** los errores de la aplicación por su página genérica de bloqueo. «Su cuenta no tiene acceso» y los errores de formulario que la vista devuelve con 403 se veían como un bloqueo del WAF | En `app.*`, BunkerWeb solo intercepta 502, 503 y 504. Sus propios bloqueos (CRS, límites) no cambian | `b94072f`. Prueba real a través del WAF: el 403 llega con el mensaje de la aplicación y `pruebas.sh` sigue en verde |
+| A-12 | Baja (operación) | El worker arrancaba a la vez que GLPI: la primera sincronización fallaba y el worker quedaba *unhealthy* 5 minutos, hasta la siguiente | GLPI tiene chequeo de salud. El worker y `configurar-glpi` esperan a que esté sano | Arranque en frío: los 7 servicios sanos en unos 100 s |
 | A-08 | Informativa | SHA-1 de GLPI sin marcar como no criptográfico. Textos «PROVISIONAL hasta el spike 0.3» desactualizados | `usedforsecurity=False` y excepciones de bandit con su motivo. Textos actualizados | `8638323`, `6d52d28` |
 | A-09 | Informativa | La CI no tenía análisis de seguridad | Job `seguridad` (gitleaks, pip-audit, bandit) en cada push. Trivy bloquea la publicación de una imagen con vulnerabilidades altas o críticas que tengan corrección | `91b36ab`. Verde en GitHub |
 
@@ -80,7 +81,7 @@ Además, la guía `docs/probar-localmente.md` se siguió **desde un clon limpio 
 - La suite real.
 - El ingreso con una cuenta del Supabase compartido. Para esta prueba se crearon dos cuentas desechables, que se desactivaron al terminar.
 
-Ahí aparecieron A-04, A-10 y A-11.
+Ahí aparecieron A-04, A-10, A-11 y A-12.
 
 ## 5. Riesgos aceptados y pendientes
 

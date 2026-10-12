@@ -10,7 +10,7 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 - `docs/supuestos-nucleo.md` (S-01 a S-35).
 - `docs/decisiones.md` (hasta ADR-028).
 - `docs/operacion.md`, `docs/probar-localmente.md` y `docs/manual-usuario.md`.
-- `docs/auditoria-2026-10-12.md` (auditoría de funcionalidad y seguridad: 11 hallazgos corregidos).
+- `docs/auditoria-2026-10-12.md` (auditoría de funcionalidad y seguridad: 12 hallazgos corregidos).
 
 ## 1. Resumen
 
@@ -22,7 +22,7 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 | 4. Dashboard y búsqueda | 4.2 a 4.4 hechos. 4.1: índices puestos; falta medir el p95 |
 | 5. Entrega | 5.1 hecho. 5.4 en curso: auditoría hecha y análisis de seguridad en la CI; faltan ZAP y sqlmap. El manual de usuario, el de operación, el despliegue en Azure y los respaldos están escritos sin ejecutar |
 
-**Auditoría** (12/10/2026, `docs/auditoria-2026-10-12.md`): 11 hallazgos corregidos con prueba y commit.
+**Auditoría** (12/10/2026, `docs/auditoria-2026-10-12.md`): 12 hallazgos corregidos con prueba y commit.
 
 - El más grave: la API REST de GLPI respondía desde internet a través del WAF y admitía usuario y contraseña sin doble factor. Ahora está cerrada en el WAF y en GLPI.
 - Además: un configurador de GLPI que duplicaba sin aviso si corría dos veces a la vez, el WAF tapando los 403 de la aplicación, y las cuentas del equipo inutilizables con una base local (`admin-usuarios vincular`).

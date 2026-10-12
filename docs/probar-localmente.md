@@ -58,7 +58,7 @@ docker compose $C exec web python manage.py semillas
 
 ## 3. GLPI (una vez)
 
-GLPI se instala solo la primera vez y tarda de 2 a 4 minutos. Cuando `https://glpi.localhost` abra en el navegador (sección 5), ejecute:
+GLPI se instala solo la primera vez y tarda de 2 a 4 minutos. Cuando `docker compose $C ps` muestre `glpi` como *healthy*, ejecute:
 
 ```bash
 COMPOSE="$C" infra/glpi/preparar-glpi.sh            # API solo interna, usuario de servicio, tokens y clave del admin
@@ -107,7 +107,7 @@ Para probar varios roles, vincule varias cuentas. Cambiar los roles de una cuent
 ## 6. Comprobar que todo está bien (opcional)
 
 ```bash
-docker compose $C --profile glpi ps                 # todo "healthy" (glpi no tiene chequeo)
+docker compose $C --profile glpi ps                 # los 7 servicios "healthy"
 infra/waf/pruebas.sh app.localhost                  # tráfico normal pasa, ataques 403
 infra/waf/pruebas.sh glpi.localhost                 # además, la API de GLPI cerrada desde fuera
 JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # 30 pruebas contra su GLPI (necesita uv)
@@ -135,8 +135,8 @@ Para desactivar una cuenta: `run --rm admin-usuarios desactivar --usuario <id>`.
 | **429** en `/ingreso` | Límite de 5 intentos por minuto. Espere un minuto |
 | «Su cuenta no tiene acceso» | Falta la sección 4, o el rol o el id no son los correctos |
 | `web` no queda *healthy* | `docker compose $C logs web`. Casi siempre falta `migrar` o la clave publicable |
-| `worker` no queda *healthy* | Falta la sección 3, o GLPI no terminó de instalarse: `docker compose $C logs worker` |
-| `preparar-glpi.sh` falla | GLPI aún se está instalando: espere a que `https://glpi.localhost` abra y repítalo. Es idempotente |
+| `worker` no queda *healthy* | Espera a que `glpi` esté *healthy*. Si sigue así, falta la sección 3: `docker compose $C logs worker` |
+| `preparar-glpi.sh` falla | GLPI aún se está instalando: espere a que `glpi` esté *healthy* y repítalo. Es idempotente |
 | `pool overlaps` al levantar | Hay otra copia del proyecto con las mismas redes: `docker compose … down` en la otra carpeta |
 
 **Apagar** sin perder datos: `docker compose $C --profile glpi down`. **Empezar de cero**, borrando la base y GLPI: `docker compose $C --profile glpi down -v` y repetir desde la sección 2.

@@ -239,7 +239,7 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔ CA-11 con evidencia.
 - [~] **5.4 Pruebas de seguridad**, sin WAF (en local) y a través de BunkerWeb (RS-13).
   ✔ CA-12, CA-13 y CA-20; informes adjuntos.
-  ✔✔ **Auditoría del 12/10/2026** (`docs/auditoria-2026-10-12.md`): revisión manual completa y 11 hallazgos corregidos, entre ellos la API de GLPI expuesta por el WAF (alta). En la CI, job `seguridad` con gitleaks sobre todo el historial, pip-audit y bandit, y Trivy antes de publicar la imagen, todos en cero. `pruebas.sh` en verde en ambos sitios (CA-20). ⏳ ZAP y sqlmap dinámicos contra Azure (con la IP del escáner fuera del baneo).
+  ✔✔ **Auditoría del 12/10/2026** (`docs/auditoria-2026-10-12.md`): revisión manual completa y 12 hallazgos corregidos, entre ellos la API de GLPI expuesta por el WAF (alta). En la CI, job `seguridad` con gitleaks sobre todo el historial, pip-audit y bandit, y Trivy antes de publicar la imagen, todos en cero. `pruebas.sh` en verde en ambos sitios (CA-20). ⏳ ZAP y sqlmap dinámicos contra Azure (con la IP del escáner fuera del baneo).
 - [ ] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ CA-21.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
