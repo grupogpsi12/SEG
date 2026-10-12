@@ -8,7 +8,7 @@ from django.test import Client
 
 from jml.adaptadores.entrada.web import vistas
 
-CSP = "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+CSP = "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
 
 @pytest.mark.django_db

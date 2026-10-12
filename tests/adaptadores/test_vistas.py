@@ -334,6 +334,17 @@ def test_el_ingreso_no_acepta_equipo_sin_tipo(mundo: Mundo) -> None:
     assert "tipo_equipo" in texto(r)
 
 
+def test_el_administrador_no_ve_el_ingreso_ni_su_soporte(mundo: Mundo) -> None:
+    """Invariante 12: el soporte solo lo sube RRHH. Un ingreso nunca es excepcion del
+    Administrador (la persona aun no existe, luego no es de RRHH: S-08), asi que la interfaz no
+    le ofrece el formulario ni el campo del PDF (auditoria del 12/10/2026)."""
+    admin = como("u-admin")
+    assert "/solicitudes/nueva/ING" not in texto(admin.get("/solicitudes/nueva"))
+    assert "/solicitudes/nueva/VAC" in texto(admin.get("/solicitudes/nueva"))
+    assert admin.get("/solicitudes/nueva/ING").status_code == 403
+    assert "soporte_pdf" not in texto(como("u-admin").get("/solicitudes/nueva/RET"))
+
+
 def test_el_administrador_emite_por_excepcion_solo_sobre_rrhh(mundo: Mundo) -> None:
     admin = como("u-admin")
     base = {

@@ -36,7 +36,7 @@ def barras(
         filas.append('<text x="8" y="18">Sin datos</text>')
     ancho = ANCHO_ETIQUETA + ANCHO_BARRAS + 60
     # mark_safe: SVG construido aqui con enteros y etiquetas escapadas (ver docstring del modulo).
-    return mark_safe(
+    return mark_safe(  # nosec B308 B703
         f'<svg class="grafico" role="img" aria-label="{escape(titulo)}"'
         f' viewBox="0 0 {ancho} {alto}" width="100%" preserveAspectRatio="xMinYMin meet" xmlns="http://www.w3.org/2000/svg">'
         f"<title>{escape(titulo)}</title>{''.join(filas)}</svg>"

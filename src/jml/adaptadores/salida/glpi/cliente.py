@@ -1,8 +1,8 @@
 """SistemaDeTickets sobre la API REST v1 de GLPI 11 (`apirest.php`), item 3.2.
 
-PROVISIONAL hasta el spike 0.3 (docs/spikes/glpi-puerto.md): esta escrito contra la documentacion
-de la API v1 y probado contra un GLPI simulado (`tests/dobles/glpi_api.py`) con la suite de
-contrato. Lo que el spike debe confirmar esta marcado con «spike 0.3».
+Confirmado contra GLPI 11.0.11 real (spike 0.3, docs/spikes/glpi.md): pasa la suite de contrato
+contra GLPI real y contra el simulado (`tests/dobles/glpi_api.py`). Lo aprendido en el spike esta
+marcado con «spike 0.3».
 
 Decisiones:
 - Idempotencia de tickets: la clave va en `externalid` y se busca antes de crear. GLPI no la
@@ -261,7 +261,8 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
         )
 
     def subir_documento(self, nombre: NombreDeSoporteSaneado, contenido: bytes) -> str:
-        sha1 = hashlib.sha1(contenido).hexdigest()
+        # SHA-1 solo para buscar en GLPI (es lo que guarda); la integridad la da el SHA-256.
+        sha1 = hashlib.sha1(contenido, usedforsecurity=False).hexdigest()
         for d in self._lista("Document", sha1sum=sha1):
             if d.get("sha1sum") == sha1:
                 return str(d["id"])

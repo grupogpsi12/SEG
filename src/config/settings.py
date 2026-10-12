@@ -98,7 +98,8 @@ JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  
 # Supabase Auth (ADR-017). La clave publicable es publica por diseno (no da acceso a datos: el
 # esquema `app` no esta expuesto, RD-10); `service_role` NUNCA se lee aqui (invariante 8).
 JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
-JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # RNF-01
+# RNF-01. /tmp es el tmpfs noexec propio de cada contenedor (compose): nadie mas escribe ahi.
+JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # nosec B108
 # RD-04: el worker deja aqui la exportacion diaria; el host la sube a Blob inmutable.
 JML_EXPORTES_DIR = os.environ.get("JML_EXPORTES_DIR", "/var/lib/jml/exportes")
 # Solo para enlazar tickets desde la ficha (RF-33); la web NUNCA llama a GLPI (CLAUDE.md).
@@ -129,8 +130,11 @@ SECURE_REFERRER_POLICY = None
 # Estos avisos de `check --deploy` cubren lo que hace BunkerWeb, no Django: HSTS, nosniff y
 # Referrer-Policy (RS-07, una sola fuente por cabecera) y la redireccion a HTTPS (RS-01).
 SILENCED_SYSTEM_CHECKS = ["security.W004", "security.W006", "security.W008", "security.W022"]
+# base-uri y form-action no heredan de default-src: sin ellas una inyeccion de HTML podria
+# cambiar la base de los enlaces o mandar un formulario a otro sitio (auditoria 12/10/2026).
 POLITICA_DE_CONTENIDO = (
-    "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; "
+    "base-uri 'none'; form-action 'self'"
 )
 
 # --- logs JSON con correlation_id y sin campos prohibidos (RS-09) ------------------------------

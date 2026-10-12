@@ -98,8 +98,12 @@ def _contexto(perfil: PerfilDeUsuario, **extra: Any) -> dict[str, Any]:
 
 
 def _tipos_disponibles(perfil: PerfilDeUsuario, hay_subordinados: bool) -> list[TipoEvento]:
-    if perfil.roles & EMISORES:
+    if Rol.RRHH in perfil.roles:
         return list(TipoEvento)
+    if Rol.ADMINISTRADOR in perfil.roles:
+        # Un ingreso nunca es excepcion del Administrador: la persona aun no existe, luego no es
+        # de RRHH (S-08). Tampoco sube el soporte, que es solo de RRHH (invariante 12).
+        return [t for t in TipoEvento if t is not TipoEvento.ING]
     if Rol.SOLICITANTE not in perfil.roles:
         return []
     disponibles: list[TipoEvento] = []
