@@ -10,7 +10,7 @@ Para quién: el Administrador del sistema y quien despliegue u opere la platafor
 | `web` | Aplicación Django (gunicorn: 1 proceso × 8 hilos, S-29) | `django_secret_key`, `db_password`, `supabase_ca_crt` |
 | `worker` | Bandeja de salida a GLPI, sincronización cada 5 minutos, exportación diaria de auditoría | lo anterior + `glpi_app_token`, `glpi_user_token` |
 | `migrar` (una sola vez) | `migrate` como `app_owner` (ADR-028) | `db_owner_password` (como `db_password`) |
-| `admin-usuarios` (una sola vez) | Crear o desactivar cuentas (RF-06) | lo de `web` + `supabase_service_role` |
+| `admin-usuarios` (una sola vez) | Crear, vincular o desactivar cuentas (RF-06) | lo de `web` + `supabase_service_role` |
 | `configurar-glpi` (una sola vez) | GLPI como código (3.1) | `glpi_app_token`, `glpi_admin_user_token` |
 | `glpi` + `mariadb` | Mesa de servicio | `glpi_db_password` |
 
@@ -38,7 +38,14 @@ docker compose -f infra/compose.yaml run --rm configurar-glpi   # categorías, r
 docker compose -f infra/compose.yaml up -d worker               # (en compose.local.yaml: --profile glpi)
 ```
 
-Los dos primeros son idempotentes. `preparar-glpi.sh` escribe en `secrets/` los tres tokens y la clave del administrador de GLPI (`glpi_admin_password`), y **deshabilita las cuentas de demostración** de GLPI. En Azure, `JML_SECRETOS` apunta al tmpfs y los secretos pasan a Key Vault.
+Los dos primeros son idempotentes. **Nunca los corra dos veces a la vez**: cada corrida busca, no encuentra y crea, y quedan duplicados. Si los encuentra, `configurar-glpi` se detiene y nombra los ids que sobran.
+
+`preparar-glpi.sh` hace además lo siguiente:
+- Escribe en `secrets/` los tres tokens y la clave del administrador de GLPI (`glpi_admin_password`).
+- **Deshabilita las cuentas de demostración** de GLPI.
+- Deja la API **solo para la red interna**: el cliente de API excluye la IP del WAF y no se admite el inicio de sesión por usuario y contraseña.
+
+Además, BunkerWeb responde 403 a `/apirest.php` y `/api.php` desde fuera (auditoría del 12/10/2026). En Azure, `JML_SECRETOS` apunta al tmpfs y los secretos pasan a Key Vault.
 
 Pasos que **siguen siendo manuales**:
 1. Doble factor para los técnicos (*Configuración > Autenticación*, SRS 3.1).
@@ -73,6 +80,7 @@ Pasos que **siguen siendo manuales**:
 | Solicitudes en `error` | Aplicación → **Solicitudes en error → Reintentar**, una vez que GLPI responda (RF-38) |
 | Integridad de la auditoría | El Auditor: **Auditoría → Verificar**. Además, comparar la cabeza de la cadena con el último `ancla-*.json` de Blob: si no coinciden, alguien reescribió la cadena |
 | Crear o desactivar una cuenta | `docker compose -f infra/compose.yaml run --rm admin-usuarios crear --correo X --rol Y [--colaborador col-…]` / `desactivar --usuario <id>` |
+| Registrar en otra base una cuenta que ya existe en Supabase | `… run --rm admin-usuarios vincular --usuario <id> --rol Y [--colaborador col-…]`. No usa `service_role`. Lo usa cada integrante con su base local (`docs/probar-localmente.md` §4) |
 | Cambio de esquema | `docker compose … run --rm migrar` (nunca `migrate` desde `web`: `app_backend` no tiene permisos para eso) |
 
 ## 5. Incidentes
@@ -99,6 +107,6 @@ Pasos que **siguen siendo manuales**:
 | `django_secret_key` | Generar uno nuevo, actualizar Key Vault y reiniciar `web` y `worker` (cierra todas las sesiones) |
 | `db_password`, `db_owner_password` | Como `postgres`: `ALTER ROLE app_backend PASSWORD '…'` (o `app_owner`); actualizar Key Vault; reiniciar |
 | `supabase_service_role` | Dashboard → API Keys: crear una nueva y revocar la anterior |
-| `glpi_*_token` | Regenerarlos en GLPI (cliente de API y preferencias del usuario) |
+| `glpi_*_token` | Regenerarlos en GLPI (cliente de API y preferencias del usuario). El de administrador (`glpi_admin_user_token`) solo lo usa `configurar-glpi`: en Azure, regenérelo después de configurar |
 | `bw_api_token` | Generar uno nuevo y recrear `bunkerweb` y `bw-scheduler` |
 | Contraseña de `postgres` en Supabase | Dashboard → Database → Reset password. **Pendiente**: se compartió en una conversación durante el desarrollo |

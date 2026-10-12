@@ -167,3 +167,18 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
     → Los límites de subida se declaran juntos (BunkerWeb, Django, `infra/glpi/php-jml.ini` y `document_max_size`) y se prueban con el archivo del tamaño máximo.
 
 50. **Código que depende de la hora del servidor.** Se enviaba el vencimiento en hora de Bogotá a un GLPI que guarda UTC: quedaba 5 horas corrido. → Enviar siempre en la zona del servidor receptor (UTC) y documentar la conversión para quien lo lee (S-35).
+
+51. **Una restricción por IP que incluye al proxy no restringe nada.** El cliente de API de GLPI admitía `10.20.40.0/24`, y BunkerWeb (`10.20.40.2`) está en ese rango: cualquiera que llegara por el WAF con los tokens entraba. Además, la API aceptaba usuario y contraseña, un inicio de sesión sin el doble factor de la interfaz.
+    → Todo servicio detrás del WAF debe revisarse ruta por ruta: lo que solo usa la red interna se bloquea en el WAF y, además, en el propio servicio. Se prueba desde fuera (`pruebas.sh`) y desde la IP del WAF.
+
+52. **Idempotente no significa seguro ante la concurrencia.** `configurar-glpi` busca y crea si no encuentra: dos corridas a la vez duplicaron grupos, reglas y SLA sin avisar. Pasó porque una tarea detenida siguió viva en segundo plano.
+    → Un comando que crea objetos detecta duplicados y se detiene nombrándolos. Al detener una tarea, comprobar que sus procesos hijos (`docker run`) también terminaron.
+
+53. **Una guía para otros solo está probada si se siguió desde cero.** Desde un clon limpio aparecieron tres fallos invisibles en la máquina del autor: las cuentas compartidas no servían con otra base, el WAF tapaba los 403 de la aplicación y la configuración concurrente de GLPI duplicaba.
+    → Antes de entregar instrucciones, seguirlas en una carpeta nueva con un proyecto de Compose aparte (`-p`), sin los secretos del autor.
+
+54. **Una prueba de concurrencia que exige un ganador concreto falla de forma intermitente.** H3 esperaba que ganara siempre la cancelación; la CI quedaba en rojo según el orden de los hilos y, como la imagen solo se publica con la CI en verde, el equipo siguió descargando una imagen rota durante dos commits.
+    → En una carrera se verifica la invariante (gana exactamente una) y no quién gana. Revisar que lo publicado (`ultima`) corresponda al último commit.
+
+55. **El WAF también reescribe respuestas legítimas.** BunkerWeb intercepta por defecto los 4xx y 5xx del upstream y pone su página: el «Su cuenta no tiene acceso» de la aplicación se veía como un bloqueo del WAF.
+    → En sitios cuya aplicación genera sus propios errores con contenido, interceptar solo 502, 503 y 504 (`INTERCEPTED_ERROR_CODES`), y verificar a través del WAF los mensajes de error, no solo los códigos.

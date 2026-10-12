@@ -6,7 +6,7 @@ Hecho con GLPI **11.0.11** (imagen `glpi/glpi` fijada por digest) en `infra/comp
 
 | # | Punto | Resultado |
 |---|---|---|
-| 1 | Autenticación de servicio | **API v1** con `App-Token` + `Authorization: user_token`. Cliente de API restringido a la red interna `10.20.40.0/24`; usuario `jml-servicio` con un perfil acotado. ADR-014 decidido: v1, sin OAuth (la v2 de GLPI 11 no se necesita) |
+| 1 | Autenticación de servicio | **API v1** con `App-Token` + `Authorization: user_token`. Cliente de API restringido a `10.20.40.3`–`10.20.40.254`: la red interna sin la puerta de enlace ni el WAF. Usuario `jml-servicio` con un perfil acotado. Sin inicio de sesión por credenciales en la API, y API cerrada en el WAF (auditoría del 12/10/2026). ADR-014 decidido: v1, sin OAuth; la v2 de GLPI 11 no se necesita |
 | 2 | Buscar un ticket por referencia externa | **Sí**: el campo `externalid` existe en `Ticket` y se puede escribir. `searchText` busca por subcadena y `externalid` **no es único**, así que el adaptador filtra exacto y purga duplicados |
 | 3 | Ticket en «En espera» | **Sí**: `status: 4` al crear |
 | 4 | Categoría ITIL y enrutamiento | **Sí**: 114 categorías `JML/<tipo>/<cola>/<acción>`; la regla asigna el grupo y una categoría desconocida va a «Revisión manual» (CA-03 verificado) |
@@ -36,7 +36,7 @@ Hecho con GLPI **11.0.11** (imagen `glpi/glpi` fijada por digest) en `infra/comp
 export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"        # Git Bash en Windows
 COMPOSE="-f infra/compose.yaml -f infra/compose.local.yaml" infra/glpi/preparar-glpi.sh
 docker compose -f infra/compose.yaml -f infra/compose.local.yaml run --rm configurar-glpi
-JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh     # 26 pruebas contra el GLPI real
+JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh     # 30 pruebas contra el GLPI real
 ```
 
 `contrato-glpi.sh` corre dentro de la red de Docker y **borra los tickets cuya clave empieza con `SOL-`**: úselo solo con un GLPI de pruebas.
@@ -45,4 +45,4 @@ JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh     # 26 pruebas contra el
 
 - Correr esta suite en la CI (necesita levantar GLPI y MariaDB como servicios).
 - La zona horaria de los técnicos en GLPI (S-35) y su doble factor: pasos manuales de operación.
-- Los flujos VAC, RET y EMG de extremo a extremo (sección 5.1).
+- ~~Los flujos VAC, RET y EMG de extremo a extremo~~: hechos el 12/10/2026 (`tests/integracion/test_flujos_glpi_real.py`).

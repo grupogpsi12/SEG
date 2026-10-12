@@ -10,7 +10,8 @@ Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin e
 
 - [ ] **0.0 Aprobar el SRS v2.2** con el equipo y el docente.
   ✔ Comentarios incorporados; versión aprobada registrada en "Control del documento".
-- [ ] **0.1 Repositorio base:** GitHub con la estructura de `CLAUDE.md`, `.gitignore`, pre-commit (gitleaks, ruff) y protección de `main`.
+- [~] **0.1 Repositorio base:** GitHub con la estructura de `CLAUDE.md`, `.gitignore`, pre-commit (gitleaks, ruff) y protección de `main`.
+  ✔ Repositorio `grupogpsi12/SEG` con CI (`verificar`: compuertas, seguridad con gitleaks, integración) e imagen en GHCR. ⏳ Protección de `master` y pre-commit local: los configura un dueño del repositorio.
   ✔ Un commit con un secreto falso es bloqueado.
 - [~] **0.2 Spike de Supabase** (SUP-02, ADR-015). Hecho lo de la base (`docs/spikes/supabase.md`); falta `pg_dump`/`pg_restore`, la prueba de `/rest/v1` y el proyecto de entrega. *No bloquea el núcleo; se hace antes de la Fase 2.*
   - Crear los proyectos de desarrollo y de entrega en `us-east-1`.
@@ -206,11 +207,12 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔ Los casos `SincronizarTickets` y `SincronizarActivos` (núcleo) corren en el ciclo del worker cada 5 minutos con el adaptador de 3.2; latido para el chequeo de salud. ⏳ Probar contra GLPI real.
   ✔ CA-08; la solicitud se cierra solo con solución y acta.
   ✔✔ **CA-08 y el flujo ING (CA-05)** de extremo a extremo con GLPI real: los técnicos resolvieron los 4 tickets con solución y acta, y el worker (reiniciado para sincronizar de inmediato) cerró la solicitud, cambió las cuentas AD, Red y M365 de `pendiente_alta` a `activa`, leyó el equipo con su acta y lo dejó todo en la auditoría (`ticket.estado_sincronizado`, `cuenta.estado_derivado`, `solicitud.cerrada`).
-- [~] **3.4 Derivación de cuentas sobre datos reales** (RF-27, §4.7).
+- [x] **3.4 Derivación de cuentas sobre datos reales** (RF-27, §4.7).
   ✔ Los escenarios de 1.12 pasan con el adaptador real de GLPI.
+  ✔ Verificado el camino ING con GLPI real (`pendiente_alta` → `activa` en los tres sistemas).
+  ✔✔ 12/10/2026: VAC (`pendiente_suspension` → `suspendida` → `activa` en su fecha), RET (`pendiente_baja` → `deshabilitada` → `eliminada` a los 90 días) y EMG con PostgreSQL y GLPI reales (`tests/integracion/test_flujos_glpi_real.py`).
 
 ## Fase 4 — Dashboard y búsqueda
-  ✔ Verificado el camino ING con GLPI real (`pendiente_alta` → `activa` en los tres sistemas). ⏳ Faltan VAC (suspensión y reactivación programada), RET y EMG con el adaptador real: es la sección 5.1.
 - [~] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
   ✔ CA-15: **el resultado SQL es idéntico al oráculo en memoria de 1.11** con los mismos datos; el percentil 95 está por debajo de 2 s con 300 colaboradores (RNF-06).
   ✔✔ Hecho: las consultas del ORM (`persistencia/consultas.py`) dan lo mismo que el oráculo en ~230 instantes con bordes (`test_persistencia_oraculo.py`, SQLite y PostgreSQL). ⏳ Falta: índices y medir el p95 con 300 colaboradores sobre PostgreSQL (necesita una semilla grande). Índices agregados el 11/10/2026 (migración 0005: `ticket.activo_desde`, `ticket.vence_en`, `solicitud.creada_en`, `solicitud.estado`, `colaborador.estado`; las claves foráneas ya tenían índice). **No medir contra Supabase desde Colombia**: la latencia de red (~150 ms por consulta) domina el resultado; medir con PostgreSQL 17 local en Docker o desde la VM de Azure (misma región que Supabase).
@@ -225,17 +227,19 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 
 ## Fase 5 — Flujos completos y entrega
 
-- [~] **5.1 Pruebas de extremo a extremo** de ING, VAC, RET y EMG con GLPI en contenedor.
+- [x] **5.1 Pruebas de extremo a extremo** de ING, VAC, RET y EMG con GLPI en contenedor.
   ✔ CA-05 y CA-06 (los mismos escenarios de 1.12, ahora con los adaptadores reales).
   ✔ **ING completo** (CA-05) verificado a mano con scripts (`e2e_*` del scratchpad, no versionados aún): emisión por RRHH con PDF → tickets → resolución → sincronización → cerrada. ⏳ VAC, RET y EMG (CA-06 con el escalamiento al vencer), y llevar el flujo a pruebas automáticas versionadas (Playwright, ítem de calidad).
+  ✔✔ **12/10/2026** (auditoría): `tests/integracion/test_flujos_glpi_real.py`, versionado, con repositorios contra PostgreSQL, el worker y GLPI 11 real; solo el reloj es simulado. Cubre VAC con reactivación programada y RET que cierra sin esperar la eliminación (**CA-04**), EMG con prioridad 5, SLA de 1 hora y exposición en el dashboard (**CA-06**), y GLPI caído → 10 reintentos → `error` → reintento del Administrador sin duplicar mientras la aplicación sigue aprobando (**CA-07**). Corre con `JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh`, que levanta un PostgreSQL desechable: 30 de 30. El ingreso por la interfaz con TOTP se verificó otra vez desde un clon limpio. ⏳ Opcional: Playwright para la interfaz.
 - [~] **5.2 Despliegue en Azure:** VM, NSG (80/443 públicos y 22 restringido), DuckDNS, Let's Encrypt emitido por BunkerWeb y Key Vault (bootstrap a tmpfs). Si ADR-024 se acepta: `cloudflared`, dominio en Cloudflare, Access para `glpi.*`, real IP desde `CF-Connecting-IP` y NSG sin 80/443.
   ✔ Procedimiento de 10 pasos o menos, ejecutado desde cero por un integrante distinto del autor.
   ✔ Procedimiento escrito (`docs/operacion.md` §3, 10 pasos) **sin ejecutar**: falta Azure.
 - [~] **5.3 Respaldos y restauración** (RD-06, RNF-04).
   ✔ Escrito sin Azure: `infra/scripts/respaldo.sh` (`pg_dump` del esquema `app` como `app_owner` por TLS + `mariadb-dump` de GLPI, subidos a Blob con la identidad de la VM); restauración en `docs/operacion.md`. ⏳ Ejecutarlo y probar la restauración con evidencia (CA-11).
   ✔ CA-11 con evidencia.
-- [ ] **5.4 Pruebas de seguridad**, sin WAF (en local) y a través de BunkerWeb (RS-13).
+- [~] **5.4 Pruebas de seguridad**, sin WAF (en local) y a través de BunkerWeb (RS-13).
   ✔ CA-12, CA-13 y CA-20; informes adjuntos.
+  ✔✔ **Auditoría del 12/10/2026** (`docs/auditoria-2026-10-12.md`): revisión manual completa y 11 hallazgos corregidos, entre ellos la API de GLPI expuesta por el WAF (alta). En la CI, job `seguridad` con gitleaks sobre todo el historial, pip-audit y bandit, y Trivy antes de publicar la imagen, todos en cero. `pruebas.sh` en verde en ambos sitios (CA-20). ⏳ ZAP y sqlmap dinámicos contra Azure (con la IP del escáner fuera del baneo).
 - [ ] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ CA-21.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.

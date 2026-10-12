@@ -90,6 +90,8 @@ make verificar        # ruff + mypy --strict + lint-imports + pytest con cobertu
 make mutacion         # mutmut sobre dominio (lento; antes del Hito N y en cada cambio de reglas)
 ruff check . && mypy src && lint-imports && pytest -q tests/dominio tests/aplicacion tests/contratos tests/escenarios
 pytest -q tests/integracion          # requiere GLPI y PostgreSQL de prueba en contenedor
+JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # contrato + flujos contra GLPI real (PostgreSQL desechable)
+docker compose -f infra/compose.yaml run --rm admin-usuarios vincular --usuario <id> --rol Y   # cuenta existente en otra base
 infra/waf/pruebas.sh app.localhost && infra/waf/pruebas.sh glpi.localhost   # el WAF bloquea y deja pasar lo que debe
 docker compose -f infra/compose.yaml exec bw-scheduler bwcli unban <ip>    # tras baneos por pruebas (confirmar en el spike 0.6)
 ```
