@@ -93,7 +93,11 @@ def test_H3_aprobar_contra_cancelar_solo_gana_una(
             lambda: CancelarSolicitud(dep).ejecutar("u-col", sid),
         ],
     )
-    assert resultados == ["ok", "transicion_invalida"]
+    # Gana una sola, la que tome primero el candado. Si gana la cancelacion, la aprobacion ve
+    # una cancelada (transicion invalida); si gana la aprobacion, el colaborador ya no puede
+    # cancelar una aprobada: solo RRHH lo hace (RF-11), y el dominio responde «no autorizado».
+    assert resultados.count("ok") == 1, resultados
+    assert set(resultados) - {"ok"} <= {"transicion_invalida", "no_autorizado"}, resultados
     assert m.Decision.objects.filter(solicitud_id=sid.valor).count() == 1
 
 
