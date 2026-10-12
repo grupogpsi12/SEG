@@ -29,5 +29,11 @@ jobs:
           IMAGEN="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/jml-app"
           echo "$TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
           docker build -t "$IMAGEN:$SHA" -t "$IMAGEN:ultima" .
+          # Item 5.4: no se publica una imagen con vulnerabilidades altas o criticas que ya tengan
+          # correccion (Trivy en contenedor, fijado por digest).
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.67.2@sha256:e2b22eac59c02003d8749f5b8d9bd073b62e30fefaef5b7c8371204e0a4b0c08 \
+            image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            "$IMAGEN:$SHA"
           docker push "$IMAGEN:$SHA"
           docker push "$IMAGEN:ultima"
