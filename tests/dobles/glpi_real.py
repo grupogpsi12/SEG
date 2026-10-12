@@ -47,6 +47,10 @@ class TransporteConFallos(httpx.BaseTransport):
     def caida(self, llamadas: int) -> None:
         self._caidas += llamadas
 
+    def recuperar(self) -> None:
+        """GLPI vuelve a responder: se cancelan las caidas que falten (CA-07)."""
+        self._caidas = 0
+
     # --- transporte ---------------------------------------------------------------------------
 
     def handle_request(self, request: httpx.Request) -> httpx.Response:
