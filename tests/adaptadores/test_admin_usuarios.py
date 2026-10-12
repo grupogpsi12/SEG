@@ -114,3 +114,37 @@ def test_sin_el_secreto_de_servicio_el_comando_no_corre(
     monkeypatch.setenv("JML_SECRETOS_DIR", str(tmp_path))
     with pytest.raises(CommandError, match="supabase_service_role"):
         admin_usuarios.administrador()
+
+
+# --- vincular: la cuenta ya existe en Supabase y falta en esta base (auditoria del 12/10/2026) --
+
+UID = "0f9e5a3c-1d2b-4c5e-8f70-123456789abc"
+
+
+def test_vincular_registra_los_roles_sin_tocar_supabase(gotrue: GoTrueSimulado) -> None:
+    """Un integrante con su base local usa una cuenta que el equipo ya creo en Supabase."""
+    salida = correr("vincular", "--usuario", UID, "--rol", "rrhh", "--colaborador", "col-1")
+    assert f"usuario vinculado: {UID}" in salida
+    assert [g.name for g in User.objects.get(username=UID).groups.all()] == [Rol.RRHH.value]
+    assert auditoria("usuario.vinculado") == [UID]
+    assert gotrue.llamadas == []  # ni service_role ni Supabase
+
+
+def test_vincular_no_pisa_una_cuenta_que_ya_esta_en_la_base(gotrue: GoTrueSimulado) -> None:
+    correr("vincular", "--usuario", UID, "--rol", "rrhh")
+    with pytest.raises(CommandError, match="ya existe"):
+        correr("vincular", "--usuario", UID, "--rol", "administrador")
+    assert [g.name for g in User.objects.get(username=UID).groups.all()] == [Rol.RRHH.value]
+
+
+@pytest.mark.parametrize("usuario", ["no-es-un-uuid", "../x", ""])
+def test_vincular_exige_un_id_de_supabase(gotrue: GoTrueSimulado, usuario: str) -> None:
+    with pytest.raises(CommandError, match="id de Supabase"):
+        correr("vincular", "--usuario", usuario, "--rol", "rrhh")
+
+
+def test_vincular_valida_roles_y_colaborador(gotrue: GoTrueSimulado) -> None:
+    with pytest.raises(CommandError, match="incompatibles"):
+        correr("vincular", "--usuario", UID, "--rol", "rrhh", "--rol", "auditor")
+    with pytest.raises(CommandError, match="no existe el colaborador"):
+        correr("vincular", "--usuario", UID, "--rol", "rrhh", "--colaborador", "col-999")

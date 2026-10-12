@@ -6,9 +6,15 @@ id, en Django con sus roles (grupos). El TOTP lo inscribe la persona en su prime
 
 La contrasena inicial es aleatoria y se muestra UNA vez en la terminal del administrador, que la
 entrega por un canal fuera de la aplicacion (no hay correos: fuera de alcance).
+
+`vincular` registra en ESTA base los roles de una cuenta que ya existe en Supabase Auth: cada
+integrante del equipo tiene su PostgreSQL local, pero las cuentas son las del Supabase compartido
+(docs/probar-localmente.md). No usa `service_role`: un id inventado no da acceso a nadie, porque la
+sesion solo se crea si Supabase autentica ese id con contrasena y TOTP (invariante 9).
 """
 
 import os
+import re
 import secrets
 from pathlib import Path
 from typing import Any
@@ -29,6 +35,7 @@ from jml.dominio.permisos import UsuarioDelSistema, validar_roles
 from jml.dominio.tipos import Rol
 
 ACTOR = "sistema:admin-usuarios"
+_ID_SUPABASE = re.compile(r"^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
 
 
 def administrador() -> AdministradorSupabase:
@@ -59,6 +66,14 @@ class Command(BaseCommand):
             "--rol", action="append", required=True, choices=[r.value for r in Rol], dest="roles"
         )
         crear.add_argument("--colaborador", help="Id del colaborador al que corresponde")
+        vincular = sub.add_parser(
+            "vincular", help="Registra en esta base los roles de una cuenta que ya existe"
+        )
+        vincular.add_argument("--usuario", required=True, help="Id de Supabase del usuario")
+        vincular.add_argument(
+            "--rol", action="append", required=True, choices=[r.value for r in Rol], dest="roles"
+        )
+        vincular.add_argument("--colaborador", help="Id del colaborador al que corresponde")
         desactivar = sub.add_parser("desactivar", help="Banea la cuenta y la desactiva")
         desactivar.add_argument("--usuario", required=True, help="Id de Supabase del usuario")
 
@@ -66,21 +81,28 @@ class Command(BaseCommand):
         try:
             if o["accion"] == "crear":
                 self._crear(o["correo"], frozenset(Rol(r) for r in o["roles"]), o["colaborador"])
+            elif o["accion"] == "vincular":
+                roles = frozenset(Rol(r) for r in o["roles"])
+                self._vincular(o["usuario"], roles, o["colaborador"])
             else:
                 self._desactivar(o["usuario"])
         except (ErrorDeAdministracion, IdentidadNoDisponible) as e:
             raise CommandError(f"Supabase rechazo la operacion: {e}") from None
 
-    def _crear(self, correo: str, roles: frozenset[Rol], colaborador: str | None) -> None:
+    @staticmethod
+    def _validar(repos: Repositorios, roles: frozenset[Rol], colaborador: str | None) -> None:
         try:
-            validar_roles(roles)  # RF-05: antes de tocar Supabase
+            validar_roles(roles)  # RF-05: antes de tocar Supabase o la base
         except RolesIncompatibles as e:
             raise CommandError(str(e)) from None
-        repos = repositorios()
         if colaborador is not None:
             with repos.unidad_de_trabajo() as u:
                 if u.colaboradores.obtener(colaborador) is None:
                     raise CommandError(f"no existe el colaborador {colaborador}")
+
+    def _crear(self, correo: str, roles: frozenset[Rol], colaborador: str | None) -> None:
+        repos = repositorios()
+        self._validar(repos, roles, colaborador)
         admin = administrador()
         contrasena = secrets.token_urlsafe(18)  # 24 caracteres (RS-16 pide al menos 12)
         uid = admin.crear(correo, contrasena)
@@ -98,6 +120,24 @@ class Command(BaseCommand):
             raise
         self.stdout.write(f"usuario creado: {uid}")
         self.stdout.write(f"contrasena inicial (se muestra una sola vez): {contrasena}")
+
+    def _vincular(self, uid: str, roles: frozenset[Rol], colaborador: str | None) -> None:
+        if not _ID_SUPABASE.fullmatch(uid):
+            raise CommandError("--usuario debe ser el id de Supabase (un UUID en minusculas)")
+        repos = repositorios()
+        self._validar(repos, roles, colaborador)
+        with repos.unidad_de_trabajo() as u:
+            if any(x.id == uid for x in u.usuarios.todos()):
+                # Cambiar roles es de la administracion web, con su auditoria (RF-37).
+                raise CommandError(f"el usuario {uid} ya existe en esta base")
+            u.usuarios.guardar(UsuarioDelSistema(uid, colaborador, roles))
+            u.auditoria.registrar(
+                ACTOR,
+                EventoDeAuditoria(
+                    "usuario.vinculado", uid, {"roles": ",".join(sorted(r.value for r in roles))}
+                ),
+            )
+        self.stdout.write(f"usuario vinculado: {uid}")
 
     def _desactivar(self, uid: str) -> None:
         repos = repositorios()
