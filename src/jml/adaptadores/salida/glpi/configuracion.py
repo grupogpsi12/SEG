@@ -1,9 +1,9 @@
 """Configuracion de GLPI como codigo (item 3.1, RF-19, SRS 4.6). Idempotente: busca por nombre
 y solo crea lo que falta, asi que se puede correr en cada despliegue.
 
-PROVISIONAL hasta el spike 0.3: los codigos de condicion y de accion de las reglas siguen la
-documentacion de GLPI (RuleTicket, RuleCriteria, RuleAction, SLM/SLA/SlaLevel) y se confirman
-contra GLPI 11 real. Necesita un token de un usuario administrador de GLPI, no el de servicio.
+Confirmado contra GLPI 11.0.11 real (spike 0.3): los codigos de condicion y de accion de las
+reglas (RuleTicket, RuleCriteria, RuleAction, SLM/SLA/SlaLevel) enrutan cada cola a su grupo
+(CA-03). Necesita un token de un usuario administrador de GLPI, no el de servicio.
 
 Lo que NO configura (pasos manuales documentados en docs/operacion.md): habilitar la API, el
 perfil de la cuenta de servicio y el doble factor de los tecnicos.

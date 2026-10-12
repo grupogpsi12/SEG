@@ -38,7 +38,7 @@ def _secreto(nombre: str) -> str:
 
 
 def sistema_de_tickets() -> SistemaDeTickets:
-    """Adaptador de la API v1 de GLPI (3.2, PROVISIONAL hasta el spike 0.3)."""
+    """Adaptador de la API v1 de GLPI (3.2, confirmado contra GLPI real en el spike 0.3)."""
     return SistemaDeTicketsGlpi(
         settings.JML_GLPI_API_URL,
         _secreto("glpi_app_token"),

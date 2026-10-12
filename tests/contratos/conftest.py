@@ -80,8 +80,8 @@ def fabrica_orm(directorio: Path) -> EntornoDeContrato:
 
 
 def fabrica_glpi_api(directorio: Path) -> EntornoDeContrato:
-    """El adaptador REAL de GLPI (API v1) contra un GLPI simulado (3.2, PROVISIONAL hasta el
-    spike 0.3). Lo demas es el doble en memoria: esta fabrica existe por SistemaDeTickets."""
+    """El adaptador REAL de GLPI (API v1) contra un GLPI simulado (3.2; contra GLPI real, la
+    fabrica `glpi_real`). Lo demas es el doble en memoria: existe por SistemaDeTickets."""
     from jml.adaptadores.salida.glpi.cliente import SistemaDeTicketsGlpi
     from tests.dobles.glpi_api import APP_TOKEN, BASE, USER_TOKEN, GlpiSimulado
 

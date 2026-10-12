@@ -1,6 +1,6 @@
 """Item 3.2: lo propio del adaptador de GLPI (API v1), mas alla de la suite de contrato.
 
-PROVISIONAL hasta el spike 0.3: el GLPI simulado sigue la documentacion de la API v1.
+El GLPI simulado imita lo que el spike 0.3 encontro en GLPI 11 real (docs/spikes/glpi.md).
 """
 
 from dataclasses import replace

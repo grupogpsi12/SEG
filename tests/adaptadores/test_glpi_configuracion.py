@@ -1,4 +1,4 @@
-"""Item 3.1: configuracion de GLPI como codigo, contra el GLPI simulado (PROVISIONAL, spike 0.3)."""
+"""Item 3.1: configuracion de GLPI como codigo, contra el GLPI simulado (confirmada contra GLPI real en el spike 0.3)."""
 
 from collections import Counter
 

@@ -187,8 +187,8 @@ class TicketCreado:
 class SistemaDeTickets(Protocol):
     """GLPI es la fuente de la verdad sobre el estado de cada ticket (ADR-001, ADR-016).
 
-    PROVISIONAL hasta el spike 0.3: debe confirmarse que GLPI permite buscar un ticket por
-    referencia externa y un documento por hash. Todas las escrituras son idempotentes.
+    Confirmado en el spike 0.3 contra GLPI 11 real: un ticket se busca por referencia externa y
+    un documento por hash, sin cambiar el puerto. Todas las escrituras son idempotentes.
     """
 
     def asegurar_usuario(self, colaborador: Colaborador) -> str:
