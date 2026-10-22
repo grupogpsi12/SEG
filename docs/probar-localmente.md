@@ -115,6 +115,18 @@ JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # 30 pruebas contra su G
 
 `contrato-glpi.sh` **borra los tickets cuya clave empieza con `SOL-`** en su GLPI: úselo solo en su equipo.
 
+### Reportería del WAF (opcional, RNF-16)
+
+Los ataques y bloqueos de BunkerWeb en un dashboard de Grafana. Agregue el tercer archivo al atajo y vuelva a levantar:
+
+```bash
+infra/scripts/preparar-entorno.sh                   # crea secrets/grafana_admin_password si falta
+C="-f infra/compose.yaml -f infra/compose.local.yaml -f infra/compose.reporteria.yaml"
+docker compose $C up -d
+```
+
+Abra `http://localhost:3000` (usuario `admin`, clave en `secrets/grafana_admin_password`). Tras `infra/waf/pruebas.sh app.localhost`, el dashboard **WAF BunkerWeb** muestra los bloqueos en menos de un minuto. Los logs quedan 30 días en el volumen `loki-datos`; `down -v` los borra.
+
 ## 7. Para el Administrador: crear cuentas
 
 Solo quien tiene `secrets/supabase_service_role` (no se comparte):

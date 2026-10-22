@@ -1,0 +1,95 @@
+# Reporteria del WAF (item 5.5, RNF-16, ADR-023): Fluent Bit + Loki + Grafana de waf-stack.
+# Se suma como un archivo mas; sin el, los logs quedan en Docker como hasta ahora.
+#
+#   infra/scripts/preparar-entorno.sh     # crea secrets/grafana_admin_password si falta
+#   docker compose -f infra/compose.yaml -f infra/compose.local.yaml -f infra/compose.reporteria.yaml up -d
+#   Grafana: http://localhost:3000  (usuario admin, clave en secrets/grafana_admin_password)
+#
+# Flujo: bunkerweb y bw-scheduler --driver fluentd (127.0.0.1:24224)--> fluent-bit --> loki --> grafana
+#
+# RS-02: fluent-bit (24224) y grafana (3000) escuchan solo en 127.0.0.1. El 24224 lo usa el propio
+# Docker para entregar los logs; Grafana se consulta en el equipo o, en la VM, por tunel SSH.
+# Ninguno recibe trafico de usuarios: el unico borde sigue siendo bunkerweb (invariante 14).
+#
+# Pendiente en 5.5: fijar las tres imagenes por digest (RS-18) y, en Azure, Loki sobre Blob con la
+# identidad administrada (RS-20) en lugar de loki-local.yaml.
+
+x-endurecido-reporteria: &endurecido
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+
+x-logging-reporteria: &logging-reporteria
+  driver: fluentd
+  options:
+    fluentd-address: "127.0.0.1:24224"
+    # Sin fluent-bit, el contenedor arranca igual y esos logs se descartan (BunkerWeb no se bloquea).
+    fluentd-async: "true"
+    tag: "docker.{{.Name}}"
+
+services:
+  bunkerweb:
+    logging: *logging-reporteria
+    depends_on: [fluent-bit]
+
+  bw-scheduler:
+    logging: *logging-reporteria
+
+  fluent-bit:
+    <<: *endurecido
+    image: fluent/fluent-bit:3.2
+    read_only: true
+    tmpfs: ["/tmp:size=16m,noexec,nosuid"]
+    ports:
+      - "127.0.0.1:24224:24224/tcp"
+    volumes:
+      - ./reporteria/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./reporteria/clasificar.lua:/fluent-bit/etc/clasificar.lua:ro
+    mem_limit: 64m
+    networks: [waf-logs]
+
+  loki:
+    <<: *endurecido
+    image: grafana/loki:3.4.2
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    volumes:
+      - ./reporteria/loki-local.yaml:/etc/loki/loki.yaml:ro
+      - loki-datos:/loki
+    # Al detenerse escribe lo pendiente del WAL
+    stop_grace_period: 1m
+    mem_limit: 384m
+    networks: [waf-logs]
+
+  grafana:
+    <<: *endurecido
+    image: grafana/grafana:11.5.2
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      TZ: America/Bogota
+      GF_SECURITY_ADMIN_USER: admin
+      # RS-20: la clave viene de /run/secrets, no del entorno
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/dashboards/waf-bunkerweb.json
+    secrets: [grafana_admin_password]
+    volumes:
+      - ./reporteria/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./reporteria/grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana-datos:/var/lib/grafana
+    depends_on: [loki]
+    mem_limit: 256m
+    networks: [waf-logs]
+
+secrets:
+  grafana_admin_password: { file: ../secrets/grafana_admin_password }
+
+volumes:
+  loki-datos:
+  grafana-datos:
+
+networks:
+  # Solo la reporteria: fluent-bit no entra en app, db_net ni bw-universe
+  waf-logs:

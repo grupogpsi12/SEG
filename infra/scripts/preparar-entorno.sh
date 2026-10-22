@@ -33,6 +33,7 @@ asegurar() {  # nombre longitud
 asegurar django_secret_key 50
 asegurar bw_api_token 32
 asegurar glpi_db_password 32
+asegurar grafana_admin_password 24  # infra/compose.reporteria.yaml (RS-20)
 
 if [ "${JML_MODO:-}" = "local" ]; then
   # infra/compose.local.yaml: PostgreSQL propio, sin la base de Supabase (docs/probar-localmente.md)

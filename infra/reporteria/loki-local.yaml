@@ -1,0 +1,59 @@
+# Loki para pruebas en un equipo propio: los logs en el volumen `loki-datos` (30 dias).
+# En Azure, RNF-16 y RS-20 piden Blob con la identidad administrada de la VM (pendiente en 5.5).
+# Sobrevive a reinicios y a `docker compose down`; se pierde con `down -v`.
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+  log_level: warn
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /loki
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+ingester:
+  chunk_idle_period: 5m
+  max_chunk_age: 1h
+
+limits_config:
+  # Cuánto tiempo se conservan los logs (720h = 30 días)
+  retention_period: 720h
+  max_query_lookback: 720h
+  volume_enabled: true
+
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  delete_request_store: filesystem
+
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+analytics:
+  reporting_enabled: false
