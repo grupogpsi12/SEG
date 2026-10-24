@@ -58,6 +58,8 @@ def test_invariante_14_waf_en_bloqueo_con_crs_y_api_token() -> None:
     ):
         assert ajuste in entorno
     assert "API_TOKEN=${BW_API_TOKEN:?" in entorno
+    # invariante 5 y RS-09: el log de auditoria no copia cabeceras (cookie) ni cuerpo
+    assert "MODSECURITY_SEC_AUDIT_LOG_PARTS=FH" in entorno
     assert "API_TOKEN" in _entorno("bunkerweb")
     assert not {"bw-ui", "bw-db"} & set(SERVICIOS)  # sin interfaz ni su base (RS-19)
 

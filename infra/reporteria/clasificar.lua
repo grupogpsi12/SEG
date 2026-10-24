@@ -12,6 +12,45 @@ local function contiene(texto, fragmento)
   return string.find(texto, fragmento, 1, true) ~= nil
 end
 
+-- JML (revision del 24/10/2026): ModSecurity escribe el valor que disparo la regla. Si el campo es
+-- un restringido o una credencial (invariante 5, RS-09), el valor no viaja a Loki; se conservan la
+-- variable y la regla, que es lo que sirve para investigar. Mismas palabras que los logs de la
+-- aplicacion (jml/adaptadores/registro.py), mas `codigo` (el TOTP).
+local SENSIBLES = {
+  "password", "contrasena", "token", "totp", "secret", "motivo", "descripcion", "codigo",
+}
+local FILTRADO = "[filtrado]"
+
+local function sensible(variable)
+  local v = string.lower(variable)
+  for _, palabra in ipairs(SENSIBLES) do
+    if contiene(v, palabra) then
+      return true
+    end
+  end
+  return false
+end
+
+local function tapar(linea)
+  -- `against variable `ARGS:motivo' (Value: `...' )`
+  linea = string.gsub(linea, "(against variable `)([^']+)(' %(Value: `)(.-)(' %))",
+    function(a, variable, b, valor, c)
+      if sensible(variable) then
+        return a .. variable .. b .. FILTRADO .. c
+      end
+      return nil
+    end)
+  -- `[data "Matched Data: ... found within ARGS:motivo: ..."]`
+  linea = string.gsub(linea, '(%[data "Matched Data: )(.-)( found within )([^:"]+:[^:"]+)(: )(.-)("%])',
+    function(a, dato, b, variable, c, valor, d)
+      if sensible(variable) then
+        return a .. FILTRADO .. b .. variable .. c .. FILTRADO .. d
+      end
+      return nil
+    end)
+  return linea
+end
+
 -- Formato de acceso por defecto de BunkerWeb:
 -- $host $remote_addr - $request_id $remote_user [$time_local] "$request" $status ...
 local PATRON_ACCESO = '^%S+ %S+ %- %S+ %S+ %[[^%]]+%] "'
@@ -40,6 +79,7 @@ function clasificar(tag, timestamp, record)
 
   if contiene(linea, "ModSecurity: ") then
     tipo = "waf"
+    linea = tapar(linea)
   elseif string.find(linea, PATRON_ACCESO) then
     tipo = "acceso"
   else

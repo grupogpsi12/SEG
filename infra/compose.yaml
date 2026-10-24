@@ -91,6 +91,10 @@ services:
       - USE_MODSECURITY=yes
       - USE_MODSECURITY_CRS=yes
       - MODSECURITY_CRS_VERSION=4
+      # El log de auditoria por defecto (BCFH) copia las cabeceras (la cookie de sesion) y el cuerpo
+      # (contrasenas, motivo, descripcion) de cada peticion marcada: solo respuesta y mensajes de
+      # las reglas (A y Z van siempre). Invariante 5 y RS-09; revision del 24/10/2026.
+      - MODSECURITY_SEC_AUDIT_LOG_PARTS=FH
       # Limites (RS-08): 2 r/s por IP en general; 5 r/min en ingreso y TOTP; ban de 1 hora
       - USE_LIMIT_REQ=yes
       - LIMIT_REQ_RATE=2r/s
