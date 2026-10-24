@@ -216,3 +216,11 @@ def test_RS_07_cabeceras_de_aislamiento_de_origen_en_el_waf_y_estaticos_sin_cors
     assert "app.localhost}_CUSTOM_HEADER_1=Cross-Origin-Embedder-Policy: require-corp" in entorno
     assert settings.WHITENOISE_ALLOW_ALL_ORIGINS is False
 
+
+def test_S_29_el_unico_proceso_de_gunicorn_no_se_reinicia_cada_n_peticiones() -> None:
+    """Con un solo proceso (S-29), `--max-requests` lo reiniciaba cada ~2000 peticiones: la
+    aplicacion quedaba unos segundos sin servicio y se perdian los desafios TOTP en curso, que
+    viven en su memoria. Lo mostro sqlmap el 24/10/2026 ('Broken pipe' en cada reinicio)."""
+    cmd = next(x for x in (RAIZ / "Dockerfile").read_text().splitlines() if x.startswith("CMD"))
+    assert '"--workers", "1"' in cmd
+    assert '"--max-requests"' not in (RAIZ / "Dockerfile").read_text()  # como argumento del CMD

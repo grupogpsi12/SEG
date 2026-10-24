@@ -30,5 +30,7 @@ RUN install -d /tmp/s \
 USER jml
 EXPOSE 8000
 # Un solo proceso con hilos: los desafios TOTP a medio camino viven en su memoria (S-29).
+# Sin --max-requests: con un solo proceso, reiniciarlo deja la aplicacion sin servicio unos segundos
+# y pierde los desafios TOTP en curso (lo mostro sqlmap el 24/10/2026).
 CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "8", \
-     "--timeout", "60", "--max-requests", "2000", "--max-requests-jitter", "200"]
+     "--timeout", "60"]
