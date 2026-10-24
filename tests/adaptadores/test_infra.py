@@ -69,6 +69,11 @@ def test_RS_08_y_RS_17_limites_del_sitio_de_la_aplicacion() -> None:
     assert "_MAX_CLIENT_SIZE=21m" in entorno
     assert "_LIMIT_REQ_RATE_1=5r/m" in entorno
     assert "_LIMIT_REQ_URL_1=^/ingreso" in entorno
+    # Los estaticos (inmutables) tienen su propio limite: con 2 r/s el CSS de una pagina recibia
+    # 429 tras un POST y su redireccion (prueba de interfaz del 24/10/2026).
+    assert "_LIMIT_REQ_URL_2=^/static/" in entorno
+    assert "_LIMIT_REQ_RATE_2=10r/s" in entorno
+    assert "LIMIT_REQ_RATE=2r/s" in entorno  # el general no cambia
     assert "BAD_BEHAVIOR_BAN_TIME=3600" in entorno
 
 
@@ -210,3 +215,4 @@ def test_RS_07_cabeceras_de_aislamiento_de_origen_en_el_waf_y_estaticos_sin_cors
     assert "app.localhost}_CUSTOM_HEADER=Cross-Origin-Resource-Policy: same-origin" in entorno
     assert "app.localhost}_CUSTOM_HEADER_1=Cross-Origin-Embedder-Policy: require-corp" in entorno
     assert settings.WHITENOISE_ALLOW_ALL_ORIGINS is False
+

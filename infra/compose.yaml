@@ -121,6 +121,10 @@ services:
       - ${APP_DOMINIO:-app.localhost}_INTERCEPTED_ERROR_CODES=502 503 504
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_1=^/ingreso
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_1=5r/m
+      # Estaticos inmutables (WhiteNoise): con 2 r/s el CSS recibia 429 tras un POST y su
+      # redireccion y la pagina salia sin estilos (prueba de interfaz del 24/10/2026, RS-08).
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_2=^/static/
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_2=10r/s
       # --- glpi.*: GLPI (CSP por defecto de BunkerWeb, RS-07) ---
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_REVERSE_PROXY=yes
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_URL=/
