@@ -324,9 +324,10 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - **Cómo:** con sesiones creadas en la base. El TOTP real ya se probó de punta a punta y aquí se omite.
   - **Criterio:** cada flujo llega a «cerrada» después de que los técnicos resuelven en GLPI.
   - **Dependencia:** `playwright` para Python. Ya figura en la tabla del stack; se usa solo en las pruebas, con Chromium descargado por la propia herramienta.
-- [ ] **5.9 Suite contra GLPI real en la CI.**
+- [~] **5.9 Suite contra GLPI real en la CI.**
   - **Qué:** un job con GLPI 11 y MariaDB como contenedores, `preparar-glpi.sh`, `configurar-glpi` y `contrato-glpi.sh`.
   - **Criterio:** las 30 pruebas en verde en GitHub Actions en cada push a `master`.
+  ✔ Job `glpi-real` en `verificar.yml` (24/10/2026). Corre solo en los push a `master`, con secretos de un solo uso del runner, y sigue los mismos pasos que `docs/probar-localmente.md` §3, ya verificados en local. ⏳ Comprobar que pasa en GitHub con el primer push.
 - [ ] **5.10 Mutación antes de la entrega** (meta de 85 % en `dominio`; la última fue de 93,6 %).
   - **Criterio:** `make mutacion` igual o mayor a 85 %, con el informe en `docs/spikes/mutacion.md`.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.

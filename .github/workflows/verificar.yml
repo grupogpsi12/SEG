@@ -43,6 +43,34 @@ jobs:
       - name: Analisis estatico (bandit)
         run: uvx bandit==1.9.4 -q -r src -x '*/migrations/*'
 
+  # Item 5.9: el adaptador de GLPI contra GLPI 11 REAL en cada push a master (contrato, CA-03,
+  # CA-06, CA-10 y los flujos VAC, RET, EMG y caida de GLPI). Los mismos pasos que
+  # docs/probar-localmente.md §3, con secretos de un solo uso del propio runner.
+  glpi-real:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      C: -f infra/compose.yaml -f infra/compose.local.yaml
+      # No son secretos: solo los exige preparar-entorno.sh para escribir infra/.env
+      JML_SUPABASE_URL: https://ci.invalid
+      JML_SUPABASE_CLAVE_PUBLICA: sb_publishable_ci
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e  # v6.8.0
+        with:
+          python-version: "3.12"
+      - name: Secretos de un solo uso
+        run: JML_MODO=local infra/scripts/preparar-entorno.sh
+      - name: GLPI 11 y MariaDB (la primera instalacion tarda unos minutos)
+        run: docker compose $C up -d --wait --wait-timeout 600 glpi
+      - name: GLPI como codigo (preparar-glpi.sh y configurar-glpi)
+        run: |
+          COMPOSE="$C" infra/glpi/preparar-glpi.sh
+          docker compose $C run --rm configurar-glpi
+      - name: Contrato y flujos contra GLPI real
+        run: JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh
+
   integracion:
     runs-on: ubuntu-24.04
     services:
