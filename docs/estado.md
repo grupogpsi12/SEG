@@ -4,7 +4,7 @@
 
 Este documento existe para que otra persona, u otra sesión de Claude Code con otra cuenta, retome el trabajo sin el historial de la conversación. Todo lo que afirma está respaldado por commits, pruebas o documentos del repositorio. **Léase junto con:**
 - `CLAUDE.md` (reglas).
-- `docs/SRS.md` (v2.3).
+- `docs/SRS.md` (v2.4).
 - `tasks/todo.md` (estado y evidencia de cada ítem).
 - `tasks/lessons.md` (58 lecciones).
 - `docs/supuestos-nucleo.md` (S-01 a S-36).
@@ -102,7 +102,7 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 1. **Supabase**: contraseña mínima de 12 en el Dashboard y correr el asesor de seguridad antes de la entrega (RS-16). El registro abierto y la clave `service_role` ya están hechos.
 2. **Docker en el equipo de desarrollo**: ya funciona (se habilitó la plataforma de máquina virtual y se reinició). `docker.exe` no está en el PATH de Git Bash: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`. Para probar: `docs/probar-localmente.md`. Falta agregar `127.0.0.1 app.localhost glpi.localhost` al archivo `hosts` para usar el navegador.
 3. **GitHub** (0.1): falta la protección de `master` y un pre-commit con gitleaks; gitleaks ya corre en la CI. **Decidir si el paquete de GHCR se hace público**: no contiene secretos y le ahorra al equipo el `docker login`.
-4. Decisiones: 0.0 (aprobar el SRS v2.3), 0.7 (Cloudflare), los supuestos **S-28 a S-33**, y revisar ADR-025 a ADR-028.
+4. Decisiones: 0.0 (aprobar el SRS v2.4), 0.7 (Cloudflare), los supuestos **S-28 a S-36**, y revisar ADR-025 a ADR-030.
 5. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
 
 ### B. Con Docker

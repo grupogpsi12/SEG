@@ -4,7 +4,7 @@ Proyecto académico (Politécnico Grancolombiano, Gerencia de Proyectos en Segur
 
 ## Antes de cualquier trabajo
 
-1. Lee `docs/SRS.md` (v2.3) y `docs/estado.md` (estado y traspaso). Es la fuente de verdad. Si algo que te piden contradice el SRS, di **"Pausa —"**, explica la contradicción y espera una decisión.
+1. Lee `docs/SRS.md` (v2.4) y `docs/estado.md` (estado y traspaso). Es la fuente de verdad. Si algo que te piden contradice el SRS, di **"Pausa —"**, explica la contradicción y espera una decisión.
 2. Lee `tasks/todo.md` y trabaja solo sobre el ítem activo.
 3. Lee `tasks/lessons.md` y no repitas errores registrados.
 4. Las decisiones vigentes están en `docs/decisiones.md`. Los ADR marcados **REEMPLAZADA** no se aplican. Cambiar una decisión vigente exige un ADR nuevo.

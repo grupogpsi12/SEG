@@ -9,8 +9,8 @@ lang: es-CO
 | Proyecto | Sistema integrado de eventos laborales con identidad, recursos humanos y accesos automatizados |
 | Documento | Especificación de Requisitos de Software (SRS) |
 | Norma de referencia | ISO/IEC/IEEE 29148:2018, adaptada al alcance académico |
-| Versión | 2.3 — Borrador para revisión |
-| Fecha | 11 de octubre de 2026 |
+| Versión | 2.4 — Borrador para revisión |
+| Fecha | 24 de octubre de 2026 |
 | Autores | Jhinnet Bravo, Carlos Ruiz, Luis Ceron, Jhon Leal y Cristian Caro |
 | Docente | José Eduardo Patiño Santafé |
 | Estado | Pendiente de aprobación por el equipo y el docente |
@@ -22,6 +22,7 @@ lang: es-CO
 | 2.1 | 07/10/2026 | Soporte de vinculación obligatorio en el ingreso, adjunto a los tickets de GLPI; permisos sobre recursos compartidos con ruta y perfil (Consulta, Edición, Retiro de accesos) dentro de los eventos laborales. Basado en formularios de referencia de sistemas similares. |
 | 2.2 | 10/10/2026 | El proxy inverso pasa a ser BunkerWeb (nginx + ModSecurity + OWASP CRS), tomando como referencia el proyecto `waf-stack` del equipo; se descarta Application Gateway por costo. Reportería de logs del WAF con Fluent Bit, Loki y Grafana. Cloudflare Tunnel + Access queda como propuesta pendiente (ADR-024). El SRS deja de generarse en Word. |
 | 2.3 | 11/10/2026 | Tras una revisión externa (ADR-028): las migraciones las corre un rol dueño separado (`app_owner`) y `app_backend` solo opera, sin poder cambiar permisos ni disparadores (RI-03); el disparador de inmutabilidad valida también las transiciones de estado (RF-14). Sin cambios de alcance. Las consultas nuevas de los puertos para las vistas quedan en ADR-025 a ADR-027. |
+| 2.4 | 24/10/2026 | Precisiones de seguridad y operación tras la auditoría del 12/10/2026 y la revisión del 24/10/2026, sin cambios de alcance. La API de GLPI solo es interna (RS-02). Los logs del WAF no guardan cabeceras, cuerpos ni campos sensibles (RS-09). El chequeo del worker también pregunta a GLPI (RNF-01). Los secretos compartidos del equipo van cifrados con SOPS + age (RS-06, ADR-029). La auditoría y las listas de solicitudes se leen por páginas (RF-36, ADR-030). Una cuenta existente se vincula a otra base (RF-06). La CSP agrega `base-uri` y `form-action`, y BunkerWeb envía CORP y COEP (RS-07). La rotación de logs sin reportería es por tamaño (RNF-16, S-36). |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -387,7 +388,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RF-03 | El sistema debe aplicar los permisos de la sección 3.3 en cada vista del servidor, según los grupos de Django del usuario. | Debe |
 | RF-04 | El sistema debe cerrar la sesión tras 30 minutos de inactividad o 8 horas de duración total, y rotar el identificador de sesión al iniciarla. | Debe |
 | RF-05 | El sistema debe negar el acceso y registrar el evento en auditoría si un usuario tiene roles incompatibles. | Debe |
-| RF-06 | El registro abierto debe estar deshabilitado. Las cuentas de usuario solo se crean y desactivan con un comando de administración que ejecuta el Administrador del sistema. | Debe |
+| RF-06 | El registro abierto debe estar deshabilitado. Las cuentas de usuario solo se crean y desactivan con un comando de administración que ejecuta el Administrador del sistema. Una cuenta que ya existe en Supabase se registra en otra base de la aplicación con el mismo comando (`vincular`), sin la clave `service_role`; sin el TOTP de esa cuenta no da acceso. | Debe |
 
 ## Gestión de solicitudes
 
@@ -449,7 +450,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | ID | Requisito | Prioridad |
 |---|---|---|
 | RF-35 | El sistema debe registrar en auditoría: inicios de sesión exitosos y fallidos, solicitudes, decisiones, emisiones, tickets creados, cambios de estado sincronizados, cambios de cuentas derivadas, consultas de fichas de colaboradores, accesos a campos restringidos, cambios en la matriz de perfiles y en los roles. | Debe |
-| RF-36 | El Auditor debe poder consultar la auditoría y verificar la integridad de la cadena de hashes desde la interfaz. | Debe |
+| RF-36 | El Auditor debe poder consultar la auditoría, por páginas y sin leer la cadena completa (ADR-030), y verificar la integridad de la cadena de hashes desde la interfaz. | Debe |
 | RF-37 | El Administrador del sistema debe poder mantener la matriz de perfiles, los catálogos y los roles desde un área de administración restringida a su rol. | Debe |
 | RF-38 | El Administrador del sistema debe poder reintentar la emisión de una solicitud en `error`. | Debe |
 
@@ -511,14 +512,14 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | ID | Requisito | Prioridad |
 |---|---|---|
 | RS-01 | Todo el tráfico externo debe usar TLS 1.2 o superior, terminado en BunkerWeb con certificados de Let's Encrypt (`AUTO_LETS_ENCRYPT`). El puerto 80 solo atiende el desafío de Let's Encrypt y redirige a 443. Si se adopta Cloudflare (ADR-024), TLS lo termina Cloudflare y el túnel cifra el tramo hasta la VM. | Debe |
-| RS-02 | Solo BunkerWeb publica puertos (443 y 80). web, worker, GLPI, MariaDB, el scheduler y la reportería no publican puertos al exterior; Grafana solo escucha en `127.0.0.1` y se consulta por túnel SSH. El SSH a la VM se restringe por NSG a las IP del equipo y solo con llaves. | Debe |
+| RS-02 | Solo BunkerWeb publica puertos (443 y 80). web, worker, GLPI, MariaDB, el scheduler y la reportería no publican puertos al exterior; Grafana solo escucha en `127.0.0.1` y se consulta por túnel SSH. La API de GLPI (`/apirest.php` y `/api.php`) solo se usa desde la red interna: BunkerWeb la bloquea en `glpi.*`, el cliente de API de GLPI excluye la IP del WAF y no se admite el inicio de sesión por usuario y contraseña en la API, que no pide el doble factor. El SSH a la VM se restringe por NSG a las IP del equipo y solo con llaves. | Debe |
 | RS-03 | La red `db_net` debe declararse `internal: true`, y MariaDB no debe publicar puertos. | Debe |
 | RS-04 | Django en producción debe tener `DEBUG=False`, `ALLOWED_HOSTS` explícito, cookies de sesión y CSRF con `Secure`, `HttpOnly` y `SameSite=Lax`, HSTS, `X-Frame-Options: DENY` y protección CSRF en todos los formularios. | Debe |
 | RS-05 | Todo input externo, incluidas las cabeceras HTTP, se valida con formularios de Django o esquemas. Las consultas usan el ORM o SQL con parámetros, incluidas las escrituras de auditoría y logs. Django confía en `X-Forwarded-For` y `X-Forwarded-Proto` solo cuando vienen del contenedor de BunkerWeb. | Debe |
-| RS-06 | Los secretos viven en Key Vault y se rotan cada 90 días: clave secreta de Django, contraseña de `app_backend`, token de GLPI y claves de Supabase. | Debe |
-| RS-07 | Cabeceras de seguridad con una sola fuente por cabecera. Django envía la CSP de la aplicación (`default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'`) y `X-Frame-Options: DENY`; BunkerWeb las conserva (`KEEP_UPSTREAM_HEADERS`). BunkerWeb envía HSTS, `Referrer-Policy` y `X-Content-Type-Options` en ambos sitios, la CSP por defecto de GLPI, y elimina `Server` y `X-Powered-By`. | Debe |
+| RS-06 | Los secretos de producción viven en Key Vault y se rotan cada 90 días: clave secreta de Django, contraseña de `app_backend`, token de GLPI y claves de Supabase. Los que el equipo comparte durante el desarrollo se versionan cifrados con SOPS + age, por persona, y se rotan al quitar a alguien (ADR-029). | Debe |
+| RS-07 | Cabeceras de seguridad con una sola fuente por cabecera. Django envía la CSP de la aplicación (`default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`) y `X-Frame-Options: DENY`; BunkerWeb las conserva (`KEEP_UPSTREAM_HEADERS`). BunkerWeb envía HSTS, `Referrer-Policy`, `X-Content-Type-Options` y `Permissions-Policy` en ambos sitios, `Cross-Origin-Resource-Policy` y `Cross-Origin-Embedder-Policy` de mismo origen en `app.*` y la CSP por defecto de GLPI, y elimina `Server` y `X-Powered-By`. Los estáticos no abren CORS. | Debe |
 | RS-08 | Límite de peticiones en BunkerWeb (`USE_LIMIT_REQ`): 5 por minuto por IP en inicio de sesión y verificación TOTP, y 2 por segundo por IP en general (valor por defecto de BunkerWeb), más bloqueo por mal comportamiento (`USE_BAD_BEHAVIOR`, 1 hora). Los errores de inicio de sesión deben ser genéricos (no revelan si el correo existe). | Debe |
-| RS-09 | Los logs son JSON con identificador de correlación y sin secretos, contraseñas, códigos TOTP, tokens ni campos restringidos. | Debe |
+| RS-09 | Los logs son JSON con identificador de correlación y sin secretos, contraseñas, códigos TOTP, tokens ni campos restringidos. Los del WAF tampoco los guardan: el log de auditoría de ModSecurity no copia cabeceras ni cuerpo, y la reportería tapa el valor de los campos sensibles que disparan una regla. | Debe |
 | RS-10 | Los técnicos inician sesión en GLPI con cuentas nominales y el doble factor nativo de GLPI 11. La cuenta de servicio de la API no puede iniciar sesión en la interfaz. | Debe |
 | RS-11 | Las dependencias y las imágenes se escanean en cada integración continua (pip-audit, Trivy). Una vulnerabilidad crítica bloquea el despliegue. | Debe |
 | RS-12 | Escaneo de secretos (gitleaks) en cada commit y en la integración continua. | Debe |
@@ -535,7 +536,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 
 | ID | Requisito | Prioridad |
 |---|---|---|
-| RNF-01 | Cada contenedor tiene un chequeo de salud. El de web verifica también la conexión con Supabase y el de worker la hora de la última sincronización. Un fallo simulado de GLPI o de Supabase debe detectarse en menos de 2 minutos. | Debe |
+| RNF-01 | Cada contenedor tiene un chequeo de salud. El de web verifica también la conexión con Supabase y el de worker la hora de la última sincronización y que GLPI responda. Un fallo simulado de GLPI o de Supabase debe detectarse en menos de 2 minutos. | Debe |
 | RNF-02 | Si GLPI no está disponible, la aplicación sigue aceptando y aprobando solicitudes y encola los tickets. Si Supabase no está disponible, la aplicación muestra una página de mantenimiento sin exponer errores internos. | Debe |
 | RNF-03 | Disponibilidad objetivo: 99 % en horario hábil (lunes a viernes, de 7:00 a 19:00, hora de Colombia). | Debe |
 | RNF-04 | RPO de 24 horas y RTO de 4 horas. La restauración desde los respaldos (`pg_restore` en un proyecto de Supabase y restauración de MariaDB) se prueba al menos una vez antes de la entrega, con evidencia. | Debe |
@@ -560,7 +561,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RNF-13 | Los cambios de esquema se versionan con migraciones de Django, incluidas las restricciones, disparadores, permisos y RLS (con `RunSQL` cuando el ORM no los expresa). | Debe |
 | RNF-14 | La interfaz está en español, con mensajes de error comprensibles para usuarios no técnicos. | Debe |
 | RNF-15 | El despliegue completo desde cero se hace con un procedimiento documentado de máximo 10 pasos. | Debe |
-| RNF-16 | Los logs de BunkerWeb y del scheduler se clasifican (waf, protección, acceso, sistema) con Fluent Bit, se guardan en Loki con almacenamiento en Blob durante 30 días y se consultan en un dashboard de Grafana, reutilizando la configuración de `waf-stack`. Sin reportería, los logs quedan en Docker con rotación de 7 días. | Debería |
+| RNF-16 | Los logs de BunkerWeb y del scheduler se clasifican (waf, protección, acceso, sistema) con Fluent Bit, se guardan en Loki con almacenamiento en Blob durante 30 días y se consultan en un dashboard de Grafana, reutilizando la configuración de `waf-stack`. Sin reportería, los logs quedan en Docker con rotación (por tamaño, 7 archivos de 10 MB por contenedor: S-36). | Debería |
 
 # Análisis de amenazas (STRIDE)
 

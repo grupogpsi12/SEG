@@ -337,6 +337,8 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - `admin_usuarios vincular`;
   - SOPS.
   Sube a v2.4 en «Control del documento».
+  ✔✔ **SRS v2.4 (24/10/2026).** Lleva al SRS lo decidido en la auditoría, en ADR-029 y ADR-030 y en la revisión de la reportería, sin cambios de alcance. Cambian RF-06, RF-36, RS-02, RS-06, RS-07, RS-09, RNF-01 y RNF-16; el detalle está en «Control del documento».
+  ⏳ Corregir el manual de operación al desplegar en Azure (5.2) y aprobar el SRS (0.0).
 ## Orden de recorte (SRS §14)
 
 Reportería del WAF (RNF-16) → RF-34 (CSV) → RF-30 (g) → gráficos SVG, conservando las tablas. **Nunca se recortan:** RET, EMG, deduplicación, auditoría, MFA, derivación de cuentas, WAF en modo bloqueo e indicadores (a), (c) y (e). **El núcleo (Fase 1) no se recorta**: si falta tiempo, se recortan adaptadores y vistas, no reglas.
