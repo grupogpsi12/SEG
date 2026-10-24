@@ -220,7 +220,7 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   ✔✔ 12/10/2026: VAC (`pendiente_suspension` → `suspendida` → `activa` en su fecha), RET (`pendiente_baja` → `deshabilitada` → `eliminada` a los 90 días) y EMG con PostgreSQL y GLPI reales (`tests/integracion/test_flujos_glpi_real.py`).
 
 ## Fase 4 — Dashboard y búsqueda
-- [~] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
+- [x] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
   ✔ CA-15: **el resultado SQL es idéntico al oráculo en memoria de 1.11** con los mismos datos; el percentil 95 está por debajo de 2 s con 300 colaboradores (RNF-06).
   ✔✔ Hecho: las consultas del ORM (`persistencia/consultas.py`) dan lo mismo que el oráculo en ~230 instantes con bordes (`test_persistencia_oraculo.py`, SQLite y PostgreSQL). ⏳ Falta: índices y medir el p95 con 300 colaboradores sobre PostgreSQL (necesita una semilla grande). Índices agregados el 11/10/2026 (migración 0005: `ticket.activo_desde`, `ticket.vence_en`, `solicitud.creada_en`, `solicitud.estado`, `colaborador.estado`; las claves foráneas ya tenían índice). **No medir contra Supabase desde Colombia**: la latencia de red (~150 ms por consulta) domina el resultado; medir con PostgreSQL 17 local en Docker o desde la VM de Azure (misma región que Supabase).
   **Plan del 24/10/2026 (RNF-06).** Requisito: p95 menor a 800 ms en las páginas y menor a 2 s en el dashboard, con 300 colaboradores y 20 usuarios concurrentes.
@@ -228,6 +228,11 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - **Semilla** (`tests/carga/sembrar.py`): 300 ingresos y una mezcla de VAC, RET y EMG, emitidos con los casos de uso reales; la bandeja y la sincronización usan el GLPI en memoria, con tickets resueltos y pendientes.
   - **Medición** (`tests/carga/medir.py`): 20 hilos con sesiones de técnico, RRHH y Auditor contra web, **sin el WAF**. El límite del WAF es por IP (2 r/s) y frenaría a un solo generador; 20 personas reales tienen 20 IP.
   - **Evidencia:** `docs/evidencia/rendimiento-2026-10-24.md` con el p95 por página. Si algo no cumple, se optimiza y se vuelve a medir.
+  ✔✔ **Cumplido el 24/10/2026** (`docs/evidencia/rendimiento-2026-10-24.md`). Con 300 colaboradores y 20 usuarios concurrentes sin pausa, todas las páginas tienen un p95 menor a 800 ms y el dashboard 791 ms (umbral de 2 s), en 1440 peticiones sin errores.
+  - **Primera medición:** 8 de 9 páginas fuera del umbral.
+  - **Corregido:** tres N+1 en el adaptador, y lecturas paginadas de la auditoría y de las solicitudes (ADR-030).
+  - **Herramientas:** `infra/scripts/carga.sh` (entorno desechable), `tests/carga/` (semilla, sesiones, medición y perfil) e `infra/scripts/integracion-local.sh`, que reproduce el job de integración de la CI.
+  - ⏳ Repetir la medición en la VM de Azure (5.2).
 - [x] **4.2 Gráficos SVG en el servidor**, sin JavaScript.
   ✔ La CSP estricta no reporta violaciones.
   ✔✔ `web/graficos.py` (barras de (a) y (e), cola propia resaltada): único `mark_safe`, con etiquetas escapadas y valores enteros; sin `<script>` ni recarga (`test_tecnicos_web.py`). La revisión con las herramientas del navegador queda para 5.4.
