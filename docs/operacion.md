@@ -94,15 +94,27 @@ Pasos que **siguen siendo manuales**:
 - **Una sesión de base queda bloqueando** (`statement timeout` en cascada): como `postgres`, `select pg_terminate_backend(pid) from pg_stat_activity where usename like 'app_%' and state = 'idle in transaction';` (lecciones 34 y 35).
 - **La cadena de auditoría está rota**: no tocar la base. Exportar evidencia (la exportación diaria la incluye igual), avisar al Auditor y comparar con las anclas guardadas en Blob para acotar desde cuándo.
 
-## 6. Restauración (RNF-04: RPO 24 h, RTO 4 h) **(sin verificar)**
+## 6. Restauración (RNF-04: RPO 24 h, RTO 4 h)
 
-1. **Aplicación**:
-   - Crear un proyecto de Supabase nuevo y aplicar la sección 2 (roles y `duenio-separado.sql`).
-   - Restaurar con `pg_restore --no-owner --role=app_owner --schema=app -d "<conexión como app_owner>" app-AAAA-MM-DD.dump` (descargar antes el archivo del contenedor `respaldos`).
-   - Correr `migrar`: aplica lo que falte y los permisos de la 0004.
-2. **GLPI**: `gunzip -c glpi-AAAA-MM-DD.sql.gz | docker compose … exec -T mariadb sh -c 'mariadb -u glpi -p"$(cat /run/secrets/glpi_db_password)" glpi'`.
-3. Comprobar con el Auditor (**Verificar**) y comparar con el ancla del día del respaldo.
-4. Registrar tiempos y capturas como evidencia de CA-11.
+Simulacro **verificado en local** el 24/10/2026: restauración completa y verificada en 23 s (`docs/evidencia/disponibilidad-2026-10-24.md`). Repítalo antes de la entrega y tras cada cambio de esquema:
+
+```bash
+JML_MODO=local JML_RESPALDO_DESTINO=.contrato-tmp/respaldos infra/scripts/respaldo.sh
+infra/scripts/restaurar-prueba.sh .contrato-tmp/respaldos
+```
+
+**En Azure** (sin verificar todavía):
+1. **Aplicación.**
+   - Crear un proyecto de Supabase nuevo y aplicar la sección 2: los roles y `duenio-separado.sql`. El esquema `app` queda creado y vacío.
+   - Descargar el volcado del contenedor `respaldos` y restaurarlo **sin su `CREATE SCHEMA`**, porque el esquema ya existe:
+     ```bash
+     pg_restore -l app-AAAA-MM-DD.dump | grep -v ' SCHEMA - app ' > lista
+     pg_restore -d "<conexión como app_owner>" --no-owner --role=app_owner --exit-on-error -L lista app-AAAA-MM-DD.dump
+     ```
+   - Correr `migrar`, que aplica lo que falte.
+2. **GLPI.** `gunzip -c glpi-AAAA-MM-DD.sql.gz | docker compose … exec -T mariadb sh -c 'mariadb -u glpi -p"$(cat /run/secrets/glpi_db_password)" glpi'`.
+3. **Comprobar.** El Auditor pulsa **Verificar**, y la cabeza de la cadena se compara con el ancla del día del respaldo (RD-04).
+4. **Evidencia.** Registrar tiempos y capturas para CA-11.
 
 ## 7. Rotación de secretos (RS-06, cada 90 días)
 

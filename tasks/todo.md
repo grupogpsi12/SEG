@@ -261,6 +261,10 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
     - verificación de la cadena de auditoría y del conteo de tickets de GLPI;
     - tiempo total, contra el RTO de 4 h.
   - **Detección en menos de 2 minutos** (RNF-01): detener GLPI y la base y medir cuándo queda *unhealthy* el contenedor. Hipótesis: hoy el worker tarda hasta 15 minutos con GLPI caído (su latido es de 3 ciclos de 5 minutos).
+  ✔✔ **CA-11 en local, 24/10/2026** (`docs/evidencia/disponibilidad-2026-10-24.md`):
+  - **Detección (RNF-01).** GLPI caído **no se detectaba** (el worker seguía «healthy» a los 300 s). Ahora se detecta en 63 s y la base caída en 56 s: `worker --salud` pregunta a GLPI y los chequeos van a 30 s × 2 (`test_infra.py` lo vigila).
+  - **Restauración.** `respaldo.sh` en modo local y `restaurar-prueba.sh` en instancias desechables. Resultado: filas iguales en 24 tablas, la misma cabeza de la cadena, la cadena válida según la aplicación, `app_backend` sin UPDATE sobre la auditoría y GLPI igual, en **23 s** (RTO de 4 h). Hallazgo: el volcado no se restauraba sin quitar su `CREATE SCHEMA`, ya corregido en `docs/operacion.md` §6.
+  - ⏳ Repetirlo en Azure: restaurar en un proyecto de Supabase nuevo y descargar de Blob (5.2).
 - [~] **5.4 Pruebas de seguridad**, sin WAF (en local) y a través de BunkerWeb (RS-13).
   ✔ CA-12, CA-13 y CA-20; informes adjuntos.
   ✔✔ **Auditoría del 12/10/2026** (`docs/auditoria-2026-10-12.md`): revisión manual completa y 12 hallazgos corregidos, entre ellos la API de GLPI expuesta por el WAF (alta). En la CI, job `seguridad` con gitleaks sobre todo el historial, pip-audit y bandit, y Trivy antes de publicar la imagen, todos en cero. `pruebas.sh` en verde en ambos sitios (CA-20). ⏳ ZAP y sqlmap dinámicos contra Azure (con la IP del escáner fuera del baneo).
