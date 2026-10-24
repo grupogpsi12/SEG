@@ -1,0 +1,16 @@
+# Destinatarios de los secretos compartidos del equipo (ADR-029). Se edita con
+# infra/scripts/secretos.sh agregar|quitar, que ademas vuelve a cifrar el archivo del grupo.
+# Solo claves PUBLICAS de age, una por persona y con su nombre en el comentario.
+# [/\\]: sops compara la regla con la ruta completa del archivo, que en Windows usa barras invertidas.
+creation_rules:
+  # Todo el equipo: supabase_url, supabase_clave_publica y supabase_ca_crt (lo que pide el modo local)
+  - path_regex: infra[/\\]secretos[/\\]equipo\.sops\.yaml$
+    key_groups:
+      - age:
+          - age1msrpt2zs5v4xszjta57yqms3n0jpx8vw7fvp43jk33a2ypk6wd5sfwcv9a  # Luis Cerón
+  # Solo quien administra: supabase_service_role (invariante 8) y las claves del Supabase de
+  # desarrollo (db_password de app_backend, db_owner_password de app_owner)
+  - path_regex: infra[/\\]secretos[/\\]administracion\.sops\.yaml$
+    key_groups:
+      - age:
+          - age1msrpt2zs5v4xszjta57yqms3n0jpx8vw7fvp43jk33a2ypk6wd5sfwcv9a  # Luis Cerón

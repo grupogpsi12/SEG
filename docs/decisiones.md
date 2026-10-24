@@ -17,7 +17,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 011 | Sincronización con GLPI por consulta periódica | Aceptada | 05/10/2026 |
 | 012 | Stack FastAPI + React + PostgreSQL | **Reemplazada** por ADR-015 y ADR-018 | 05/10/2026 |
 | 013 | Exclusión del monitoreo del DC | Aceptada | 05/10/2026 |
-| 014 | Autenticación de servicio contra la API de GLPI | **Pendiente** (sprint 0) | — |
+| 014 | Autenticación de servicio contra la API de GLPI: API v1 con App-Token y token de usuario | Aceptada (spike 0.3) | 11/10/2026 |
 | 015 | Supabase como base de datos de la aplicación | Aceptada | 07/10/2026 |
 | 016 | Arquitectura hexagonal con la solicitud y sus tickets como núcleo | Aceptada | 07/10/2026 |
 | 017 | Supabase Auth con TOTP mediado por el servidor | Aceptada | 07/10/2026 |
@@ -32,6 +32,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 026 | Consulta de solicitudes en `error` para el reintento del Administrador (2.12) | Aceptada | 11/10/2026 |
 | 027 | Matriz y usuarios completos para el área de administración (2.13) | Aceptada | 11/10/2026 |
 | 028 | Dueño del esquema separado de `app_backend`, disparador con transiciones y bloqueo al decidir (revisión externa H1 a H3) | Aceptada | 11/10/2026 |
+| 029 | Secretos compartidos del equipo cifrados en el repositorio con SOPS + age | Aceptada | 24/10/2026 |
 
 ---
 
@@ -116,9 +117,11 @@ Reemplazada por ADR-015 (base de datos) y ADR-018 (framework e interfaz).
 
 **Decisión.** Se excluyen; no son parte de la gestión del ciclo de vida de identidades. Desde v2.0 tampoco hay DC montado.
 
-## ADR-014 — Autenticación de servicio contra la API de GLPI · PENDIENTE
+## ADR-014 — Autenticación de servicio contra la API de GLPI · ACEPTADA (spike 0.3)
 
-Se decide en el sprint 0 (tarea 0.3): API v2 con OAuth2 si admite autenticación de servicio; si no, API v1 con token de aplicación y token de usuario.
+Se decidía en el sprint 0 (tarea 0.3): API v2 con OAuth2 si admitía autenticación de servicio; si no, API v1 con token de aplicación y token de usuario.
+
+**Decisión (11/10/2026).** API v1 con `App-Token` y `Authorization: user_token`, con el usuario `jml-servicio` y un perfil acotado. La v2 no hacía falta. La auditoría del 12/10/2026 la cerró a la red interna: el cliente de API excluye la IP del WAF, no se admite usuario y contraseña, y BunkerWeb responde 403 a `/apirest.php` y `/api.php` (`docs/spikes/glpi.md`).
 
 ## ADR-015 — Supabase como base de datos de la aplicación
 
@@ -387,3 +390,40 @@ El equipo aprobó corregirlos (nivel N3).
 - Las pruebas de integración migran con el alias `duenio` (`JML_PG_DUENIO_USUARIO` y `JML_PG_DUENIO_CLAVE`) y prueban con `app_backend`.
 - El anclaje externo del último hash (para detectar una reescritura completa de la cadena hecha por alguien con `postgres`) queda en la exportación diaria a Blob (RD-04).
 - Evidencia contra Supabase: `tests/integracion/test_revision_externa.py` y `test_postgresql.py`, 23 pruebas en verde.
+
+## ADR-029 — Secretos compartidos del equipo cifrados en el repositorio con SOPS + age
+
+**Contexto.** ADR-009 resuelve los secretos en producción: Key Vault entrega archivos en `/run/secrets`. No resuelve cómo los comparte el equipo durante el desarrollo:
+- la URL y la clave publicable de Supabase,
+- las claves de `app_backend` y `app_owner` del Supabase de desarrollo,
+- la clave `service_role` del Administrador.
+
+Hasta ahora se pasaban por chat, y por eso hubo que rotar la contraseña de `postgres`. Se evaluaron bóvedas el 24/10/2026: HashiCorp Vault (licencia BUSL 1.1), OpenBao (fork con licencia MPL), Infisical, Azure Key Vault y SOPS + age. El repositorio `grupogpsi12/SEG` es **público**.
+
+**Decisión.**
+1. **Cifrado en el repositorio.** Los secretos compartidos se versionan **cifrados** con SOPS (CNCF) y age, en `infra/secretos/<grupo>.sops.yaml`. Hay un archivo por grupo de destinatarios:
+   - `equipo`: todo el equipo. Lleva la URL y la clave publicable de Supabase y el certificado de su CA, que es lo que pide el modo local.
+   - `administracion`: solo quien administra. Lleva `supabase_service_role` (invariante 8) y las claves de `app_backend` y `app_owner` del Supabase de desarrollo (mínimo privilegio).
+2. **Llaves.** Cada persona tiene su propia llave age y nunca la comparte. Su clave pública queda en `.sops.yaml`, con su nombre en un comentario.
+3. **Herramienta.** `infra/scripts/secretos.sh` es la única herramienta:
+   - `llave` crea la llave.
+   - `descifrar` escribe en `secrets/` lo que falte y nunca pisa un archivo distinto.
+   - `cifrar` toma archivos de `secrets/`.
+   - `agregar` y `quitar` gestionan destinatarios.
+   - Nada se imprime.
+4. **Solo desarrollo.** Los secretos de **producción** no van al repositorio: siguen en Key Vault (ADR-009). Lo que se genera por entorno, como `django_secret_key` o los tokens de GLPI, tampoco se comparte: cada entorno tiene los suyos.
+5. **Quitar a alguien exige rotar.** Al quitar a una persona se cambian los valores en su origen (Supabase) y se vuelve a cifrar. Esa persona conserva su llave y el historial de Git, así que volver a cifrar sin rotar no la deja fuera.
+
+**Alternativas descartadas.**
+- **HashiCorp Vault u OpenBao en la VM:**
+  - un servidor más que desbloquear, respaldar y vigilar, con su propio token raíz;
+  - RAM en una VM de 4 GiB (RNF-09);
+  - para desbloquearse solo necesitaría Key Vault de todos modos.
+- **Infisical:** otro servicio, y su capa gratuita no tiene auditoría.
+- **Key Vault también para el equipo:** cada integrante necesitaría una cuenta de Azure con permisos sobre el vault, y no funciona sin conexión.
+- **Seguir por chat:** es lo que causó la rotación.
+
+**Consecuencias.**
+- **Herramientas:** `sops` 3.13 y `age` 1.3 se instalan en el equipo de quien las usa (`winget`, `brew` o `apt`). No van en la imagen ni en `pyproject.toml`.
+- **Un repositorio público no filtra los secretos**, pero sí muestra sus nombres y cuándo cambian: los nombres no son secretos. Un archivo sin cifrar se detecta antes del commit: `tests/adaptadores/test_secretos.py` falla si un valor de `infra/secretos/` no empieza con `ENC[`, y gitleaks corre en la CI.
+- **Alta de una persona:** quien ya descifra la agrega (`secretos.sh agregar`). Nadie puede darse acceso a sí mismo.

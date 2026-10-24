@@ -46,6 +46,11 @@ if [ "${JML_MODO:-}" = "local" ]; then
   JML_DB_USUARIO_DUENIO=app_owner
 fi
 
+# ADR-029: la URL y la clave publicable de Supabase las deja en secrets/ `secretos.sh descifrar`;
+# una variable de entorno, si se define, tiene prioridad.
+[ -n "${JML_SUPABASE_URL:-}" ] || JML_SUPABASE_URL="$(cat "$SECRETOS/supabase_url" 2> /dev/null || true)"
+[ -n "${JML_SUPABASE_CLAVE_PUBLICA:-}" ]   || JML_SUPABASE_CLAVE_PUBLICA="$(cat "$SECRETOS/supabase_clave_publica" 2> /dev/null || true)"
+
 for requerido in db_password supabase_ca_crt; do
   if [ ! -e "$SECRETOS/$requerido" ]; then
     echo "falta $SECRETOS/$requerido (ver docs/spikes/supabase.md)" >&2
@@ -71,8 +76,8 @@ done
   echo "JML_DB_HOST=${JML_DB_HOST:-aws-0-us-east-1.pooler.supabase.com}"
   echo "JML_DB_USUARIO=${JML_DB_USUARIO:?defina JML_DB_USUARIO=app_backend.<ref>}"
   echo "JML_DB_USUARIO_DUENIO=${JML_DB_USUARIO_DUENIO:-app_owner.${JML_DB_USUARIO#*.}}"
-  echo "JML_SUPABASE_URL=${JML_SUPABASE_URL:?defina JML_SUPABASE_URL}"
-  echo "JML_SUPABASE_CLAVE_PUBLICA=${JML_SUPABASE_CLAVE_PUBLICA:?defina JML_SUPABASE_CLAVE_PUBLICA}"
+  echo "JML_SUPABASE_URL=${JML_SUPABASE_URL:?defina JML_SUPABASE_URL o corra secretos.sh descifrar}"
+  echo "JML_SUPABASE_CLAVE_PUBLICA=${JML_SUPABASE_CLAVE_PUBLICA:?defina JML_SUPABASE_CLAVE_PUBLICA o corra secretos.sh descifrar}"
 } > "$ENV_SALIDA"
 chmod 600 "$ENV_SALIDA"
 echo "escrito: $ENV_SALIDA"
