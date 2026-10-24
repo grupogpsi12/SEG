@@ -21,6 +21,10 @@ Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin e
   - Comprobar que la actividad del worker evita la pausa (o documentar el procedimiento de reactivación).
 
   ✔ `migrate` funciona; una petición a `/rest/v1/<tabla>` con la clave `anon` falla; `pg_dump` y `pg_restore` funcionan contra un proyecto vacío.
+  ⏳ (24/10/2026) Falta:
+  - `pg_dump` y `pg_restore`: se prueban en local con 5.3 y contra Supabase al crear el proyecto de entrega.
+  - El proyecto de entrega.
+  La prueba de `/rest/v1` con `anon` ya se hizo (CA-13, spike 0.4).
 - [x] **0.3 Spike de la API de GLPI 11** (SUP-03, SUP-04). **Alimenta el puerto `SistemaDeTickets`: debe estar hecho antes de congelar el núcleo (1.9), o el puerto queda marcado «provisional».** Probar la autenticación de servicio (API v2 con OAuth2 o v1 con tokens); crear un ticket en estado «En espera» con vencimiento; **buscar un ticket por una referencia externa (idempotencia)**; leer estado, solución y documentos; leer activos y licencias por usuario; subir un PDF y vincularlo a dos tickets (R10); ver si se puede exigir la plantilla de solución por categoría.
   ✔ Script que lo demuestra; ADR-014 decidido; hallazgos anotados en `docs/spikes/glpi.md` para ajustar el puerto.
   ✔✔ Hecho el 11/10/2026 contra GLPI 11.0.11 real (`docs/spikes/glpi.md`): la suite de contrato de `SistemaDeTickets` (17 pruebas) pasa contra el adaptador y GLPI reales, repetible, incluida la idempotencia tras un timeout posterior a la escritura; más 9 pruebas de integración (enrutamiento CA-03, SLA de emergencia CA-06, confidencialidad CA-10, prioridad y vencimiento, configuración). Dos ajustes a la suite, sin tocar ninguna regla: el ayudante `asignar_activo/licencia` devuelve el id que GLPI asigna, y el estado inicial puede ser «Nuevo» o «En curso» (S-34). Decisión del punto 9: SHA-256 calculado descargando el documento (opción a de la lección 24); no cambia el puerto. ADR-014: API v1 con App-Token + token de usuario (sin OAuth). Comando: `JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh`.
@@ -126,13 +130,14 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - `import-linter`: `config` → `adaptadores` → `aplicacion` → `dominio`; el núcleo no puede importar `config` ni `adaptadores`.
   - Fuera de 2.1 (a propósito): confianza en `X-Forwarded-*` solo desde BunkerWeb y WhiteNoise (2.2); sesión de 8 horas máximo (2.5).
   ✔✔ Evidencia: 1129 pruebas (49 de adaptadores); `mypy --strict` con `django-stubs` y `ruff` limpios; `import-linter` cumple y **rompe** si `aplicacion` importa `config` o si `dominio` importa `jml.adaptadores` (probado y revertido); los logs filtran `password`, `token`, `totp`, `secret`, `motivo` y `descripcion` (también anidados) y un `CampoRestringido` se imprime `<oculto>`; `/salud` responde 200 o 503 genérico; la CSP y `X-Frame-Options` salen de Django y las demás cabeceras no se duplican; `manage.py check --deploy` sin avisos (solo se silencian los cuatro que resuelve BunkerWeb). Cobertura de `config` + `adaptadores`: 97 % (`wsgi.py` se prueba en 2.2 con gunicorn). Nueva dependencia: `psycopg[binary]` 3 (driver de PostgreSQL, ya en la tabla de herramientas del SRS).
-- [~] **2.2 `infra/compose.yaml`:** bunkerweb, bw-scheduler, web, worker, glpi y mariadb, más el servicio `admin-usuarios` (perfil aparte). Redes `bw-universe` (aislada), `app` y `db_net` (interna). BunkerWeb en multisitio con `API_TOKEN`, CRS en bloqueo, `MAX_CLIENT_SIZE=21m` en `app.*`, límites (RS-08) y real IP. Django con WhiteNoise, `SECURE_PROXY_SSL_HEADER` y confianza en `X-Forwarded-For` solo desde BunkerWeb. Chequeos de salud, límites de memoria e imágenes por digest.
+- [x] **2.2 `infra/compose.yaml`:** bunkerweb, bw-scheduler, web, worker, glpi y mariadb, más el servicio `admin-usuarios` (perfil aparte). Redes `bw-universe` (aislada), `app` y `db_net` (interna). BunkerWeb en multisitio con `API_TOKEN`, CRS en bloqueo, `MAX_CLIENT_SIZE=21m` en `app.*`, límites (RS-08) y real IP. Django con WhiteNoise, `SECURE_PROXY_SSL_HEADER` y confianza en `X-Forwarded-For` solo desde BunkerWeb. Chequeos de salud, límites de memoria e imágenes por digest.
   ✔ Todo en healthy; `docker port` solo muestra `bunkerweb`; `service_role` no aparece en web ni worker; `pruebas.sh` en verde contra `app.localhost` y `glpi.localhost`; una petición a la API interna sin token es rechazada.
   ✔ Escrito y probado sin Docker (11/10/2026): `Dockerfile` (base por digest, dependencias con hash desde `requirements.lock`, usuario sin root, `collectstatic` con secretos de un solo uso, gunicorn 1 proceso × 8 hilos por S-29), `infra/compose.yaml` (bunkerweb + scheduler en multisitio sin interfaz, web, worker, admin-usuarios en perfil `admin`, GLPI 11.0.11, MariaDB 11.4; todo por digest; redes `bw-universe`, `app` con IP fija de bunkerweb y `db_net` interna; `read_only`, `cap_drop`, límites de memoria y chequeos de salud), `infra/compose.azure.yaml` (Let's Encrypt y soportes en un sistema de archivos `noexec`), `infra/scripts/preparar-entorno.sh`, `infra/waf/pruebas.sh` adaptado y `infra/bunkerweb/configs/README.md`. Django: WhiteNoise y `proxy_confiable` (RS-05). `tests/adaptadores/test_infra.py` vigila RS-02, RS-03, RS-05, RS-08, RS-17, RS-18, RS-19 y los invariantes 8 y 14 sin Docker.
   ✔✔ Verificado en GitHub Actions (commit `776a24b`, 11/10/2026): el `Dockerfile` **construye** y la imagen se publica en `ghcr.io/grupogpsi12/jml-app` (workflow `imagen`); `verificar` pasa completo, incluida la integración contra un `postgres:17` limpio (migraciones 0001 a 0005 como `app_owner`, pruebas H1 a H3 y contratos). La imagen es privada por defecto: quien la use necesita `docker login ghcr.io` con un token de lectura de paquetes.
   ✔✔ **Probado con Docker el 11/10/2026**: `up -d --build` con `compose.local.yaml` deja los 6 servicios sanos (bunkerweb, bw-scheduler, web, postgres, mariadb y glpi 11.0.11, que se instala solo); `migrar` aplica las 5 migraciones como `app_owner`; `semillas` carga 18 perfiles y 30 colaboradores; `pruebas.sh` en verde en ambos sitios; solo `bunkerweb` publica puertos; la API interna rechaza sin token. **Ingreso real de extremo a extremo** por HTTPS y a través del WAF con Supabase Auth: contraseña → TOTP → sesión. Se corrigieron dos defectos que solo aparecieron al correr los contenedores (montaje de `/data/configs` y plantillas ausentes en la imagen). ⏳ Falta el worker con GLPI configurado y el modo `detect` de GLPI. `infra/.env.example` no se pudo crear por una regla de permisos del asistente; su contenido está en `docs/estado.md`.
   **Dependencias nuevas:** `whitenoise` 6 (MIT; estáticos sin nginx, ADR-023), `gunicorn` 23 (MIT; servidor WSGI del stack), y solo para pruebas `pyyaml` 6 (MIT; leer el compose en `test_infra.py`, la biblioteca estándar no lee YAML).
-- [~] **2.3 Persistencia** (RD-01 a RD-03, RD-09 a RD-11, RF-14): modelos, migraciones y repositorios que implementan los puertos; restricción parcial, documento único, disparador de inmutabilidad, `REVOKE` y RLS por `RunSQL`.
+  ✔✔ **Cerrado el 24/10/2026:** todos los criterios se verificaron con Docker (11 y 12/10/2026). Todo queda *healthy*, solo `bunkerweb` publica puertos, `service_role` está solo en `admin-usuarios`, `pruebas.sh` pasa en verde en ambos sitios y la API interna rechaza las peticiones sin token. La guía se siguió desde un clon limpio (auditoría del 12/10/2026).
+- [x] **2.3 Persistencia** (RD-01 a RD-03, RD-09 a RD-11, RF-14): modelos, migraciones y repositorios que implementan los puertos; restricción parcial, documento único, disparador de inmutabilidad, `REVOKE` y RLS por `RunSQL`.
   ✔ **La suite de contrato de 1.9 pasa contra PostgreSQL sin cambios**; duplicado abierto falla (incluido el concurrente, CA-01); UPDATE sobre una aprobada falla; UPDATE sobre la auditoría con `app_backend` falla (CA-09).
 
   **Plan (sin Docker todavía).**
@@ -145,9 +150,11 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - Las consultas del dashboard (`indicadores`) se implementan de forma directa y se comparan con el oráculo; su versión agregada en SQL es el ítem 4.1.
   ✔ Hecho sin PostgreSQL (evidencia): modelos y migraciones (0001 generada; 0002 con disparador, REVOKE y RLS solo para PostgreSQL); repositorios, unidad de trabajo y auditoría encadenada con fila candado sobre el ORM. **La suite de contrato pasa con la fábrica `orm` (SQLite) sin cambiar una sola expectativa**: 69 pruebas, más las 69 del doble. Solo se agregaron los datos padre que exigen las claves foráneas (lessons n.º 27). CA-15 adelantado: indicadores (a) a (h) agregados en la base con `COUNT`/`MIN … GROUP BY`, búsqueda y ficha **idénticos al oráculo** en un barrido de instantes que cruza cada borde (la prueba detectó 8 de 8 cambios introducidos a propósito en las consultas). Mapeo: ida y vuelta de los 6 tipos, de los 55 tickets dorados, y error tipado ante datos corruptos. Cobertura de `adaptadores`: 98 %.
   ⏳ Pendiente (necesita PostgreSQL, Docker o Supabase): correr `tests/integracion` y la suite de contrato con `--ds tests.integracion.ajustes` (CA-01 concurrente, RF-14 por disparador, RD-02 REVOKE, RD-10 RLS).
+  ✔✔ **Cerrado el 24/10/2026:** la suite de contrato y `tests/integracion` (CA-01 concurrente, RF-14 por disparador, RD-02 y RD-10) pasan contra PostgreSQL 17 en cada CI (job `integracion`) y contra Supabase (11/10/2026).
 - [~] **2.4 Auditoría encadenada sobre PostgreSQL** (adaptador del puerto `Auditoria`) y verificación desde la base.
   ✔ CA-09 contra PostgreSQL.
   ✔✔ Adaptador `AuditoriaDjango` con fila candado para la secuencia; CA-09 y el REVOKE probados contra Supabase (`tests/integracion/test_postgresql.py`); verificación desde la interfaz en 2.11. ✔ RD-04 escrito (11/10/2026): caso `ExportarAuditoria` (registros del día en forma canónica con sus hashes, verificables sin la base, más el **ancla** = cabeza de toda la cadena, que delata una reescritura completa: revisión externa H1, punto 3); el worker deja `auditoria-AAAA-MM-DD.jsonl` y `ancla-AAAA-MM-DD.json` en el volumen `exportes` una vez al día, de forma idempotente; `infra/scripts/subir-exportes.sh` los sube a Blob inmutable con la identidad de la VM. `tests/adaptadores/test_exportacion_auditoria.py`. ⏳ Probar la subida en Azure (5.2).
+  ⏳ (24/10/2026) Solo falta la subida diaria a Blob inmutable, que necesita Azure (5.2). Lo demás está hecho.
 - [x] **2.5 Autenticación** (RF-01 a RF-06, RS-08, RS-16): adaptador `ProveedorDeIdentidad` (Supabase Auth), vistas de inicio de sesión, inscripción y verificación de TOTP; sesión de Django; grupos como roles; incompatibilidades; comando `admin-usuarios`.
   ✔ CA-14; con roles incompatibles se recibe 403 y queda en auditoría.
   ✔✔ Evidencia: `ProveedorSupabase` (API REST de GoTrue con `httpx`) pasa la suite de contrato del puerto sin cambios contra un GoTrue simulado; 21 pruebas propias (token AAL1 solo en memoria 5 min y 5 intentos —S-29—, logout de Supabase al llegar a AAL2, sin inscribir un segundo factor con solo la contraseña, comprobación de `aal2`, errores de red sin detalles). Caso de uso `CompletarIngreso` audita `sesion.iniciada` / `sesion.denegada` (RF-05 probado con grupos incompatibles en la base). Vistas `/ingreso`, `/ingreso/segundo-factor` y `/salir`: 13 pruebas de extremo a extremo (CA-14 sin código no hay sesión, RF-02 inscripción con clave manual —S-30—, error genérico, id de sesión rotado, sin tokens en la sesión, `no-store`, 8 h máximo y 30 min de inactividad —RF-04—). Comando `admin_usuarios crear|desactivar` (RF-06, S-31): 7 pruebas, incluida la compensación si la base falla. Suite: 1349 pruebas, cobertura 98 %.
@@ -164,10 +171,10 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [x] **2.8 Campos restringidos en la persistencia y las vistas** (RD-05).
   ✔ CA-10 completo (logs, respuestas, fichas).
   ✔✔ Evidencia: caso `ConsultarSolicitud` y vista `/solicitudes/<id>`: RRHH ve el motivo o la descripción (página `no-store`, consulta auditada como `restringido.consultado`); quien registró ve el detalle sin el campo; los demás reciben 404 (no se confirma que el id exista). `tests/adaptadores/test_restringidos.py` recorre todas las páginas con los 9 roles no-RRHH tras un RET, una EMG y una renuncia con el centinela, y comprueba que no aparece en ninguna respuesta, ni en la auditoría, ni en ningún log capturado del proceso. Persistencia: el campo vive solo en `solicitud_restringida` (2.3). Fichas: el DTO no tiene el campo (1.11). GLPI: el generador de tickets ya lo excluye (1.6); se revalida con el adaptador real en 3.2.
-- [~] **2.9 Carga del soporte de vinculación** (RF-39, RD-12, RS-17): formulario con archivo, adaptador `AlmacenDeSoportes` sobre el volumen `noexec`, validación de firma y tamaño, y límite en BunkerWeb.
+- [x] **2.9 Carga del soporte de vinculación** (RF-39, RD-12, RS-17): formulario con archivo, adaptador `AlmacenDeSoportes` sobre el volumen `noexec`, validación de firma y tamaño, y límite en BunkerWeb.
   ✔ CA-18 (parte de la carga): un archivo no PDF renombrado a `.pdf` y uno de más de 20 MB se rechazan; el nombre en disco es aleatorio; la suite de contrato de `AlmacenDeSoportes` pasa.
   ✔ Hecho (adaptador): `AlmacenDeSoportesEnDisco` pasa la suite de contrato sin cambios (fábrica `orm`, sobre `tmp_path`): nombre aleatorio de 32 hex sin extensión, creación exclusiva con 0o600, y un nombre manipulado en la base no sale del volumen. ⏳ Falta el formulario de carga (con 2.7) y el límite en BunkerWeb (2.2).
-
+  ✔✔ **Cerrado el 24/10/2026:** el formulario de carga quedó hecho en 2.7 y el límite en BunkerWeb (`MAX_CLIENT_SIZE=21m`) en 2.2. Un PDF de 20 MB llegó a través del WAF hasta GLPI, vinculado a AD y Licencias con el hash correcto y con la copia local borrada; uno de 22 MB se corta con 413 (CA-18, 11/10/2026).
 - [x] **2.10 Ingresos fallidos en la auditoría** (RF-35): contraseña o código TOTP rechazados quedan como `sesion.fallida`, sin la contraseña ni el código.
   ✔ Prueba: un intento fallido deja un registro y el contenido no incluye la contraseña.
   ✔✔ `IniciarIngreso` y `CompletarIngreso` auditan `sesion.fallida` (`paso`: `contrasena` o `totp`; objeto: el correo normalizado o el id de Supabase del primer factor). Pruebas en `tests/aplicacion/test_ingreso.py`. El volumen lo acota el límite de BunkerWeb (RS-08).
@@ -216,6 +223,11 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [~] **4.1 Consultas SQL del dashboard** (RF-29, RF-30 a–h, RF-31): agregaciones en la base e índices.
   ✔ CA-15: **el resultado SQL es idéntico al oráculo en memoria de 1.11** con los mismos datos; el percentil 95 está por debajo de 2 s con 300 colaboradores (RNF-06).
   ✔✔ Hecho: las consultas del ORM (`persistencia/consultas.py`) dan lo mismo que el oráculo en ~230 instantes con bordes (`test_persistencia_oraculo.py`, SQLite y PostgreSQL). ⏳ Falta: índices y medir el p95 con 300 colaboradores sobre PostgreSQL (necesita una semilla grande). Índices agregados el 11/10/2026 (migración 0005: `ticket.activo_desde`, `ticket.vence_en`, `solicitud.creada_en`, `solicitud.estado`, `colaborador.estado`; las claves foráneas ya tenían índice). **No medir contra Supabase desde Colombia**: la latencia de red (~150 ms por consulta) domina el resultado; medir con PostgreSQL 17 local en Docker o desde la VM de Azure (misma región que Supabase).
+  **Plan del 24/10/2026 (RNF-06).** Requisito: p95 menor a 800 ms en las páginas y menor a 2 s en el dashboard, con 300 colaboradores y 20 usuarios concurrentes.
+  - **Entorno:** desechable (`infra/scripts/carga.sh`), con un PostgreSQL 17 con los roles de Supabase y la imagen de la aplicación con su configuración de producción (gunicorn, 1 proceso × 8 hilos, S-29), en una red propia. No toca la base del stack.
+  - **Semilla** (`tests/carga/sembrar.py`): 300 ingresos y una mezcla de VAC, RET y EMG, emitidos con los casos de uso reales; la bandeja y la sincronización usan el GLPI en memoria, con tickets resueltos y pendientes.
+  - **Medición** (`tests/carga/medir.py`): 20 hilos con sesiones de técnico, RRHH y Auditor contra web, **sin el WAF**. El límite del WAF es por IP (2 r/s) y frenaría a un solo generador; 20 personas reales tienen 20 IP.
+  - **Evidencia:** `docs/evidencia/rendimiento-2026-10-24.md` con el p95 por página. Si algo no cumple, se optimiza y se vuelve a medir.
 - [x] **4.2 Gráficos SVG en el servidor**, sin JavaScript.
   ✔ La CSP estricta no reporta violaciones.
   ✔✔ `web/graficos.py` (barras de (a) y (e), cola propia resaltada): único `mark_safe`, con etiquetas escapadas y valores enteros; sin `<script>` ni recarga (`test_tecnicos_web.py`). La revisión con las herramientas del navegador queda para 5.4.
@@ -237,9 +249,23 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [~] **5.3 Respaldos y restauración** (RD-06, RNF-04).
   ✔ Escrito sin Azure: `infra/scripts/respaldo.sh` (`pg_dump` del esquema `app` como `app_owner` por TLS + `mariadb-dump` de GLPI, subidos a Blob con la identidad de la VM); restauración en `docs/operacion.md`. ⏳ Ejecutarlo y probar la restauración con evidencia (CA-11).
   ✔ CA-11 con evidencia.
+  **Plan del 24/10/2026 (CA-11, RNF-01, RNF-04).**
+  - **Respaldo y restauración en local** (`respaldo.sh` sin Azure):
+    - `pg_dump` del esquema `app` como `app_owner` y `mariadb-dump` de GLPI;
+    - restauración en instancias nuevas;
+    - verificación de la cadena de auditoría y del conteo de tickets de GLPI;
+    - tiempo total, contra el RTO de 4 h.
+  - **Detección en menos de 2 minutos** (RNF-01): detener GLPI y la base y medir cuándo queda *unhealthy* el contenedor. Hipótesis: hoy el worker tarda hasta 15 minutos con GLPI caído (su latido es de 3 ciclos de 5 minutos).
 - [~] **5.4 Pruebas de seguridad**, sin WAF (en local) y a través de BunkerWeb (RS-13).
   ✔ CA-12, CA-13 y CA-20; informes adjuntos.
   ✔✔ **Auditoría del 12/10/2026** (`docs/auditoria-2026-10-12.md`): revisión manual completa y 12 hallazgos corregidos, entre ellos la API de GLPI expuesta por el WAF (alta). En la CI, job `seguridad` con gitleaks sobre todo el historial, pip-audit y bandit, y Trivy antes de publicar la imagen, todos en cero. `pruebas.sh` en verde en ambos sitios (CA-20). ⏳ ZAP y sqlmap dinámicos contra Azure (con la IP del escáner fuera del baneo).
+  **Plan del 24/10/2026 (CA-12, CA-13).**
+  - **ZAP:** *baseline* y escaneo completo autenticado (sesión de RRHH y de técnico).
+  - **sqlmap** nivel 3 sobre los formularios y los filtros.
+  - **Dónde:** contra web directo, para ver si la aplicación misma resiste, y a través del WAF.
+  - **Herramientas:** en contenedores fijados por digest. Antes, la IP del escáner sale del baneo.
+  - **Evidencia:** informes en `docs/evidencia/`.
+  - **CA-13:** repetir la inspección de contenedores, para comprobar que `service_role` no está en web ni en worker.
 - [~] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ Local (20/10/2026): `infra/compose.reporteria.yaml` (fluent-bit, loki, grafana en la red `waf-logs`; 24224 y 3000 solo en `127.0.0.1`), `infra/reporteria/` (de `waf-stack`), clave de Grafana en `secrets/grafana_admin_password` (RS-20). Loki local sobre el volumen `loki-datos`. ⏳ Fijar las tres imágenes por digest (RS-18); Loki sobre Blob con la identidad administrada en Azure (RS-20); medir la RAM con la reportería (RNF-09).
   ✔ CA-21.
@@ -283,9 +309,25 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - *Qué resuelven:* hoy los secretos compartidos (las claves del Supabase de desarrollo, `service_role` y la clave de Grafana) se pasan por chat, y por eso hubo que rotar la contraseña de `postgres`.
   - *Por qué no alcanza la biblioteca estándar:* cifrar por destinatario, con historial en Git y revocación por persona, es exactamente lo que hace SOPS. Reimplementarlo sería criptografía propia.
   - *Mantenimiento:* proyecto de la CNCF con publicaciones frecuentes; age es de Filippo Valsorda (ex Go Security). La alternativa de un servidor (Vault u OpenBao) se descartó en ADR-029.
+
+- [ ] **5.8 Pruebas de la interfaz con Playwright** (stack de calidad del SRS, CA-05 a CA-07 por la interfaz).
+  - **Qué:** los flujos ING (con PDF), VAC, RET y EMG en un navegador real, a través del WAF.
+  - **Cómo:** con sesiones creadas en la base. El TOTP real ya se probó de punta a punta y aquí se omite.
+  - **Criterio:** cada flujo llega a «cerrada» después de que los técnicos resuelven en GLPI.
+  - **Dependencia:** `playwright` para Python. Ya figura en la tabla del stack; se usa solo en las pruebas, con Chromium descargado por la propia herramienta.
+- [ ] **5.9 Suite contra GLPI real en la CI.**
+  - **Qué:** un job con GLPI 11 y MariaDB como contenedores, `preparar-glpi.sh`, `configurar-glpi` y `contrato-glpi.sh`.
+  - **Criterio:** las 30 pruebas en verde en GitHub Actions en cada push a `master`.
+- [ ] **5.10 Mutación antes de la entrega** (meta de 85 % en `dominio`; la última fue de 93,6 %).
+  - **Criterio:** `make mutacion` igual o mayor a 85 %, con el informe en `docs/spikes/mutacion.md`.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
   ✔ Parcial (11/10/2026): `docs/manual-usuario.md` por rol (ingreso con TOTP, solicitante, jefe, RRHH, técnicos, Auditor y Administrador) y `docs/estado.md` (estado y traspaso). ✔ `docs/operacion.md` (manual de operación: piezas y secretos, instalación, despliegue en Azure en 10 pasos, operación diaria, incidentes, restauración y rotación) y `docs/probar-localmente.md`. Plantillas de solución por cola: como código en `configurar_glpi` (3.1). ⏳ Ejecutar y corregir el manual de operación al desplegar (5.2) y actualizar `docs/SRS.md` con lo decidido en las ADR 025 a 028.
-
+  **Plan del 24/10/2026:** pasar al SRS lo decidido en ADR-025 a ADR-029, más:
+  - la reportería revisada;
+  - la API de GLPI solo interna;
+  - `admin_usuarios vincular`;
+  - SOPS.
+  Sube a v2.4 en «Control del documento».
 ## Orden de recorte (SRS §14)
 
 Reportería del WAF (RNF-16) → RF-34 (CSV) → RF-30 (g) → gráficos SVG, conservando las tablas. **Nunca se recortan:** RET, EMG, deduplicación, auditoría, MFA, derivación de cuentas, WAF en modo bloqueo e indicadores (a), (c) y (e). **El núcleo (Fase 1) no se recorta**: si falta tiempo, se recortan adaptadores y vistas, no reglas.
