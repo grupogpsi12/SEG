@@ -14,7 +14,11 @@ Para quién: el Administrador del sistema y quien despliegue u opere la platafor
 | `configurar-glpi` (una sola vez) | GLPI como código (3.1) | `glpi_app_token`, `glpi_admin_user_token` |
 | `glpi` + `mariadb` | Mesa de servicio | `glpi_db_password` |
 
-Ningún secreto se versiona. En Azure vienen de Key Vault a un tmpfs (ADR-009). Rotación cada 90 días (RS-06): sección 7.
+Ningún secreto se versiona **en claro**. En Azure vienen de Key Vault a un tmpfs (ADR-009). Los que el equipo comparte durante el desarrollo se versionan **cifrados** con SOPS + age en `infra/secretos/` (ADR-029):
+- `equipo`: URL, clave publicable y CA de Supabase.
+- `administracion`: `service_role` y las claves del Supabase de desarrollo.
+
+Se gestionan con `infra/scripts/secretos.sh` (`docs/probar-localmente.md` §1 y §7). Los de **producción** nunca van al repositorio. Rotación cada 90 días (RS-06): sección 7.
 
 ## 2. Primera instalación
 
@@ -110,3 +114,6 @@ Pasos que **siguen siendo manuales**:
 | `glpi_*_token` | Regenerarlos en GLPI (cliente de API y preferencias del usuario). El de administrador (`glpi_admin_user_token`) solo lo usa `configurar-glpi`: en Azure, regenérelo después de configurar |
 | `bw_api_token` | Generar uno nuevo y recrear `bunkerweb` y `bw-scheduler` |
 | Contraseña de `postgres` en Supabase | Dashboard → Database → Reset password. **Pendiente**: se compartió en una conversación durante el desarrollo |
+| Secretos de `infra/secretos/` | Cambiar el valor en su origen, dejarlo en `secrets/` y `secretos.sh cifrar <grupo> <nombre>`. **Siempre** que se quite a una persona con `secretos.sh quitar` (ADR-029) |
+| Llave age de una persona perdida o expuesta | Quitarla (`secretos.sh quitar`), rotar los secretos de sus grupos y agregar su llave nueva |
+| `grafana_admin_password` | Generar una nueva en `secrets/` y recrear `grafana` (la reportería guarda el usuario en su volumen: cambiarla también en Grafana) |

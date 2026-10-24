@@ -93,6 +93,8 @@ pytest -q tests/integracion          # requiere GLPI y PostgreSQL de prueba en c
 JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # contrato + flujos contra GLPI real (PostgreSQL desechable)
 docker compose -f infra/compose.yaml run --rm admin-usuarios vincular --usuario <id> --rol Y   # cuenta existente en otra base
 infra/waf/pruebas.sh app.localhost && infra/waf/pruebas.sh glpi.localhost   # el WAF bloquea y deja pasar lo que debe
+infra/scripts/secretos.sh estado|descifrar|cifrar|agregar|quitar   # secretos compartidos con SOPS + age (ADR-029)
+docker compose -f infra/compose.yaml -f infra/compose.local.yaml -f infra/compose.reporteria.yaml up -d   # reportería del WAF (5.5)
 docker compose -f infra/compose.yaml exec bw-scheduler bwcli unban <ip>    # tras baneos por pruebas (confirmar en el spike 0.6)
 ```
 

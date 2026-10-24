@@ -10,22 +10,30 @@ Para quién: integrantes del equipo que quieren usar la aplicación completa sin
 - **Git**. En Windows, todos los comandos se ejecutan en **Git Bash**, no en PowerShell.
 - Si Git Bash no encuentra `docker`: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`.
 - Los puertos 80 y 443 libres.
+- **SOPS y age** (ADR-029), para recibir los secretos del equipo. En Windows, `winget install -e --id SecretsOPerationS.SOPS` y `winget install -e --id FiloSottile.age`; en macOS, `brew install sops age`; en Linux, el paquete `age` y el binario de `sops` de su página oficial. **Abra una terminal nueva** y compruebe `sops --version` y `age --version`.
 
-**Pídale al equipo, por un canal privado:**
+## 1. Clonar y recibir los secretos del equipo (una vez)
 
-1. La URL de Supabase y la clave publicable `sb_publishable_…`. La clave es pública por diseño.
-2. Su cuenta: correo, contraseña inicial, **id de usuario** (UUID) y rol. La crea el Administrador (sección 7).
-
-## 1. Clonar y preparar (una vez)
+Los secretos que el equipo comparte están **cifrados** en el repositorio (`infra/secretos/`). Cada persona los descifra con su propia llave age, y nadie los pasa por chat.
 
 ```bash
 git clone https://github.com/grupogpsi12/SEG.git jml && cd jml
-export JML_SUPABASE_URL=https://tzxziubxwzgqdbmfkdiq.supabase.co
-export JML_SUPABASE_CLAVE_PUBLICA=sb_publishable_...      # la que le dio el equipo
-JML_MODO=local infra/scripts/preparar-entorno.sh           # secretos aleatorios en ./secrets e infra/.env
+infra/scripts/secretos.sh llave          # crea SU llave (fuera del repositorio) y muestra su clave pública
 ```
 
-`secrets/` e `infra/.env` no se versionan. Nunca los suba ni los comparta.
+1. Envíe la **clave pública** (`age1…`, la última línea) al Administrador. La llave privada **nunca** se comparte: respáldela.
+2. El Administrador la agrega (sección 7) y sube el cambio. Usted entonces ejecuta:
+
+```bash
+git pull
+infra/scripts/secretos.sh estado         # «equipo: lo descifra»
+infra/scripts/secretos.sh descifrar      # URL, clave publicable y CA de Supabase en ./secrets
+JML_MODO=local infra/scripts/preparar-entorno.sh    # el resto de secretos, aleatorios, e infra/.env
+```
+
+`descifrar` nunca pisa un archivo distinto de `secrets/`, y no muestra ningún valor. `secrets/` e `infra/.env` no se versionan: nunca los suba ni los comparta.
+
+**Su cuenta** (correo, contraseña inicial, id de usuario y rol) es personal y no va en `infra/secretos/`. Se la entrega el Administrador directamente.
 
 ## 2. Levantar
 
@@ -35,10 +43,11 @@ Defina un atajo para los comandos que siguen (en cada terminal nueva):
 C="-f infra/compose.yaml -f infra/compose.local.yaml"
 ```
 
-**Opción A: imagen publicada** (no compila nada). El paquete de GHCR es privado: inicie sesión una vez con un token personal de GitHub que tenga el permiso `read:packages`.
+**Opción A: imagen publicada** (no compila nada). El paquete de GHCR es privado: inicie sesión una vez con un token personal de GitHub **classic** con el permiso `read:packages`. Los *fine-grained* no sirven para GHCR. Se crea en *GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)*.
 
 ```bash
-docker login ghcr.io -u <su-usuario-de-github>          # pega el token como contraseña
+read -s -p "Token de GitHub: " TOKEN; echo                 # no queda en el historial
+echo "$TOKEN" | docker login ghcr.io -u <su-usuario-de-github> --password-stdin; unset TOKEN
 export JML_IMAGEN=ghcr.io/grupogpsi12/jml-app:ultima
 docker compose $C up -d --no-build
 ```
@@ -117,17 +126,39 @@ JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # 30 pruebas contra su G
 
 ### Reportería del WAF (opcional, RNF-16)
 
-Los ataques y bloqueos de BunkerWeb en un dashboard de Grafana. Agregue el tercer archivo al atajo y vuelva a levantar:
+Los ataques y bloqueos de BunkerWeb en un dashboard de Grafana (Fluent Bit → Loki → Grafana). Agregue el tercer archivo al atajo y vuelva a levantar:
 
 ```bash
-infra/scripts/preparar-entorno.sh                   # crea secrets/grafana_admin_password si falta
+JML_MODO=local infra/scripts/preparar-entorno.sh    # crea secrets/grafana_admin_password si falta
 C="-f infra/compose.yaml -f infra/compose.local.yaml -f infra/compose.reporteria.yaml"
-docker compose $C up -d
+docker compose $C --profile glpi up -d
 ```
 
-Abra `http://localhost:3000` (usuario `admin`, clave en `secrets/grafana_admin_password`). Tras `infra/waf/pruebas.sh app.localhost`, el dashboard **WAF BunkerWeb** muestra los bloqueos en menos de un minuto. Los logs quedan 30 días en el volumen `loki-datos`; `down -v` los borra.
+1. Abra `http://127.0.0.1:3000` (usuario `admin`; la clave está en `secrets/grafana_admin_password`). Use `127.0.0.1` y no `localhost`, que en Windows puede ir a IPv6.
+2. Tras `infra/waf/pruebas.sh app.localhost`, el dashboard **WAF · BunkerWeb** muestra los bloqueos en menos de un minuto.
+3. Los logs quedan 30 días en el volumen `loki-datos`.
 
-## 7. Para el Administrador: crear cuentas
+**Qué no llega a Loki:** el valor de los campos sensibles que disparan una regla (`contrasena`, `codigo`, `motivo`, `descripcion`, tokens). Se ven la variable y la regla, pero no el contenido. Tampoco llegan las cabeceras ni el cuerpo de las peticiones (invariante 5).
+
+## 7. Para el Administrador: agregar personas y crear cuentas
+
+**Agregar a una persona a los secretos del equipo** (ADR-029). Solo lo puede hacer alguien que ya los descifra:
+
+```bash
+infra/scripts/secretos.sh agregar equipo age1... "Nombre Apellido"
+git add .sops.yaml infra/secretos && git commit -m "chore(secretos): agregar a Nombre (ADR-029)" && git push
+```
+
+Para quitar a alguien: `secretos.sh quitar equipo age1...`. Después **rote en su origen** los secretos del grupo: la persona conserva su llave y el historial de Git. El script lista cuáles.
+
+**Cifrar por primera vez** (o tras rotar), desde los archivos de su `secrets/`:
+
+```bash
+infra/scripts/secretos.sh cifrar equipo supabase_url supabase_clave_publica supabase_ca_crt
+infra/scripts/secretos.sh cifrar administracion supabase_service_role db_password db_owner_password
+```
+
+**Crear una cuenta:**
 
 Solo quien tiene `secrets/supabase_service_role` (no se comparte):
 

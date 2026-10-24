@@ -243,6 +243,46 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
 - [~] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ Local (20/10/2026): `infra/compose.reporteria.yaml` (fluent-bit, loki, grafana en la red `waf-logs`; 24224 y 3000 solo en `127.0.0.1`), `infra/reporteria/` (de `waf-stack`), clave de Grafana en `secrets/grafana_admin_password` (RS-20). Loki local sobre el volumen `loki-datos`. ⏳ Fijar las tres imágenes por digest (RS-18); Loki sobre Blob con la identidad administrada en Azure (RS-20); medir la RAM con la reportería (RNF-09).
   ✔ CA-21.
+  **Revisión del 24/10/2026** (versión de Carlos Ruiz integrada, `234ef2a`). Criterios de verificación:
+  - (a) Las tres imágenes fijadas por digest, y `test_infra.py` lo vigila también en `compose.reporteria.yaml` (RS-18).
+  - (b) Fluent Bit y Grafana solo en `127.0.0.1`, y ningún otro servicio de la reportería publica puertos (RS-02), también vigilado por `test_infra.py`.
+  - (c) Ningún valor de los campos restringidos (`motivo`, `descripcion`) ni de `contrasena` o `codigo` llega a Loki aunque dispare el CRS (invariante 5, RS-09), con una prueba de `clasificar.lua`.
+  - (d) Sin reportería, los logs de Docker rotan (RNF-16).
+  - (e) Prueba real: un ataque aparece clasificado como `waf` en Grafana en menos de 2 minutos (parte local de CA-21), y se mide la RAM del stack completo (RNF-09).
+  ✔✔ **Hecho el 24/10/2026** (commits `d01452e` y `8b9a890`):
+  - **(a)** fluent-bit 5.1.3, loki 3.7.8 y grafana 13.2.3 fijadas por digest. Las versiones de `waf-stack` tenían 56, 59 y 146 vulnerabilidades altas o críticas corregibles; estas, 4, 5 y 84, casi todas en plugins de Grafana sin uso.
+  - **(b)** Puertos solo en `127.0.0.1`, vigilado por `test_infra.py`.
+  - **(c) Fuga confirmada y cerrada.** ModSecurity copiaba en su log de auditoría las cabeceras (con la cookie de sesión) y el cuerpo, y en sus mensajes el valor de `ARGS:contrasena` y `ARGS:motivo`; todo llegaba a Loki. Ahora:
+    - `MODSECURITY_SEC_AUDIT_LOG_PARTS=FH`;
+    - `clasificar.lua` tapa los campos sensibles y conserva variable y regla;
+    - probado con el Fluent Bit real (`test_reporteria.py`) y con un ataque real: 0 centinelas en Loki.
+    - Riesgo residual: el mensaje de la regla sigue en los logs locales de Docker de BunkerWeb, en la VM y con rotación.
+  - **(d)** Rotación de 7 × 10 MB por contenedor (S-36).
+  - **(e)** Ataque clasificado como `waf` en Loki en menos de 30 s. Grafana sano, con el dashboard aprovisionado y sin registro abierto. Stack completo con reportería: ~1 GiB de RAM real; Grafana pasa a 384 MiB porque usa 220.
+  - ⏳ Loki sobre Blob con identidad administrada en Azure (RS-20) y la parte de Blob de CA-21.
+- [~] **5.7 Secretos compartidos del equipo con SOPS + age** (ADR-029; amplía ADR-009, RS-06, RS-20).
+  Criterios de verificación:
+  - (a) Los secretos que el equipo comparte se versionan cifrados en `infra/secretos/*.sops.yaml`, uno por grupo de destinatarios: el equipo y la administración. Una prueba falla si algún valor queda sin cifrar (`ENC[`).
+  - (b) `infra/scripts/secretos.sh` descifra hacia `secrets/` sin sobrescribir lo distinto, cifra desde `secrets/`, agrega o quita personas y vuelve a cifrar.
+  - (c) gitleaks sigue en cero.
+  - (d) Probado en este equipo con una llave age real.
+  - (e) Documentado en `docs/operacion.md` y `docs/probar-localmente.md`.
+  ✔✔ **Hecho el 24/10/2026, menos el cifrado de los secretos reales:**
+  - ADR-029.
+  - `.sops.yaml` con los grupos `equipo` y `administracion`, y la primera llave (Luis Cerón).
+  - `infra/scripts/secretos.sh` (`llave`, `estado`, `descifrar`, `cifrar`, `agregar`, `quitar`).
+  - `preparar-entorno.sh` lee la URL y la clave publicable de `secrets/`.
+  - `tests/adaptadores/test_secretos.py`, 7 pruebas: ningún valor en claro, ida y vuelta con comillas, barras y valores multilínea, sin pisar lo distinto, alta y baja con nuevo cifrado, rechazo de rutas, y que nadie se agregue a sí mismo. El script nunca imprime un valor.
+  - gitleaks sigue en cero.
+  - Documentado en `docs/probar-localmente.md` §1 y §7 y en `docs/operacion.md`.
+  - ⏳ **Lo hace el Administrador** (el asistente no lee `secrets/`):
+    - `secretos.sh cifrar equipo supabase_url supabase_clave_publica supabase_ca_crt`
+    - `secretos.sh cifrar administracion supabase_service_role db_password db_owner_password`
+    - Agregar las llaves públicas de los demás integrantes.
+  **Dependencias nuevas (CLAUDE.md):** `sops` 3.13 (MPL 2.0, CNCF) y `age` 1.3 (BSD-3). Son herramientas de línea de comandos que se instalan en el equipo de quien las usa (`winget`, `brew` o `apt`); no van en la imagen ni en `pyproject.toml`.
+  - *Qué resuelven:* hoy los secretos compartidos (las claves del Supabase de desarrollo, `service_role` y la clave de Grafana) se pasan por chat, y por eso hubo que rotar la contraseña de `postgres`.
+  - *Por qué no alcanza la biblioteca estándar:* cifrar por destinatario, con historial en Git y revocación por persona, es exactamente lo que hace SOPS. Reimplementarlo sería criptografía propia.
+  - *Mantenimiento:* proyecto de la CNCF con publicaciones frecuentes; age es de Filippo Valsorda (ex Go Security). La alternativa de un servidor (Vault u OpenBao) se descartó en ADR-029.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
   ✔ Parcial (11/10/2026): `docs/manual-usuario.md` por rol (ingreso con TOTP, solicitante, jefe, RRHH, técnicos, Auditor y Administrador) y `docs/estado.md` (estado y traspaso). ✔ `docs/operacion.md` (manual de operación: piezas y secretos, instalación, despliegue en Azure en 10 pasos, operación diaria, incidentes, restauración y rotación) y `docs/probar-localmente.md`. Plantillas de solución por cola: como código en `configurar_glpi` (3.1). ⏳ Ejecutar y corregir el manual de operación al desplegar (5.2) y actualizar `docs/SRS.md` con lo decidido en las ADR 025 a 028.
 

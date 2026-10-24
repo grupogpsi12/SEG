@@ -1,14 +1,14 @@
 # Estado del proyecto y traspaso
 
-**Última actualización:** 12/10/2026 · rama `master`.
+**Última actualización:** 24/10/2026 · rama `master`.
 
 Este documento existe para que otra persona, u otra sesión de Claude Code con otra cuenta, retome el trabajo sin el historial de la conversación. Todo lo que afirma está respaldado por commits, pruebas o documentos del repositorio. **Léase junto con:**
 - `CLAUDE.md` (reglas).
 - `docs/SRS.md` (v2.3).
 - `tasks/todo.md` (estado y evidencia de cada ítem).
-- `tasks/lessons.md` (55 lecciones).
-- `docs/supuestos-nucleo.md` (S-01 a S-35).
-- `docs/decisiones.md` (hasta ADR-028).
+- `tasks/lessons.md` (58 lecciones).
+- `docs/supuestos-nucleo.md` (S-01 a S-36).
+- `docs/decisiones.md` (hasta ADR-029).
 - `docs/operacion.md`, `docs/probar-localmente.md` y `docs/manual-usuario.md`.
 - `docs/auditoria-2026-10-12.md` (auditoría de funcionalidad y seguridad: 12 hallazgos corregidos).
 
@@ -22,6 +22,16 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 | 4. Dashboard y búsqueda | 4.2 a 4.4 hechos. 4.1: índices puestos; falta medir el p95 |
 | 5. Entrega | 5.1 hecho. 5.4 en curso: auditoría hecha y análisis de seguridad en la CI; faltan ZAP y sqlmap. El manual de usuario, el de operación, el despliegue en Azure y los respaldos están escritos sin ejecutar |
 
+**24/10/2026: versión de Carlos Ruiz integrada, reportería revisada y secretos con SOPS.**
+- **Versión de Carlos.** La carpeta «Demo GLPI V2» traía un solo commit propio, `234ef2a` (reportería del WAF, ítem 5.5). El resto era idéntico al repositorio: las diferencias eran solo finales de línea. Se integró como avance directo y la carpeta se movió fuera del repositorio (`Downloads/Demo GLPI V2`): traía `secrets/` e `infra/.env` de otro entorno.
+- **Revisión de la reportería** (ver 5.5 en `tasks/todo.md`):
+  - imágenes actualizadas y fijadas por digest;
+  - fuga de contraseñas, motivos y la cookie de sesión en los logs del WAF, cerrada;
+  - rotación de logs (S-36);
+  - Grafana con memoria suficiente;
+  - CA-21 en local.
+- **Secretos del equipo con SOPS + age** (ADR-029, ítem 5.7). Falta que el Administrador cifre los secretos reales y agregue a los demás.
+
 **Auditoría** (12/10/2026, `docs/auditoria-2026-10-12.md`): 12 hallazgos corregidos con prueba y commit.
 
 - El más grave: la API REST de GLPI respondía desde internet a través del WAF y admitía usuario y contraseña sin doble factor. Ahora está cerrada en el WAF y en GLPI.
@@ -34,7 +44,7 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 
 **CI en GitHub** (`grupogpsi12/SEG`, 12/10/2026): `verificar` (compuertas, **seguridad** y contra PostgreSQL) e `imagen` (con Trivy) en verde. La imagen `ghcr.io/grupogpsi12/jml-app:ultima` es privada: el equipo entra con `docker login ghcr.io` y un token `read:packages`.
 
-**Pruebas locales** (SQLite, sin Docker): **1581 pasan**. Cobertura de ramas sobre las metas. `ruff`, `mypy --strict`, `import-linter` y `bandit` limpios.
+**Pruebas locales** (SQLite; las de la reportería y de SOPS necesitan Docker, `sops` y `age`, y si no, se omiten): **1600 pasan**. Cobertura de ramas sobre las metas. `ruff`, `mypy --strict`, `import-linter` y `bandit` limpios.
 
 **Contra GLPI real** (`JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh`, con un PostgreSQL desechable): **30 pasan**. Son el contrato, la integración de GLPI y los flujos VAC, RET, EMG y caída de GLPI.
 
@@ -101,8 +111,12 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 8. **(hecho)** ~~2.9 / CA-18 / CA-20~~: el PDF de 20 MB sube a través del WAF hasta GLPI (11/10/2026).
 9. **4.1**: p95 con 300 colaboradores, con PostgreSQL local o desde Azure, nunca contra Supabase desde Colombia.
 
+### B2. Secretos (5.7)
+- El Administrador cifra los secretos reales (comandos en 5.7 de `tasks/todo.md`) y agrega las claves públicas de cada integrante.
+- Después, nadie vuelve a pasar secretos por chat.
+
 ### C. Azure
-10. 0.5, 5.2 (seguir `docs/operacion.md` §3), 5.3 (ejecutar `respaldo.sh` y probar la restauración), 5.4 (ZAP y sqlmap; Trivy, gitleaks, pip-audit y bandit ya corren en la CI) y 5.5 (reportería, «debería»).
+10. 0.5, 5.2 (seguir `docs/operacion.md` §3; con Loki sobre Blob e identidad administrada para 5.5), 5.3 (ejecutar `respaldo.sh` y probar la restauración), 5.4 (ZAP y sqlmap; Trivy, gitleaks, pip-audit y bandit ya corren en la CI) y 5.5 (reportería, «debería»).
 
 ### D. Documentación
 11. Actualizar `docs/operacion.md` con lo que se aprenda al desplegar.
@@ -122,6 +136,8 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
   - El cliente de API de GLPI excluye la IP del WAF.
   - Sin inicio de sesión por usuario y contraseña en la API.
   - En `app.*`, BunkerWeb solo intercepta 502, 503 y 504, para que se vean los mensajes 403 de la aplicación.
+- **Reportería** (5.5): `infra/compose.reporteria.yaml`, opcional. Grafana en `127.0.0.1:3000`. `clasificar.lua` tapa los campos sensibles, y el log de auditoría de ModSecurity va sin cabeceras ni cuerpo (`FH`).
+- **Secretos del equipo** (ADR-029): `infra/scripts/secretos.sh` con SOPS + age, en dos grupos: `equipo` y `administracion`. La llave de cada persona vive en `%APPDATA%\sops\age\keys.txt` (o `~/.config/sops/age/keys.txt`).
 - **Cuentas del equipo**: cada integrante vincula en su base local una cuenta del Supabase compartido con `admin_usuarios vincular` (sin `service_role`).
 
 ## 6. Contenido de `infra/.env.example`

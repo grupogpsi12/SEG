@@ -182,3 +182,12 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 55. **El WAF también reescribe respuestas legítimas.** BunkerWeb intercepta por defecto los 4xx y 5xx del upstream y pone su página: el «Su cuenta no tiene acceso» de la aplicación se veía como un bloqueo del WAF.
     → En sitios cuya aplicación genera sus propios errores con contenido, interceptar solo 502, 503 y 504 (`INTERCEPTED_ERROR_CODES`), y verificar a través del WAF los mensajes de error, no solo los códigos.
+
+56. **Integrar una carpeta «nueva versión» sin compararla bien.** «Demo GLPI V2» mostraba cientos de archivos distintos, pero eran solo finales de línea (CRLF del árbol de Windows frente a LF): había un solo commit nuevo. Además traía su propio `.git`, `secrets/` e `infra/.env` dentro de nuestro repositorio.
+    → Comparar el historial (`git log`) y el árbol con `diff --strip-trailing-cr` antes de concluir nada. Integrar por `git fetch <carpeta>` + fast-forward, y sacar la carpeta del repositorio.
+
+57. **Reutilizar configuración de terceros sin revisar qué registra.** La reportería de `waf-stack` funcionaba, pero el log de auditoría de ModSecurity (partes `BCFH` por defecto) copiaba cookies, contraseñas y motivos, que terminaban 30 días en Loki. Las imágenes sin digest también arrastraban cientos de vulnerabilidades.
+    → Ante todo servicio que recibe logs, enviar un centinela por el camino real (un ataque a través del WAF) y buscarlo en el destino final. Pasar Trivy a toda imagen nueva antes de fijarla.
+
+58. **SOPS en Windows: la regla no coincidía.** SOPS compara `path_regex` con la ruta completa del archivo, y en Windows usa barras invertidas: `infra/secretos/...` nunca coincidía («no matching creation rules»).
+    → Escribir las reglas con `[/\\]` como separador y probar el script con la misma estructura de carpetas que el repositorio.
