@@ -615,6 +615,32 @@ def test_ADR_025_del_solicitante_devuelve_solo_las_que_el_registro(
         assert u.solicitudes.del_solicitante("nadie") == []
 
 
+def test_ADR_030_del_solicitante_por_tramos_y_su_conteo(entorno: EntornoDeContrato) -> None:
+    con_colaboradores(entorno)
+    with uow(entorno) as u:
+        for n in range(1, 6):
+            u.solicitudes.guardar(replace(vac(n, estado=S.CERRADA), solicitante_id="u-ana"))
+        u.solicitudes.guardar(replace(vac(6, colaborador_id="col-2"), solicitante_id="u-luis"))
+        assert u.solicitudes.contar_del_solicitante("u-ana") == 5
+        assert u.solicitudes.contar_del_solicitante("nadie") == 0
+        assert [s.id.valor[-1] for s in u.solicitudes.del_solicitante("u-ana", 1, 3)] == ["2", "3"]
+        assert [s.id.valor[-1] for s in u.solicitudes.del_solicitante("u-ana", 3)] == ["4", "5"]
+        assert u.solicitudes.del_solicitante("u-ana", 5, 9) == []
+        assert len(u.solicitudes.del_solicitante("u-ana")) == 5  # sin tramo: todas, como antes
+
+
+def test_ADR_030_la_auditoria_se_lee_por_tramos(entorno: EntornoDeContrato) -> None:
+    with uow(entorno) as u:
+        assert u.auditoria.total() == 0
+        assert u.auditoria.tramo(0, 10) == ()
+        for n in range(5):
+            u.auditoria.registrar("u1", EventoDeAuditoria("prueba", f"obj-{n}", {"n": n}))
+    with uow(entorno) as u:
+        assert u.auditoria.total() == 5
+        assert u.auditoria.tramo(1, 3) == tuple(u.auditoria.registros()[1:3])
+        assert [r.secuencia for r in u.auditoria.tramo(3, 50)] == [4, 5]
+
+
 def test_ADR_025_pendientes_de_aprobacion_solo_las_pendientes(entorno: EntornoDeContrato) -> None:
     con_colaboradores(entorno)
     with uow(entorno) as u:

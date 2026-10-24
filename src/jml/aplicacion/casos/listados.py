@@ -13,6 +13,7 @@ from jml.aplicacion.dtos import (
     DetalleDeSolicitud,
     FilaDeSolicitud,
     OpcionDeColaborador,
+    PaginaDeSolicitudes,
     PerfilDeUsuario,
 )
 from jml.aplicacion.puertos import Repositorios, UnidadDeTrabajo
@@ -22,6 +23,8 @@ from jml.dominio.permisos import Actor, puede_reintentar_emision, puede_ver_rest
 from jml.dominio.solicitud import Solicitud
 from jml.dominio.tipos import EstadoSolicitud, Rol
 from jml.dominio.valores import BOGOTA, Documento, SolicitudId
+
+TAMANO_DE_PAGINA = 50  # ADR-030, como la auditoria
 
 
 def _actor(uow: UnidadDeTrabajo, usuario_id: str) -> Actor:
@@ -48,16 +51,26 @@ def _fila(uow: UnidadDeTrabajo, s: Solicitud, usuario_id: str) -> FilaDeSolicitu
 
 
 class MisSolicitudes:
-    """RF-11: el solicitante consulta las que registro."""
+    """RF-11: el solicitante consulta las que registro, de la mas reciente a la mas antigua.
 
-    def __init__(self, repos: Repositorios) -> None:
+    ADR-030: por paginas. RRHH emite cientos al ano y la lista entera hacia lenta cada vista.
+    """
+
+    def __init__(self, repos: Repositorios, tamano: int = TAMANO_DE_PAGINA) -> None:
         self._repos = repos
+        self._tamano = tamano
 
-    def ejecutar(self, usuario_id: str) -> tuple[FilaDeSolicitud, ...]:
+    def ejecutar(self, usuario_id: str, pagina: int = 1) -> PaginaDeSolicitudes:
+        if pagina < 1:
+            raise DatoInvalido("pagina", "empieza en 1")
         with self._repos.unidad_de_trabajo() as uow:
-            return tuple(
-                _fila(uow, s, usuario_id) for s in uow.solicitudes.del_solicitante(usuario_id)
+            total = uow.solicitudes.contar_del_solicitante(usuario_id)
+            hasta = total - (pagina - 1) * self._tamano
+            tramo = uow.solicitudes.del_solicitante(
+                usuario_id, max(hasta - self._tamano, 0), max(hasta, 0)
             )
+            filas = tuple(_fila(uow, s, usuario_id) for s in reversed(tramo))
+            return PaginaDeSolicitudes(filas, total, pagina, self._tamano)
 
 
 class PendientesDeAprobacion:

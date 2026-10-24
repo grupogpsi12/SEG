@@ -4,6 +4,7 @@
 {% block contenido %}
 <h1>Mis solicitudes</h1>
 {% if filas %}
+{% if ultima > 1 %}<p class="aviso">{{ p.total }} solicitudes · página {{ p.pagina }} de {{ ultima }} (de la más reciente a la más antigua)</p>{% endif %}
 <table>
   <thead><tr><th>Solicitud</th><th>Evento</th><th>Colaborador</th><th>Fecha efectiva</th><th>Estado</th><th></th></tr></thead>
   <tbody>
@@ -25,6 +26,12 @@
   {% endfor %}
   </tbody>
 </table>
+{% if ultima > 1 %}
+<p>
+  {% if p.pagina > 1 %}<a href="?pagina={{ p.pagina|add:'-1' }}">Más recientes</a>{% endif %}
+  {% if p.pagina < ultima %}<a href="?pagina={{ p.pagina|add:'1' }}">Más antiguas</a>{% endif %}
+</p>
+{% endif %}
 {% else %}
 <p>Todavía no ha registrado solicitudes.</p>
 {% endif %}

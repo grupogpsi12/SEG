@@ -311,6 +311,16 @@ class DetalleDeSolicitud:
 
 
 @dataclass(frozen=True, slots=True)
+class PaginaDeSolicitudes:
+    """ADR-030: las que registro el usuario, de la mas reciente a la mas antigua."""
+
+    filas: tuple[FilaDeSolicitud, ...]
+    total: int
+    pagina: int
+    tamano: int
+
+
+@dataclass(frozen=True, slots=True)
 class PaginaDeAuditoria:
     """RF-36: registros del mas reciente al mas antiguo."""
 

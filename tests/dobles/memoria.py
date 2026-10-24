@@ -144,11 +144,16 @@ class _RepoSolicitudes:
     def abierta_de_tipo(self, colaborador_id: ColaboradorId, tipo: TipoEvento) -> Solicitud | None:
         return next((s for s in self.abiertas_de(colaborador_id) if s.tipo is tipo), None)
 
-    def del_solicitante(self, usuario_id: UsuarioId) -> Sequence[Solicitud]:
+    def del_solicitante(
+        self, usuario_id: UsuarioId, desde: int = 0, hasta: int | None = None
+    ) -> Sequence[Solicitud]:
         return sorted(
             (s for s in self.a.solicitudes.values() if s.solicitante_id == usuario_id),
             key=lambda s: s.id.valor,
-        )
+        )[desde:hasta]
+
+    def contar_del_solicitante(self, usuario_id: UsuarioId) -> int:
+        return len(self.del_solicitante(usuario_id))
 
     def pendientes_de_aprobacion(self) -> Sequence[Solicitud]:
         pendientes = (
@@ -394,6 +399,12 @@ class AuditoriaEnMemoria:
 
     def registros(self) -> Sequence[RegistroDeAuditoria]:
         return tuple(self.a.auditoria)
+
+    def total(self) -> int:
+        return len(self.a.auditoria)
+
+    def tramo(self, desde: int, hasta: int) -> Sequence[RegistroDeAuditoria]:
+        return tuple(self.a.auditoria[desde:hasta])
 
     def verificar(self) -> ResultadoDeVerificacion:
         return verificar_cadena(self.a.auditoria)

@@ -119,6 +119,15 @@ class Auditoria(Protocol):
         """Todos los registros, en orden de secuencia."""
         ...
 
+    # ADR-030: la vista del Auditor lee por tramos; la cadena crece sin limite.
+    def total(self) -> int:
+        """Cuantos registros hay."""
+        ...
+
+    def tramo(self, desde: int, hasta: int) -> Sequence[RegistroDeAuditoria]:
+        """`registros()[desde:hasta]` sin leer los demas."""
+        ...
+
     def verificar(self) -> ResultadoDeVerificacion: ...
 
 
@@ -247,8 +256,17 @@ class RepoSolicitudes(Protocol):
     ) -> Solicitud | None: ...
 
     # ADR-025: lecturas para las vistas.
-    def del_solicitante(self, usuario_id: UsuarioId) -> Sequence[Solicitud]:
-        """Las que registro ese usuario (abiertas y finales), por orden de identificador."""
+    def del_solicitante(
+        self, usuario_id: UsuarioId, desde: int = 0, hasta: int | None = None
+    ) -> Sequence[Solicitud]:
+        """Las que registro ese usuario (abiertas y finales), por orden de identificador.
+
+        ADR-030: `[desde:hasta]` de esa lista, para paginar sin leerla entera.
+        """
+        ...
+
+    def contar_del_solicitante(self, usuario_id: UsuarioId) -> int:
+        """ADR-030: cuantas registro ese usuario."""
         ...
 
     def pendientes_de_aprobacion(self) -> Sequence[Solicitud]: ...

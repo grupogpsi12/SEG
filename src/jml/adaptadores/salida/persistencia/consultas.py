@@ -5,7 +5,8 @@ memoria (CA-15). La busqueda filtra sin tildes en Python: con 300 colaboradores 
 memoria y evita depender de la extension `unaccent` de PostgreSQL.
 """
 
-from collections.abc import Iterable
+from collections import defaultdict
+from collections.abc import Iterable, Sequence
 from datetime import datetime, time, timedelta
 
 from django.db.models import Count, Min, Q
@@ -210,9 +211,11 @@ def indicadores(ahora: datetime) -> Indicadores:
 # --- busqueda y ficha ------------------------------------------------------------------------
 
 
-def _resumenes(colaborador_id: ColaboradorId) -> tuple[ResumenDeCuenta, ...]:
+def _resumenes(
+    colaborador_id: ColaboradorId, cuentas: Sequence[m.Cuenta] | None = None
+) -> tuple[ResumenDeCuenta, ...]:
     filas = sorted(
-        m.Cuenta.objects.filter(colaborador_id=colaborador_id),
+        m.Cuenta.objects.filter(colaborador_id=colaborador_id) if cuentas is None else cuentas,
         key=lambda f: _orden(SistemaDeCuenta, SistemaDeCuenta(f.sistema)),
     )
     return tuple(
@@ -227,7 +230,7 @@ def _resumenes(colaborador_id: ColaboradorId) -> tuple[ResumenDeCuenta, ...]:
     )
 
 
-def _coincide(c: Colaborador, f: FiltroDeCuentas) -> bool:
+def _coincide(c: Colaborador, f: FiltroDeCuentas, cuentas: Sequence[m.Cuenta]) -> bool:
     if f.nombre is not None:
         texto = ascii_minuscula(c.nombre_completo)
         if not all(p in texto for p in ascii_minuscula(f.nombre).split()):
@@ -245,19 +248,22 @@ def _coincide(c: Colaborador, f: FiltroDeCuentas) -> bool:
     if f.sede is not None and ascii_minuscula(c.sede) != ascii_minuscula(f.sede):
         return False
     if f.sistema is not None or f.estado_de_cuenta is not None:
-        cuentas = m.Cuenta.objects.filter(colaborador_id=c.id)
-        if f.sistema is not None:
-            cuentas = cuentas.filter(sistema=f.sistema.value)
-        if f.estado_de_cuenta is not None:
-            cuentas = cuentas.filter(estado=f.estado_de_cuenta.value)
-        return cuentas.exists()
+        return any(
+            (f.sistema is None or cu.sistema == f.sistema.value)
+            and (f.estado_de_cuenta is None or cu.estado == f.estado_de_cuenta.value)
+            for cu in cuentas
+        )
     return True
 
 
 def buscar_cuentas(f: FiltroDeCuentas) -> PaginaDeCuentas:
     colaboradores = [mp.colaborador_de_modelo(fila) for fila in m.Colaborador.objects.all()]
+    # Todas las cuentas en una consulta, no una por colaborador (RNF-06, medido el 24/10/2026).
+    por_colaborador: dict[ColaboradorId, list[m.Cuenta]] = defaultdict(list)
+    for cuenta in m.Cuenta.objects.all():
+        por_colaborador[cuenta.colaborador_id].append(cuenta)
     ordenados = sorted(
-        (c for c in colaboradores if _coincide(c, f)),
+        (c for c in colaboradores if _coincide(c, f, por_colaborador[c.id])),
         key=lambda c: (ascii_minuscula(c.apellidos), ascii_minuscula(c.nombres), c.id),
     )
     inicio = (f.pagina - 1) * f.tamano
@@ -270,7 +276,7 @@ def buscar_cuentas(f: FiltroDeCuentas) -> PaginaDeCuentas:
             c.departamento,
             c.sede,
             c.estado,
-            _resumenes(c.id),
+            _resumenes(c.id, por_colaborador[c.id]),
         )
         for c in ordenados[inicio : inicio + f.tamano]
     )

@@ -11,7 +11,7 @@ from jml.aplicacion.casos.listados import (
     PendientesDeAprobacion,
     SubordinadosDe,
 )
-from jml.dominio.errores import NoAutorizado
+from jml.dominio.errores import DatoInvalido, NoAutorizado
 from jml.dominio.tipos import EstadoSolicitud, Rol
 from tests.fabricas import SENTINELA
 from tests.mundo import Mundo, cambio_de_departamento, retiro, vacaciones
@@ -21,7 +21,7 @@ def test_mis_solicitudes_son_las_que_registre_con_el_nombre_del_sujeto() -> None
     m = Mundo.nuevo()
     vac = m.registrar(vacaciones())
     m.registrar(cambio_de_departamento())  # la registro el jefe, no u-col
-    filas = MisSolicitudes(m.puerto).ejecutar("u-col")
+    filas = MisSolicitudes(m.puerto).ejecutar("u-col").filas
     assert [(f.id, f.colaborador_nombre) for f in filas] == [
         (vac.solicitud_id, "María José Gómez Ramírez")
     ]
@@ -33,11 +33,29 @@ def test_una_solicitud_aprobada_o_final_no_es_cancelable_por_el_solicitante() ->
     m = Mundo.nuevo()
     a = m.registrar(vacaciones())
     m.aprobar("u-rrhh", a.solicitud_id)
-    assert [f.cancelable for f in MisSolicitudes(m.puerto).ejecutar("u-col")] == [False]
+    assert [f.cancelable for f in MisSolicitudes(m.puerto).ejecutar("u-col").filas] == [False]
 
 
 def test_mis_solicitudes_de_quien_no_registro_nada_esta_vacia() -> None:
-    assert MisSolicitudes(Mundo.nuevo().puerto).ejecutar("u-otro") == ()
+    pagina = MisSolicitudes(Mundo.nuevo().puerto).ejecutar("u-otro")
+    assert (pagina.filas, pagina.total, pagina.pagina) == ((), 0, 1)
+
+
+def test_ADR_030_mis_solicitudes_se_paginan_de_la_mas_reciente_a_la_mas_antigua() -> None:
+    """RRHH emite cientos de solicitudes al año: la lista no se lee ni se muestra entera."""
+    m = Mundo.nuevo()
+    ids = []
+    for n in range(3):  # cada una se cancela: la deduplicación no deja registrar la siguiente
+        ids.append(m.registrar(vacaciones(dias=7 + n)).solicitud_id)
+        m.cancelar("u-col", ids[-1])
+    primera = MisSolicitudes(m.puerto, tamano=2).ejecutar("u-col")
+    assert [f.id for f in primera.filas] == [ids[2], ids[1]]
+    assert (primera.total, primera.pagina, primera.tamano) == (3, 1, 2)
+    segunda = MisSolicitudes(m.puerto, tamano=2).ejecutar("u-col", pagina=2)
+    assert [f.id for f in segunda.filas] == [ids[0]]
+    assert MisSolicitudes(m.puerto, tamano=2).ejecutar("u-col", pagina=3).filas == ()
+    with pytest.raises(DatoInvalido):
+        MisSolicitudes(m.puerto).ejecutar("u-col", pagina=0)
 
 
 def test_pendientes_de_aprobacion_solo_para_rrhh() -> None:
@@ -56,10 +74,12 @@ def test_las_filas_nunca_llevan_el_campo_restringido() -> None:
     m = Mundo.nuevo()
     m.emitir(retiro(restringido=SENTINELA))
     m.registrar(vacaciones())
-    todo = repr(MisSolicitudes(m.puerto).ejecutar("u-col")) + repr(
+    todo = repr(MisSolicitudes(m.puerto).ejecutar("u-col").filas) + repr(
         PendientesDeAprobacion(m.puerto).ejecutar("u-rrhh")
     )
-    todo += repr([dataclasses.fields(type(f)) for f in MisSolicitudes(m.puerto).ejecutar("u-rrhh")])
+    todo += repr(
+        [dataclasses.fields(type(f)) for f in MisSolicitudes(m.puerto).ejecutar("u-rrhh").filas]
+    )
     assert SENTINELA not in todo
     assert "motivo" not in todo.lower()
 

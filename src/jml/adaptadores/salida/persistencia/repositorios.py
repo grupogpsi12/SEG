@@ -4,13 +4,14 @@ La base de datos garantiza las reglas (RD-01, RD-09); el codigo solo traduce el
 `IntegrityError` al error del puerto, dentro de un savepoint para que la transaccion siga viva.
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Iterable, Sequence
 from datetime import datetime
 from types import TracebackType
 from typing import Self
 
 from django.contrib.auth.models import Group, User
 from django.db import IntegrityError, transaction
+from django.db.models import QuerySet
 
 from jml.adaptadores.salida.persistencia import consultas
 from jml.adaptadores.salida.persistencia import mapeo as mp
@@ -61,8 +62,16 @@ _CANDADO_DE_AUDITORIA = "auditoria"
 
 
 def _restringido(fila: m.Solicitud) -> str | None:
-    r = m.SolicitudRestringida.objects.filter(solicitud_id=fila.id).first()
-    return None if r is None else r.contenido
+    # Viene en la misma consulta (`_CON_RESTRINGIDO`): una consulta por fila convertia cada lista
+    # en N+1 (RNF-06, medido el 24/10/2026).
+    try:
+        return fila.solicitudrestringida.contenido
+    except m.SolicitudRestringida.DoesNotExist:
+        return None
+
+
+def _con_restringido() -> QuerySet[m.Solicitud]:
+    return m.Solicitud.objects.select_related("solicitudrestringida")
 
 
 def _solicitud(fila: m.Solicitud) -> Solicitud:
@@ -70,6 +79,18 @@ def _solicitud(fila: m.Solicitud) -> Solicitud:
 
 
 class RepoSolicitudes:
+    def __init__(
+        self, precargar: Callable[[Iterable[ColaboradorId]], None] = lambda _: None
+    ) -> None:
+        # Las listas de solicitudes se muestran con el nombre del colaborador: se precargan todos
+        # en una consulta en vez de una por fila (RNF-06).
+        self._precargar = precargar
+
+    def _lista(self, filas: QuerySet[m.Solicitud]) -> list[Solicitud]:
+        lista = [_solicitud(f) for f in filas]
+        self._precargar({s.colaborador_id for s in lista})
+        return lista
+
     def siguiente_id(self, anio: int) -> SolicitudId:
         fila, _ = m.Consecutivo.objects.select_for_update().get_or_create(clave=f"solicitud-{anio}")
         fila.ultimo += 1
@@ -128,43 +149,57 @@ class RepoSolicitudes:
         `of=("self",)`: solo la solicitud, no las filas relacionadas. En SQLite no tiene efecto.
         """
         fila = (
-            m.Solicitud.objects.select_for_update(of=("self",))
-            .filter(pk=solicitud_id.valor)
-            .first()
+            _con_restringido().select_for_update(of=("self",)).filter(pk=solicitud_id.valor).first()
         )
         return None if fila is None else _solicitud(fila)
 
     def abiertas_de(self, colaborador_id: ColaboradorId) -> Sequence[Solicitud]:
-        filas = m.Solicitud.objects.filter(colaborador_id=colaborador_id, estado__in=_ABIERTOS)
-        return [_solicitud(f) for f in filas.order_by("id")]
+        filas = _con_restringido().filter(colaborador_id=colaborador_id, estado__in=_ABIERTOS)
+        return self._lista(filas.order_by("id"))
 
     def de_colaborador(self, colaborador_id: ColaboradorId) -> Sequence[Solicitud]:
-        return [
-            _solicitud(f)
-            for f in m.Solicitud.objects.filter(colaborador_id=colaborador_id).order_by("id")
-        ]
+        return self._lista(_con_restringido().filter(colaborador_id=colaborador_id).order_by("id"))
 
-    def del_solicitante(self, usuario_id: UsuarioId) -> Sequence[Solicitud]:
-        filas = m.Solicitud.objects.filter(solicitante_id=usuario_id).order_by("id")
-        return [_solicitud(f) for f in filas]
+    def del_solicitante(
+        self, usuario_id: UsuarioId, desde: int = 0, hasta: int | None = None
+    ) -> Sequence[Solicitud]:
+        filas = _con_restringido().filter(solicitante_id=usuario_id).order_by("id")
+        return self._lista(filas[desde:hasta])  # OFFSET/LIMIT en la base (ADR-030)
+
+    def contar_del_solicitante(self, usuario_id: UsuarioId) -> int:
+        return m.Solicitud.objects.filter(solicitante_id=usuario_id).count()
 
     def pendientes_de_aprobacion(self) -> Sequence[Solicitud]:
-        filas = m.Solicitud.objects.filter(estado=EstadoSolicitud.PENDIENTE_APROBACION.value)
-        return [_solicitud(f) for f in filas.order_by("id")]
+        filas = _con_restringido().filter(estado=EstadoSolicitud.PENDIENTE_APROBACION.value)
+        return self._lista(filas.order_by("id"))
 
     def en_error(self) -> Sequence[Solicitud]:
-        filas = m.Solicitud.objects.filter(estado=EstadoSolicitud.ERROR.value)
-        return [_solicitud(f) for f in filas.order_by("id")]
+        filas = _con_restringido().filter(estado=EstadoSolicitud.ERROR.value)
+        return self._lista(filas.order_by("id"))
 
     def abierta_de_tipo(self, colaborador_id: ColaboradorId, tipo: TipoEvento) -> Solicitud | None:
-        fila = m.Solicitud.objects.filter(
-            colaborador_id=colaborador_id, tipo=tipo.value, estado__in=_ABIERTOS
-        ).first()
+        fila = (
+            _con_restringido()
+            .filter(colaborador_id=colaborador_id, tipo=tipo.value, estado__in=_ABIERTOS)
+            .first()
+        )
         return None if fila is None else _solicitud(fila)
 
 
 class RepoColaboradores:
+    """Con cache por unidad de trabajo: las entidades son inmutables y toda escritura pasa por
+    `guardar`, que la actualiza. Vive lo que la transaccion (RNF-06)."""
+
+    def __init__(self) -> None:
+        self._cache: dict[ColaboradorId, Colaborador | None] = {}
+
+    def precargar(self, ids: Iterable[ColaboradorId]) -> None:
+        faltan = [i for i in ids if i not in self._cache]
+        for fila in m.Colaborador.objects.filter(pk__in=faltan):
+            self._cache[fila.id] = mp.colaborador_de_modelo(fila)
+
     def guardar(self, colaborador: Colaborador) -> None:
+        self._cache.pop(colaborador.id, None)
         try:
             with transaction.atomic():
                 m.Colaborador.objects.update_or_create(
@@ -182,8 +217,10 @@ class RepoColaboradores:
             raise DocumentoYaRegistrado(otro.id) from None
 
     def obtener(self, colaborador_id: ColaboradorId) -> Colaborador | None:
-        fila = m.Colaborador.objects.filter(pk=colaborador_id).first()
-        return None if fila is None else mp.colaborador_de_modelo(fila)
+        if colaborador_id not in self._cache:
+            fila = m.Colaborador.objects.filter(pk=colaborador_id).first()
+            self._cache[colaborador_id] = None if fila is None else mp.colaborador_de_modelo(fila)
+        return self._cache[colaborador_id]
 
     def por_documento(self, documento: Documento) -> Colaborador | None:
         fila = (
@@ -559,6 +596,13 @@ class AuditoriaDjango:
             registro_de_modelo(f) for f in m.RegistroDeAuditoria.objects.order_by("secuencia")
         )
 
+    def total(self) -> int:
+        return m.RegistroDeAuditoria.objects.count()
+
+    def tramo(self, desde: int, hasta: int) -> Sequence[RegistroDeAuditoria]:
+        filas = m.RegistroDeAuditoria.objects.order_by("secuencia")[desde:hasta]  # ADR-030
+        return tuple(registro_de_modelo(f) for f in filas)
+
     def verificar(self) -> ResultadoDeVerificacion:
         return verificar_cadena(self.registros())
 
@@ -567,8 +611,8 @@ class UnidadDeTrabajoDjango:
     """Transaccion atomica de Django: si el bloque lanza, se deshace todo (CA-02)."""
 
     def __init__(self, reloj: Reloj) -> None:
-        self.solicitudes = RepoSolicitudes()
         self.colaboradores = RepoColaboradores()
+        self.solicitudes = RepoSolicitudes(self.colaboradores.precargar)
         self.usuarios = RepoUsuarios()
         self.perfiles = RepoPerfiles()
         self.tickets = RepoTickets()

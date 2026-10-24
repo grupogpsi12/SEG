@@ -14,9 +14,9 @@ from django.test import Client
 
 from jml.adaptadores.entrada.web import composicion
 from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
-from jml.dominio.valores import BOGOTA
+from jml.dominio.valores import BOGOTA, SolicitudId
 from tests.fabricas import AHORA, HOY, SENTINELA
-from tests.mundo import PDF_VALIDO, Mundo
+from tests.mundo import PDF_VALIDO, Mundo, vacaciones
 
 pytestmark = pytest.mark.django_db
 
@@ -121,6 +121,18 @@ def test_el_solicitante_cancela_la_suya_mientras_este_pendiente(mundo: Mundo) ->
     r = c.post(f"/solicitudes/{sid}/cancelar")
     assert (r.status_code, r["Location"]) == (302, "/solicitudes")
     assert "Cancelada" in texto(c.get("/solicitudes"))
+
+
+def test_ADR_030_mis_solicitudes_pagina_y_rechaza_una_pagina_invalida(mundo: Mundo) -> None:
+    ids = []
+    for n in range(3):  # cada una se cancela: la deduplicación no deja registrar la siguiente
+        ids.append(mundo.registrar(vacaciones(dias=7 + n)).solicitud_id.valor)
+        mundo.cancelar("u-col", SolicitudId(ids[-1]))
+    pagina = texto(como("u-col").get("/solicitudes"))
+    assert pagina.index(ids[2]) < pagina.index(ids[1]) < pagina.index(ids[0])  # recientes primero
+    assert como("u-col").get("/solicitudes?pagina=0").status_code == 404
+    assert como("u-col").get("/solicitudes?pagina=x").status_code == 404
+    assert como("u-col").get("/solicitudes?pagina=9").status_code == 200  # vacía, sin error
 
 
 def test_el_colaborador_solo_ofrece_vacaciones_y_renuncia(mundo: Mundo) -> None:

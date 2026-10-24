@@ -29,11 +29,12 @@ class ConsultarAuditoria:
         if pagina < 1:
             raise DatoInvalido("pagina", "empieza en 1")
         _exigir_auditor(self._repos, usuario_id)
+        # ADR-030: solo el tramo de la pagina; la cadena crece sin limite.
         with self._repos.unidad_de_trabajo() as uow:
-            todos = uow.auditoria.registros()
-        inicio = len(todos) - pagina * TAMANO_DE_PAGINA
-        tramo = todos[max(inicio, 0) : max(inicio + TAMANO_DE_PAGINA, 0)]
-        return PaginaDeAuditoria(tuple(reversed(tramo)), len(todos), pagina, TAMANO_DE_PAGINA)
+            total = uow.auditoria.total()
+            inicio = total - pagina * TAMANO_DE_PAGINA
+            tramo = uow.auditoria.tramo(max(inicio, 0), max(inicio + TAMANO_DE_PAGINA, 0))
+        return PaginaDeAuditoria(tuple(reversed(tramo)), total, pagina, TAMANO_DE_PAGINA)
 
 
 class VerificarAuditoria:

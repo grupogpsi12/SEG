@@ -33,6 +33,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 027 | Matriz y usuarios completos para el área de administración (2.13) | Aceptada | 11/10/2026 |
 | 028 | Dueño del esquema separado de `app_backend`, disparador con transiciones y bloqueo al decidir (revisión externa H1 a H3) | Aceptada | 11/10/2026 |
 | 029 | Secretos compartidos del equipo cifrados en el repositorio con SOPS + age | Aceptada | 24/10/2026 |
+| 030 | Lecturas paginadas de la auditoría y de las solicitudes de un usuario (RNF-06) | Aceptada | 24/10/2026 |
 
 ---
 
@@ -427,3 +428,22 @@ Hasta ahora se pasaban por chat, y por eso hubo que rotar la contraseña de `pos
 - **Herramientas:** `sops` 3.13 y `age` 1.3 se instalan en el equipo de quien las usa (`winget`, `brew` o `apt`). No van en la imagen ni en `pyproject.toml`.
 - **Un repositorio público no filtra los secretos**, pero sí muestra sus nombres y cuándo cambian: los nombres no son secretos. Un archivo sin cifrar se detecta antes del commit: `tests/adaptadores/test_secretos.py` falla si un valor de `infra/secretos/` no empieza con `ENC[`, y gitleaks corre en la CI.
 - **Alta de una persona:** quien ya descifra la agrega (`secretos.sh agregar`). Nadie puede darse acceso a sí mismo.
+
+## ADR-030 — Lecturas paginadas de la auditoría y de las solicitudes de un usuario (RNF-06)
+
+**Contexto.** La medición de RNF-06 del 24/10/2026, con 300 colaboradores y 20 usuarios concurrentes (`infra/scripts/carga.sh`), mostró dos lecturas que crecen sin límite:
+- La vista del Auditor cargaba **toda** la cadena (6586 registros en la semilla) para mostrar 50.
+- «Mis solicitudes» devolvía todas las solicitudes del usuario. RRHH emite cientos al año.
+
+Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: con el tiempo cualquier servidor se vuelve lento. Los N+1 del adaptador (el campo restringido, el colaborador de cada fila y las cuentas de la búsqueda) se corrigieron sin tocar los puertos.
+
+**Decisión.**
+1. **Auditoría.** El puerto `Auditoria` gana `total()` y `tramo(desde, hasta)`, con la semántica de `registros()[desde:hasta]`. `ConsultarAuditoria` lee solo el tramo de la página. `registros()` sigue para verificar y exportar, que necesitan la cadena completa.
+2. **Solicitudes.** `RepoSolicitudes.del_solicitante` acepta un tramo opcional (`desde` y `hasta`) y se agrega `contar_del_solicitante`; sin argumentos se comporta como antes. `MisSolicitudes` devuelve una `PaginaDeSolicitudes` de 50 por página, de la más reciente a la más antigua, como la auditoría.
+3. **Contrato.** El doble en memoria y el ORM pasan los mismos casos (`test_ADR_030_*` en `tests/contratos/test_repositorios.py`).
+
+**Alternativas descartadas.**
+- **Paginar en la vista:** la lista seguiría leyéndose entera.
+- **Cursor por secuencia:** es más eficiente en tablas enormes, pero la cadena es contigua y, al volumen del proyecto, OFFSET/LIMIT sobre el índice de la secuencia alcanza.
+
+**Consecuencias.** El núcleo congelado (`nucleo-v1`) cambia en dos puertos y dos casos de uso, igual que con ADR-025 a ADR-027. La lista de solicitudes cambia de orden: ahora va de la más reciente a la más antigua.

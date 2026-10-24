@@ -122,8 +122,15 @@ def inicio(request: HttpRequest) -> HttpResponse:
 @require_GET
 @con_sesion
 def solicitudes(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
-    filas = composicion.casos().mis_solicitudes.ejecutar(perfil.usuario_id)
-    return render(request, "web/solicitudes.html", _contexto(perfil, filas=filas))
+    try:
+        pagina = int(request.GET.get("pagina", "1"))
+        p = composicion.casos().mis_solicitudes.ejecutar(perfil.usuario_id, pagina)
+    except (ValueError, DatoInvalido):
+        raise Http404 from None
+    ultima = max(1, -(-p.total // p.tamano))
+    return render(
+        request, "web/solicitudes.html", _contexto(perfil, filas=p.filas, p=p, ultima=ultima)
+    )
 
 
 @require_GET
