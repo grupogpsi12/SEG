@@ -1,7 +1,9 @@
 """Ciclo del worker (ADR-011, RNF-01, RNF-02) con los casos de uso reales y GLPI en memoria."""
 
+import time
 from pathlib import Path
 
+import httpx
 import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -128,3 +130,39 @@ def test_con_los_tokens_el_worker_arma_el_adaptador_de_glpi(
         (tmp_path / nombre).write_text("x", encoding="utf-8")
     monkeypatch.setenv("JML_SECRETOS_DIR", str(tmp_path))
     assert isinstance(comando.sistema_de_tickets(), SistemaDeTicketsGlpi)
+
+
+# --- RNF-01: GLPI caido se detecta en menos de 2 minutos (revision del 24/10/2026) -------------
+# El latido solo envejece tras 3 ciclos de 5 minutos: con GLPI caido el worker seguia «healthy»
+# hasta 15 minutos. El chequeo tambien pregunta a GLPI.
+
+
+@pytest.mark.parametrize(
+    ("respuesta", "vivo"),
+    [(200, True), (401, True), (404, True), (500, False), (503, False), (None, False)],
+)
+def test_RNF_01_glpi_responde_segun_su_respuesta(respuesta: int | None, vivo: bool) -> None:
+    from jml.adaptadores.entrada.worker.management.commands.worker import glpi_responde
+
+    def manejar(request: httpx.Request) -> httpx.Response:
+        if respuesta is None:
+            raise httpx.ConnectError("caido", request=request)
+        return httpx.Response(respuesta, request=request)
+
+    cliente = httpx.Client(transport=httpx.MockTransport(manejar))
+    assert glpi_responde("http://glpi/apirest.php", cliente) is vivo
+
+
+def test_RNF_01_el_comando_de_salud_falla_si_glpi_no_responde(
+    tmp_path: Path, settings: object, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from jml.adaptadores.entrada.worker.management.commands import worker as comando
+
+    latido = tmp_path / "latido"
+    latido.write_text(str(time.time()), encoding="ascii")  # sincronizo hace un instante
+    settings.JML_LATIDO_WORKER = str(latido)  # type: ignore[attr-defined]
+    monkeypatch.setattr(comando, "glpi_responde", lambda *_: False)
+    with pytest.raises(CommandError, match="GLPI no responde"):
+        call_command("worker", "--salud")
+    monkeypatch.setattr(comando, "glpi_responde", lambda *_: True)
+    call_command("worker", "--salud")  # latido fresco y GLPI vivo: sano

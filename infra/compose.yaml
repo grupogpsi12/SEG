@@ -141,9 +141,10 @@ services:
     <<: *app
     healthcheck:  # RNF-01: /salud verifica tambien Supabase
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/salud', headers={'Host': '${APP_DOMINIO:-app.localhost}'}), timeout=5)"]
+      # RNF-01: Supabase caido se detecta en menos de 2 minutos (2 fallos x 30 s; medido 24/10/2026)
       interval: 30s
       timeout: 6s
-      retries: 3
+      retries: 2
       start_period: 20s
     mem_limit: 512m
 
@@ -163,9 +164,9 @@ services:
     volumes:
       - soportes:/var/lib/jml/soportes
       - exportes:/var/lib/jml/exportes  # RD-04: lo sube a Blob infra/scripts/subir-exportes.sh
-    healthcheck:  # RNF-01: hora de la ultima sincronizacion exitosa
+    healthcheck:  # RNF-01: ultima sincronizacion exitosa y GLPI que responde (menos de 2 minutos)
       test: ["CMD", "python", "manage.py", "worker", "--salud"]
-      interval: 60s
+      interval: 30s
       timeout: 20s
       retries: 2
       start_period: 120s

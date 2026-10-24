@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+import httpx
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 
@@ -35,6 +36,20 @@ def _secreto(nombre: str) -> str:
     if not valor:
         raise CommandError(f"falta el secreto {nombre} (token de la API de GLPI, item 3.1)")
     return valor
+
+
+def glpi_responde(url_api: str, cliente: httpx.Client | None = None) -> bool:
+    """RNF-01: GLPI caido se detecta en menos de 2 minutos.
+
+    El latido solo envejece tras 3 ciclos de sincronizacion (15 minutos), asi que el chequeo
+    tambien pregunta a la raiz de la API. No necesita tokens: cualquier respuesta por debajo de
+    500 prueba que GLPI esta arriba; un error de red o un 5xx, que no.
+    """
+    http = cliente or httpx.Client(timeout=5.0)
+    try:
+        return http.get(url_api.rstrip("/") + "/").status_code < 500
+    except httpx.HTTPError:
+        return False
 
 
 def sistema_de_tickets() -> SistemaDeTickets:
@@ -76,6 +91,8 @@ class Command(BaseCommand):
         if opciones["salud"]:
             if not esta_sano(Path(settings.JML_LATIDO_WORKER), time.time()):
                 raise CommandError("sin sincronizacion exitosa reciente")
+            if not glpi_responde(settings.JML_GLPI_API_URL):
+                raise CommandError("GLPI no responde")
             self.stdout.write("ok")
             return
         worker = construir()

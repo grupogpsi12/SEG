@@ -184,3 +184,17 @@ def test_RNF_16_sin_reporteria_los_logs_de_docker_rotan() -> None:
         assert {"max-size", "max-file"} <= set(logging.get("options", {})), nombre
     for nombre in ("bunkerweb", "bw-scheduler"):
         assert REPORTERIA["services"][nombre]["logging"]["driver"] == "fluentd"
+
+
+def test_RNF_01_los_chequeos_detectan_un_fallo_en_menos_de_2_minutos() -> None:
+    """Intervalo x reintentos + tiempo de espera, en el peor caso, por debajo de 120 s. Medido el
+    24/10/2026 con infra/scripts/deteccion.sh: GLPI caido 63 s (antes, mas de 300), base 56 s."""
+
+    def segundos(texto: str) -> int:
+        return int(texto.rstrip("s"))
+
+    for nombre in ("web", "worker"):
+        salud = SERVICIOS[nombre]["healthcheck"]
+        peor = segundos(salud["interval"]) * salud["retries"] + segundos(salud["timeout"])
+        assert peor < 120, (nombre, peor)
+    assert SERVICIOS["worker"]["healthcheck"]["test"][-1] == "--salud"  # latido y GLPI vivo
