@@ -22,6 +22,11 @@ x-endurecido: &endurecido
   restart: unless-stopped
   security_opt: ["no-new-privileges:true"]
   cap_drop: ["ALL"]
+  # RNF-16: sin reporteria los logs quedan en Docker y rotan. Docker rota por tamano, no por dias:
+  # 7 archivos de 10 MB por contenedor (S-36). compose.reporteria.yaml cambia el driver del WAF.
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "7" }
 
 x-app: &app
   <<: *endurecido

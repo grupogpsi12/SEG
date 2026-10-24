@@ -134,3 +134,51 @@ def test_solo_el_worker_opera_glpi_y_solo_el_configurador_lo_administra() -> Non
     assert _con_secreto("glpi_admin_user_token") == {"configurar-glpi"}
     assert SERVICIOS["configurar-glpi"]["profiles"] == ["admin"]
     assert "web" not in _con_secreto("glpi_app_token")
+
+
+# --- 5.5 Reportería del WAF (infra/compose.reporteria.yaml, revisión del 24/10/2026) ----------
+
+REPORTERIA: dict[str, Any] = yaml.safe_load(
+    (RAIZ / "infra" / "compose.reporteria.yaml").read_text(encoding="utf-8")
+)
+PROPIOS_DE_LA_REPORTERIA = {"fluent-bit", "loki", "grafana"}
+
+
+def test_RS_18_la_reporteria_fija_sus_imagenes_por_digest() -> None:
+    for nombre in PROPIOS_DE_LA_REPORTERIA:
+        assert re.search(r"@sha256:[0-9a-f]{64}$", REPORTERIA["services"][nombre]["image"]), nombre
+
+
+def test_RS_02_la_reporteria_solo_escucha_en_el_equipo() -> None:
+    """Grafana y la entrada de Fluent Bit solo en 127.0.0.1 (SRS §627); Loki, en ninguno."""
+    con_puertos = {n for n, s in REPORTERIA["services"].items() if s.get("ports")}
+    assert con_puertos == {"fluent-bit", "grafana"}
+    for nombre in con_puertos:
+        for puerto in REPORTERIA["services"][nombre]["ports"]:
+            assert str(puerto).startswith("127.0.0.1:"), (nombre, puerto)
+    for nombre in PROPIOS_DE_LA_REPORTERIA:
+        assert REPORTERIA["services"][nombre]["networks"] == ["waf-logs"], nombre
+
+
+def test_RS_20_grafana_lee_su_clave_de_un_secreto() -> None:
+    grafana = REPORTERIA["services"]["grafana"]
+    assert grafana["environment"]["GF_SECURITY_ADMIN_PASSWORD__FILE"].startswith("/run/secrets/")
+    assert "GF_SECURITY_ADMIN_PASSWORD" not in grafana["environment"]
+    assert grafana["environment"]["GF_USERS_ALLOW_SIGN_UP"] == "false"
+
+
+def test_RNF_16_sin_reporteria_los_logs_de_docker_rotan() -> None:
+    """S-36: cada contenedor guarda sus logs con tope de tamaño y de archivos. Se revisan todos los
+    del compose base y los que solo existen en el modo local o en la reportería (las
+    sobrescrituras heredan el del base; con la reportería, el WAF pasa a fluentd)."""
+    propios = {
+        **SERVICIOS,
+        **{n: s for n, s in LOCAL["services"].items() if n not in SERVICIOS},
+        **{n: s for n, s in REPORTERIA["services"].items() if n not in SERVICIOS},
+    }
+    for nombre, servicio in propios.items():
+        logging = servicio.get("logging", {})
+        assert logging.get("driver") == "json-file", nombre
+        assert {"max-size", "max-file"} <= set(logging.get("options", {})), nombre
+    for nombre in ("bunkerweb", "bw-scheduler"):
+        assert REPORTERIA["services"][nombre]["logging"]["driver"] == "fluentd"
