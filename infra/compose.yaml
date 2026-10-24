@@ -113,6 +113,9 @@ services:
       - ${APP_DOMINIO:-app.localhost}_KEEP_UPSTREAM_HEADERS=Content-Security-Policy X-Frame-Options
       - ${APP_DOMINIO:-app.localhost}_CONTENT_SECURITY_POLICY=
       - ${APP_DOMINIO:-app.localhost}_X_FRAME_OPTIONS=
+      # Aislamiento de origen (ZAP del 24/10/2026): nada se carga de otro origen (invariante 11).
+      - "${APP_DOMINIO:-app.localhost}_CUSTOM_HEADER=Cross-Origin-Resource-Policy: same-origin"
+      - "${APP_DOMINIO:-app.localhost}_CUSTOM_HEADER_1=Cross-Origin-Embedder-Policy: require-corp"
       # Django devuelve 403 CON su mensaje («sin acceso», «no autorizado» en un formulario): BunkerWeb
       # solo reemplaza los errores de disponibilidad. Sus propios bloqueos (CRS, limites) no cambian.
       - ${APP_DOMINIO:-app.localhost}_INTERCEPTED_ERROR_CODES=502 503 504

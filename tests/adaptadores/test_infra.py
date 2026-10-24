@@ -198,3 +198,15 @@ def test_RNF_01_los_chequeos_detectan_un_fallo_en_menos_de_2_minutos() -> None:
         peor = segundos(salud["interval"]) * salud["retries"] + segundos(salud["timeout"])
         assert peor < 120, (nombre, peor)
     assert SERVICIOS["worker"]["healthcheck"]["test"][-1] == "--salud"  # latido y GLPI vivo
+
+
+def test_RS_07_cabeceras_de_aislamiento_de_origen_en_el_waf_y_estaticos_sin_cors() -> None:
+    """ZAP baseline del 24/10/2026: los estaticos salian con `Access-Control-Allow-Origin: *`
+    (WhiteNoise, riesgo medio) y faltaban CORP y COEP. La aplicacion no carga nada de otro origen
+    (invariante 11), asi que se puede exigir el mismo origen."""
+    from django.conf import settings
+
+    entorno = _entorno("bw-scheduler")
+    assert "app.localhost}_CUSTOM_HEADER=Cross-Origin-Resource-Policy: same-origin" in entorno
+    assert "app.localhost}_CUSTOM_HEADER_1=Cross-Origin-Embedder-Policy: require-corp" in entorno
+    assert settings.WHITENOISE_ALLOW_ALL_ORIGINS is False

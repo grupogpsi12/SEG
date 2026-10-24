@@ -83,6 +83,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# WhiteNoise abre CORS (`*`) en los estaticos por defecto: no hace falta (ZAP del 24/10/2026).
+WHITENOISE_ALLOW_ALL_ORIGINS = False
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
