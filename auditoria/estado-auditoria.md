@@ -31,7 +31,7 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | F1-03 | Contrato y flujos contra GLPI real (`contrato-glpi.sh`) | 30 pruebas, 0 fallos | F0-06 | ✔ 30 de 30 tras B-16 y B-17 (F1-03-GLPI-REAL-3) |
 | F1-04 | Playwright por el WAF (`e2e-interfaz.sh`) | 4 pruebas, 0 fallos | F0-06 | ✔ 4 de 4 (F1-04-E2E) |
 | F1-05 | `metricas.json` con los números medidos hoy y comparación con los documentados | Cada diferencia > 1 % entre lo medido y `estado.md` es un hallazgo | F1-01…04 | ✔ `metricas.json` completo; diferencias: B-14 (ramas puras 94,4 % frente a «99 %»), 1618 frente a 1600 pruebas (+1,1 %) |
-| F1-06 | Estabilidad: 20 corridas de la suite unitaria | < 1 % de pruebas inestables y cero reintentos automáticos | F1-01 | ○ |
+| F1-06 | Estabilidad: 20 corridas de la suite unitaria | < 1 % de pruebas inestables y cero reintentos automáticos | F1-01 | ✔ 20 de 20 corridas sin fallos, 1632 pruebas cada una, sin reintentos (F1-06-ESTABILIDAD). La primera tanda quedó invalidada por una edición mía a mitad de corrida (F1-06-ESTABILIDAD-CONTAMINADA) |
 
 ## F2 — Caja blanca estática
 
@@ -62,7 +62,7 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | F3-U08 | `manage.py check --deploy` con los ajustes de producción | Salida vacía | F1-01 | ○ |
 | F3-U09 | Un intento denegado por rol siempre deja evento de auditoría | Un evento por cada denegación de la matriz | F5-02 | ○ |
 | F3-BD | Pruebas de base de datos con `SET ROLE` (dueño, REVOKE, disparadores, `PUBLIC`/`anon`/`authenticated`) | Aserciones que fallan al quitar cada control | F1-02 | ○ |
-| F3-PAR | Paridad del catálogo local frente a Supabase de desarrollo, **solo lectura** | Diferencia vacía salvo las declaradas (TLS y `pg_hba`) | F1-02 | ⛔ requiere leer Supabase real: pedir confirmación antes (regla «Pausa —») |
+| F3-PAR | Paridad del catálogo local frente a Supabase de desarrollo, **solo lectura** | Diferencia vacía salvo las declaradas (TLS y `pg_hba`) | F1-02 | ✔ autorizada por el usuario (lectura de catálogo). Igual en columnas, restricciones, índices, disparadores, funciones, RLS, privilegios y esquema. Difieren solo 4 extensiones de la plataforma (`pgcrypto`, `uuid-ossp`, `supabase_vault`, `pg_stat_statements`) y los roles `anon`, `authenticated` y `service_role` (en Supabase traen `statement_timeout` y `service_role` omite RLS) (F3-PAR) |
 | F3-COV | Cobertura de ramas y mutación de los módulos de seguridad | ≥ 95 % y ≥ 85 %, o hallazgo abierto con plan | F3-U01…09 | ○ |
 
 ## F4 — Gherkin ejecutable

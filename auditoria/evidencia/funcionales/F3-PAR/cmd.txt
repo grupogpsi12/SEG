@@ -1,0 +1,1 @@
+python auditoria/scripts/comparar-catalogos.py auditoria/evidencia/funcionales/F3-PAR-INSTANTANEAS/catalogo-local.json auditoria/evidencia/funcionales/F3-PAR-INSTANTANEAS/catalogo-supabase.json
