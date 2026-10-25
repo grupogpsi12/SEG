@@ -1,1 +1,1 @@
-fc77a96200e06be085eb7fc784a5328ffc16bff0 (sin rama; con cambios sin confirmar)
+fb23a6fd27961d81e05bcb9e949abf5ad03ea6f8 (auditoria/entrega; con cambios sin confirmar)

@@ -1,1 +1,1 @@
-mutmut 2.5.1 sobre src/jml/aplicacion (worktree descartable)
+mutmut 3.8.0 (BSD-3, 12/09/2026) en contenedor Linux python:3.12-slim, sobre src/jml/aplicacion
