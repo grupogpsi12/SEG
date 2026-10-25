@@ -247,8 +247,10 @@ def test_B_19_un_error_que_no_es_de_dominio_tampoco_detiene_la_sincronizacion_de
     registros = [
         r for r in m.repos.auditoria().registros() if r.accion == "sincronizacion.solicitud_fallida"
     ]
-    # solo el tipo de la excepcion: su mensaje podria llevar datos
-    assert [(r.objeto, dict(r.datos)) for r in registros] == [(a.valor, {"codigo": "RuntimeError"})]
+    # codigo estable: el mensaje de la excepcion podria llevar datos
+    assert [(r.objeto, dict(r.datos)) for r in registros] == [
+        (a.valor, {"codigo": "error_inesperado"})
+    ]
 
 
 def test_R1_un_ticket_creado_mientras_se_cancelaba_la_solicitud_no_se_pierde_de_vista() -> None:

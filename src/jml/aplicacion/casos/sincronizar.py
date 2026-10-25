@@ -69,21 +69,23 @@ class SincronizarTickets:
         for sid in solicitudes:
             try:
                 self._solicitud(sid, observaciones)
-            except ErrorDeDominio as error:
-                # Un dato corrupto en una solicitud no detiene a las demas (R2). Su transaccion
-                # ya se deshizo; el fallo queda en la auditoria con su codigo estable.
+            except Exception as error:
+                # Un dato corrupto o un rechazo de la base en una solicitud no detiene a las demas.
+                # Su transaccion ya se deshizo; el fallo queda en la auditoria con un codigo
+                # estable: el del dominio o `error_inesperado` (el mensaje podria llevar datos).
                 errores += 1
-                self._auditar_fallo(sid, error)
+                codigo = error.codigo if isinstance(error, ErrorDeDominio) else "error_inesperado"
+                self._auditar_fallo(sid, codigo)
         return self._registrar(
             inicio, "ok" if errores == 0 else "error", len(observaciones), errores
         )
 
-    def _auditar_fallo(self, sid: SolicitudId, error: ErrorDeDominio) -> None:
+    def _auditar_fallo(self, sid: SolicitudId, codigo: str) -> None:
         with self._dep.repos.unidad_de_trabajo() as uow:
             uow.auditoria.registrar(
                 ACTOR_DEL_WORKER,
                 EventoDeAuditoria(
-                    "sincronizacion.solicitud_fallida", sid.valor, {"codigo": error.codigo}
+                    "sincronizacion.solicitud_fallida", sid.valor, {"codigo": codigo}
                 ),
             )
 

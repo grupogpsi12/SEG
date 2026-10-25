@@ -271,7 +271,7 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
             "fijar vencimiento",
         )
         # GLPI responde 200 aunque rechace el cambio (p. ej. vencimiento anterior a la apertura):
-        # el resultado va por item, `[{"<id>": false, "message": ...}]` (B-17); sin copiar el mensaje.
+        # el resultado va por item, `[{"<id>": false, "message": ...}]` (B-17); no se copia el texto
         if isinstance(respuesta, list) and any(
             isinstance(r, dict) and r.get(id_ticket) is False for r in respuesta
         ):
