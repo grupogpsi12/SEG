@@ -61,6 +61,7 @@ class GlpiSimulado:
     sesiones: set[str] = field(default_factory=set)
     programados: deque[str] = field(default_factory=deque)
     caidas: int = 0
+    rechaza_actualizaciones: bool = False  # GLPI real: 200 con message por item (B-17)
     llamadas: list[str] = field(default_factory=list)
     _secuencia: int = 0
 
@@ -183,6 +184,8 @@ class GlpiSimulado:
             item = self._tabla(partes[0]).get(partes[1])
             if item is None:
                 return _json(["ERROR_ITEM_NOT_FOUND", "no existe"], 404)
+            if self.rechaza_actualizaciones:
+                return _json([{partes[1]: False, "message": "Invalid dates. Update cancelled."}])
             item.update(json.loads(p.content)["input"])
             return _json([{partes[1]: True, "message": ""}])
         if p.method == "DELETE" and len(partes) == 2:

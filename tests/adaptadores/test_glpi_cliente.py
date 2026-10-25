@@ -50,6 +50,16 @@ def test_el_ticket_lleva_titulo_contenido_tecnico_prioridad_categoria_y_vencimie
     assert creado["time_to_resolve"] == t.vence_en.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S")
 
 
+def test_B_17_si_glpi_rechaza_el_vencimiento_con_200_el_adaptador_no_lo_da_por_hecho() -> None:
+    """GLPI 11 responde 200 con `[{"<id>": false, "message": "Invalid dates. Update cancelled."}]`
+    cuando `time_to_resolve` es anterior a la apertura. Antes se ignoraba y el ticket quedaba sin
+    vencimiento sin que nadie lo supiera."""
+    glpi = GlpiSimulado()
+    glpi.rechaza_actualizaciones = True
+    with pytest.raises(GlpiRechazo, match="fijar vencimiento"):
+        armar(glpi).crear_ticket(tickets()[0])
+
+
 def test_si_un_timeout_corto_antes_de_fijar_el_vencimiento_el_reintento_lo_completa() -> None:
     glpi = GlpiSimulado()
     cliente = armar(glpi)
