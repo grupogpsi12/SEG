@@ -287,6 +287,9 @@ networks:
   bw-universe:
     ipam: { config: [{ subnet: 10.20.30.0/24 }] }
   app:
-    ipam: { config: [{ subnet: 10.20.40.0/24 }] }
+    # ip_range: Docker reparte a los demas contenedores solo la mitad alta (.128 a .255). La IP fija
+    # de bunkerweb (.2), la unica en la que Django confia (RS-05), queda reservada: sin esto, tras un
+    # reinicio otro contenedor la tomaba primero y bunkerweb no arrancaba (B-01, auditoria 24/10/2026).
+    ipam: { config: [{ subnet: 10.20.40.0/24, ip_range: 10.20.40.128/25 }] }
   db_net:
     internal: true  # RS-03
