@@ -21,7 +21,14 @@ def _docker(*args: str, entrada: str | None = None) -> str:
     if shutil.which("docker") is None:
         pytest.skip("S-37: sin docker en el PATH")
     r = subprocess.run(
-        ["docker", *args], input=entrada, capture_output=True, text=True, check=False, timeout=120
+        ["docker", *args],
+        input=entrada,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        timeout=120,
     )
     return r.stdout + r.stderr
 
@@ -37,7 +44,15 @@ def _curl(*cabeceras: str) -> int:
     for c in cabeceras:
         orden += ["-H", c]
     orden.append(f"https://{HOST}/")
-    r = subprocess.run(orden, capture_output=True, text=True, check=False, timeout=40)
+    r = subprocess.run(
+        orden,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        timeout=40,
+    )
     return int(r.stdout or 0)
 
 
