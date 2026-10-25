@@ -1,0 +1,7 @@
+glpi detenido: worker unhealthy a los 63 s (RNF-01 exige menos de 120)
+ Container jml-glpi-1 Stopping 
+ Container jml-glpi-1 Stopped 
+ Container jml-mariadb-1 Waiting 
+ Container jml-mariadb-1 Healthy 
+ Container jml-glpi-1 Starting 
+ Container jml-glpi-1 Started 

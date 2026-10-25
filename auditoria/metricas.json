@@ -47,17 +47,17 @@
     },
     "deteccion_glpi_s": {
       "documentado": 63,
-      "medido": null,
+      "medido": 63,
       "umbral": 120
     },
     "deteccion_base_s": {
       "documentado": 56,
-      "medido": null,
+      "medido": 43,
       "umbral": 120
     },
     "restauracion_s": {
       "documentado": 23,
-      "medido": null,
+      "medido": 19,
       "umbral": 14400
     },
     "cobertura_combinada_dominio_pct": {
@@ -85,14 +85,14 @@
   "hallazgos": {
     "criticos": 0,
     "altos": 0,
-    "medios": 12,
-    "bajos": 11,
-    "informativos": 5,
-    "total": 28,
-    "abiertos": 13,
+    "medios": 14,
+    "bajos": 12,
+    "informativos": 6,
+    "total": 32,
+    "abiertos": 16,
     "verificados": 11,
     "corregidos": 2,
-    "aceptados": 2
+    "aceptados": 3
   },
   "celdas_matriz_authz": {
     "total": null,
