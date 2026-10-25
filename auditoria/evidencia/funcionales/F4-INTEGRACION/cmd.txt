@@ -1,0 +1,1 @@
+bash infra/scripts/integracion-local.sh

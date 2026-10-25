@@ -380,7 +380,7 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Riesgo:** el archivo sembrado contiene un secreto falso: se genera en una carpeta temporal y **nunca** se versiona (la CI de `gitleaks` lo rechazaría).
 - [x] **A-F3 Pruebas nuevas de seguridad.** Cerrada el 24/10/2026: U01, U02, U04 a U09, BD con roles, paridad de catálogo con Supabase (lectura autorizada por el usuario), cobertura de ramas de seguridad al 100 %. Salieron B-21 (filtro de logs sin acentos), B-22 (PDF políglota, aceptado), B-23 (RLS en tablas de Django), B-24 (500 al inscribir el TOTP con Supabase caído), B-25 (denegaciones sin evento) y B-26 (el Auditor no lee solicitudes; decisión del equipo).
 - [x] **A-F5 Autorización y rotura deliberada.** Matriz de 440 celdas, IDOR, asignación masiva y CSRF, y los seis defectos sembrados detectados (`auditoria/defectos-sembrados.md`).
-- [ ] **A-F4 Gherkin ejecutable.**
+- [x] **A-F4 Gherkin ejecutable.** Cerrada el 24/10/2026: 13 características (12 más la de PostgreSQL), 2341 pruebas en verde con las nuevas, 273 de integración. Salió B-27.
   - **Objetivo:** que cada amenaza tenga un escenario ejecutable y trazado, sin duplicar la suite: los `.feature` invocan las pruebas existentes.
   - **Comandos:** `pytest tests/bdd`.
   - **Criterio:** 12 características con camino feliz, borde y adversarial; cero etiquetas sin trazar; ninguna amenaza T1–T21 sin escenario.

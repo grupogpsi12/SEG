@@ -76,10 +76,9 @@
   "trazabilidad": {
     "filas": 141,
     "por_estado": {
-      "prueba-nombrada": 79,
-      "solo-documento": 19,
-      "sin-prueba-nombrada": 29,
-      "declarada-sin-verificar": 14
+      "prueba-nombrada": 111,
+      "solo-documento": 11,
+      "sin-prueba-nombrada": 19
     },
     "fuente": "auditoria/trazabilidad.csv (trazar.py)"
   },
@@ -87,10 +86,10 @@
     "criticos": 0,
     "altos": 0,
     "medios": 12,
-    "bajos": 9,
+    "bajos": 10,
     "informativos": 5,
-    "total": 26,
-    "abiertos": 11,
+    "total": 27,
+    "abiertos": 12,
     "verificados": 11,
     "corregidos": 2,
     "aceptados": 2

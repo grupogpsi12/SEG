@@ -1,6 +1,8 @@
 """Perfiles de hypothesis: `mutacion` es determinista y mas corto, para que mutmut sea estable."""
 
 import os
+import re
+from pathlib import Path
 
 import pytest
 from hypothesis import HealthCheck, settings
@@ -32,3 +34,12 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
 if os.environ.get("JML_PG_HOST"):
     # Contra PostgreSQL real no se crean bases (app_backend no puede): se usa el esquema app_test.
     from tests.integracion.conftest import base_con_commit, django_db_setup  # noqa: F401
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Las etiquetas de los `.feature` (@T1, @RF-01…) son marcadores de pytest; con
+    `--strict-markers` hay que declararlas. Se leen de los propios archivos: una etiqueta mal
+    escrita falla en el trazado (tests/bdd/test_trazabilidad.py), no aqui."""
+    for feature in (Path(__file__).parent / "bdd" / "features").glob("*.feature"):
+        for etiqueta in set(re.findall(r"(?<!\S)@([\w.-]+)", feature.read_text(encoding="utf-8"))):
+            config.addinivalue_line("markers", f"{etiqueta}: etiqueta de Gherkin")

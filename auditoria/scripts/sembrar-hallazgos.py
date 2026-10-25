@@ -520,6 +520,25 @@ H = [
         indicador="Solicitud de acceso del Auditor a RRHH para consultar un caso.",
         esfuerzo="3 h · Próximo",
     ),
+    dict(
+        id="B-27",
+        sev="Baja",
+        estado="abierto — decisión del equipo: ADR-023 e invariante 14 dicen «solo bunkerweb publica puertos»",
+        titulo="La reportería publica Grafana (3000) y fluent-bit (24224) en el bucle local, contra el invariante 14",
+        ubicacion="infra/compose.reporteria.yaml (`ports: 127.0.0.1:3000:3000` y `127.0.0.1:24224:24224`)",
+        estandares="OWASP A02:2025 (configuración) · RS-02 · ADR-023 · amenaza T19",
+        inherente="3/4/2/3/3 = 3,0 (Bajo): solo se alcanzan desde el propio equipo; en Azure no son accesibles desde fuera",
+        residual="3,0 (no baja sin decisión: no es un defecto, es una excepción no escrita)",
+        origen="F4: el escenario «Solo el WAF publica puertos» del `borde.feature` lo detectó al listar `docker ps`.",
+        evidencia="`tests/bdd/test_borde.py` (el paso comprueba que lo demás solo publica en 127.0.0.1) y `docker ps` del equipo.",
+        impacto="Cualquier proceso local del anfitrión (otro usuario, una extensión del navegador con acceso a localhost) llega a Grafana y al receptor de logs. Grafana exige la contraseña del administrador; fluent-bit no autentica.",
+        correccion="Decidir y escribir: (a) añadir a ADR-023 y al invariante 14 «la reportería, opcional, publica solo en 127.0.0.1», o (b) acceder a Grafana a través de BunkerWeb. La excepción ya está acotada por la prueba: cualquier publicación fuera del bucle local la hace fallar.",
+        regresion="`tests/bdd/test_borde.py::ningún otro contenedor publica puertos fuera de 127.0.0.1`.",
+        principio="Una regla absoluta con una excepción conocida deja de ser regla: o se escribe la excepción o se elimina.",
+        falsabilidad="`docker ps` muestra un puerto publicado en 0.0.0.0 por un contenedor distinto de bunkerweb.",
+        indicador="El escenario del borde en rojo.",
+        esfuerzo="0,5 h · Próximo",
+    ),
 ]
 
 if __name__ == "__main__":

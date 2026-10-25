@@ -69,10 +69,10 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F4-01 | Instalar `pytest-bdd` (solo `dev`) y registrar la justificación en `tasks/todo.md` | Versión y licencia confirmadas en PyPI; `uv.lock` actualizado | F1-01 | ○ |
-| F4-02 | Características del §8: ingreso, autorización, inmutabilidad, restringidos, cabeceras, borde | Cada una con camino feliz, borde y adversarial | F4-01 | ○ |
-| F4-03 | Características restantes: soporte-pdf, cuentas-derivadas, resiliencia, supabase-aislada, cadena-de-suministro, secretos-y-logs | Ídem | F4-02 | ○ |
-| F4-04 | Trazabilidad Gherkin | Cero etiquetas sin trazar; ninguna amenaza sin escenario | F4-03 | ○ |
+| F4-01 | Instalar `pytest-bdd` (solo `dev`) y registrar la justificación en `tasks/todo.md` | Versión y licencia confirmadas en PyPI; `uv.lock` actualizado | F1-01 | ✔ pytest-bdd 9.0.0 (MIT, 30/09/2026) solo en `dev`; justificación en `tasks/todo.md`; `uv.lock` actualizado |
+| F4-02 | Características del §8: ingreso, autorización, inmutabilidad, restringidos, cabeceras, borde | Cada una con camino feliz, borde y adversarial | F4-01 | ✔ ingreso, autorización, inmutabilidad (en memoria y en PostgreSQL), restringidos, cabeceras y borde; todas con camino feliz o borde y caso adversarial |
+| F4-03 | Características restantes: soporte-pdf, cuentas-derivadas, resiliencia, supabase-aislada, cadena-de-suministro, secretos-y-logs | Ídem | F4-02 | ✔ soporte-pdf, cuentas-derivadas, resiliencia, supabase-aislada, cadena-de-suministro y secretos-y-logs |
+| F4-04 | Trazabilidad Gherkin | Cero etiquetas sin trazar; ninguna amenaza sin escenario | F4-03 | ✔ `test_trazabilidad.py`: ninguna etiqueta sin trazar; T1–T21 y N-1..N-5 con escenario; 3 escenarios omitidos a F7 marcados (S-37, S-38) |
 
 ## F5 — Autorización y rotura deliberada
 

@@ -7,7 +7,7 @@ Fuentes (todas del repositorio, nada de memoria):
   - docs/SRS.md                RF, RNF, RS, RD, RI, CA y T21 (tablas «| ID | ... |»)
   - docs/PLAN_AUDITORIA.md     N-1 a N-5 (§3.2)
   - tests/**/*.py              el nombre y el docstring de cada prueba, leidos con `ast`
-  - auditoria/features/*.feature  etiquetas Gherkin (@RF-01, @T7, ...)
+  - tests/bdd/features/*.feature  etiquetas Gherkin (@RF-01, @T7, ...)
   - docs/evidencia/*.md y auditoria/evidencia/**/salida.txt  menciones de CA-nn
 
 Un ID cuenta como «citado» por una prueba si aparece en su nombre o en su docstring, con
@@ -83,8 +83,8 @@ def leer_pruebas() -> list[tuple[str, str]]:
 def leer_features() -> dict[str, list[str]]:
     por_id: dict[str, list[str]] = defaultdict(list)
     for ruta in (
-        sorted((RAIZ / "auditoria" / "features").glob("*.feature"))
-        if (RAIZ / "auditoria" / "features").exists()
+        sorted((RAIZ / "tests" / "bdd" / "features").glob("*.feature"))
+        if (RAIZ / "tests" / "bdd" / "features").exists()
         else []
     ):
         for etiqueta in re.findall(r"@([A-Z]+-?\d+)", ruta.read_text(encoding="utf-8")):
