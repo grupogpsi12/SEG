@@ -672,6 +672,25 @@ H = [
         indicador="El número de pruebas `test_wcag_*` en rojo.",
         esfuerzo="0,5 h · Próximo",
     ),
+    dict(
+        id="B-35",
+        sev="Baja",
+        estado="abierto — decisión del equipo (propuesta P-11)",
+        titulo="La cuenta de servicio de GLPI puede borrar y purgar tickets, y RI-02 no lo necesita",
+        ubicacion="infra/glpi/bootstrap.php (perfil «JML - servicio»: `'ticket' => LEER | ACTUALIZAR | CREAR | BORRAR | PURGAR | 1024`)",
+        estandares="RI-02 · OWASP A01:2025 (mínimo privilegio) · amenaza T2 · ASVS V8.2",
+        inherente="4/3/3/5/3 = 3,6 (Bajo): exige tener ya el control del worker o de su token · **factor** ×0,5",
+        residual="3,6 (no baja sin cambiar el perfil). Con un perfil sin BORRAR ni PURGAR bajaría a ~1,6",
+        origen="Anexo A (Excel), RI-02: «cuenta de servicio cuyo perfil de GLPI se limita a esas operaciones». Medido con la propia cuenta del worker.",
+        evidencia="`auditoria/evidencia/vulnerabilidades/RI-02-PERFIL-GLPI`: perfil «JML - servicio» con ticket=RUCDP (leer, actualizar, crear, **borrar, purgar**), document=RUC, user=RUC, activos y categorías=R; sin derechos sobre `config`, `profile`, reglas, copias ni registros (14 de 122 derechos distintos de cero). Además la cuenta puede elegir el perfil «Self-Service».",
+        impacto="Un worker o un token comprometidos pueden borrar los tickets de las colas, que son la fuente de verdad del estado de las solicitudes. La aplicación conserva el id externo y la cadena de auditoría, así que la pérdida se detecta, pero los tickets de seguridad (una baja en curso) desaparecerían del tablero de los técnicos.",
+        correccion="Quitar BORRAR y PURGAR del perfil de producción. La suite de contrato contra GLPI real los usa para limpiar sus tickets de prueba: darle un perfil de pruebas aparte (`JML - pruebas`) que solo se crea con `JML_GLPI_DE_PRUEBAS=si`. Verificar con `sonda-perfil-glpi.py`: ticket=RUC.",
+        regresion="Una prueba de `test_infra.py` o del bootstrap que falle si `BORRAR` o `PURGAR` aparecen en el perfil de servicio; y `sonda-perfil-glpi.py` en el cierre de F7.",
+        principio="Un permiso que sirve para la limpieza de las pruebas no debería viajar a producción: el mínimo privilegio se mide con la cuenta, no con el comentario del perfil.",
+        falsabilidad="`getActiveProfile` de la cuenta muestra D o P en `ticket`.",
+        indicador="El número de derechos distintos de cero del perfil de servicio y la presencia de D o P.",
+        esfuerzo="1,5 h · Próximo",
+    ),
 ]
 
 if __name__ == "__main__":

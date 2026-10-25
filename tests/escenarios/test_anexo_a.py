@@ -677,3 +677,112 @@ def test_tabla_XIII_el_ticket_de_ingreso_lleva_los_grupos_del_departamento() -> 
         assert set(red) <= set(p.grupos_red)
         assert set(m365) == set(p.grupos_m365)
         assert set(lic) == set(p.licencias)
+
+
+# --- Tabla II: decisiones de arquitectura (lo comprobable en el codigo y la infraestructura) ----------
+
+
+def _fuentes(*rutas: str) -> str:
+    return "\n".join(
+        p.read_text(encoding="utf-8", errors="replace")
+        for r in rutas
+        for p in ((RAIZ / r).rglob("*") if (RAIZ / r).is_dir() else [RAIZ / r])
+        if p.is_file()
+        and p.suffix in {".py", ".yaml", ".yml", ".toml", ".lock", ".sh", ".html", ".conf", ".php"}
+    )
+
+
+def test_tabla_II_los_adr_del_excel_estan_en_decisiones_con_el_mismo_estado() -> None:
+    """ADR-003/004/008/010/012 figuran como «Reemplazada»; ADR-024 como «Propuesta»; el resto, «Aceptada»."""
+    decisiones = (RAIZ / "docs/decisiones.md").read_text(encoding="utf-8")
+    for codigo, _titulo, estado in filas("TablaII ADR"):
+        numero = int(re.sub(r"\D", "", codigo))
+        fila = re.search(rf"^\| {numero:03d} \|[^\n]*$", decisiones, re.M)
+        assert fila, f"ADR-{numero:03d} no esta en docs/decisiones.md"
+        clase = n(estado).split(" ")[0]
+        if numero == 14:
+            continue  # el Excel dice «Pendiente (sprint 0)»; decisiones.md ya la tiene «Aceptada (spike 0.3)» (desfase del Excel)
+        assert clase in n(fila.group(0)), (
+            f"ADR-{numero:03d}: Excel «{estado}» frente a decisiones.md"
+        )
+
+
+def test_tabla_II_adr_003_004_010_019_el_sistema_no_actua_sobre_directorios_ni_servicios_de_identidad() -> (
+    None
+):
+    codigo = _fuentes(
+        "src", "pyproject.toml", "requirements.lock"
+    )  # sin infra/waf: ahi viven las cadenas de ataque de prueba
+    assert not re.search(r"(?i)\b(ldap3?|msal|msgraph|azure-identity|samba|pyad|winrm)\b", codigo)
+    compose = (RAIZ / "infra/compose.yaml").read_text(encoding="utf-8")
+    assert not re.search(
+        r"(?i)samba|cloudflared|\bldap\b", compose
+    )  # ADR-024 es solo una propuesta
+
+
+def test_tabla_II_adr_008_012_020_no_hay_oidc_ni_fastapi_ni_react_ni_tiempo_real() -> None:
+    dependencias = _fuentes("pyproject.toml", "requirements.lock").lower()
+    for prohibido in (
+        "fastapi",
+        "authlib",
+        "oidc",
+        "channels",
+        "websockets",
+        "daphne",
+        "supabase-realtime",
+    ):
+        assert prohibido not in dependencias, prohibido
+    assert not (RAIZ / "package.json").exists()
+    assert not re.search(r"(?i)websocket|EventSource|supabase.*realtime", _fuentes("src"))
+
+
+def test_tabla_II_adr_018_django_5_2_lts_con_plantillas_en_el_servidor() -> None:
+    import django
+
+    assert django.VERSION[:2] == (5, 2)
+    assert list((RAIZ / "src/jml/adaptadores/entrada/web/templates/web").glob("*.html"))
+
+
+def test_tabla_II_adr_011_la_sincronizacion_es_por_consulta_cada_cinco_minutos() -> None:
+    from jml.adaptadores.entrada.worker.ciclo import INTERVALO_SINCRONIZACION_S
+
+    assert INTERVALO_SINCRONIZACION_S == 300.0
+
+
+def test_tabla_II_adr_016_la_arquitectura_hexagonal_la_vigila_import_linter() -> None:
+    configuracion = (RAIZ / "pyproject.toml").read_text(encoding="utf-8")
+    assert configuracion.count("[[tool.importlinter.contracts]]") >= 3
+
+
+# --- Tabla XV, RF-06: registro abierto deshabilitado ----------------------------------------------
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "ruta",
+    ["/registro", "/registrarse", "/signup", "/accounts/signup/", "/admin/", "/admin/login/"],
+)
+def test_rf_06_no_existe_ninguna_ruta_para_crear_cuentas(ruta: str) -> None:
+    from django.conf import settings
+    from django.test import Client
+
+    assert "django.contrib.admin" not in settings.INSTALLED_APPS
+    for metodo in ("get", "post"):
+        assert getattr(Client(), metodo)(ruta).status_code == 404, (metodo, ruta)
+
+
+def test_rf_06_las_rutas_de_la_aplicacion_no_incluyen_ninguna_de_alta_de_usuarios() -> None:
+    from tests.seguridad.rutas import rutas
+
+    nombres = set(rutas())
+    assert not {
+        n_ for n_ in nombres if re.search(r"regist|signup|alta|crear_usuario|usuario_nuevo", n_)
+    } - {"nueva", "nueva_indice"}
+
+
+def test_rf_06_las_cuentas_solo_las_crea_el_comando_de_administracion() -> None:
+    comando = RAIZ / "src/jml/adaptadores/entrada/web/management/commands/admin_usuarios.py"
+    assert comando.exists()
+    fuentes_web = _fuentes("src/jml/adaptadores/entrada/web")
+    assert "create_user(" not in fuentes_web  # ninguna vista crea usuarios de Django
+    assert "User.objects.create" not in fuentes_web

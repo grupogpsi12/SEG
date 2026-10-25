@@ -101,3 +101,16 @@ Ordenadas por la prioridad de los hallazgos que las originan (`score-global.md`)
 **Contexto.** Cada denegación por rol deja ahora el evento `acceso.denegado` en el log estructurado (usuario, ruta, método y `correlation_id`). La cadena de auditoría (SRS RF-35) **no** los incluye.
 
 **Decisión propuesta.** Mantenerlo en el log y NO en la cadena: la cadena se escribe con un candado global, y un usuario que repitiera una URL prohibida inflaría la cadena y la volvería lenta; el WAF limita el ritmo, pero la cadena es para decisiones, no para ruido. Si el equipo quiere los intentos en la cadena, hacerlo con un máximo por usuario y minuto.
+
+---
+
+## P-11 · Perfil de servicio de GLPI sin BORRAR ni PURGAR (B-35)
+
+**Contexto.** El Anexo A (RI-02) pide una cuenta de servicio «cuyo perfil de GLPI se limita a esas operaciones». Medido con la propia cuenta: el perfil «JML - servicio» concede leer, actualizar, crear, **borrar y purgar** tickets. El borrado sirve a la suite de contrato, que limpia sus tickets de prueba; la aplicación no borra nunca un ticket.
+
+**Decisión propuesta.** El perfil de producción queda en leer, actualizar y crear sobre `ticket`. La suite de contrato (`JML_GLPI_DE_PRUEBAS=si`) crea y usa un perfil aparte, «JML - pruebas», con BORRAR y PURGAR, en la instancia desechable.
+
+**Alternativas.** (a) Dejarlo: el riesgo es Bajo (3,6, factor ×0,5) porque exige controlar ya el worker. (b) Que la suite no limpie y se tire la instancia de GLPI al final: más simple, pero deja de poder repetirse contra una instancia en uso.
+
+**Consecuencias.** Baja el residual de B-35. Cuesta una condición en `bootstrap.php` y una prueba que impida volver a poner D o P en el perfil de producción.
+

@@ -1,0 +1,1 @@
+uv run pytest tests/dominio tests/aplicacion tests/contratos tests/escenarios tests/adaptadores tests/seguridad tests/bdd -p no:cacheprovider -q --junitxml=auditoria/evidencia/funcionales/ANEXO-A-JUNIT/junit.xml
