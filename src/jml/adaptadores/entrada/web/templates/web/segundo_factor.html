@@ -2,6 +2,7 @@
 {% block titulo %}Segundo factor{% endblock %}
 {% block contenido %}
 <h1>Segundo factor</h1>
+{% if aviso %}<p class="mensaje error" role="alert">{{ aviso }}</p>{% endif %}
 {% if inscribir %}
   {% if secreto %}
   <p>Es su primer ingreso: registre esta clave en su aplicación autenticadora (Google Authenticator,
