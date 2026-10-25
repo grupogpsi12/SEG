@@ -25,6 +25,12 @@ DEFECTOS: dict[str, tuple[str, str, str, list[str]]] = {
         "    if False:  # DEFECTO SEMBRADO: se acepta cualquier contenido con extension .pdf",
         ["tests/seguridad/test_soporte.py"],
     ),
+    "U04-filtro-roto": (
+        "src/jml/adaptadores/registro.py",
+        "    return any(p in sin_acentos for p in PALABRAS_PROHIBIDAS)",
+        "    return False  # DEFECTO SEMBRADO: el filtro deja pasar todo",
+        ["tests/seguridad/test_filtro_de_logs.py"],
+    ),
 }
 
 
