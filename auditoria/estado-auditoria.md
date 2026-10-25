@@ -87,14 +87,14 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F6-00 | **Control positivo de sqlmap y ZAP**: aplicación sembrada vulnerable en una red de laboratorio | sqlmap y ZAP la detectan; si no, el escaneo no cuenta | F2-01 | ○ |
-| F6-01 | Neutralización y `pruebas.sh` como control | `pg_dump` previo, worker apuntando al GLPI desechable, `bwcli unban` y `correlation_id` de laboratorio; `pruebas.sh` en verde | F6-00 | ○ |
+| F6-00 | **Control positivo de sqlmap y ZAP**: aplicación sembrada vulnerable en una red de laboratorio | sqlmap y ZAP la detectan; si no, el escaneo no cuenta | F2-01 | ✔ sqlmap ve la inyección SQL y ZAP ve el XSS y las cabeceras ausentes de la app sembrada (F6-00-CONTROL-POSITIVO) |
+| F6-01 | Neutralización y `pruebas.sh` como control | `pg_dump` previo, worker apuntando al GLPI desechable, `bwcli unban` y `correlation_id` de laboratorio; `pruebas.sh` en verde | F6-00 | ✔ `pruebas.sh` en verde en `app.*` y `glpi.*` (F6-01-PRUEBAS-SH); neutralización con `neutralizar.sh` (copia de la base, worker detenido, desbaneo) |
 | F6-02 | `seguridad-dinamica.sh` completo **con** WAF y exención de baneo solo para la IP del escáner (B-04) | ModSecurity y la CRS siguen en bloqueo durante la corrida; la exención queda registrada | F6-01 | ○ |
 | F6-03 | La misma corrida **sin** exención | El baneo actúa (RS-08); se reporta aparte | F6-02 | ○ |
 | F6-04 | sqlmap nivel 5 con `Host` y verificación de segundo orden (B-05, B-02) | 0 hallazgos y la cadena de auditoría íntegra; reemplaza a la corrida preliminar | F6-00 | ○ |
 | F6-05 | Cobertura de superficie del escáner | ≥ 95 % de las rutas de `urls.py` vistas por rol | F6-02 | ○ |
-| F6-06 | Reproducir D-02/D-03: el Auditor verifica la cadena **a través del WAF** a ritmo humano y a ritmo de guion | Sin 429 a ritmo humano; con el 429 a ritmo de guion se decide si es hallazgo | F6-01 | ○ |
-| F6-07 | Regresión de las exclusiones del WAF | `infra/bunkerweb/configs/` sin exclusiones: se anota «0 exclusiones, 0 pruebas necesarias» | F6-01 | ○ |
+| F6-06 | Reproducir D-02/D-03: el Auditor verifica la cadena **a través del WAF** a ritmo humano y a ritmo de guion | Sin 429 a ritmo humano; con el 429 a ritmo de guion se decide si es hallazgo | F6-01 | ✔ ritmo humano: 5 de 5 verificaciones en 200 sin 429; ritmo de guion: 429 por el límite de 2 r/s, que es el diseño (RS-08). D-02/D-03 reproducidos y explicados (F6-06-AUDITOR-POR-WAF) |
+| F6-07 | Regresión de las exclusiones del WAF | `infra/bunkerweb/configs/` sin exclusiones: se anota «0 exclusiones, 0 pruebas necesarias» | F6-01 | ✔ 0 exclusiones, 0 pruebas necesarias (F6-07-EXCLUSIONES) |
 | F6-08 | Cada 403/429 esperado con su control positivo (la misma operación legítima da 200) | Cero bloqueos sin su control | F6-02 | ○ |
 
 ## F7 — Infraestructura, red y datos
@@ -136,7 +136,7 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 
 | # | Decisión | Motivo | Ítems afectados |
 |---|---|---|---|
-| 1 | ¿Se lee el Supabase de desarrollo (solo catálogo) para la paridad? | Es un tercero: la regla pide confirmación | F3-PAR |
+| 1 | ¿Se lee el Supabase de desarrollo (solo catálogo) para la paridad? | **Resuelta:** el usuario la autorizó el 24/10/2026 | F3-PAR ✔ |
 | 2 | Proteger `master` y fijar la política de ramas | Exige permisos de dueño del repositorio | B-07 |
 | 3 | Ejecutar el asesor de Supabase y la contraseña mínima | Acción humana en el Dashboard | B-10 |
 | 4 | Aceptar o cambiar el proceso único de `gunicorn` | Es una decisión de diseño (ADR-017/S-29) | B-06 |
