@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe -m pytest -q tests/aplicacion/test_bandeja.py -p no:cacheprovider
