@@ -114,3 +114,15 @@ Ordenadas por la prioridad de los hallazgos que las originan (`score-global.md`)
 
 **Consecuencias.** Baja el residual de B-35. Cuesta una condición en `bootstrap.php` y una prueba que impida volver a poner D o P en el perfil de producción.
 
+---
+
+## P-12 · El límite de ritmo no debe banear a quien tiene sesión (B-36)
+
+**Contexto.** RS-08 fija 2 r/s por IP. Medido: sin espera, la tercera página recibe 429; con 0,4 s entre páginas, también; solo con 1 s o más no hay 429. Varios 429 seguidos activan `BAD_BEHAVIOR` y la IP queda baneada una hora (403). El recorrido Playwright por el WAF falló por esto en 2 de 3 corridas.
+
+**Decisión propuesta.** Dejar el límite de 2 r/s (frena a un escáner) pero quitar `429` de `BAD_BEHAVIOR_STATUS_CODES`: el límite de ritmo responde 429 sin banear; el baneo queda para 400, 401, 403, 404, 405 y 444, que sí delatan un ataque. Y, si se adopta ADR-024, configurar la IP real del cliente en BunkerWeb.
+
+**Alternativas.** (a) Subir a 5 r/s: reduce los 429 pero también la protección contra fuerza bruta en rutas sin límite propio. (b) Dejarlo y documentar que el usuario debe esperar un segundo entre páginas: es lo que hoy hace el e2e.
+
+**Consecuencias.** Cambia RS-08 (versión 2.5 del SRS). La protección del inicio de sesión no se debilita: `/ingreso` tiene su propio límite de 5 por minuto.
+

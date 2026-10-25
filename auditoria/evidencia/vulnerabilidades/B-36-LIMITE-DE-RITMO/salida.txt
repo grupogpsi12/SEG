@@ -1,0 +1,5 @@
+espera entre peticiones=0s -> 302 302 429 429 429 429
+espera entre peticiones=0.2s -> 403 403 403 403 403 403
+espera entre peticiones=0.4s -> 302 302 429 429 429 302
+espera entre peticiones=0.55s -> 302 302 429 429 429 403
+espera entre peticiones=1.0s -> 302 302 302 302 302 302

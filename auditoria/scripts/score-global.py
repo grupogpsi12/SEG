@@ -22,6 +22,7 @@ FACTORES = {
     "B-29": (0.5, "exige la red interna"),
     "B-30": (0.5, "exige la red interna"),
     "B-32": (0.5, "exige un contenedor comprometido en la red interna"),
+    "B-35": (0.5, "exige el control del worker o de su token"),
     "B-25": (0.7, "exige una sesión"),
     "B-26": (0.7, "exige una sesión"),
 }

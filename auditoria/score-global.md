@@ -1,11 +1,12 @@
 # Puntajes DREAD y score global
 
-Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (35 hallazgos). Un residual solo baja si hay una prueba que se rompe al quitar el control (anclas: `dread-anclas.md`).
+Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (36 hallazgos). Un residual solo baja si hay una prueba que se rompe al quitar el control (anclas: `dread-anclas.md`).
 
 ## Hallazgos ordenados por prioridad (DREAD × factor)
 
 | ID | Severidad | Estado | DREAD inherente | Factor | Prioridad | DREAD residual |
 |---|---|---|---|---|---|---|
+| B-36 | Media | abierto — decisión del equipo (RS-08 fija 2 r/s; | 6,4 | ×1,0 | 6,4 | 6,4 |
 | B-06 | Media | abierto — decisión del equipo (ADR) en F8 | 6,0 | ×1,0 | 6,0 | n/a |
 | B-10 | Media | abierto — [PENDIENTE: acción humana en el Dashbo | 6,0 | ×1,0 | 6,0 | n/a |
 | B-15 | Media | verificado (rojo→verde, evidencia B-15-ROJO / B- | 6,0 | ×1,0 | 6,0 | 2,0 |
@@ -21,7 +22,6 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 | B-19 | Media | verificado (rojo→verde, evidencia B-19-ROJO / B- | 4,0 | ×1,0 | 4,0 | 2,0 |
 | B-25 | Media | verificado (rojo→verde: 118 celdas de la matriz  | 5,4 | ×0,7 (exige una sesión) | 3,8 | 1,8 |
 | B-13 | Baja | verificado (cobertura de ramas de `seguridad:ing | 3,6 | ×1,0 | 3,6 | n/a |
-| B-35 | Baja | abierto — decisión del equipo (propuesta P-11) | 3,6 | ×1,0 | 3,6 | 3,6 |
 | B-21 | Baja | verificado (rojo→verde, evidencia B-21-ROJO / B- | 3,4 | ×1,0 | 3,4 | 1,0 |
 | B-18 | Baja | aceptado — sin parche en Debian 13,7; se revisa  | 3,0 | ×1,0 | 3,0 | 3,0 |
 | B-27 | Baja | abierto — decisión del equipo: ADR-023 e invaria | 3,0 | ×1,0 | 3,0 | 3,0 |
@@ -32,6 +32,7 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 | B-01 | Media | verificado | 5,0 | ×0,5 (exige acceso al host) | 2,5 | 4,0 |
 | B-29 | Informativa | abierto — corregir RS-19 y la descripción de la  | 5,0 | ×0,5 (exige la red interna) | 2,5 | 2,0 |
 | B-28 | Baja | abierto — decisión del equipo (ASVS V9,1, V9,2 y | 3,6 | ×0,5 (exige interponerse en el tramo servidor→Supabase) | 1,8 | 3,6 |
+| B-35 | Baja | abierto — decisión del equipo (propuesta P-11) | 3,6 | ×0,5 (exige el control del worker o de su token) | 1,8 | 3,6 |
 | B-30 | Baja | abierto — propuesta de endurecimiento (ADR en F8 | 3,0 | ×0,5 (exige la red interna) | 1,5 | 1,8 |
 | B-03 | Informativa | corregido (sin prueba automática viable) | n/a | ×1,0 | — | n/a |
 | B-04 | Media | verificado (F6-02 con la exención registrada y F | n/a | ×1,0 | — | n/a |
@@ -44,9 +45,9 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 
 ## Score global
 
-- Hallazgos que siguen en pie (abiertos o aceptados): **17** (Crítica: 0, Alta: 0, Media: 4, Baja: 9; informativos 4 no suman).
-- Exposición ponderada: **17**.
+- Hallazgos que siguen en pie (abiertos o aceptados): **18** (Crítica: 0, Alta: 0, Media: 5, Baja: 9; informativos 4 no suman).
+- Exposición ponderada: **19**.
 - Controles verificados (ASVS L1/L2 en «verificado»): **144**.
-- **Score global = 17 / (144 × 10) × 100 = 1,2** → aceptable (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).
+- **Score global = 19 / (144 × 10) × 100 = 1,3** → aceptable (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).
 
 Se reporta junto al número de controles verificados: con 144 probados el score tiene sentido; con 10 no lo tendría.
