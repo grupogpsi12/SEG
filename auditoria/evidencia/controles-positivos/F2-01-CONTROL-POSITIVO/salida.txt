@@ -1,0 +1,5 @@
+OK    ruff S (secreto, SQL x2, mark_safe, shell=True): marca 5 (se esperaban >= 5)
+OK    bandit (secreto, SQL x2, mark_safe, shell=True): marca 5 (se esperaban >= 5)
+OK    gitleaks (token sembrado): marca 1 (se esperaban >= 1)
+OK    pip-audit (dependencias con CVE): marca 35 (se esperaban >= 1)
+CONTROL POSITIVO: todos los escaneres ven el defecto sembrado

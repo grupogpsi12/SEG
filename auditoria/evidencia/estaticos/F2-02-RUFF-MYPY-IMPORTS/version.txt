@@ -1,0 +1,1 @@
+ruff 0.17.0; mypy 2.4.0 (compiled: yes); import-linter

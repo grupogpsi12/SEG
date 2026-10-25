@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe -m pytest -q tests/aplicacion/test_defensas.py -p no:cacheprovider

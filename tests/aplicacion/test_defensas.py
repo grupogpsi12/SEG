@@ -221,6 +221,36 @@ def test_R2_cualquier_error_de_dominio_en_una_solicitud_se_aisla_y_se_audita(
     assert m.repos.auditoria().verificar().valida
 
 
+def test_B_19_un_error_que_no_es_de_dominio_tampoco_detiene_la_sincronizacion_de_las_demas(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un fallo de la base (p. ej. un disparador que rechaza) en UNA solicitud no puede frenar a
+    todas: el worker dejaria de escribir el latido y la sincronizacion quedaria detenida."""
+    from jml.aplicacion.casos.sincronizar import SincronizarTickets
+
+    m = Mundo.nuevo()
+    a = emitir_vac(m)
+    b = m.emitir(ingreso()).solicitud_id
+    m.correr_bandeja_hasta_vaciar()
+    m.tecnico_resuelve_todo(b)
+    original = SincronizarTickets._solicitud
+
+    def con_fallo(self: SincronizarTickets, sid: SolicitudId, obs: dict) -> None:  # type: ignore[type-arg]  # firma del metodo privado
+        if sid == a:
+            raise RuntimeError("fallo inesperado con datos que no deben llegar al registro")
+        original(self, sid, obs)
+
+    monkeypatch.setattr(SincronizarTickets, "_solicitud", con_fallo)
+    res = m.sincronizar()
+    assert (res.resultado, res.errores) == ("error", 1)
+    assert m.solicitud(b).estado is S.CERRADA
+    registros = [
+        r for r in m.repos.auditoria().registros() if r.accion == "sincronizacion.solicitud_fallida"
+    ]
+    # solo el tipo de la excepcion: su mensaje podria llevar datos
+    assert [(r.objeto, dict(r.datos)) for r in registros] == [(a.valor, {"codigo": "RuntimeError"})]
+
+
 def test_R1_un_ticket_creado_mientras_se_cancelaba_la_solicitud_no_se_pierde_de_vista() -> None:
     """RRHH cancela justo despues de que GLPI crea el primer ticket y antes de confirmarlo."""
     m = Mundo.nuevo()
