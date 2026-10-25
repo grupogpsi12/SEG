@@ -17,7 +17,7 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 | Fase | Estado |
 |---|---|
 | 1. Núcleo (`dominio` + `aplicacion`) | **Congelado** en el Hito N (etiqueta `nucleo-v1`). Cobertura de ramas: 99 %; mutación del dominio: 93,6 % (el dominio no cambió desde entonces) |
-| 2. Adaptadores base y seguridad | Hechos 2.1, 2.3, 2.5 a 2.8 y 2.10 a 2.14. 2.4 hecho salvo subir a Blob (Azure). 2.2 escrito y probado sin Docker. 2.9 falta probarlo a través del WAF |
+| 2. Adaptadores base y seguridad | **Hechos 2.1 a 2.3 y 2.5 a 2.14**, con Docker y a través del WAF (2.2 y 2.9 verificados en 11 y 12/10/2026). 2.4 hecho salvo la subida diaria a Blob, que necesita Azure |
 | 3. GLPI | **3.1 a 3.4 hechos y verificados contra GLPI 11.0.11 real** (spike 0.3 cerrado). ING, VAC, RET, EMG y la caída de GLPI funcionan de punta a punta (5.1) |
 | 4. Dashboard y búsqueda | **4.1 a 4.4 hechos.** RNF-06 medido y cumplido: 300 colaboradores y 20 usuarios concurrentes |
 | 5. Entrega | 5.1 y 5.8 (Playwright) hechos. 5.3 y 5.4 hechos en local (CA-11 y CA-12 con evidencia en `docs/evidencia/`); falta repetirlos en Azure. 5.9 (GLPI real en la CI) escrito, falta verlo en GitHub. 5.6: SRS v2.4. Falta Azure (5.2) |
