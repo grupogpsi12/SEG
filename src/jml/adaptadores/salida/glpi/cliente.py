@@ -266,10 +266,16 @@ class SistemaDeTicketsGlpi(ClienteGlpiV1):
         if int(actual.get("slas_id_ttr") or 0) or actual.get("time_to_resolve"):
             return
         vence = ticket.vence_en.astimezone(UTC).strftime(FORMATO_DE_FECHA)
-        self._exigir(
+        respuesta = self._exigir(
             self._api("PUT", f"Ticket/{id_ticket}", json={"input": {"time_to_resolve": vence}}),
             "fijar vencimiento",
         )
+        # GLPI responde 200 aunque rechace el cambio (p. ej. vencimiento anterior a la apertura):
+        # el resultado va por item, `[{"<id>": false, "message": ...}]` (B-17); sin copiar el mensaje.
+        if isinstance(respuesta, list) and any(
+            isinstance(r, dict) and r.get(id_ticket) is False for r in respuesta
+        ):
+            raise GlpiRechazo("fijar vencimiento: GLPI rechazo el cambio")
 
     def subir_documento(self, nombre: NombreDeSoporteSaneado, contenido: bytes) -> str:
         # SHA-1 solo para buscar en GLPI (es lo que guarda); la integridad la da el SHA-256.
