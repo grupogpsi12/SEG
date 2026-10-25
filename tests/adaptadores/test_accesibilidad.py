@@ -43,7 +43,7 @@ def contraste(a: str, b: str) -> float:
     return (la + 0.05) / (lb + 0.05)
 
 
-VARIABLES = dict(re.findall(r"--(\w+):\s*(#[0-9a-fA-F]{6})", CSS))
+VARIABLES = dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]{6})", CSS))
 BLANCO = "#ffffff"
 
 
@@ -70,19 +70,13 @@ def test_wcag_1_4_3_el_texto_tiene_al_menos_4_5_a_1(texto: str, fondo: str) -> N
     assert contraste(texto, fondo) >= 4.5, f"{texto} sobre {fondo}: {contraste(texto, fondo):.2f}:1"
 
 
-@pytest.mark.xfail(  # S-40
-    strict=True,
-    reason="S-40 (B-34): el borde de los campos de formulario mide 1,4:1 y WCAG 1.4.11 pide 3:1",
-)
 def test_wcag_1_4_11_el_borde_de_los_campos_tiene_al_menos_3_a_1() -> None:
-    assert contraste(VARIABLES["borde"], BLANCO) >= 3.0
+    """S-40 (B-34): estaba en 1,39:1; el borde de los campos se oscurecio hasta 3,74:1."""
+    assert contraste(VARIABLES["borde-campo"], BLANCO) >= 3.0
 
 
-@pytest.mark.xfail(  # S-40
-    strict=True,
-    reason="S-40 (B-34): las barras del gráfico miden 2,1:1 y WCAG 1.4.11 pide 3:1",
-)
 def test_wcag_1_4_11_las_barras_del_grafico_tienen_al_menos_3_a_1() -> None:
+    """S-40 (B-34): estaban en 2,07:1; el relleno de las barras es ahora de 3,40:1."""
     barra = re.search(r"\.grafico \.barra \{ fill: (#[0-9a-fA-F]{6})", CSS)
     assert barra is not None
     assert contraste(barra.group(1), BLANCO) >= 3.0

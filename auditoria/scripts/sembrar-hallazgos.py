@@ -656,7 +656,7 @@ H = [
     dict(
         id="B-34",
         sev="Baja",
-        estado="abierto — corrección mínima en el commit siguiente (CSS)",
+        estado="corregido — `--borde-campo` (3,74:1) y relleno de barras (3,40:1); evidencia `B-34-VERDE`",
         titulo="El borde de los campos (1,39:1) y las barras del gráfico (2,07:1) no llegan a 3:1 (WCAG 1.4.11, RI-01)",
         ubicacion="src/jml/adaptadores/entrada/web/static/web/estilo.css (`--borde` en `input`, `select`, `textarea`; `.grafico .barra`)",
         estandares="WCAG 2.1 AA 1.4.11 · RI-01 (Anexo A, Tabla XVIII) · OWASP A04:2025 (diseño inseguro: no aplica; es accesibilidad)",
