@@ -653,6 +653,25 @@ H = [
         indicador="El número de avisos WARN de las secciones 4 y 5 de Docker Bench.",
         esfuerzo="3 h · Más adelante",
     ),
+    dict(
+        id="B-34",
+        sev="Baja",
+        estado="abierto — corrección mínima en el commit siguiente (CSS)",
+        titulo="El borde de los campos (1,39:1) y las barras del gráfico (2,07:1) no llegan a 3:1 (WCAG 1.4.11, RI-01)",
+        ubicacion="src/jml/adaptadores/entrada/web/static/web/estilo.css (`--borde` en `input`, `select`, `textarea`; `.grafico .barra`)",
+        estandares="WCAG 2.1 AA 1.4.11 · RI-01 (Anexo A, Tabla XVIII) · OWASP A04:2025 (diseño inseguro: no aplica; es accesibilidad)",
+        inherente="1/10/10/1/1 = 4,6 → Bajo en riesgo de seguridad; es incumplimiento de un requisito de usabilidad",
+        residual="0,0 tras el cambio de color",
+        origen="Anexo A (Excel): RI-01 exige WCAG 2.1 AA en contraste y navegación por teclado y no existía ninguna prueba que lo midiera.",
+        evidencia="`auditoria/evidencia/estaticos/B-34-ROJO`: `tests/adaptadores/test_accesibilidad.py` con `--runxfail` falla en 2 de 50. Texto: todas las parejas cumplen 4,5:1 (mínimo 6,09:1); estructura, etiquetas, idioma, foco y ausencia de JavaScript: 48 de 48.",
+        impacto="Una persona con baja visión no distingue dónde empieza un campo de texto ni las barras del dashboard sin la tabla contigua. No afecta a la confidencialidad, integridad ni disponibilidad.",
+        correccion="Variable `--borde-campo: #7a8594` (3,74:1) para los campos y relleno `#6b8cc4` (3,40:1) para las barras. Sin cambios de estructura.",
+        regresion="`tests/adaptadores/test_accesibilidad.py::test_wcag_1_4_11_*` (estaban en `xfail(strict)` con S-40; al corregir se retira la marca).",
+        principio="Un requisito sin prueba que lo mida se cumple por casualidad: RI-01 decía WCAG 2.1 AA y nadie había calculado un solo contraste.",
+        falsabilidad="Cualquier pareja de colores de un componente de interfaz con menos de 3:1 sobre su fondo.",
+        indicador="El número de pruebas `test_wcag_*` en rojo.",
+        esfuerzo="0,5 h · Próximo",
+    ),
 ]
 
 if __name__ == "__main__":

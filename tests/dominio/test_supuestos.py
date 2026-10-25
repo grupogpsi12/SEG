@@ -22,7 +22,7 @@ def _ids_citados(texto: str) -> set[str]:
 
 
 def test_el_registro_tiene_los_supuestos_sin_huecos() -> None:
-    esperados = {f"S-{n:02d}" for n in range(1, 40)}
+    esperados = {f"S-{n:02d}" for n in range(1, 41)}
     assert _ids_del_registro() == esperados
 
 
