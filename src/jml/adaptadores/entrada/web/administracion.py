@@ -10,6 +10,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from jml.adaptadores.entrada.web import composicion
 from jml.adaptadores.entrada.web.mensajes import texto_del_error
+from jml.adaptadores.entrada.web.middleware import registrar_denegacion
 from jml.adaptadores.entrada.web.vistas import _contexto, con_sesion
 from jml.aplicacion.dtos import PerfilDeUsuario
 from jml.dominio.errores import ErrorDeDominio, NoAutorizado
@@ -169,6 +170,8 @@ def cambiar_roles(request: HttpRequest, perfil: PerfilDeUsuario, usuario: str) -
         try:
             composicion.casos().cambiar_roles.ejecutar(perfil.usuario_id, usuario, roles)
         except ErrorDeDominio as e:
+            if isinstance(e, NoAutorizado):
+                registrar_denegacion(request)
             messages.error(request, texto_del_error(e))
         else:
             messages.success(request, "Roles actualizados.")

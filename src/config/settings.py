@@ -32,6 +32,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "jml.adaptadores.entrada.web.middleware.denegaciones",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "jml.adaptadores.entrada.web.middleware.politica_de_contenido",
 ]

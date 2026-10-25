@@ -24,6 +24,7 @@ from jml.adaptadores.entrada.web.formularios import (
     FormularioDeJustificacion,
 )
 from jml.adaptadores.entrada.web.mensajes import texto_del_error
+from jml.adaptadores.entrada.web.middleware import registrar_denegacion
 from jml.aplicacion.dtos import (
     NuevaSolicitud,
     PerfilDeUsuario,
@@ -270,6 +271,8 @@ def decidir(
     try:
         caso(perfil.usuario_id, solicitud_id, justificacion.cleaned_data["justificacion"] or None)
     except ErrorDeDominio as e:
+        if isinstance(e, NoAutorizado):
+            registrar_denegacion(request)
         messages.error(request, texto_del_error(e))
     else:
         hecho = {"aprobar": "aprobada", "rechazar": "rechazada", "cancelar": "cancelada"}[accion]
@@ -319,6 +322,8 @@ def reintentar(request: HttpRequest, perfil: PerfilDeUsuario, solicitud: str) ->
     try:
         composicion.casos().reintentar.ejecutar(perfil.usuario_id, SolicitudId(solicitud))
     except ErrorDeDominio as e:
+        if isinstance(e, NoAutorizado):
+            registrar_denegacion(request)
         messages.error(request, texto_del_error(e))
     else:
         messages.success(request, f"Solicitud {solicitud} devuelta a la bandeja de salida.")
