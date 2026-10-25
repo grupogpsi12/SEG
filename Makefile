@@ -12,7 +12,7 @@ verificar:
 	$(PY) -m ruff check .
 	$(PY) -m mypy
 	$(BIN)/lint-imports
-	$(PY) -m pytest -q --cov=jml --cov-branch tests/dominio tests/aplicacion tests/contratos tests/escenarios tests/adaptadores
+	$(PY) -m pytest -q --cov=jml --cov-branch tests/dominio tests/aplicacion tests/contratos tests/escenarios tests/adaptadores tests/seguridad
 	$(PY) -m coverage report --include="src/jml/dominio/*" --fail-under=95
 	$(PY) -m coverage report --include="src/jml/aplicacion/*" --fail-under=90
 # Lento. NO editar src/ ni correr pruebas mientras corre: mutmut modifica los archivos en su sitio.
