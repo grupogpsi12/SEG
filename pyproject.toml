@@ -47,6 +47,9 @@ norecursedirs = ["integracion", ".*", "*.egg-info"]
 pythonpath = ["src", "."]
 addopts = "-ra --strict-markers --strict-config"
 xfail_strict = true
+markers = [
+    "seguridad: pruebas de la auditoria de seguridad (docs/PLAN_AUDITORIA.md §5), con la etiqueta de amenaza en el nombre",
+]
 DJANGO_SETTINGS_MODULE = "tests.adaptadores.ajustes"
 
 [tool.coverage.run]
