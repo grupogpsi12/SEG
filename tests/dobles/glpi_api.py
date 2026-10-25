@@ -212,7 +212,7 @@ class GlpiSimulado:
             {
                 "name": entrada["name"],
                 "filename": entrada["_filename"][0],
-                "sha1sum": hashlib.sha1(contenido).hexdigest(),
+                "sha1sum": hashlib.sha1(contenido, usedforsecurity=False).hexdigest(),
             },
         )
         self.archivos[id_] = contenido

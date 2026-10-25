@@ -98,7 +98,8 @@ def test_RD_02_app_backend_no_puede_modificar_las_tablas_de_solo_insercion(tabla
     repos = RepositoriosDjango(RelojSimulado())
     with repos.unidad_de_trabajo() as u:
         u.auditoria.registrar("u", EventoDeAuditoria("a", "o", {}))
-    for sql in (f"UPDATE {tabla} SET id = id", f"DELETE FROM {tabla}", f"TRUNCATE {tabla}"):
+    # `tabla` sale de la lista fija de parametrize, no de una entrada (falso positivo de bandit)
+    for sql in (f"UPDATE {tabla} SET id = id", f"DELETE FROM {tabla}", f"TRUNCATE {tabla}"):  # nosec B608
         with (
             pytest.raises(DatabaseError, match="permission denied"),
             transaction.atomic(),
