@@ -6,7 +6,7 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 - `CLAUDE.md` (reglas).
 - `docs/SRS.md` (v2.4).
 - `tasks/todo.md` (estado y evidencia de cada ítem).
-- `tasks/lessons.md` (58 lecciones).
+- `tasks/lessons.md` (65 lecciones).
 - `docs/supuestos-nucleo.md` (S-01 a S-36).
 - `docs/decisiones.md` (hasta ADR-029).
 - `docs/operacion.md`, `docs/probar-localmente.md` y `docs/manual-usuario.md`.
@@ -19,8 +19,22 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 | 1. Núcleo (`dominio` + `aplicacion`) | **Congelado** en el Hito N (etiqueta `nucleo-v1`). Cobertura de ramas: 99 %; mutación del dominio: 93,6 % (el dominio no cambió desde entonces) |
 | 2. Adaptadores base y seguridad | Hechos 2.1, 2.3, 2.5 a 2.8 y 2.10 a 2.14. 2.4 hecho salvo subir a Blob (Azure). 2.2 escrito y probado sin Docker. 2.9 falta probarlo a través del WAF |
 | 3. GLPI | **3.1 a 3.4 hechos y verificados contra GLPI 11.0.11 real** (spike 0.3 cerrado). ING, VAC, RET, EMG y la caída de GLPI funcionan de punta a punta (5.1) |
-| 4. Dashboard y búsqueda | 4.2 a 4.4 hechos. 4.1: índices puestos; falta medir el p95 |
-| 5. Entrega | 5.1 hecho. 5.4 en curso: auditoría hecha y análisis de seguridad en la CI; faltan ZAP y sqlmap. El manual de usuario, el de operación, el despliegue en Azure y los respaldos están escritos sin ejecutar |
+| 4. Dashboard y búsqueda | **4.1 a 4.4 hechos.** RNF-06 medido y cumplido: 300 colaboradores y 20 usuarios concurrentes |
+| 5. Entrega | 5.1 y 5.8 (Playwright) hechos. 5.3 y 5.4 hechos en local (CA-11 y CA-12 con evidencia en `docs/evidencia/`); falta repetirlos en Azure. 5.9 (GLPI real en la CI) escrito, falta verlo en GitHub. 5.6: SRS v2.4. Falta Azure (5.2) |
+
+**24/10/2026 (segunda parte): evidencia de entrega en local.** Cada punto deja un script reproducible y un documento en `docs/evidencia/`:
+- **RNF-06** (`rendimiento-2026-10-24.md`). Con 300 colaboradores y 20 usuarios concurrentes sin pausa, todas las páginas quedan por debajo de 800 ms y el dashboard en 791 ms.
+  - Antes, 8 de 9 páginas no cumplían, por tres N+1 y por dos lecturas que crecían sin límite.
+  - Se corrigieron con ADR-030: auditoría y solicitudes por páginas.
+- **CA-11** (`disponibilidad-2026-10-24.md`).
+  - GLPI caído **no se detectaba** (el worker seguía sano a los 300 s); ahora se detecta en 63 s, y la base en 56 s.
+  - La restauración completa y verificada tarda 23 s. El volcado no se restauraba sin quitar su `CREATE SCHEMA`; ya está corregido en el manual.
+- **CA-12** (`seguridad-2026-10-24.md`).
+  - ZAP *baseline* sin altas; a través del WAF, solo informativas. ZAP activo autenticado sin hallazgos reales; el único «alto» se comprobó que es falso positivo. sqlmap nivel 3 sin parámetros inyectables.
+  - Corregido por estas pruebas: CORS abierto en los estáticos, CORP y COEP, y el reinicio periódico del único proceso de gunicorn, que cortaba el servicio y perdía los TOTP en curso.
+- **5.8 Playwright** (`tests/e2e`, `infra/scripts/e2e-interfaz.sh`): ING con PDF, VAC con aprobación, RET y EMG en un navegador real, por el WAF y hasta GLPI.
+  - Encontró que el CSS recibía 429 con el límite general de 2 r/s. Ahora los estáticos tienen 10 r/s (RS-08).
+- **SRS v2.4.** Lleva al SRS lo decidido; sin cambios de alcance.
 
 **24/10/2026: versión de Carlos Ruiz integrada, reportería revisada y secretos con SOPS.**
 - **Versión de Carlos.** La carpeta «Demo GLPI V2» traía un solo commit propio, `234ef2a` (reportería del WAF, ítem 5.5). El resto era idéntico al repositorio: las diferencias eran solo finales de línea. Se integró como avance directo y la carpeta se movió fuera del repositorio (`Downloads/Demo GLPI V2`): traía `secrets/` e `infra/.env` de otro entorno.
@@ -104,22 +118,27 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 3. **GitHub** (0.1): falta la protección de `master` y un pre-commit con gitleaks; gitleaks ya corre en la CI. **Decidir si el paquete de GHCR se hace público**: no contiene secretos y le ahorra al equipo el `docker login`.
 4. Decisiones: 0.0 (aprobar el SRS v2.4), 0.7 (Cloudflare), los supuestos **S-28 a S-36**, y revisar ADR-025 a ADR-030.
 5. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
+6. **Hacer `git push`.** Los commits del 24/10/2026 están solo en local: Git pide iniciar sesión con la cuenta nueva. Tras el push, comprobar en GitHub los jobs `seguridad` y `glpi-real`, y que se publique la imagen.
 
 ### B. Con Docker
-6. **(hecho)** ~~VAC, RET y EMG de extremo a extremo~~ (`test_flujos_glpi_real.py`). Pendiente: correr la suite real de GLPI en la CI (necesita GLPI y MariaDB como servicios) y, si se quiere, Playwright para la interfaz.
-7. **(hecho)** ~~0.3 Spike de GLPI 11~~: confirmar cada punto marcado «spike 0.3» en `adaptadores/salida/glpi/` (tabla en `docs/spikes/glpi-puerto.md`). La suite de contrato debe pasar **sin cambios** contra GLPI en contenedor (Toxiproxy para los fallos). Correr `configurar_glpi` contra un GLPI limpio.
-8. **(hecho)** ~~2.9 / CA-18 / CA-20~~: el PDF de 20 MB sube a través del WAF hasta GLPI (11/10/2026).
-9. **4.1**: p95 con 300 colaboradores, con PostgreSQL local o desde Azure, nunca contra Supabase desde Colombia.
+7. **(hecho)** ~~VAC, RET y EMG de extremo a extremo~~, también por la interfaz con Playwright (5.8). La suite real de GLPI ya está en la CI (job `glpi-real`, 5.9): falta verla pasar en GitHub tras el primer push.
+8. **(hecho)** ~~0.3 Spike de GLPI 11~~: confirmar cada punto marcado «spike 0.3» en `adaptadores/salida/glpi/` (tabla en `docs/spikes/glpi-puerto.md`). La suite de contrato debe pasar **sin cambios** contra GLPI en contenedor (Toxiproxy para los fallos). Correr `configurar_glpi` contra un GLPI limpio.
+9. **(hecho)** ~~2.9 / CA-18 / CA-20~~: el PDF de 20 MB sube a través del WAF hasta GLPI (11/10/2026).
+10. **(hecho en local)** ~~4.1, 5.3 y 5.4~~: repetir en Azure `carga.sh`, `deteccion.sh`, `respaldo.sh` con `restaurar-prueba.sh` y `seguridad-dinamica.sh` (`docs/operacion.md` §4).
+11. **5.10, mutación aplazada.** El dominio no cambió desde el 93,6 %. Repetirla con la máquina libre (`tasks/todo.md` 5.10).
 
 ### B2. Secretos (5.7)
 - El Administrador cifra los secretos reales (comandos en 5.7 de `tasks/todo.md`) y agrega las claves públicas de cada integrante.
 - Después, nadie vuelve a pasar secretos por chat.
 
 ### C. Azure
-10. 0.5, 5.2 (seguir `docs/operacion.md` §3; con Loki sobre Blob e identidad administrada para 5.5), 5.3 (ejecutar `respaldo.sh` y probar la restauración), 5.4 (ZAP y sqlmap; Trivy, gitleaks, pip-audit y bandit ya corren en la CI) y 5.5 (reportería, «debería»).
+12. 0.5 y 5.2 (seguir `docs/operacion.md` §3). Allí, con los mismos scripts:
+    - las evidencias de 4.1, 5.3 y 5.4;
+    - Loki sobre Blob con identidad administrada (5.5);
+    - el proyecto de Supabase de entrega, con la restauración probada en él (0.2 y CA-11).
 
 ### D. Documentación
-11. Actualizar `docs/operacion.md` con lo que se aprenda al desplegar.
+13. Actualizar `docs/operacion.md` con lo que se aprenda al desplegar.
 
 ## 5. Decisiones de esta etapa que conviene conocer
 

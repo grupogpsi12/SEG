@@ -191,3 +191,21 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 
 58. **SOPS en Windows: la regla no coincidía.** SOPS compara `path_regex` con la ruta completa del archivo, y en Windows usa barras invertidas: `infra/secretos/...` nunca coincidía («no matching creation rules»).
     → Escribir las reglas con `[/\\]` como separador y probar el script con la misma estructura de carpetas que el repositorio.
+
+59. **El rendimiento no se afirma, se mide con volumen.** Con 30 colaboradores todo iba rápido. Con 300 y 20 usuarios, 8 de 9 páginas incumplían RNF-06: había tres N+1 (una consulta por fila) y dos lecturas que crecían sin límite (la auditoría entera para mostrar 50, y todas las solicitudes de RRHH).
+    → Medir con la semilla de carga (`infra/scripts/carga.sh`) y perfilar las consultas por página (`tests/carga/perfilar.py`) antes de dar un requisito por cumplido. Toda lista que crece con el uso se lee por páginas.
+
+60. **Un chequeo de salud que solo mira el último éxito detecta tarde.** El worker se veía sano con GLPI caído durante 15 minutos, porque su latido solo envejece tras 3 ciclos. → El chequeo pregunta directamente a la dependencia (sin credenciales), y se mide el tiempo de detección cortando el servicio de verdad (`deteccion.sh`).
+
+61. **Un procedimiento de restauración que nunca se ejecutó está roto.** El manual decía `pg_restore` del esquema, pero el aprovisionamiento ya crea el esquema y el volcado trae su propio `CREATE SCHEMA`. → Hacer el simulacro con instancias nuevas y comparar contra el origen: filas, cabeza de la cadena y permisos.
+
+62. **Un solo proceso con `--max-requests` es una caída programada.** gunicorn reiniciaba su único proceso cada ~2000 peticiones: unos segundos sin servicio, y se perdían los desafíos TOTP en memoria (S-29). → Con un solo proceso, sin reinicios periódicos. Lo descubrió sqlmap, no una prueba funcional.
+
+63. **Un límite de peticiones por IP también cuenta los estáticos.** Con 2 r/s, el CSS de la página tras un POST recibía 429 y la página salía sin estilos. → Probar la interfaz en un navegador real a través del WAF; dar a los estáticos inmutables su propio límite.
+
+64. **El primer botón de envío de la página puede ser «Salir».** La prueba de Playwright cerraba su propia sesión al pulsar `button[type=submit]`. → Seleccionar por nombre accesible (`get_by_role("button", name="Enviar")`) y registrar las respuestas de red para diagnosticar.
+
+65. **Git Bash otra vez.**
+    - `MSYS_NO_PATHCONV` evita que se traduzcan las rutas de los contenedores, pero rompe las de `docker compose -f`. Usar rutas relativas para compose y `cygpath -w` para los montajes.
+    - `python` es el Python del sistema: mutmut necesita el del entorno virtual delante en el `PATH`.
+    - Las barras invertidas dentro de un heredoc de Python siguen fallando (lección 29): escribir el archivo entero con la herramienta de archivos.

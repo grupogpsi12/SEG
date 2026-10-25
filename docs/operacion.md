@@ -77,7 +77,7 @@ Pasos que **siguen siendo manuales**:
 
 | Qué | Cómo |
 |---|---|
-| Salud | `docker compose -f infra/compose.yaml ps`. `web` revisa la base (`/salud`); `worker` revisa que haya sincronizado en los últimos 15 minutos (RNF-01) |
+| Salud | `docker compose -f infra/compose.yaml ps`. `web` revisa la base (`/salud`); `worker` revisa que haya sincronizado en los últimos 15 minutos y que GLPI responda. Una caída se nota en menos de 2 minutos (RNF-01) |
 | Logs | `docker compose … logs -f web worker`. Son JSON con `correlation_id`; el mismo id viaja en la cabecera `X-Request-ID` |
 | IP bloqueada por el WAF | `docker compose -f infra/compose.yaml exec bw-scheduler bwcli unban <ip>`. El baneo dura 1 hora (RS-08) |
 | Falso positivo del WAF | Nunca desactivar el CRS. Agregar una exclusión puntual en `infra/bunkerweb/configs/` (ver su README) y probar el flujo completo |
@@ -86,6 +86,20 @@ Pasos que **siguen siendo manuales**:
 | Crear o desactivar una cuenta | `docker compose -f infra/compose.yaml run --rm admin-usuarios crear --correo X --rol Y [--colaborador col-…]` / `desactivar --usuario <id>` |
 | Registrar en otra base una cuenta que ya existe en Supabase | `… run --rm admin-usuarios vincular --usuario <id> --rol Y [--colaborador col-…]`. No usa `service_role`. Lo usa cada integrante con su base local (`docs/probar-localmente.md` §4) |
 | Cambio de esquema | `docker compose … run --rm migrar` (nunca `migrate` desde `web`: `app_backend` no tiene permisos para eso) |
+
+### Antes de cada entrega o cambio grande
+
+Cada criterio de aceptación con evidencia tiene un script reproducible. Las evidencias del 24/10/2026, hechas en local, están en `docs/evidencia/`; en Azure se repiten con los mismos scripts.
+
+| Criterio | Comando | Evidencia |
+|---|---|---|
+| RNF-06 (rendimiento) | `infra/scripts/carga.sh` | `rendimiento-2026-10-24.md` |
+| RNF-01 y CA-11 (detección) | `infra/scripts/deteccion.sh glpi` y `deteccion.sh base` (cortan el servicio un momento) | `disponibilidad-2026-10-24.md` |
+| CA-11 (restauración) | `respaldo.sh`, seguido de `restaurar-prueba.sh <carpeta>` | `disponibilidad-2026-10-24.md` |
+| CA-12 (seguridad dinámica) | `infra/scripts/seguridad-dinamica.sh` | `seguridad-2026-10-24.md` |
+| CA-20 (WAF) | `infra/waf/pruebas.sh app.<dominio>` y `pruebas.sh glpi.<dominio>` | `docs/spikes/bunkerweb.md` |
+| GLPI real y flujos | `JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh`, solo con un GLPI de pruebas | job `glpi-real` de la CI |
+| Interfaz (5.8) | `JML_GLPI_DE_PRUEBAS=si infra/scripts/e2e-interfaz.sh`, solo en un stack de pruebas | — |
 
 ## 5. Incidentes
 

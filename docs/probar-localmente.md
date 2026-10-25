@@ -124,6 +124,17 @@ JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # 30 pruebas contra su G
 
 `contrato-glpi.sh` **borra los tickets cuya clave empieza con `SOL-`** en su GLPI: úselo solo en su equipo.
 
+**Otras pruebas reproducibles** (todas con Docker; las cuatro primeras en entornos desechables que no tocan su base):
+
+| Comando | Qué prueba |
+|---|---|
+| `infra/scripts/integracion-local.sh` | El job de integración de la CI, contra un PostgreSQL 17 desechable |
+| `infra/scripts/carga.sh` | RNF-06: 300 colaboradores y 20 usuarios concurrentes |
+| `infra/scripts/seguridad-dinamica.sh` | CA-12: ZAP pasivo y activo autenticado, y sqlmap nivel 3. Informes en `.contrato-tmp/seguridad/` |
+| `JML_MODO=local JML_RESPALDO_DESTINO=.contrato-tmp/respaldos infra/scripts/respaldo.sh` seguido de `infra/scripts/restaurar-prueba.sh .contrato-tmp/respaldos` | CA-11: respaldo y restauración verificada |
+| `infra/scripts/deteccion.sh glpi` o `deteccion.sh base` | RNF-01: cuánto tarda en detectarse una caída. **Detiene el servicio un momento** |
+| `JML_GLPI_DE_PRUEBAS=si infra/scripts/e2e-interfaz.sh` | 5.8: ING, VAC, RET y EMG en un navegador real, por el WAF y hasta GLPI. Crea datos y tickets de prueba en **su** stack |
+
 ### Reportería del WAF (opcional, RNF-16)
 
 Los ataques y bloqueos de BunkerWeb en un dashboard de Grafana (Fluent Bit → Loki → Grafana). Agregue el tercer archivo al atajo y vuelva a levantar:

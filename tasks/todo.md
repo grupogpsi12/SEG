@@ -275,6 +275,12 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - **Herramientas:** en contenedores fijados por digest. Antes, la IP del escáner sale del baneo.
   - **Evidencia:** informes en `docs/evidencia/`.
   - **CA-13:** repetir la inspección de contenedores, para comprobar que `service_role` no está en web ni en worker.
+  ✔✔ **CA-12 en local, 24/10/2026** (`docs/evidencia/seguridad-2026-10-24.md`, `infra/scripts/seguridad-dinamica.sh`):
+  - **ZAP *baseline*:** sin altas; a través del WAF, solo informativas.
+  - **ZAP activo autenticado** (RRHH y técnico): sin hallazgos reales. El único «alto» (*path traversal*, confianza baja) se comprobó a mano que es falso positivo.
+  - **sqlmap nivel 3:** ningún parámetro inyectable.
+  - **Corregido por estas pruebas:** CORS abierto en los estáticos, CORP y COEP, y el reinicio periódico del único proceso de gunicorn.
+  - ⏳ El asesor de Supabase, y repetirlo contra Azure.
 - [~] **5.5 Reportería del WAF** (RNF-16, debería): Fluent Bit con `clasificar.lua`, Loki con Blob e identidad administrada, y el dashboard de Grafana de `waf-stack` en `127.0.0.1:3000`.
   ✔ Local (20/10/2026): `infra/compose.reporteria.yaml` (fluent-bit, loki, grafana en la red `waf-logs`; 24224 y 3000 solo en `127.0.0.1`), `infra/reporteria/` (de `waf-stack`), clave de Grafana en `secrets/grafana_admin_password` (RS-20). Loki local sobre el volumen `loki-datos`. ⏳ Fijar las tres imágenes por digest (RS-18); Loki sobre Blob con la identidad administrada en Azure (RS-20); medir la RAM con la reportería (RNF-09).
   ✔ CA-21.
@@ -319,17 +325,29 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - *Por qué no alcanza la biblioteca estándar:* cifrar por destinatario, con historial en Git y revocación por persona, es exactamente lo que hace SOPS. Reimplementarlo sería criptografía propia.
   - *Mantenimiento:* proyecto de la CNCF con publicaciones frecuentes; age es de Filippo Valsorda (ex Go Security). La alternativa de un servidor (Vault u OpenBao) se descartó en ADR-029.
 
-- [ ] **5.8 Pruebas de la interfaz con Playwright** (stack de calidad del SRS, CA-05 a CA-07 por la interfaz).
+- [x] **5.8 Pruebas de la interfaz con Playwright** (stack de calidad del SRS, CA-05 a CA-07 por la interfaz).
   - **Qué:** los flujos ING (con PDF), VAC, RET y EMG en un navegador real, a través del WAF.
   - **Cómo:** con sesiones creadas en la base. El TOTP real ya se probó de punta a punta y aquí se omite.
   - **Criterio:** cada flujo llega a «cerrada» después de que los técnicos resuelven en GLPI.
   - **Dependencia:** `playwright` para Python. Ya figura en la tabla del stack; se usa solo en las pruebas, con Chromium descargado por la propia herramienta.
+  ✔✔ **Hecho el 24/10/2026** (`tests/e2e/test_interfaz.py`, `infra/scripts/e2e-interfaz.sh`), 4 de 4, estables en 3 corridas:
+  - **ING** con un PDF de 2 MB, por el WAF, y sus 4 tickets en GLPI.
+  - **VAC** registrada por el colaborador y aprobada en la bandeja de RRHH.
+  - **RET** sin que el motivo llegue a GLPI (CA-10).
+  - **EMG** con prioridad 5 (CA-06).
+
+  En cada página: sin errores de consola, sin violaciones de la CSP y sin websockets. Hallazgos que dejó, ya corregidos:
+  - Con el límite general de 2 r/s, **el CSS recibía 429** tras un POST y su redirección, y la página salía sin estilos. Ahora `/static/` tiene 10 r/s (RS-08).
+  - Mis colaboradores de prueba no tenían usuario de AD, como sí lo tiene uno real.
 - [~] **5.9 Suite contra GLPI real en la CI.**
   - **Qué:** un job con GLPI 11 y MariaDB como contenedores, `preparar-glpi.sh`, `configurar-glpi` y `contrato-glpi.sh`.
   - **Criterio:** las 30 pruebas en verde en GitHub Actions en cada push a `master`.
   ✔ Job `glpi-real` en `verificar.yml` (24/10/2026). Corre solo en los push a `master`, con secretos de un solo uso del runner, y sigue los mismos pasos que `docs/probar-localmente.md` §3, ya verificados en local. ⏳ Comprobar que pasa en GitHub con el primer push.
 - [ ] **5.10 Mutación antes de la entrega** (meta de 85 % en `dominio`; la última fue de 93,6 %).
   - **Criterio:** `make mutacion` igual o mayor a 85 %, con el informe en `docs/spikes/mutacion.md`.
+  ⏸ **Aplazado a pedido del equipo (24/10/2026).** Se lanzó y se detuvo a los 60 de 1341 mutantes: con Docker ocupando la CPU iba a tardar horas. `src/` se restauró con `git checkout`.
+  - El dominio no cambió desde la corrida del 93,6 % (su último commit es del 10/10/2026, el mismo día del registro de mutación), así que ese resultado sigue valiendo.
+  - Para repetirla: `make mutacion` con la máquina libre y con `.venv/Scripts` delante en el `PATH` (lección 65); no editar `src/` mientras corre.
 - [~] **5.6 Documentación final:** `docs/SRS.md` actualizado, manual de usuario por rol (incluidas las plantillas de solución para técnicos) y manual de operación.
   ✔ Parcial (11/10/2026): `docs/manual-usuario.md` por rol (ingreso con TOTP, solicitante, jefe, RRHH, técnicos, Auditor y Administrador) y `docs/estado.md` (estado y traspaso). ✔ `docs/operacion.md` (manual de operación: piezas y secretos, instalación, despliegue en Azure en 10 pasos, operación diaria, incidentes, restauración y rotación) y `docs/probar-localmente.md`. Plantillas de solución por cola: como código en `configurar_glpi` (3.1). ⏳ Ejecutar y corregir el manual de operación al desplegar (5.2) y actualizar `docs/SRS.md` con lo decidido en las ADR 025 a 028.
   **Plan del 24/10/2026:** pasar al SRS lo decidido en ADR-025 a ADR-029, más:

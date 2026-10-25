@@ -20,7 +20,7 @@ Tenga en cuenta:
 |---|---|
 | Pedir vacaciones | **Nueva solicitud → Vacaciones**. Indique la fecha de inicio y la de regreso. |
 | Presentar su renuncia | **Nueva solicitud → Retiro**. Indique su último día y el motivo. El motivo **solo lo ve RRHH**. |
-| Ver en qué van sus solicitudes | **Mis solicitudes**. Haga clic en el número para ver el detalle. |
+| Ver en qué van sus solicitudes | **Mis solicitudes**, de la más reciente a la más antigua, de 50 en 50 (enlaces **Más recientes** y **Más antiguas**). Haga clic en el número para ver el detalle. |
 | Cancelar una solicitud | En **Mis solicitudes**, botón **Cancelar**. Solo se puede mientras siga *pendiente de aprobación*. |
 
 No puede haber dos solicitudes abiertas del mismo tipo para la misma persona: la aplicación se lo indicará.
@@ -56,7 +56,7 @@ El trabajo técnico se hace **en GLPI** (`https://glpi.<dominio>`). La aplicaci�
 
 ## Auditor
 
-**Auditoría**: muestra todos los registros, del más reciente al más antiguo. El botón **Verificar la integridad de la cadena** recorre la cadena completa y, si alguien alteró un registro directamente en la base de datos, indica la posición del primero afectado. La verificación también queda registrada.
+**Auditoría**: muestra los registros del más reciente al más antiguo, de 50 en 50. El botón **Verificar la integridad de la cadena** recorre la cadena completa y, si alguien alteró un registro directamente en la base de datos, indica la posición del primero afectado. La verificación también queda registrada.
 
 ## Administrador del sistema
 
