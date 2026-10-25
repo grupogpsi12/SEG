@@ -21,7 +21,7 @@ CSRF = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 
 
 def levantar_baneos() -> None:
-    for ip in ("10.20.40.128", "127.0.0.1"):
+    for ip in ("10.20.30.1", "10.20.40.128", "127.0.0.1"):
         subprocess.run(
             ["docker", "compose", "-f", "infra/compose.yaml", "exec", "-T", "bw-scheduler",
              "bwcli", "unban", ip],

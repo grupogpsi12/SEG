@@ -20,3 +20,13 @@ sqlmap nivel 3 por el WAF: 0 inyectables en los 4 objetivos probados, y el WAF b
 ## F6-04 · sqlmap nivel 5 directo
 
 0 inyectables en los 8 objetivos, `Host` y segundo orden incluidos. Aviso intermedio de sqlmap sobre `User-Agent` y `Referer` de `/solicitudes` («boolean-based blind … injectable»), retirado por su propio veredicto final: falso positivo por página dinámica; el código no lee esas cabeceras (`grep` en `src`). Cadena de auditoría íntegra tras la corrida (551 registros).
+
+## F6-03 · la misma corrida SIN exención (configuración real: 2 r/s y baneo de 1 hora)
+
+**El baneo actúa (RS-08), y esto es lo que se mide, no la seguridad de la aplicación.** Al arrancar ZAP, el WAF baneó la IP del escáner (`10.20.30.1`, motivo «bad behavior») en el primer minuto: `bwcli bans` la mostró con «Banned on 11:56:26 for 1 hour». Desde entonces todo lo que ZAP y sqlmap enviaron recibió 403 o 429 del WAF y nada llegó a la aplicación. Se ve en que sqlmap quedó en «checking if the target is protected by some kind of WAF/IPS» y venció su tiempo de espera de 10 minutos en cada objetivo, sin ninguna conclusión.
+
+**Lectura honesta: no concluyente sobre la aplicación.** Un escaneo bloqueado desde el segundo minuto no demuestra nada sobre ella; por eso F6-02 y F6-04 existen. Su valor es otro: demostrar que un escáner agresivo no puede operar contra el sitio real.
+
+**Aclaración de las alertas «CSP no establecida» de F6-02 y F6-03.** En esta corrida ZAP reportó 12 y 4 instancias de «CSP Header Not Set» sobre páginas que **no** salieron de la aplicación (bloqueos del WAF). Eso apoya la explicación de F6-02: son las páginas 403/429 de BunkerWeb, no respuestas de Django.
+
+**Corrección de un guion.** El guion de neutralización solo levantaba el baneo de `10.20.40.128` y `127.0.0.1`; la IP que el WAF ve para el tráfico de un contenedor que entra por la puerta de enlace es `10.20.30.1` y quedó baneada tras F6-03. Se agregó a `neutralizar.sh` y a `auditor-por-waf.py`.
