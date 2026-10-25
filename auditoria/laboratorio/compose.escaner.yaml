@@ -15,3 +15,8 @@ services:
       - LIMIT_REQ_RATE=1000r/s
       - app.localhost_LIMIT_REQ_RATE_1=100000r/m
       - app.localhost_LIMIT_REQ_RATE_2=1000r/s
+      # el limite de CONEXIONES por IP (`v1ips`, 10 por defecto) tambien frena a un escaner con hilos;
+      # nginx rechaza valores de 65536 o mas («connection limit must be less than 65536») y el planificador
+      # vuelve entonces a la ultima configuracion buena: por eso 60000
+      - LIMIT_CONN_MAX_HTTP1=60000
+      - LIMIT_CONN_MAX_HTTP2=60000

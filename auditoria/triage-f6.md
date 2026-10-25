@@ -30,3 +30,34 @@ sqlmap nivel 3 por el WAF: 0 inyectables en los 4 objetivos probados, y el WAF b
 **Aclaración de las alertas «CSP no establecida» de F6-02 y F6-03.** En esta corrida ZAP reportó 12 y 4 instancias de «CSP Header Not Set» sobre páginas que **no** salieron de la aplicación (bloqueos del WAF). Eso apoya la explicación de F6-02: son las páginas 403/429 de BunkerWeb, no respuestas de Django.
 
 **Corrección de un guion.** El guion de neutralización solo levantaba el baneo de `10.20.40.128` y `127.0.0.1`; la IP que el WAF ve para el tráfico de un contenedor que entra por la puerta de enlace es `10.20.30.1` y quedó baneada tras F6-03. Se agregó a `neutralizar.sh` y a `auditor-por-waf.py`.
+
+## F6-05 · cobertura de la superficie por el escáner
+
+ZAP (rastreo y escaneo activo, 3 minutos por rol) por el WAF con la exención de F6-02, cruzado con el log del WAF delimitado por marcas. Una ruta cuenta si el escáner llegó a la aplicación con ella (200, 302, 404 o 405).
+
+| Rol | Rutas vistas (de 22) |
+|---|---|
+| RRHH | 10 |
+| Técnico | 10 |
+| Administrador | 10 |
+| Solicitante | 8 |
+| Auditor | 7 |
+| **Unión de los cinco roles** | **20 de 22 = 90,9 %** |
+
+**Meta del plan: ≥ 95 %. No se alcanza, por dos rutas que ningún escáner con una sesión inyectada puede visitar:**
+- `reintentar` solo existe para una solicitud en estado `error`; en el stack de pruebas no hay ninguna.
+- `segundo_factor` solo responde con un desafío en la sesión, que nace entre la contraseña y el TOTP.
+
+Con esas dos fuera, la cobertura es 20 de 20. Ambas quedan cubiertas por otra vía: la matriz de autorización de 440 celdas las recorre todas (F5-02), el Gherkin de ingreso ejerce `segundo_factor` (F4) y el sqlmap dirigido de F6-04 las parametrizadas. Es una medición parcial y se reporta como tal.
+
+## F6-08 · cada bloqueo esperado con su control positivo
+
+| Bloqueo esperado | Control positivo (la misma operación legítima funciona) | Evidencia |
+|---|---|---|
+| 403 del CRS a 7 ataques en `app.*` y `glpi.*` | tráfico normal 200/302 en la misma corrida de `pruebas.sh` | F6-01 |
+| 403 a cabeceras hostiles | petición normal de control 302 antes y después | F3-U06 |
+| 429 del límite a ritmo de guion | ritmo humano: 5 de 5 verificaciones en 200 | F6-06 |
+| baneo de la IP del escáner | petición legítima 302 tras desbanear; la exención mide la aplicación (F6-02) | F6-02, F6-03 |
+| 403 de ModSecurity durante la corrida exenta | ataque de control 403 antes y después | F6-02 |
+
+Cero bloqueos sin su control.

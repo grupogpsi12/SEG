@@ -209,3 +209,11 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
     - `MSYS_NO_PATHCONV` evita que se traduzcan las rutas de los contenedores, pero rompe las de `docker compose -f`. Usar rutas relativas para compose y `cygpath -w` para los montajes.
     - `python` es el Python del sistema: mutmut necesita el del entorno virtual delante en el `PATH`.
     - Las barras invertidas dentro de un heredoc de Python siguen fallando (lección 29): escribir el archivo entero con la herramienta de archivos.
+
+
+## Auditoría (24/10/2026)
+
+- **Una exención de límites se comprueba, no se supone.** Tras relajar BunkerWeb, 20 peticiones seguidas sin 429 son la prueba; el límite de *conexiones* por IP (`v1ips`, 10) sobrevive a la recarga cuando quedan conexiones colgadas de un escaneo anterior, y solo reiniciar el contenedor `bunkerweb` las libera. Los 429 cuentan como mal comportamiento y terminan en baneo.
+- **En Git Bash, un `$VAR` con espacios sin comillas puede borrar o crear donde no debe** (la ruta del proyecto tiene un espacio). Siempre entre comillas, y rutas de Windows (`pwd -W`) para Python nativo y Docker.
+- **`docker logs --since` con una hora ISO falló** por la zona horaria; se delimita la corrida con peticiones marca (`?marca=INICIO-x`) dentro del propio log.
+- **Si el planificador de BunkerWeb no aplica un cambio, mirar su log antes de reiniciar cosas.** El overlay del laboratorio fallaba en silencio: nginx rechaza `limit_conn` de 65536 o más (`config check failed`), el planificador vuelve a la última configuración buena y todo parece funcionar con los límites de siempre. `docker logs jml-bw-scheduler-1 | grep -i error` lo muestra.

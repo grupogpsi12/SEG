@@ -1,0 +1,1 @@
+bash auditoria/scripts/cobertura-superficie.sh && .venv/Scripts/python.exe auditoria/scripts/cobertura-superficie.py .contrato-tmp/cobertura
