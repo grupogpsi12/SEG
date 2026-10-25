@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-import marcadores
+import marcadores  # type: ignore[import-not-found]
 
 CA_CUMPLE = re.compile(
     r"\|\s*(CA-\d+)\s*\|[^|\n]*\|\s*(cumple|cumplido|verificado)\s*\|(.*)\|", re.IGNORECASE
