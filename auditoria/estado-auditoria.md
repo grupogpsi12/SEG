@@ -29,24 +29,24 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | F1-01 | Suite unitaria con cobertura de ramas (los comandos de `make verificar`, que no está instalado aquí) | 0 fallos; dominio ≥ 95 % y aplicación ≥ 90 %; `junit.xml` y el reporte guardados | F0-07 | ✔ dominio 97,74 % y aplicación 94,4 % de ramas (F1-01-COBERTURA); B-13, B-14 |
 | F1-02 | Integración contra PostgreSQL 17 (`integracion-local.sh`) | 0 fallos | F1-01 | ✔ 251 pasan, 18 omitidas (F1-02-INTEGRACION) |
 | F1-03 | Contrato y flujos contra GLPI real (`contrato-glpi.sh`) | 30 pruebas, 0 fallos | F0-06 | ✔ 30 de 30 tras B-16 y B-17 (F1-03-GLPI-REAL-3) |
-| F1-04 | Playwright por el WAF (`e2e-interfaz.sh`) | 4 pruebas, 0 fallos | F0-06 | ○ |
-| F1-05 | `metricas.json` con los números medidos hoy y comparación con los documentados | Cada diferencia > 1 % entre lo medido y `estado.md` es un hallazgo | F1-01…04 | ○ |
+| F1-04 | Playwright por el WAF (`e2e-interfaz.sh`) | 4 pruebas, 0 fallos | F0-06 | ✔ 4 de 4 (F1-04-E2E) |
+| F1-05 | `metricas.json` con los números medidos hoy y comparación con los documentados | Cada diferencia > 1 % entre lo medido y `estado.md` es un hallazgo | F1-01…04 | ✔ `metricas.json` completo; diferencias: B-14 (ramas puras 94,4 % frente a «99 %»), 1618 frente a 1600 pruebas (+1,1 %) |
 | F1-06 | Estabilidad: 20 corridas de la suite unitaria | < 1 % de pruebas inestables y cero reintentos automáticos | F1-01 | ○ |
 
 ## F2 — Caja blanca estática
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F2-01 | **Control positivo estático**: `controles-positivos/vulnerable.py` generado en carpeta temporal (nunca versionado: contiene un secreto falso y `gitleaks` de la CI lo rechazaría) | `bandit` y `ruff` marcan SQL por f-string, `mark_safe` de entrada, `shell=True` y cabecera concatenada; `gitleaks` marca el secreto. Si no, el escaneo no cuenta | F0-03 | ○ |
-| F2-02 | `ruff`, `mypy --strict`, `lint-imports` | 0 errores; los 3 contratos de `import-linter` cumplidos | F2-01 | ○ |
-| F2-03 | `bandit` sobre `src` y `tests` | 0 hallazgos Medio o superior sin triage | F2-01 | ○ |
-| F2-04 | `pip-audit` | 0 vulnerabilidades sin exención escrita | F2-01 | ○ |
-| F2-05 | `gitleaks` en árbol e historial | 0 secretos; los avisos de `infra/.env` y `secrets/` (ignorados por git) documentados | F2-01 | ○ |
-| F2-06 | `trivy fs` y `trivy config` sobre `infra/` y el repositorio | 0 críticas sin exención | F2-01 | ○ |
-| F2-07 | SBOM de la imagen de la aplicación | Archivo CycloneDX o SPDX generado y su sha256 registrado | F2-06 | ○ |
-| F2-08 | Revisión manual dirigida: TOCTOU en decidir y sincronizar, orden de estados, idempotencia del *outbox*, `request.META`, manejo de excepciones | Cada punto con veredicto y archivo:línea; cero sin triage | F1-01 | ○ |
-| F2-09 | D-08: activar las reglas `S` de `ruff` o aceptar con motivo | `ruff check .` en verde con `S`, o el motivo de aceptación escrito en `docs/decisiones.md` | F2-03 | ○ |
-| F2-10 | **G0** pre-commit con `gitleaks` y `ruff` (B-07) | Un commit con un secreto sembrado es **rechazado** por el gancho y uno limpio pasa | F2-05 | ○ |
+| F2-01 | **Control positivo estático**: `controles-positivos/vulnerable.py` generado en carpeta temporal (nunca versionado: contiene un secreto falso y `gitleaks` de la CI lo rechazaría) | `bandit` y `ruff` marcan SQL por f-string, `mark_safe` de entrada, `shell=True` y cabecera concatenada; `gitleaks` marca el secreto. Si no, el escaneo no cuenta | F0-03 | ✔ ruff S, bandit, gitleaks y pip-audit ven lo sembrado; Trivy config y fs también (F2-01-CONTROL-POSITIVO, F2-06-TRIVY) |
+| F2-02 | `ruff`, `mypy --strict`, `lint-imports` | 0 errores; los 3 contratos de `import-linter` cumplidos | F2-01 | ✔ 0 errores; 3 contratos cumplidos (F2-02) |
+| F2-03 | `bandit` sobre `src` y `tests` | 0 hallazgos Medio o superior sin triage | F2-01 | ✔ 0 con Medio o superior sin triage: 3 falsos positivos en `tests` (F2-03-BANDIT-2) |
+| F2-04 | `pip-audit` | 0 vulnerabilidades sin exención escrita | F2-01 | ✔ 0 tras B-15 (certifi) (F2-04-PIP-AUDIT) |
+| F2-05 | `gitleaks` en árbol e historial | 0 secretos; los avisos de `infra/.env` y `secrets/` (ignorados por git) documentados | F2-01 | ✔ historial 0; árbol: 5 en rutas ignoradas por git (`secrets/`, `infra/.env`, `.venv`), documentadas en F2-05 |
+| F2-06 | `trivy fs` y `trivy config` sobre `infra/` y el repositorio | 0 críticas sin exención | F2-01 | ✔ 0 HIGH/CRITICAL en `fs` y `config` (F2-06-TRIVY). Trivy no analiza `compose.yaml`: lo cubre la revisión manual de F7 |
+| F2-07 | SBOM de la imagen de la aplicación | Archivo CycloneDX o SPDX generado y su sha256 registrado | F2-06 | ✔ CycloneDX, 115 componentes, sha256 e47eaa05… (F2-07-SBOM); la imagen trae 1 CRITICAL (certifi, B-15) y 44 HIGH del SO sin parche (B-18) |
+| F2-08 | Revisión manual dirigida: TOCTOU en decidir y sincronizar, orden de estados, idempotencia del *outbox*, `request.META`, manejo de excepciones | Cada punto con veredicto y archivo:línea; cero sin triage | F1-01 | ✔ 12 puntos con veredicto: `auditoria/revision-manual-f2-08.md`; salen B-17, B-19 y B-20 |
+| F2-09 | D-08: activar las reglas `S` de `ruff` o aceptar con motivo | `ruff check .` en verde con `S`, o el motivo de aceptación escrito en `docs/decisiones.md` | F2-03 | ✔ `ruff` con `S` en verde en toda la base (F2-09-RUFF-S) |
+| F2-10 | **G0** pre-commit con `gitleaks` y `ruff` (B-07) | Un commit con un secreto sembrado es **rechazado** por el gancho y uno limpio pasa | F2-05 | ✔ gancho `.githooks/pre-commit`: rechaza el secreto sembrado y el error de ruff; sin él, el secreto pasa (F2-10-G0-GANCHO) |
 
 ## F3 — Pruebas nuevas de seguridad (`tests/seguridad`)
 

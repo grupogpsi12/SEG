@@ -1,2 +1,5 @@
 ruff=0
-sin_excepciones_en_src=0
+--- sin los noqa, src tiene:
+src\config\settings.py:104:57: S108 Probable insecure usage of temporary file or directory: "/tmp/jml-worker-latido"
+src\jml\adaptadores\entrada\web\graficos.py:39:12: S308 Use of `mark_safe` may expose cross-site scripting vulnerabilities
+Found 2 errors.

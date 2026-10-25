@@ -11,6 +11,7 @@ Para quién: integrantes del equipo que quieren usar la aplicación completa sin
 - Si Git Bash no encuentra `docker`: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`.
 - Los puertos 80 y 443 libres.
 - **SOPS y age** (ADR-029), para recibir los secretos del equipo. En Windows, `winget install -e --id SecretsOPerationS.SOPS` y `winget install -e --id FiloSottile.age`; en macOS, `brew install sops age`; en Linux, el paquete `age` y el binario de `sops` de su página oficial. **Abra una terminal nueva** y compruebe `sops --version` y `age --version`.
+- **gitleaks** (solo para quien confirma cambios): el gancho `.githooks/pre-commit` rechaza un commit con un secreto o con errores de `ruff`. Se activa una vez por clon con `git config core.hooksPath .githooks`; `winget install -e --id Gitleaks.Gitleaks` en Windows, `brew install gitleaks` en macOS.
 
 ## 1. Clonar y recibir los secretos del equipo (una vez)
 

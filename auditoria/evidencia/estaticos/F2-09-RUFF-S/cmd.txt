@@ -1,1 +1,1 @@
-.venv/Scripts/python.exe -m ruff check . --statistics; echo ruff=$?; .venv/Scripts/python.exe -m ruff check --select S --no-cache --isolated src --statistics; echo sin_excepciones_en_src=$?
+.venv/Scripts/python.exe -m ruff check . --statistics; echo ruff=$?; echo '--- sin los noqa, src tiene:'; .venv/Scripts/python.exe -m ruff check --select S --no-cache --ignore-noqa src --output-format concise

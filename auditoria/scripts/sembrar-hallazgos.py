@@ -143,7 +143,7 @@ H = [
     dict(
         id="B-07",
         sev="Baja",
-        estado="abierto — pre-commit en F2; protección de rama: [PENDIENTE: acción del equipo en GitHub]",
+        estado="abierto — pre-commit verificado (F2-10); protección de rama de `master`: [PENDIENTE: acción del equipo en GitHub]",
         titulo="`gitleaks` no corre antes del commit y `master` no tiene protección de rama",
         ubicacion=".github/workflows/verificar.yml · configuración de GitHub",
         estandares="CWE-798 · OWASP A03:2025 Software Supply Chain Failures · STRIDE: T, I · Amenaza: T16 · RS-12 (pide escaneo en cada commit)",
