@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "commit_auditado": "5fa3f32",
+  "nota": "documentado = lo que dicen docs/estado.md y docs/evidencia; medido = lo que midio la auditoria. Una diferencia de mas de 1 % es un hallazgo (plan F1-05).",
+  "linea_base": {
+    "pruebas_unitarias": {
+      "documentado": 1600,
+      "medido": null
+    },
+    "cobertura_ramas_dominio_pct": {
+      "documentado": 99,
+      "medido": null,
+      "compuerta": 95
+    },
+    "cobertura_ramas_aplicacion_pct": {
+      "documentado": 99,
+      "medido": null,
+      "compuerta": 90
+    },
+    "pruebas_glpi_real": {
+      "documentado": 30,
+      "medido": null
+    },
+    "pruebas_e2e_playwright": {
+      "documentado": 4,
+      "medido": null
+    },
+    "mutacion_dominio_pct": {
+      "documentado": 93.6,
+      "medido": null,
+      "meta": 85
+    },
+    "mutacion_aplicacion_pct": {
+      "documentado": null,
+      "medido": null,
+      "meta": 85
+    },
+    "rnf06_dashboard_p95_ms": {
+      "documentado": 791,
+      "medido": null,
+      "umbral": 2000
+    },
+    "rnf06_paginas_p95_max_ms": {
+      "documentado": 622,
+      "medido": null,
+      "umbral": 800
+    },
+    "deteccion_glpi_s": {
+      "documentado": 63,
+      "medido": null,
+      "umbral": 120
+    },
+    "deteccion_base_s": {
+      "documentado": 56,
+      "medido": null,
+      "umbral": 120
+    },
+    "restauracion_s": {
+      "documentado": 23,
+      "medido": null,
+      "umbral": 14400
+    }
+  },
+  "trazabilidad": {
+    "filas": 141,
+    "por_estado": {
+      "prueba-nombrada": 79,
+      "solo-documento": 19,
+      "sin-prueba-nombrada": 29,
+      "declarada-sin-verificar": 14
+    },
+    "fuente": "auditoria/trazabilidad.csv (trazar.py)"
+  },
+  "hallazgos": {
+    "criticos": 0,
+    "altos": 0,
+    "medios": 6,
+    "bajos": 3,
+    "informativos": 3,
+    "total": 12,
+    "abiertos": 9,
+    "verificados": 2,
+    "corregidos": 1,
+    "aceptados": 0
+  },
+  "celdas_matriz_authz": {
+    "total": null,
+    "probadas": null,
+    "inesperadas": null
+  },
+  "asvs_l2": {
+    "aplicables": null,
+    "verificados": null
+  },
+  "defectos_sembrados": {
+    "total": 6,
+    "detectados": 0
+  },
+  "score_global": null
+}

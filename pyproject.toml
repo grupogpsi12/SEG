@@ -106,5 +106,7 @@ layers = ["config", "jml.adaptadores", "jml.aplicacion", "jml.dominio"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["E501"]
+# Guiones e informes de la auditoria (docs/PLAN_AUDITORIA.md): lineas largas con rutas y comandos.
+"auditoria/**" = ["E501"]
 # Modelos y migraciones de Django: atributos de clase mutables y lineas generadas son el idioma.
 "src/jml/adaptadores/salida/persistencia/**" = ["RUF012", "E501"]

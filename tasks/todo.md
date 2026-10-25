@@ -358,6 +358,28 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   Sube a v2.4 en «Control del documento».
   ✔✔ **SRS v2.4 (24/10/2026).** Lleva al SRS lo decidido en la auditoría, en ADR-029 y ADR-030 y en la revisión de la reportería, sin cambios de alcance. Cambian RF-06, RF-36, RS-02, RS-06, RS-07, RS-09, RNF-01 y RNF-16; el detalle está en «Control del documento».
   ⏳ Corregir el manual de operación al desplegar en Azure (5.2) y aprobar el SRS (0.0).
+## Auditoría de seguridad y calidad (`docs/PLAN_AUDITORIA.md`, rama `auditoria/entrega`)
+
+Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué sigue). Evidencia cruda: `auditoria/evidencia/` con `manifiesto.sha256`. Hallazgos: `auditoria/hallazgos/B-nn.md`. Reglas duras del prompt: solo el stack local, GLPI desechable y Supabase de **solo lectura**; neutralizar efectos antes de cada escáner; control positivo antes de cada resultado; hallazgo = prueba roja, corrección mínima, verde, en commits separados.
+
+- [x] **A-F0 Preparación** (24/10/2026).
+  - **Objetivo:** leer los documentos, confirmar D-01…D-12, dejar la estructura, las herramientas y la traza.
+  - **Comandos:** `bash auditoria/scripts/confirmar-d.sh`, `python auditoria/herramientas/trazar.py`, `python auditoria/herramientas/metricas.py`.
+  - **Criterio:** 12 veredictos con evidencia; 141 filas de traza; herramientas con autoprueba; stack sano.
+  - **Resultado:** 10 confirmados, D-02 y D-03 pendientes de medir (la Entrega 3 no está en el repositorio). Hallazgos nuevos de F0: **B-01** (IP de confianza de bunkerweb no reservada, verificado) y **B-03** (deriva en `estado.md`). **B-02** (marcador sin reemplazar) verificado con regresión en `make verificar`.
+  - **Riesgo de efectos colaterales:** reiniciar el stack local (B-01). Hecho en el stack de pruebas, sin datos propios.
+- [ ] **A-F1 Línea base medida.**
+  - **Objetivo:** medir hoy lo que `estado.md` documenta, sin copiarlo.
+  - **Comandos:** suite unitaria con cobertura de ramas en un `git worktree` de `5fa3f32`; `infra/scripts/integracion-local.sh`; `JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh`; `JML_GLPI_DE_PRUEBAS=si infra/scripts/e2e-interfaz.sh`; 20 corridas de la suite.
+  - **Criterio:** 0 fallos; cada diferencia mayor de 1 % con lo documentado es un hallazgo.
+  - **Riesgo:** `contrato-glpi.sh` y `e2e-interfaz.sh` borran y crean tickets de prueba en el GLPI local (desechable).
+- [ ] **A-F2 Caja blanca estática.**
+  - **Objetivo:** análisis estático con su control positivo y revisión manual dirigida.
+  - **Comandos:** ruff, mypy, lint-imports, bandit (`src` y `tests`), pip-audit, gitleaks (árbol e historial), trivy fs/config, SBOM.
+  - **Criterio:** el archivo sembrado es detectado por cada herramienta que debe verlo; 0 hallazgos Medio o superior sin triage.
+  - **Riesgo:** el archivo sembrado contiene un secreto falso: se genera en una carpeta temporal y **nunca** se versiona (la CI de `gitleaks` lo rechazaría).
+- **Dependencias nuevas que autoriza el plan (§12.2), solo en `dev`:** `pytest-bdd` 9.0.0 (Gherkin ejecutable; F4), `reportlab` 5.1.0 y `pillow` 13.0.0 (PDF de los informes; F9). Licencia y versión se confirman en PyPI al instalarlas y se anota aquí; ninguna entra a la imagen de la aplicación.
+
 ## Orden de recorte (SRS §14)
 
 Reportería del WAF (RNF-16) → RF-34 (CSV) → RF-30 (g) → gráficos SVG, conservando las tablas. **Nunca se recortan:** RET, EMG, deduplicación, auditoría, MFA, derivación de cuentas, WAF en modo bloqueo e indicadores (a), (c) y (e). **El núcleo (Fase 1) no se recorta**: si falta tiempo, se recortan adaptadores y vistas, no reglas.
