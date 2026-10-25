@@ -21,3 +21,4 @@ staticfiles/
 infra/.env
 build/
 .contrato-tmp/
+auditoria/.captura-local/
