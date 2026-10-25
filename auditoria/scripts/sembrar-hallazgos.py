@@ -539,6 +539,25 @@ H = [
         indicador="El escenario del borde en rojo.",
         esfuerzo="0,5 h · Próximo",
     ),
+    dict(
+        id="B-28",
+        sev="Baja",
+        estado="abierto — decisión del equipo (ASVS V9.1, V9.2 y V6.8)",
+        titulo="El adaptador de Supabase lee los claims del JWT sin verificar su firma ni su vencimiento",
+        ubicacion="src/jml/adaptadores/salida/identidad/supabase.py `_claims` y `verificar_totp`",
+        estandares="ASVS 5.0 V9.1.1 y V9.2.1 · OWASP A07:2025 · amenaza T1",
+        inherente="7/2/2/5/2 = 3,6 (Bajo): el token llega por TLS verify-full de Supabase en respuesta a una petición del servidor, no del navegador; un atacante necesitaría interponerse en ese tramo",
+        residual="3,6 (no baja sin cambio de código: hoy lo acota el origen del token)",
+        origen="F8-05: la clasificación de ASVS por sección. El docstring de `_claims` ya lo declara («sin verificar la firma»); lo que faltaba era medirlo contra el estándar.",
+        evidencia="`auditoria/asvs-l2.csv` (secciones V9.1, V9.2 y V6.8 en «parcial»).",
+        impacto="Si el tramo web→Supabase se comprometiera (CA falsa, proxy), un token forjado con `aal: aal2` y el `sub` del desafío daría una sesión sin TOTP. La verificación `/verify` de Supabase y el pinning de su CA lo acotan.",
+        correccion="Verificar la firma con la clave JWT del proyecto (HS256 o JWKS) y `exp`/`iss`. Cuesta una dependencia o ~30 líneas con `hmac`; hay que decidir cómo se distribuye la clave (secreto nuevo).",
+        regresion="Una prueba con un token de `aal: aal2` firmado con otra clave debe rechazarse (hoy pasa).",
+        principio="Un token que no se verifica es un texto: la confianza en el canal sustituye a la criptografía solo mientras el canal aguante.",
+        falsabilidad="Un token con firma inválida y `aal: aal2` produce una identidad verificada.",
+        indicador="Un `access_token` sin la firma esperada en las pruebas del adaptador.",
+        esfuerzo="3 h · Próximo",
+    ),
 ]
 
 if __name__ == "__main__":

@@ -119,7 +119,7 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | F8-02 | Primera medición sobre `aplicacion` y los módulos de seguridad (contenedor Linux si mutmut<3 no corre) | ≥ 85 % o supervivientes convertidos en pruebas | F8-01 | ○ |
 | F8-03 | DREAD inherente y residual, score global y plan de remediación | Cada hallazgo con falsabilidad e indicador; residual solo con prueba | F6, F7 | ○ |
 | F8-04 | Propuestas de ADR: N-1…N-5 al SRS §7, refresco de imágenes, TLS interno hacia GLPI, RNF-11 (B-12) | ADR redactados; el SRS sube de versión si cambia | F8-03 | ○ |
-| F8-05 | `asvs-l2.csv` desde el CSV oficial de ASVS 5.0 (nivel 2) | Ningún requisito L2 aplicable sin prueba o sin «no aplica» justificado | F8-03 | ○ |
+| F8-05 | `asvs-l2.csv` desde el CSV oficial de ASVS 5.0 (nivel 2) | Ningún requisito L2 aplicable sin prueba o sin «no aplica» justificado | F8-03 | ◐ 253 requisitos L1/L2: 144 verificados, 36 parciales, 19 pendientes, 54 no aplican (72,4 % de los aplicables; el resto lo cierra F7 y las decisiones B-10, B-28). Clasificación por sección: revisión del 10 % [PENDIENTE: segunda persona] |
 
 ## F9 — Empaquetado y informes
 
