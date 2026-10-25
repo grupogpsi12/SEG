@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe auditoria/scripts/verificar-anexo-a.py
