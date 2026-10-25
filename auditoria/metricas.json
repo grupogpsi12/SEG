@@ -5,7 +5,7 @@
   "linea_base": {
     "pruebas_unitarias": {
       "documentado": 1600,
-      "medido": null
+      "medido": 1618
     },
     "cobertura_ramas_dominio_pct": {
       "documentado": 99,
@@ -74,12 +74,12 @@
   "hallazgos": {
     "criticos": 0,
     "altos": 0,
-    "medios": 6,
-    "bajos": 3,
-    "informativos": 3,
-    "total": 12,
-    "abiertos": 9,
-    "verificados": 2,
+    "medios": 9,
+    "bajos": 4,
+    "informativos": 4,
+    "total": 17,
+    "abiertos": 11,
+    "verificados": 5,
     "corregidos": 1,
     "aceptados": 0
   },

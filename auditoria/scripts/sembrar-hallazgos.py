@@ -330,6 +330,25 @@ H = [
         indicador="`glpi-real` rojo en su primer paso.",
         esfuerzo="0,5 h · Inmediato",
     ),
+    dict(
+        id="B-17",
+        sev="Media",
+        estado="verificado (rojo→verde, evidencia B-17-ROJO / F1-03-GLPI-REAL-3)",
+        titulo="El adaptador de GLPI no detecta el rechazo por ítem (HTTP 200) y deja el ticket sin vencimiento; la prueba RF-16 usaba un reloj fijo",
+        ubicacion="src/jml/adaptadores/salida/glpi/cliente.py `_asegurar_vencimiento` · tests/integracion/test_glpi_real.py",
+        estandares="OWASP A10:2025 (manejo de condiciones excepcionales) · ASVS V16 (errores) · amenaza N-5",
+        inherente="4/10/5/3/5 = 5,4 (Medio): un ticket sin vencimiento incumple el SLA de RF-16 sin ningún aviso",
+        residual="2,4 (D y R bajan a 1: el adaptador falla en alto y la prueba B-17 lo vigila)",
+        origen="F1-03: `contrato-glpi.sh` dio 29 pasan y 1 falla (`test_RF_16`), desde que el reloj real superó el 20/10/2026.",
+        evidencia="`auditoria/evidencia/funcionales/F1-03-GLPI-REAL` (rojo), `B-17-ROJO` (prueba unitaria) y `F1-03-GLPI-REAL-3` (30 de 30). La corrida intermedia `-2` muestra que el reloj no era la única causa: la fecha efectiva también salía de `HOY` fijo.",
+        impacto='GLPI responde `[{"<id>": false, "message": "Invalid dates. Update cancelled."}]` con 200 cuando el vencimiento es anterior a la apertura. El adaptador lo daba por hecho: fail-silent. Con datos reales no ocurre (el vencimiento siempre es futuro); sí ocurre ante un desfase de reloj entre la aplicación y GLPI.',
+        correccion="`_asegurar_vencimiento` lanza `GlpiRechazo` si algún ítem de la respuesta es `false` (sin copiar el mensaje). Las pruebas contra GLPI real miden las fechas desde el día real.",
+        regresion="`tests/adaptadores/test_glpi_cliente.py::test_B_17_...` (el doble ahora puede rechazar por ítem) y la suite contra GLPI real, que ya no depende del día en que se ejecute.",
+        principio="Un 200 no significa éxito: el contrato de una API se lee en el cuerpo. Y una prueba con reloj fijo contra un sistema con reloj real caduca sola.",
+        falsabilidad="Un PUT de GLPI con `message` no vacío deja pasar `crear_ticket` sin error.",
+        indicador="Tickets sin `time_to_resolve` en GLPI; `glpi-real` rojo en el reloj real.",
+        esfuerzo="1 h · Inmediato",
+    ),
 ]
 
 if __name__ == "__main__":

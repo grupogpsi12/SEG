@@ -18,7 +18,7 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | F0-04 | Confirmar o refutar D-01…D-12 contra el código real | 12 veredictos con evidencia registrada; los confirmados tienen `hallazgos/B-nn.md` | F0-03 | ✔ |
 | F0-05 | `trazabilidad.csv` con una fila por cada RF, RNF, RS, RD, RI, CA, T y N | 141 filas, generadas por `trazar.py` (reproducible) | F0-03 | ✔ |
 | F0-06 | Stack local y contenedores de auditoría | Los 10 contenedores `healthy` y `infra/waf/pruebas.sh app.localhost` en verde | F0-02 | ✔ (hallazgo B-01 en el camino) |
-| F0-07 | Línea base en verde **antes de tocar el código**: la suite en un `git worktree` del commit `5fa3f32` | 0 fallos; la cifra de pruebas queda en `metricas.json` | F0-06 | ○ |
+| F0-07 | Línea base en verde **antes de tocar el código**: la suite en un `git worktree` del commit `5fa3f32` | 0 fallos; la cifra de pruebas queda en `metricas.json` | F0-06 | ✔ 1618 pruebas en verde (F1-01-LINEA-BASE) |
 
 **Resultado de F0-04.** Confirmados: D-01, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12. **Pendientes de medición (F6):** D-02 (la Entrega 3 no está en el repositorio: `casos-de-uso.txt` no existe, no es verificable desde archivos) y D-03 (el límite de 2 r/s es plausible pero no medido). Correcciones al plan: D-11 son 22 patrones de URL (24 si se cuenta cada acción de `decidir`). **Hallazgos nuevos de F0:** B-01 (IP de confianza de bunkerweb no reservada), B-03 (deriva en `estado.md`).
 
@@ -26,9 +26,9 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F1-01 | Suite unitaria con cobertura de ramas (los comandos de `make verificar`, que no está instalado aquí) | 0 fallos; dominio ≥ 95 % y aplicación ≥ 90 %; `junit.xml` y el reporte guardados | F0-07 | ○ |
-| F1-02 | Integración contra PostgreSQL 17 (`integracion-local.sh`) | 0 fallos | F1-01 | ○ |
-| F1-03 | Contrato y flujos contra GLPI real (`contrato-glpi.sh`) | 30 pruebas, 0 fallos | F0-06 | ○ |
+| F1-01 | Suite unitaria con cobertura de ramas (los comandos de `make verificar`, que no está instalado aquí) | 0 fallos; dominio ≥ 95 % y aplicación ≥ 90 %; `junit.xml` y el reporte guardados | F0-07 | ✔ dominio 97,74 % y aplicación 94,4 % de ramas (F1-01-COBERTURA); B-13, B-14 |
+| F1-02 | Integración contra PostgreSQL 17 (`integracion-local.sh`) | 0 fallos | F1-01 | ✔ 251 pasan, 18 omitidas (F1-02-INTEGRACION) |
+| F1-03 | Contrato y flujos contra GLPI real (`contrato-glpi.sh`) | 30 pruebas, 0 fallos | F0-06 | ✔ 30 de 30 tras B-16 y B-17 (F1-03-GLPI-REAL-3) |
 | F1-04 | Playwright por el WAF (`e2e-interfaz.sh`) | 4 pruebas, 0 fallos | F0-06 | ○ |
 | F1-05 | `metricas.json` con los números medidos hoy y comparación con los documentados | Cada diferencia > 1 % entre lo medido y `estado.md` es un hallazgo | F1-01…04 | ○ |
 | F1-06 | Estabilidad: 20 corridas de la suite unitaria | < 1 % de pruebas inestables y cero reintentos automáticos | F1-01 | ○ |
