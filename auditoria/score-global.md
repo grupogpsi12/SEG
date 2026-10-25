@@ -1,6 +1,6 @@
 # Puntajes DREAD y score global
 
-Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (32 hallazgos). Un residual solo baja si hay una prueba que se rompe al quitar el control (anclas: `dread-anclas.md`).
+Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (33 hallazgos). Un residual solo baja si hay una prueba que se rompe al quitar el control (anclas: `dread-anclas.md`).
 
 ## Hallazgos ordenados por prioridad (DREAD × factor)
 
@@ -23,6 +23,7 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 | B-21 | Baja | verificado (rojo→verde, evidencia B-21-ROJO / B- | 3,4 | ×1,0 | 3,4 | 1,0 |
 | B-18 | Baja | aceptado — sin parche en Debian 13,7; se revisa  | 3,0 | ×1,0 | 3,0 | 3,0 |
 | B-27 | Baja | abierto — decisión del equipo: ADR-023 e invaria | 3,0 | ×1,0 | 3,0 | 3,0 |
+| B-33 | Baja | abierto — endurecimiento de ejecución de contene | 3,0 | ×1,0 | 3,0 | 3,0 |
 | B-22 | Informativa | aceptado — límite conocido de ADR-021 (sin antiv | 2,8 | ×1,0 | 2,8 | 2,8 |
 | B-32 | Media | abierto — propuesta de ADR en F8-04 (red dedicad | 5,4 | ×0,5 (exige un contenedor comprometido en la red interna) | 2,7 | 5,4 |
 | B-23 | Baja | corregido en el código (migración 0006); falta a | 2,6 | ×1,0 | 2,6 | 1,0 |
@@ -41,9 +42,9 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 
 ## Score global
 
-- Hallazgos que siguen en pie (abiertos o aceptados): **15** (Crítica: 0, Alta: 0, Media: 4, Baja: 7; informativos 4 no suman).
-- Exposición ponderada: **15**.
+- Hallazgos que siguen en pie (abiertos o aceptados): **16** (Crítica: 0, Alta: 0, Media: 4, Baja: 8; informativos 4 no suman).
+- Exposición ponderada: **16**.
 - Controles verificados (ASVS L1/L2 en «verificado»): **144**.
-- **Score global = 15 / (144 × 10) × 100 = 1,0** → aceptable (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).
+- **Score global = 16 / (144 × 10) × 100 = 1,1** → aceptable (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).
 
 Se reporta junto al número de controles verificados: con 144 probados el score tiene sentido; con 10 no lo tendría.

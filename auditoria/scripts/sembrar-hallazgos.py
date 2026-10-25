@@ -634,6 +634,25 @@ H = [
         indicador="Cualquier contenedor nuevo en la red `app` y la cuenta de peticiones `App-Token` en claro.",
         esfuerzo="3 h · Próximo",
     ),
+    dict(
+        id="B-33",
+        sev="Baja",
+        estado="abierto — endurecimiento de ejecución de contenedores (CIS Docker 5.x), medido al repetir Docker Bench de la Entrega 3",
+        titulo="Docker Bench (CIS) deja 12 avisos de ejecución: sistema de archivos de escritura, sin límite de procesos ni de CPU",
+        ubicacion="infra/compose.yaml (servicios sin `read_only`, `pids_limit` ni `cpus`; `glpi` con `cap_add`, `mariadb` y `postgres` como root al iniciar)",
+        estandares="CIS Docker Benchmark 4.1, 5.3, 5.11, 5.12, 5.14, 5.26, 5.28 · OWASP A02:2025 (configuración)",
+        inherente="3/3/3/3/3 = 3,0 (Bajo): exige ya un contenedor comprometido; la red `app` ya está acotada y `cap_drop: ALL` + `no-new-privileges` están aplicados",
+        residual="3,0 (no baja: no se ha corregido). Con `read_only` y `pids_limit` en los servicios que lo admiten bajaría a 2,0",
+        origen="Revisión de `pruebas anteriores/`: la Entrega 3 corrió Docker Bench y esta auditoría no. Repetido el 25/10/2026 (imagen fijada por digest, API 1.43).",
+        evidencia="`auditoria/evidencia/estaticos/F7-DOCKER-BENCH/docker-bench-sin-color.txt`: 42 chequeos, 12 avisos. Frente a la Entrega 3 ya no fallan 5.10 (memoria), 5.25 (nuevos privilegios) ni 5.1 (AppArmor).",
+        impacto="Un proceso comprometido dentro de un contenedor puede escribir en su sistema de archivos y crear procesos sin tope, lo que facilita persistir y agotar la VM. No cruza la frontera del contenedor por sí solo.",
+        correccion="Añadir `read_only: true` con `tmpfs` a BunkerWeb, GLPI, Grafana y Loki si lo admiten, `pids_limit` y `cpus` a todos, y `restart: on-failure:5` donde aplique. Cada cambio se prueba con `pruebas.sh` y la suite contra GLPI real; los que rompan el servicio se documentan como excepción. El resto (4.5 firma de contenido, 5.7 puertos 80/443, 5.13 0.0.0.0) es propio del diseño del borde.",
+        regresion="Una prueba de `tests/seguridad/test_despliegue.py` que exija `pids_limit` en cada servicio, y Docker Bench con 5.28 en PASS.",
+        principio="Un contenedor es una frontera por convención; cada límite que se le pone reduce lo que un atacante dentro de él puede hacer con el tiempo que le damos.",
+        falsabilidad="Docker Bench muestra más de 12 avisos de ejecución o un servicio sin `pids_limit` tras el cambio.",
+        indicador="El número de avisos WARN de las secciones 4 y 5 de Docker Bench.",
+        esfuerzo="3 h · Más adelante",
+    ),
 ]
 
 if __name__ == "__main__":
