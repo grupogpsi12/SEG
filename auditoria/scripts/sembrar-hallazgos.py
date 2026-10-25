@@ -444,6 +444,25 @@ H = [
         indicador="Cualquier código que llame a `open` sobre el volumen de soportes fuera del adaptador.",
         esfuerzo="n/a · Aceptado",
     ),
+    dict(
+        id="B-23",
+        sev="Baja",
+        estado="corregido en el código (migración 0006); falta aplicarla en Supabase: [PENDIENTE: el equipo corre `migrar`]",
+        titulo="Las nueve tablas de Django (`auth_*`, `django_*`) no tienen RLS, contra el invariante 8",
+        ubicacion="src/jml/adaptadores/salida/persistencia/migrations/0002_reglas_de_postgresql.py (lista `TABLAS`) · prueba RD-10",
+        estandares="OWASP A01:2025 · ASVS V8 · invariante 8 de CLAUDE.md · amenaza T5",
+        inherente="4/3/2/2/2 = 2,6 (Bajo): no es alcanzable hoy (anon y authenticated no tienen permisos y el esquema no está expuesto)",
+        residual="1,0 (la barrera de RLS vuelve a existir y `test_BD_todas_las_tablas_tienen_rls` la vigila)",
+        origen="F3-BD, y confirmado en lectura de catálogo de Supabase (F3-PAR): 9 de 26 tablas con `relrowsecurity` en falso.",
+        evidencia="`auditoria/evidencia/funcionales/F3-BD` (rojo) y `B-23-VERDE` (267 pasan); `F3-PAR-INSTANTANEAS`.",
+        impacto="La prueba RD-10 excluía `auth_%` y `django_%`, por lo que el invariante «RLS activo sin políticas» se cumplía solo para las tablas propias. `django_session` y `auth_user` quedaban protegidas únicamente por la falta de permisos y de exposición.",
+        correccion="Migración 0006: `ENABLE ROW LEVEL SECURITY` en toda tabla del esquema que no lo tenga (la aplicación no cambia: `app_backend` tiene BYPASSRLS). RD-10 deja de excluir las tablas del framework.",
+        regresion="`tests/integracion/test_roles_bd.py::test_BD_todas_las_tablas_tienen_rls_y_ninguna_politica`, `test_RD_10`, y el defecto sembrado `BD-sin-rls`.",
+        principio="Una excepción en la prueba es una excepción en el control: lo que el test no mira, nadie lo vigila.",
+        falsabilidad="Una tabla del esquema `app` con `relrowsecurity` en falso.",
+        indicador="El diff de catálogo local frente a Supabase (F3-PAR) deja de ser vacío.",
+        esfuerzo="1 h · Inmediato (aplicar en Supabase al desplegar)",
+    ),
 ]
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ Sale con 0 solo si: la prueba pasa sin el defecto, FALLA con él y el archivo vu
 El archivo se restaura siempre (finally); no se versiona el defecto.
 """
 
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -37,6 +38,24 @@ DEFECTOS: dict[str, tuple[str, str, str, list[str]]] = {
         "_con_restringido().filter(pk=solicitud_id.valor).first()  # DEFECTO SEMBRADO: sin bloqueo",
         ["bash", "infra/scripts/integracion-local.sh", "-k", "U05", "-x"],
     ),
+    "BD-sin-revoke": (
+        "src/jml/adaptadores/salida/persistencia/migrations/0004_permisos_minimos_de_app_backend.py",
+        "    REVOKE UPDATE, DELETE, TRUNCATE ON auditoria, decision, cuenta_historial FROM app_backend;",
+        "    NULL;  -- DEFECTO SEMBRADO: sin REVOKE de solo insercion",
+        ["bash", "infra/scripts/integracion-local.sh", "-k", "test_BD or RD_02", "-x"],
+    ),
+    "BD-sin-disparador": (
+        "src/jml/adaptadores/salida/persistencia/migrations/0002_reglas_de_postgresql.py",
+        "CREATE TRIGGER solicitud_inmutable BEFORE UPDATE ON solicitud",
+        "CREATE TRIGGER solicitud_inmutable BEFORE INSERT ON solicitud",
+        ["bash", "infra/scripts/integracion-local.sh", "-k", "RF_14 or test_BD", "-x"],
+    ),
+    "BD-sin-rls": (
+        "src/jml/adaptadores/salida/persistencia/migrations/0006_rls_en_las_tablas_del_framework.py",
+        "AND c.relkind = 'r' AND NOT c.relrowsecurity",
+        "AND c.relkind = 'r' AND false",  # DEFECTO SEMBRADO
+        ["bash", "infra/scripts/integracion-local.sh", "-k", "RD_10 or test_BD", "-x"],
+    ),
 }
 
 
@@ -51,7 +70,7 @@ def pytest(pruebas: list[str]) -> int:
         sys.path.insert(0, str(RAIZ / "auditoria" / "herramientas"))
         import registrar  # el mismo bash de Git y el mismo PATH (docker, venv) que la evidencia
 
-        orden = [registrar.BASH, "-c", " ".join(orden[1:])]
+        orden = [registrar.BASH, "-c", shlex.join(orden[1:])]
         entorno = registrar._entorno()
     else:
         entorno = None
