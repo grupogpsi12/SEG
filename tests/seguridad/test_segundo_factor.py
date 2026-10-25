@@ -9,7 +9,7 @@ from django.test import Client
 
 from jml.adaptadores.entrada.web import composicion
 from jml.adaptadores.entrada.web.ingreso import SESION_DESAFIO
-from jml.adaptadores.salida.identidad.supabase import ProveedorSupabase
+from jml.adaptadores.salida.identidad.supabase import VIGENCIA_S, ProveedorSupabase
 from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.aplicacion.puertos import CredencialesInvalidas
 from tests.dobles.gotrue import CLAVE_PUBLICA, GoTrueSimulado
@@ -89,4 +89,37 @@ def test_U01_tras_entrar_el_desafio_ya_no_esta_en_la_sesion(web: GoTrueSimulado)
     c.get("/ingreso/segundo-factor")
     c.post("/ingreso/segundo-factor", {"codigo": CODIGO_VALIDO})
     assert c.session["usuario_id"] == "u-col"
+    assert SESION_DESAFIO not in c.session
+
+
+@pytest.mark.django_db
+def test_U01_si_supabase_cae_entre_la_contrasena_y_el_codigo_no_hay_sesion(
+    web: GoTrueSimulado,
+) -> None:
+    c = Client()
+    c.post("/ingreso", {"correo": CORREO, "contrasena": CLAVE})
+    web.caido = True
+    r = c.get("/ingreso/segundo-factor")  # intenta inscribir el TOTP
+    assert r.status_code == 200
+    assert "no está disponible" in r.content.decode()
+    r = c.post("/ingreso/segundo-factor", {"codigo": CODIGO_VALIDO})
+    assert r.status_code == 200
+    assert "no está disponible" in r.content.decode()
+    assert "usuario_id" not in c.session
+
+
+@pytest.mark.django_db
+def test_U01_un_desafio_vencido_manda_de_nuevo_al_ingreso_y_limpia_la_sesion(
+    servidor: GoTrueSimulado, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ahora = [1000.0]
+    m = Mundo.nuevo(repositorios=RepositoriosDjango)
+    proveedor = ProveedorSupabase(URL, CLAVE_PUBLICA, servidor.cliente(), lambda: ahora[0])
+    monkeypatch.setattr(composicion, "proveedor_de_identidad", lambda: proveedor)
+    monkeypatch.setattr(composicion, "reloj", lambda: m.reloj)
+    c = Client()
+    c.post("/ingreso", {"correo": CORREO, "contrasena": CLAVE})
+    ahora[0] += VIGENCIA_S + 1
+    r = c.get("/ingreso/segundo-factor")
+    assert (r.status_code, r["Location"]) == (302, "/ingreso")
     assert SESION_DESAFIO not in c.session
