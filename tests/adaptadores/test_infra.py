@@ -224,3 +224,22 @@ def test_S_29_el_unico_proceso_de_gunicorn_no_se_reinicia_cada_n_peticiones() ->
     cmd = next(x for x in (RAIZ / "Dockerfile").read_text().splitlines() if x.startswith("CMD"))
     assert '"--workers", "1"' in cmd
     assert '"--max-requests"' not in (RAIZ / "Dockerfile").read_text()  # como argumento del CMD
+
+
+def test_B_01_la_ip_de_confianza_de_bunkerweb_esta_reservada_fuera_del_rango_dinamico() -> None:
+    """Auditoria 24/10/2026, B-01 (T20, RS-05). Django confia en `X-Forwarded-*` solo desde la IP
+    fija de bunkerweb. Si esa IP cae en el rango que Docker reparte a los demas contenedores, tras
+    un reinicio cualquiera de ellos puede tomarla primero: bunkerweb no arranca («Address already
+    in use») y la aplicacion queda sin borde. Reproducido con
+    auditoria/scripts/reproducir-ip-confianza.sh."""
+    import ipaddress
+
+    ip_fija = ipaddress.ip_address(SERVICIOS["bunkerweb"]["networks"]["app"]["ipv4_address"])
+    de_confianza = SERVICIOS["web"]["environment"]["JML_PROXIES_CONFIABLES"]
+    assert str(ip_fija) == de_confianza  # la fija ES la de confianza
+    config = COMPOSE["networks"]["app"]["ipam"]["config"][0]
+    subred = ipaddress.ip_network(config["subnet"])
+    assert ip_fija in subred
+    rango_dinamico = ipaddress.ip_network(config["ip_range"])  # falla si no se declaro
+    assert rango_dinamico.subnet_of(subred)
+    assert ip_fija not in rango_dinamico
