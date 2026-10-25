@@ -238,8 +238,8 @@ def test_B_01_la_ip_de_confianza_de_bunkerweb_esta_reservada_fuera_del_rango_din
     de_confianza = SERVICIOS["web"]["environment"]["JML_PROXIES_CONFIABLES"]
     assert str(ip_fija) == de_confianza  # la fija ES la de confianza
     config = COMPOSE["networks"]["app"]["ipam"]["config"][0]
-    subred = ipaddress.ip_network(config["subnet"])
+    subred = ipaddress.IPv4Network(config["subnet"])
     assert ip_fija in subred
-    rango_dinamico = ipaddress.ip_network(config["ip_range"])  # falla si no se declaro
+    rango_dinamico = ipaddress.IPv4Network(config["ip_range"])  # falla si no se declaro
     assert rango_dinamico.subnet_of(subred)
     assert ip_fija not in rango_dinamico
