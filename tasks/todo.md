@@ -368,16 +368,23 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Criterio:** 12 veredictos con evidencia; 141 filas de traza; herramientas con autoprueba; stack sano.
   - **Resultado:** 10 confirmados, D-02 y D-03 pendientes de medir (la Entrega 3 no está en el repositorio). Hallazgos nuevos de F0: **B-01** (IP de confianza de bunkerweb no reservada, verificado) y **B-03** (deriva en `estado.md`). **B-02** (marcador sin reemplazar) verificado con regresión en `make verificar`.
   - **Riesgo de efectos colaterales:** reiniciar el stack local (B-01). Hecho en el stack de pruebas, sin datos propios.
-- [ ] **A-F1 Línea base medida.**
+- [x] **A-F1 Línea base medida.** Cerrada el 24/10/2026: 1618 pruebas, integración 251, GLPI real 30/30, Playwright 4/4, 20 de 20 corridas estables. Salieron B-13..B-17 (B-16: scripts sin bit de ejecución rompían `glpi-real`; B-17: rechazo por ítem de GLPI ignorado).
   - **Objetivo:** medir hoy lo que `estado.md` documenta, sin copiarlo.
   - **Comandos:** suite unitaria con cobertura de ramas en un `git worktree` de `5fa3f32`; `infra/scripts/integracion-local.sh`; `JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh`; `JML_GLPI_DE_PRUEBAS=si infra/scripts/e2e-interfaz.sh`; 20 corridas de la suite.
   - **Criterio:** 0 fallos; cada diferencia mayor de 1 % con lo documentado es un hallazgo.
   - **Riesgo:** `contrato-glpi.sh` y `e2e-interfaz.sh` borran y crean tickets de prueba en el GLPI local (desechable).
-- [ ] **A-F2 Caja blanca estática.**
+- [x] **A-F2 Caja blanca estática.** Cerrada el 24/10/2026: control positivo de ruff/bandit/gitleaks/pip-audit/Trivy, SBOM de 115 componentes, revisión manual de 12 puntos. Salieron B-15 (certifi), B-18 (CVE del SO sin parche, aceptado), B-19 y B-20 (capturas de excepciones demasiado estrechas) y el gancho G0.
   - **Objetivo:** análisis estático con su control positivo y revisión manual dirigida.
   - **Comandos:** ruff, mypy, lint-imports, bandit (`src` y `tests`), pip-audit, gitleaks (árbol e historial), trivy fs/config, SBOM.
   - **Criterio:** el archivo sembrado es detectado por cada herramienta que debe verlo; 0 hallazgos Medio o superior sin triage.
   - **Riesgo:** el archivo sembrado contiene un secreto falso: se genera en una carpeta temporal y **nunca** se versiona (la CI de `gitleaks` lo rechazaría).
+- [x] **A-F3 Pruebas nuevas de seguridad.** Cerrada el 24/10/2026: U01, U02, U04 a U09, BD con roles, paridad de catálogo con Supabase (lectura autorizada por el usuario), cobertura de ramas de seguridad al 100 %. Salieron B-21 (filtro de logs sin acentos), B-22 (PDF políglota, aceptado), B-23 (RLS en tablas de Django), B-24 (500 al inscribir el TOTP con Supabase caído), B-25 (denegaciones sin evento) y B-26 (el Auditor no lee solicitudes; decisión del equipo).
+- [x] **A-F5 Autorización y rotura deliberada.** Matriz de 440 celdas, IDOR, asignación masiva y CSRF, y los seis defectos sembrados detectados (`auditoria/defectos-sembrados.md`).
+- [ ] **A-F4 Gherkin ejecutable.**
+  - **Objetivo:** que cada amenaza tenga un escenario ejecutable y trazado, sin duplicar la suite: los `.feature` invocan las pruebas existentes.
+  - **Comandos:** `pytest tests/bdd`.
+  - **Criterio:** 12 características con camino feliz, borde y adversarial; cero etiquetas sin trazar; ninguna amenaza T1–T21 sin escenario.
+  - **Dependencia nueva justificada (CLAUDE.md):** `pytest-bdd` 9.0.0, solo en `dev` (MIT, publicada el 30/09/2026, requiere Python ≥ 3.10; arrastra `mako`, `markupsafe`, `parse`, `parse-type`, todas BSD/MIT). **Qué resuelve:** el trabajo académico pide Gherkin y un `.feature` que no se ejecuta se desactualiza en silencio (D-02 es un ejemplo). **Por qué no basta la biblioteca estándar:** enlazar texto Gherkin con funciones, tablas de ejemplos y etiquetas son más de 30 líneas y un analizador propio sería código sin mantenimiento. **Alternativas descartadas:** `behave` (no comparte accesorios con pytest) y Gherkin solo documental. No entra a la imagen de la aplicación.
 - **Dependencias nuevas que autoriza el plan (§12.2), solo en `dev`:** `pytest-bdd` 9.0.0 (Gherkin ejecutable; F4), `reportlab` 5.1.0 y `pillow` 13.0.0 (PDF de los informes; F9). Licencia y versión se confirman en PyPI al instalarlas y se anota aquí; ninguna entra a la imagen de la aplicación.
 
 ## Orden de recorte (SRS §14)
