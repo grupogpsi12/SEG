@@ -1,0 +1,1 @@
+bash auditoria/scripts/testssl-borde.sh

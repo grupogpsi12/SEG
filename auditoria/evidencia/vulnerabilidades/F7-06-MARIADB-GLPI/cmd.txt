@@ -1,0 +1,1 @@
+bash auditoria/scripts/mariadb-glpi.sh
