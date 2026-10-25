@@ -1,0 +1,2 @@
+ruff=0
+sin_excepciones_en_src=0

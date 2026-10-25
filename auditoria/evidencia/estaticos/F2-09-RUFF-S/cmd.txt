@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe -m ruff check . --statistics; echo ruff=$?; .venv/Scripts/python.exe -m ruff check --select S --no-cache --isolated src --statistics; echo sin_excepciones_en_src=$?
