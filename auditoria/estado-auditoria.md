@@ -115,10 +115,10 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F8-01 | `make mutacion` sobre el dominio (cierra 5.10) | ≥ 85 % (último: 93,6 %) | F1-01 | ○ (aplazada por el equipo hasta F8) |
+| F8-01 | `make mutacion` sobre el dominio (cierra 5.10) | ≥ 85 % (último: 93,6 %) | F1-01 | ✔ mutmut 2.5.1 sobre `dominio`: 1311 eliminados + 1 timeout de 1341 = 97,8 % (meta 85 %; documentado 93,6 %); 29 supervivientes, los mismos 27 equivalentes ya clasificados en `docs/spikes/mutacion.md` más 2 de anotaciones (F8-01-MUTACION-DOMINIO) |
 | F8-02 | Primera medición sobre `aplicacion` y los módulos de seguridad (contenedor Linux si mutmut<3 no corre) | ≥ 85 % o supervivientes convertidos en pruebas | F8-01 | ○ |
-| F8-03 | DREAD inherente y residual, score global y plan de remediación | Cada hallazgo con falsabilidad e indicador; residual solo con prueba | F6, F7 | ○ |
-| F8-04 | Propuestas de ADR: N-1…N-5 al SRS §7, refresco de imágenes, TLS interno hacia GLPI, RNF-11 (B-12) | ADR redactados; el SRS sube de versión si cambia | F8-03 | ○ |
+| F8-03 | DREAD inherente y residual, score global y plan de remediación | Cada hallazgo con falsabilidad e indicador; residual solo con prueba | F6, F7 | ✔ DREAD inherente y residual de 25 hallazgos, prioridad = DREAD × factor y score global 1,0 de 100 con 144 controles verificados (aceptable) en `auditoria/score-global.md`; ningún Crítico ni Alto |
+| F8-04 | Propuestas de ADR: N-1…N-5 al SRS §7, refresco de imágenes, TLS interno hacia GLPI, RNF-11 (B-12) | ADR redactados; el SRS sube de versión si cambia | F8-03 | ✔ 10 propuestas de ADR en `auditoria/propuestas-adr.md` (red dedicada worker↔GLPI, refresco de imágenes, MariaDB, N-1..N-5 al SRS con RS-19 y RNF-11, firma del JWT, un solo proceso, Auditor, reportería, denegaciones). Siguen como propuesta hasta que el equipo las acepte |
 | F8-05 | `asvs-l2.csv` desde el CSV oficial de ASVS 5.0 (nivel 2) | Ningún requisito L2 aplicable sin prueba o sin «no aplica» justificado | F8-03 | ◐ 253 requisitos L1/L2: 144 verificados, 36 parciales, 19 pendientes, 54 no aplican (72,4 % de los aplicables; el resto lo cierra F7 y las decisiones B-10, B-28). Clasificación por sección: revisión del 10 % [PENDIENTE: segunda persona] |
 
 ## F9 — Empaquetado y informes
