@@ -1,6 +1,6 @@
 OK    commit limpio: aceptado
 OK    commit con secreto: ***enmascarado*** (1 mensajes del gancho)
-OK    commit con error de ruff: rechazado
+OK    commit con error de ruff: rechazado por F401
 G0 verificado
 OK    sin el gancho el secreto se confirma (el gancho es lo que lo impide)
 warning: in the working copy of 'ok.md', LF will be replaced by CRLF the next time Git touches it

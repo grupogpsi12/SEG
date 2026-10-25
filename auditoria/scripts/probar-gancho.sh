@@ -21,7 +21,7 @@ fi
 git reset -q HEAD malo.py && rm malo.py
 
 printf 'import os\n' > feo.py && git add feo.py
-if git commit -q -m "ruff" 2> /dev/null; then echo "FALLA ruff no rechazo F401"; exit 1; else echo "OK    commit con error de ruff: rechazado"; fi
+if git commit -q -m "ruff" 2> salida.txt; then echo "FALLA ruff no rechazo F401"; exit 1; elif grep -q F401 salida.txt; then echo "OK    commit con error de ruff: rechazado por F401"; else echo "FALLA rechazado por otra causa: $(head -1 salida.txt)"; exit 1; fi
 echo "G0 verificado"
 
 # Rotura deliberada (plan 10): sin el gancho, el mismo commit con secreto SI pasa.
