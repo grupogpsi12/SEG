@@ -27,6 +27,8 @@ dev = [
     "types-pyyaml>=6.0.12.20260906",
     "playwright==1.63.0",
     "pytest-bdd==9.0.0",
+    "reportlab==5.0.1",
+    "pillow==12.3.0",
 ]
 
 [build-system]
