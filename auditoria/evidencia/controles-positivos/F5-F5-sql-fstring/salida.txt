@@ -1,0 +1,6 @@
+[F5-sql-fstring] sin defecto:
+    (sin salida)
+[F5-sql-fstring] con el defecto sembrado en src/jml/adaptadores/salida/persistencia/repositorios.py:
+        |
+[F5-sql-fstring] archivo restaurado: True
+[F5-sql-fstring] DETECTADO: verde sin defecto, rojo con él

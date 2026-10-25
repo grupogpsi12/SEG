@@ -54,13 +54,13 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 |---|---|---|---|---|
 | F3-U01 | Código TOTP ya consumido no vuelve a servir; contraseña con el desafío de otra sesión no entra | Rojo contra el defecto sembrado «permitir el segundo uso» y verde sin él | F1-01 | ✔ `tests/seguridad/test_segundo_factor.py`; rojo con el defecto «segundo uso» y verde sin él (F3-U01) |
 | F3-U02 | Soporte: PDF políglota, 20 MB exactos, 20 MB + 1, nombre con `../`, `\x00` y ancho cero | Rechazo por firma y nombre antes de tocar el disco | F1-01 | ✔ `tests/seguridad/test_soporte.py`; rojo sin la comprobación de firma (F3-U02). Un PDF políglota pasa por diseño: B-22 (aceptado) |
-| F3-U03 | Toda ruta de `urlpatterns` está en la matriz de autorización | Falla si se agrega una vista sin clasificar | F5-01 | ○ |
+| F3-U03 | Toda ruta de `urlpatterns` está en la matriz de autorización | Falla si se agrega una vista sin clasificar | F5-01 | ✔ `test_U03_…`: las 22 rutas de `urlpatterns` están en la matriz y no sobra ninguna |
 | F3-U04 | Propiedad (Hypothesis): ningún valor sensible sobrevive al filtro de logs | 0 contraejemplos en 1000 casos | F1-01 | ✔ propiedad de 1000 casos; halló `contraseña` → B-21 corregido; rojo con el filtro roto (F3-U04) |
 | F3-U05 | Dos conexiones concurrentes registran la misma solicitud | Exactamente una gana | F1-02 | ✔ dos decisiones simultáneas: una gana; rojo sin `select_for_update` (F3-U05, F3-U05-CONTROL) |
 | F3-U06 | Cabeceras hostiles (`User-Agent`, `Referer`, `Accept-Language`, `Cookie`): se atiende o bloquea el WAF, valor literal en logs, base íntegra | Conteo de filas y esquema iguales antes y después | F1-01 | ✔ 14 cabeceras hostiles: 403 del WAF o atendidas, sin 5xx; base íntegra; control legítimo 302 antes y después (F3-U06) |
 | F3-U07 | Caída simultánea de Supabase y GLPI | Ninguna ruta protegida responde 200 ni filtra detalle | F1-01 | ✔ ninguna ruta protegida responde 200 sin sesión; sin detalle; la web no importa el adaptador de GLPI (F3-U07) |
 | F3-U08 | `manage.py check --deploy` con los ajustes de producción | Salida vacía | F1-01 | ✔ `check --deploy` sin avisos (4 silenciados, exactamente los que cubre BunkerWeb) (F3-U08) |
-| F3-U09 | Un intento denegado por rol siempre deja evento de auditoría | Un evento por cada denegación de la matriz | F5-02 | ○ |
+| F3-U09 | Un intento denegado por rol siempre deja evento de auditoría | Un evento por cada denegación de la matriz | F5-02 | ✔ 118 celdas de denegación por rol → un evento cada una; salió B-25 (corregido) (F3-U09) |
 | F3-BD | Pruebas de base de datos con `SET ROLE` (dueño, REVOKE, disparadores, `PUBLIC`/`anon`/`authenticated`) | Aserciones que fallan al quitar cada control | F1-02 | ✔ 15 pruebas por rol; tres defectos sembrados detectados; salió B-23 (RLS en tablas de Django) (F3-BD) |
 | F3-PAR | Paridad del catálogo local frente a Supabase de desarrollo, **solo lectura** | Diferencia vacía salvo las declaradas (TLS y `pg_hba`) | F1-02 | ✔ autorizada por el usuario (lectura de catálogo). Igual en columnas, restricciones, índices, disparadores, funciones, RLS, privilegios y esquema. Difieren solo 4 extensiones de la plataforma (`pgcrypto`, `uuid-ossp`, `supabase_vault`, `pg_stat_statements`) y los roles `anon`, `authenticated` y `service_role` (en Supabase traen `statement_timeout` y `service_role` omite RLS) (F3-PAR) |
 | F3-COV | Cobertura de ramas y mutación de los módulos de seguridad | ≥ 95 % y ≥ 85 %, o hallazgo abierto con plan | F3-U01…09 | ✔ cobertura de ramas de los 7 módulos de seguridad = 100 % (antes 84,48 % en ingreso); salieron B-24 y B-13 verificado. La mutación ≥ 85 % queda en F8 (aplazada por el equipo) |
@@ -78,10 +78,10 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F5-01 | `matriz-authz.csv`: rutas × roles × métodos, con lo esperado tomado del SRS §3.3 | 100 % de las celdas clasificadas | F1-01 | ○ |
-| F5-02 | Prueba parametrizada que recorre cada celda | 0 resultados distintos del esperado; 403 frente a 404 comprobado | F5-01 | ○ |
-| F5-03 | IDOR, asignación masiva y CSRF cruzado | Respuesta idéntica a un identificador inexistente | F5-02 | ○ |
-| F5-04…09 | **Seis defectos sembrados**, de uno en uno, en un `git worktree` descartable: (1) SQL por f-string, (2) quitar el `REVOKE`, (3) apagar el disparador, (4) quitar el decorador de rol, (5) aceptar el `.pdf` renombrado, (6) permitir el segundo uso del TOTP | Cada defecto hace fallar al menos una prueba; tabla `defecto → detectado por → evidencia` completa | F5-02, F3-U01 | ○ |
+| F5-01 | `matriz-authz.csv`: rutas × roles × métodos, con lo esperado tomado del SRS §3.3 | 100 % de las celdas clasificadas | F1-01 | ✔ `auditoria/matriz-authz.csv`: 440 celdas (22 rutas × 2 métodos × 10 roles) generadas desde el SRS; una excepción conocida: B-26 |
+| F5-02 | Prueba parametrizada que recorre cada celda | 0 resultados distintos del esperado; 403 frente a 404 comprobado | F5-01 | ✔ 440 celdas = lo esperado (la excepción B-26 está rastreada); 403 frente a 404 comprobado (ocultamiento del detalle) |
+| F5-03 | IDOR, asignación masiva y CSRF cruzado | Respuesta idéntica a un identificador inexistente | F5-02 | ✔ IDOR idéntico a un id inexistente, asignación masiva ignorada, CSRF sin token o con token ajeno rechazado y control positivo (`test_idor_csrf.py`) |
+| F5-04…09 | **Seis defectos sembrados**, de uno en uno, en un `git worktree` descartable: (1) SQL por f-string, (2) quitar el `REVOKE`, (3) apagar el disparador, (4) quitar el decorador de rol, (5) aceptar el `.pdf` renombrado, (6) permitir el segundo uso del TOTP | Cada defecto hace fallar al menos una prueba; tabla `defecto → detectado por → evidencia` completa | F5-02, F3-U01 | ✔ los seis detectados (`auditoria/defectos-sembrados.md`); el primer intento del #4 no se detectó por defensa en profundidad y se resembró |
 
 ## F6 — Caja negra dinámica
 

@@ -56,6 +56,25 @@ DEFECTOS: dict[str, tuple[str, str, str, list[str]]] = {
         "AND c.relkind = 'r' AND false",  # DEFECTO SEMBRADO
         ["bash", "infra/scripts/integracion-local.sh", "-k", "RD_10 or test_BD", "-x"],
     ),
+    "F5-sql-fstring": (
+        "src/jml/adaptadores/salida/persistencia/repositorios.py",
+        "    def vencidas(self, ahora: datetime, limite: int) -> Sequence[EntradaDeBandeja]:",
+        """    def buscar_sembrado(self, texto: str) -> list[tuple[object, ...]]:  # DEFECTO SEMBRADO
+        from django.db import connection
+
+        with connection.cursor() as c:
+            c.execute(f"SELECT * FROM ticket WHERE clave = '{texto}'")
+            return c.fetchall()
+
+    def vencidas(self, ahora: datetime, limite: int) -> Sequence[EntradaDeBandeja]:""",
+        ["bash", ".venv/Scripts/python.exe", "-m", "ruff", "check", "src", "-q"],
+    ),
+    "F5-sin-decorador-de-rol": (
+        "src/jml/aplicacion/casos/consultas.py",
+        "    if not puede_ver_dashboard(actor.roles):",
+        "    if False:  # DEFECTO SEMBRADO: ya no se exige un rol tecnico",
+        ["tests/seguridad/test_matriz_authz.py", "-k", "dashboard or cuentas or ficha"],
+    ),
 }
 
 

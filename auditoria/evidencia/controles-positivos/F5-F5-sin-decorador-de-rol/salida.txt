@@ -1,0 +1,6 @@
+[F5-sin-decorador-de-rol] sin defecto:
+    100 passed, 460 deselected in 3.64s
+[F5-sin-decorador-de-rol] con el defecto sembrado en src/jml/aplicacion/casos/consultas.py:
+    1 failed, 1 passed, 460 deselected in 0.62s
+[F5-sin-decorador-de-rol] archivo restaurado: True
+[F5-sin-decorador-de-rol] DETECTADO: verde sin defecto, rojo con él

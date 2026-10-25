@@ -86,12 +86,12 @@
   "hallazgos": {
     "criticos": 0,
     "altos": 0,
-    "medios": 11,
-    "bajos": 8,
+    "medios": 12,
+    "bajos": 9,
     "informativos": 5,
-    "total": 24,
-    "abiertos": 10,
-    "verificados": 10,
+    "total": 26,
+    "abiertos": 11,
+    "verificados": 11,
     "corregidos": 2,
     "aceptados": 2
   },
@@ -106,7 +106,8 @@
   },
   "defectos_sembrados": {
     "total": 6,
-    "detectados": 0
+    "detectados": 6,
+    "sembrados": 6
   },
   "score_global": null
 }
