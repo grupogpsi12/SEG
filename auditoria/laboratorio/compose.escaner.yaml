@@ -1,0 +1,17 @@
+# SOLO PARA EL LABORATORIO DE LA AUDITORIA (F6-02). NUNCA con compose.azure.yaml.
+#
+# BunkerWeb no tiene una exencion de baneo o de limites POR IP que no salte tambien ModSecurity:
+# `WHITELIST_IP` ignora TODOS los demas modulos, el CRS incluido. Para medir que pasa el WAF cuando
+# el escaner no es expulsado, se relajan SOLO el baneo y los limites de ritmo, para todo el sitio,
+# en un stack donde el unico cliente es el escaner. ModSecurity y la CRS siguen en bloqueo: la
+# corrida lo comprueba con un ataque de control antes y despues.
+#
+#   docker compose -f infra/compose.yaml -f infra/compose.local.yaml -f auditoria/laboratorio/compose.escaner.yaml up -d bw-scheduler
+#   (para volver:)  docker compose -f infra/compose.yaml -f infra/compose.local.yaml up -d bw-scheduler
+services:
+  bw-scheduler:
+    environment:
+      - BAD_BEHAVIOR_THRESHOLD=100000000
+      - LIMIT_REQ_RATE=1000r/s
+      - app.localhost_LIMIT_REQ_RATE_1=100000r/m
+      - app.localhost_LIMIT_REQ_RATE_2=1000r/s

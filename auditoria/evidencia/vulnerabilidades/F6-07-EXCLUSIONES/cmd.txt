@@ -1,0 +1,1 @@
+echo exclusiones_versionadas=$(find infra/bunkerweb/configs -name '*.conf' | wc -l); docker exec jml-bunkerweb-1 sh -c 'ls /data/configs 2>/dev/null; find /etc/bunkerweb/configs /data/configs -name "*.conf" 2>/dev/null | wc -l'; echo '0 exclusiones, 0 pruebas necesarias'

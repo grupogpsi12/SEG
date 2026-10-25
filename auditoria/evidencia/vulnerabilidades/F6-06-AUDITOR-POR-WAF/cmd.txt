@@ -1,0 +1,1 @@
+bash auditoria/scripts/auditor-por-waf.sh

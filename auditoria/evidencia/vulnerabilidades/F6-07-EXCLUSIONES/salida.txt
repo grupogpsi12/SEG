@@ -1,0 +1,12 @@
+exclusiones_versionadas=0
+crs-plugins-after
+crs-plugins-before
+default-server-http
+http
+modsec
+modsec-crs
+server-http
+server-stream
+stream
+0
+0 exclusiones, 0 pruebas necesarias

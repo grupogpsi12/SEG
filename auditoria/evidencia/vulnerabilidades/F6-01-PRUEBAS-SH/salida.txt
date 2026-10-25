@@ -1,0 +1,57 @@
+### app.localhost
+Objetivo: https://app.localhost (IP 127.0.0.1)
+
+Trafico normal
+  [32m200 [0m Salud                                          (esperado 200)
+  [32m200 [0m Pagina de ingreso                              (esperado 200)
+  [32m302 [0m Sin sesion redirige al ingreso                 (esperado 302)
+  [32m200 [0m Estatico servido por WhiteNoise                (esperado 200)
+  [32m301 [0m HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  [32m403 [0m Inyeccion SQL (GET)                            (esperado 403)
+  [32m403 [0m Inyeccion SQL (POST)                           (esperado 403)
+  [32m403 [0m XSS                                            (esperado 403)
+  [32m403 [0m Recorrido de rutas                             (esperado 403)
+  [32m403 [0m Inyeccion de comandos                          (esperado 403)
+  [32m403 [0m Log4Shell en cabecera                          (esperado 403)
+  [32m403 [0m Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  [32mOK[0m   puerto 8000 cerrado
+  [32mOK[0m   puerto 3306 cerrado
+  [32mOK[0m   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  [32mOK[0m   sin token: ***enmascarado*** · token malo: cerrada · token correcto: 200
+
+[32mTodo segun lo esperado.[0m
+codigo_app=0
+### glpi.localhost
+Objetivo: https://glpi.localhost (IP 127.0.0.1)
+
+Trafico normal
+  [32m200 [0m Pagina principal de GLPI                       (esperado 200|302)
+  [32m403 [0m API v1 de GLPI cerrada desde fuera             (esperado 403)
+  [32m403 [0m API v2 de GLPI cerrada desde fuera             (esperado 403)
+  [32m301 [0m HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  [32m403 [0m Inyeccion SQL (GET)                            (esperado 403)
+  [32m403 [0m Inyeccion SQL (POST)                           (esperado 403)
+  [32m403 [0m XSS                                            (esperado 403)
+  [32m403 [0m Recorrido de rutas                             (esperado 403)
+  [32m403 [0m Inyeccion de comandos                          (esperado 403)
+  [32m403 [0m Log4Shell en cabecera                          (esperado 403)
+  [32m403 [0m Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  [32mOK[0m   puerto 8000 cerrado
+  [32mOK[0m   puerto 3306 cerrado
+  [32mOK[0m   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  [32mOK[0m   sin token: ***enmascarado*** · token malo: cerrada · token correcto: 200
+
+[32mTodo segun lo esperado.[0m
+codigo_glpi=0
