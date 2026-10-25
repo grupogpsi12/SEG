@@ -1,0 +1,64 @@
+== modo: exento · correlation_id de laboratorio: lab-f6-exento
+filas antes (auditoria/solicitud/ticket/colaborador): 413/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== EXENCION REGISTRADA: baneo y limites de ritmo relajados para TODO el sitio en este stack de laboratorio
+   (BunkerWeb no tiene exencion por IP sin saltar ModSecurity); overlay: auditoria/laboratorio/compose.escaner.yaml
+   esperando a que BunkerWeb recargue la configuracion...
+== controles antes de escanear
+   peticion legitima: 302 (esperado 302) · ataque SQL por User-Agent: 403 (esperado 403: CRS en bloqueo)
+   30 peticiones seguidas a /salud:      30 200  (sin 429 = limites relajados)
+== sesiones de laboratorio
+== ZAP activo por el WAF, autenticado como rrhh (hasta 8 minutos)
+WARN-NEW: Proxy Disclosure [40025] x 33 
+WARN-NEW: Cookie Slack Detector [90027] x 7 
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 3	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 140
+== ZAP activo por el WAF, autenticado como tecnico (hasta 8 minutos)
+WARN-NEW: Path Traversal [6] x 1 
+WARN-NEW: Cookie Slack Detector [90027] x 7 
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 4	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 139
+== sqlmap nivel 3 por el WAF
+### GET /cuentas (tecnico)
+      1 [16:52:37] [WARNING] parameter 'Referer' does not seem to be injectable
+      1 [16:52:37] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+      1 [16:52:34] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+      1 [16:52:31] [WARNING] parameter 'User-Agent' does not seem to be injectable
+      1 [16:52:31] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be SQL injectable
+      1 [16:52:28] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+### ruta /colaboradores/<id> (tecnico)
+      1 [16:52:44] [WARNING] URI parameter '#1*' does not seem to be injectable
+      1 [16:52:44] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+      1 [16:52:41] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+      1 [16:52:38] [WARNING] heuristic (basic) test shows that URI parameter '#1*' might not be SQL injectable
+      1 [16:52:38] [INFO] checking if the target is protected by some kind of WAF/IPS
+### ruta /solicitudes/<id> (rrhh)
+      1 [16:52:50] [WARNING] URI parameter '#1*' does not seem to be injectable
+      1 [16:52:50] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+      1 [16:52:48] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+      1 [16:52:45] [WARNING] heuristic (basic) test shows that URI parameter '#1*' might not be SQL injectable
+      1 [16:52:44] [INFO] checking if the target is protected by some kind of WAF/IPS
+### GET /auditoria?pagina (auditor)
+      1 [16:53:15] [WARNING] parameter 'Referer' does not seem to be injectable
+      1 [16:53:15] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+      1 [16:53:12] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+      1 [16:53:09] [WARNING] parameter 'User-Agent' does not seem to be injectable
+      1 [16:53:09] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be SQL injectable
+      1 [16:53:06] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+== controles despues de escanear
+   IPs baneadas al terminar: 0
+   ataque SQL por User-Agent despues del escaneo: 403 (esperado 403: ModSecurity siguio en bloqueo)
+== resumen de alertas de ZAP (riesgo: cantidad)
+   activo-rrhh.json:       7 Informational       1 Low       2 Medium 
+   activo-tecnico.json:       1 High       6 Informational       1 Low       2 Medium 
+== trafico visto por el WAF durante la corrida (codigos HTTP de app.localhost)
+   3581 /auditoria?pagina=1
+      4 /solicitudes/SOL-2026-000001%27%20ORDER%20BY%201%23
+      4 /auditoria?pagina=1%27%20ORDER%20BY%201%23
+      3 /solicitudes/SOL-2026-000001%20ORDER%20BY%201%23
+      3 /auditoria?pagina=1%20ORDER%20BY%201%23
+      2 /solicitudes/SOL-2026-000001%29%20ORDER%20BY%201%23
+      2 /solicitudes/SOL-2026-000001%27%29%29%20ORDER%20BY%201%23
+      2 /solicitudes/SOL-2026-000001%27%29%20ORDER%20BY%201%23
+== neutralizar al terminar
+filas despues (auditoria/solicitud/ticket/colaborador): 413/21/88/75
+web: healthy · worker: running
