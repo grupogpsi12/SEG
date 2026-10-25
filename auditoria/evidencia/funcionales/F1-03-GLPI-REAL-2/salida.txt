@@ -1,0 +1,28 @@
+..........................F...                                           [100%]
+=================================== FAILURES ===================================
+______ test_RF_16_la_prioridad_y_el_vencimiento_del_dominio_llegan_a_glpi ______
+
+glpi = (<jml.adaptadores.salida.glpi.cliente.SistemaDeTicketsGlpi object at 0x7f2f5b93f9e0>, <tests.dobles.glpi_real.TecnicoGlpiReal object at 0x7f2f5b9986e0>)
+
+    def test_RF_16_la_prioridad_y_el_vencimiento_del_dominio_llegan_a_glpi(
+        glpi: tuple[SistemaDeTicketsGlpi, TecnicoGlpiReal],
+    ) -> None:
+        """Spike 0.3: GLPI ignora `priority` y `time_to_resolve` al crear; el adaptador los consigue
+        con urgencia = impacto y con un PUT posterior, en UTC (la zona de GLPI)."""
+        adaptador, tecnico = glpi
+        nivel = {Prioridad.MEDIA: 3, Prioridad.ALTA: 4, Prioridad.MUY_ALTA: 5}
+        for t in tickets_de(TipoEvento.RET, Subtipo.RENUNCIA):
+            ticket = tecnico.ticket(adaptador.crear_ticket(t).id_externo)
+            assert int(ticket["priority"]) == nivel[t.prioridad], t.titulo
+>           assert ticket["time_to_resolve"] == t.vence_en.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S")
+E           AssertionError: assert None == '2026-10-20 04:59:59'
+E            +  where '2026-10-20 04:59:59' = <built-in method strftime of datetime.datetime object at 0x7f2f5b93e7c0>('%Y-%m-%d %H:%M:%S')
+E            +    where <built-in method strftime of datetime.datetime object at 0x7f2f5b93e7c0> = datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc).strftime
+E            +      where datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc) = <built-in method astimezone of datetime.datetime object at 0x7f2f5b93e7c0>(datetime.timezone.utc)
+E            +        where <built-in method astimezone of datetime.datetime object at 0x7f2f5b93e7c0> = datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc).astimezone
+E            +          where datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc) = TicketDeCola(solicitud_id='SOL-2026-000001', cola=<Cola.AD: 'AD'>, clase=<ClaseTicket.CIERRE_INMEDIATO: 'cierre_inmedi...l='Finanzas / Bogotá', fecha_efectiva=datetime.date(2026, 10, 19), solicitud='SOL-2026-000001'), adjunta_soporte=False).vence_en
+
+tests/integracion/test_glpi_real.py:90: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integracion/test_glpi_real.py::test_RF_16_la_prioridad_y_el_vencimiento_del_dominio_llegan_a_glpi
+1 failed, 29 passed, 48 deselected in 21.55s
