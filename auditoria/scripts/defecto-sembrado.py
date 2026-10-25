@@ -31,12 +31,33 @@ DEFECTOS: dict[str, tuple[str, str, str, list[str]]] = {
         "    return False  # DEFECTO SEMBRADO: el filtro deja pasar todo",
         ["tests/seguridad/test_filtro_de_logs.py"],
     ),
+    "U05-sin-bloqueo": (
+        "src/jml/adaptadores/salida/persistencia/repositorios.py",
+        '_con_restringido().select_for_update(of=("self",)).filter(pk=solicitud_id.valor).first()',
+        "_con_restringido().filter(pk=solicitud_id.valor).first()  # DEFECTO SEMBRADO: sin bloqueo",
+        ["bash", "infra/scripts/integracion-local.sh", "-k", "U05", "-x"],
+    ),
 }
 
 
 def pytest(pruebas: list[str]) -> int:
+    # Si la lista empieza por "bash", es un comando completo (p. ej. integracion-local.sh)
+    orden = (
+        pruebas
+        if pruebas[0] == "bash"
+        else [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "-x", *pruebas]
+    )
+    if orden[0] == "bash":
+        sys.path.insert(0, str(RAIZ / "auditoria" / "herramientas"))
+        import registrar  # el mismo bash de Git y el mismo PATH (docker, venv) que la evidencia
+
+        orden = [registrar.BASH, "-c", " ".join(orden[1:])]
+        entorno = registrar._entorno()
+    else:
+        entorno = None
     r = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "-x", *pruebas],
+        orden,
+        env=entorno,
         cwd=RAIZ, capture_output=True, text=True, check=False,
     )  # fmt: skip
     print("   ", (r.stdout.strip().splitlines() or ["(sin salida)"])[-1])
