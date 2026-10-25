@@ -14,7 +14,7 @@
     },
     "cobertura_ramas_aplicacion_pct": {
       "documentado": 99,
-      "medido": 94.4,
+      "medido": 93.97,
       "compuerta": 90
     },
     "pruebas_glpi_real": {
@@ -68,6 +68,9 @@
     },
     "pruebas_integracion_postgresql": {
       "medido": 251
+    },
+    "cobertura_ramas_seguridad_pct": {
+      "medido": 100
     }
   },
   "trazabilidad": {
@@ -84,13 +87,13 @@
     "criticos": 0,
     "altos": 0,
     "medios": 11,
-    "bajos": 5,
-    "informativos": 4,
-    "total": 20,
-    "abiertos": 11,
-    "verificados": 7,
-    "corregidos": 1,
-    "aceptados": 1
+    "bajos": 8,
+    "informativos": 5,
+    "total": 24,
+    "abiertos": 10,
+    "verificados": 10,
+    "corregidos": 2,
+    "aceptados": 2
   },
   "celdas_matriz_authz": {
     "total": null,

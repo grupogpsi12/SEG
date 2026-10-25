@@ -104,6 +104,18 @@ def test_U01_si_supabase_cae_entre_la_contrasena_y_el_codigo_no_hay_sesion(
     assert "no está disponible" in r.content.decode()
     r = c.post("/ingreso/segundo-factor", {"codigo": CODIGO_VALIDO})
     assert r.status_code == 200
+    assert "Código incorrecto" in r.content.decode()  # sin factor inscrito no hay AAL2
+    assert "usuario_id" not in c.session
+
+
+@pytest.mark.django_db
+def test_U01_si_supabase_cae_al_verificar_el_codigo_no_hay_sesion(web: GoTrueSimulado) -> None:
+    c = Client()
+    c.post("/ingreso", {"correo": CORREO, "contrasena": CLAVE})
+    c.get("/ingreso/segundo-factor")  # inscribe el TOTP
+    web.caido = True
+    r = c.post("/ingreso/segundo-factor", {"codigo": CODIGO_VALIDO})
+    assert r.status_code == 200
     assert "no está disponible" in r.content.decode()
     assert "usuario_id" not in c.session
 
