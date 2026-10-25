@@ -1,0 +1,92 @@
+.............                                                            [100%]
+229 passed in 3.09s
+⠋ Running...⠙ Running...⠹ Running...⠸ Running...⠼ Running...Done
+Failed to parse src/jml/aplicacion/puertos.py. Internal error from parso follows.
+----------------------------------
+To apply a mutant on disk:
+    mutmut apply <id>
+
+To show a mutant:
+    mutmut show <id>
+
+
+Untested/skipped (175)
+
+---- src/jml/aplicacion/bandeja.py (40) ----
+
+1-40
+
+---- src/jml/aplicacion/dtos.py (135) ----
+
+41-175
+Traceback (most recent call last):
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\parser.py", line 180, in _add_token
+    plan = stack[-1].dfa.transitions[transition]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: <PythonTokenTypes.NAME: TokenType(NAME)>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__init__.py", line 1244, in add_mutations_by_file
+    mutations_by_file[filename] = list_mutations(context)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__init__.py", line 686, in list_mutations
+    mutate(context)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__init__.py", line 571, in mutate
+    result = parse(context.source, error_recovery=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\__init__.py", line 58, in parse
+    return grammar.parse(code, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\grammar.py", line 156, in parse
+    root_node = p.parse(tokens=***enmascarado***
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\python\parser.py", line 79, in parse
+    return super().parse(tokens)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\parser.py", line 129, in parse
+    self._add_token(token)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\parser.py", line 186, in _add_token
+    self.error_recovery(token)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\python\parser.py", line 140, in error_recovery
+    return super().error_recovery(token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\parso\parser.py", line 152, in error_recovery
+    raise ParserSyntaxError('SyntaxError: invalid syntax', error_leaf)
+parso.parser.ParserSyntaxError: ('SyntaxError: invalid syntax', <ErrorLeaf: PythonTokenTypes.NAME:'NuevoId', (35, 5)>)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__main__.py", line 542, in <module>
+    climain()
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\click\core.py", line 1631, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\click\core.py", line 1552, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\click\core.py", line 2032, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\click\core.py", line 1415, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\click\core.py", line 910, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__init__.py", line 893, in wrapper
+    f(*args, **kwargs)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__main__.py", line 170, in run
+    sys.exit(do_run(argument, paths_to_mutate, disable_mutation_types, enable_mutation_types, runner,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__main__.py", line 448, in do_run
+    parse_run_argument(argument, config, dict_synonyms, mutations_by_file, paths_to_exclude, paths_to_mutate, tests_dirs)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__main__.py", line 476, in parse_run_argument
+    add_mutations_by_file(mutations_by_file, filename, dict_synonyms, config)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\mutmut\__init__.py", line 1249, in add_mutations_by_file
+    raise RuntimeError(
+RuntimeError: Failed while creating mutations for src/jml/aplicacion/puertos.py, for line """"Puertos de salida (SRS 10.1), cada uno con una implementacion real futura y un doble."

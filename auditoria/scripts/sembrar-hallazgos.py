@@ -86,7 +86,7 @@ H = [
     dict(
         id="B-04",
         sev="Media",
-        estado="abierto — se mide en F6-02/F6-03",
+        estado="verificado (F6-02 con la exención registrada y F6-03 sin ella; ModSecurity siguió en bloqueo y el baneo actúa)",
         titulo="Las pruebas activas (ZAP y sqlmap) nunca se han medido con el WAF delante",
         ubicacion="infra/scripts/seguridad-dinamica.sh:10",
         estandares="OWASP A02:2025 · STRIDE: T · Amenazas: T4, T19, T21 · RS-13 (pide dos posiciones) · CA-12",
@@ -105,7 +105,7 @@ H = [
     dict(
         id="B-05",
         sev="Baja",
-        estado="abierto — se cierra con U-06 (F3) y sqlmap nivel 5 (F6-04)",
+        estado="verificado (U-06 en F3 y sqlmap nivel 5 con `Host` en F6-04: 0 inyectables)",
         titulo="sqlmap nivel 3 no prueba la cabecera `Host`; el riesgo está acotado pero no probado",
         ubicacion="infra/scripts/seguridad-dinamica.sh (`--level=3`)",
         estandares="CWE-89 · OWASP A05:2025 Injection · STRIDE: T · Amenaza: T4 · WSTG-INPV",
@@ -162,7 +162,7 @@ H = [
     dict(
         id="B-08",
         sev="Informativa",
-        estado="abierto — F2-09",
+        estado="verificado (reglas S de ruff activas en toda la base: F2-09)",
         titulo="`ruff` no tiene activadas las reglas `S` (flake8-bandit)",
         ubicacion="pyproject.toml `[tool.ruff.lint] select`",
         estandares="OWASP A05:2025 · detección temprana",
@@ -219,7 +219,7 @@ H = [
     dict(
         id="B-11",
         sev="Media",
-        estado="abierto — F5 (matriz) y U-03",
+        estado="verificado (matriz de 440 celdas y U-03 en F5; una excepción conocida, B-26)",
         titulo="No existe la matriz de autorización como artefacto verificable ni una prueba que impida olvidar una ruta",
         ubicacion="src/config/urls.py (22 patrones) · tests/adaptadores/",
         estandares="CWE-285 · OWASP A01:2025 Broken Access Control · STRIDE: E, I · Amenazas: T10, T15 · WSTG-ATHZ",
