@@ -19,6 +19,12 @@ DEFECTOS: dict[str, tuple[str, str, str, list[str]]] = {
         "        pass  # DEFECTO SEMBRADO: el desafio sigue valiendo",
         ["tests/seguridad/test_segundo_factor.py"],
     ),
+    "U02-sin-firma": (
+        "src/jml/dominio/soporte.py",
+        "    if not contenido.startswith(FIRMA_PDF):",
+        "    if False:  # DEFECTO SEMBRADO: se acepta cualquier contenido con extension .pdf",
+        ["tests/seguridad/test_soporte.py"],
+    ),
 }
 
 
