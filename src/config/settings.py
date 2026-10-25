@@ -101,7 +101,7 @@ JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  
 # esquema `app` no esta expuesto, RD-10); `service_role` NUNCA se lee aqui (invariante 8).
 JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
 # RNF-01. /tmp es el tmpfs noexec propio de cada contenedor (compose): nadie mas escribe ahi.
-JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # nosec B108
+JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # nosec B108  # noqa: S108
 # RD-04: el worker deja aqui la exportacion diaria; el host la sube a Blob inmutable.
 JML_EXPORTES_DIR = os.environ.get("JML_EXPORTES_DIR", "/var/lib/jml/exportes")
 # Solo para enlazar tickets desde la ficha (RF-33); la web NUNCA llama a GLPI (CLAUDE.md).

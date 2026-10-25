@@ -66,7 +66,7 @@ target-version = "py312"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT"]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT", "S"]  # S: bandit en ruff (D-08)
 ignore = ["RUF001", "RUF002", "RUF003", "UP040", "UP047"]  # UP040/UP047: mutmut 2 no entiende PEP 695
 
 [tool.mypy]
@@ -105,8 +105,8 @@ type = "layers"
 layers = ["config", "jml.adaptadores", "jml.aplicacion", "jml.dominio"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["E501"]
+"tests/**" = ["E501", "S101", "S105", "S106", "S603", "S607", "S608"]  # aserciones, claves de prueba y comandos fijos
 # Guiones e informes de la auditoria (docs/PLAN_AUDITORIA.md): lineas largas con rutas y comandos.
-"auditoria/**" = ["E501"]
+"auditoria/**" = ["E501", "S101", "S603", "S607"]  # herramientas locales: ejecutan comandos propios
 # Modelos y migraciones de Django: atributos de clase mutables y lineas generadas son el idioma.
 "src/jml/adaptadores/salida/persistencia/**" = ["RUF012", "E501"]

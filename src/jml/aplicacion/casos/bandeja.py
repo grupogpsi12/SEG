@@ -109,6 +109,12 @@ class ProcesarBandeja:
         except ErrorDeSistemaDeTickets as error:
             self._fallo(entrada, error.codigo, cuenta)
             return
+        except Exception:
+            # Una respuesta de GLPI que el adaptador no supo leer (B-20) cuenta como un intento de
+            # ESTA entrada: sin esto quedaba primera en la cola y detenia a todas las demas. Es
+            # idempotente: `crear_ticket` no duplica. El texto de la excepcion no se guarda.
+            self._fallo(entrada, "error_inesperado", cuenta)
+            return
         self._confirmar(entrada, colaborador, id_usuario, creado.id_externo, soporte_nuevo, cuenta)
         if copia is not None:
             self._dep.soportes.borrar(copia)  # tras verificar el hash y confirmar (RF-40)
