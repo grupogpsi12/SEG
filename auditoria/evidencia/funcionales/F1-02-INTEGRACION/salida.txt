@@ -1,0 +1,21 @@
+ssss....................ssssss...ssssssss............................... [ 26%]
+........................................................................ [ 53%]
+........................................................................ [ 80%]
+.....................................................                    [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\integracion\test_flujos_glpi_real.py:117: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_flujos_glpi_real.py:148: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_flujos_glpi_real.py:171: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_flujos_glpi_real.py:198: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_glpi_real.py:49: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_glpi_real.py:62: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_glpi_real.py:76: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_glpi_real.py:89: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_glpi_real.py:103: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_glpi_real.py:112: S-28: sin un GLPI real (variables JML_GLPI_*)
+SKIPPED [1] tests\integracion\test_supabase_auth.py:48: S-28: sin proyecto de Supabase
+SKIPPED [1] tests\integracion\test_supabase_auth.py:53: S-28: sin proyecto de Supabase
+SKIPPED [4] tests\integracion\test_supabase_auth.py:58: S-28: sin proyecto de Supabase
+SKIPPED [1] tests\integracion\test_supabase_auth.py:73: S-28: sin proyecto de Supabase
+SKIPPED [1] tests\integracion\test_supabase_auth.py:80: S-28: sin proyecto de Supabase
+251 passed, 18 skipped in 6.95s

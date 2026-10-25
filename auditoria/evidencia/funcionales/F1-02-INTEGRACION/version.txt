@@ -1,0 +1,1 @@
+pytest 9.1.1 · postgres:17@sha256:2d2b8998… · HEAD de auditoria/entrega

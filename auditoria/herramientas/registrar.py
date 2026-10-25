@@ -76,12 +76,14 @@ def actualizar_manifiesto() -> int:
     return len(lineas)
 
 
-def _git(*args: str) -> str:
-    r = subprocess.run(["git", *args], cwd=RAIZ, capture_output=True, text=True, check=False)
+def _git(*args: str, cwd: Path = RAIZ) -> str:
+    r = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=False)
     return r.stdout.strip()
 
 
-def registrar(item: str, tipo: str, comando: str, version: str, timeout: int) -> tuple[int, Path]:
+def registrar(
+    item: str, tipo: str, comando: str, version: str, timeout: int, cwd: Path = RAIZ
+) -> tuple[int, Path]:
     if tipo not in TIPOS:
         raise SystemExit(f"tipo desconocido «{tipo}»; use uno de {sorted(TIPOS)}")
     destino = EVIDENCIA / tipo / item
@@ -90,7 +92,7 @@ def registrar(item: str, tipo: str, comando: str, version: str, timeout: int) ->
     try:
         r = subprocess.run(
             [BASH, "-c", comando],
-            cwd=RAIZ, env=_entorno(), capture_output=True, timeout=timeout, check=False,
+            cwd=cwd, env=_entorno(), capture_output=True, timeout=timeout, check=False,
         )  # fmt: skip
         salida = r.stdout.decode("utf-8", errors="replace") + r.stderr.decode(
             "utf-8", errors="replace"
@@ -104,9 +106,12 @@ def registrar(item: str, tipo: str, comando: str, version: str, timeout: int) ->
     (destino / "cmd.txt").write_text(comando + "\n", encoding="utf-8", newline="\n")
     (destino / "salida.txt").write_text(enmascarar(salida), encoding="utf-8", newline="\n")
     (destino / "version.txt").write_text(version + "\n", encoding="utf-8", newline="\n")
-    sucio = "con cambios sin confirmar" if _git("status", "--porcelain") else "árbol limpio"
+    sucio = (
+        "con cambios sin confirmar" if _git("status", "--porcelain", cwd=cwd) else "árbol limpio"
+    )
+    rama = _git("branch", "--show-current", cwd=cwd) or "sin rama"
     (destino / "commit.txt").write_text(
-        f"{_git('rev-parse', 'HEAD')} ({_git('branch', '--show-current')}; {sucio})\n",
+        f"{_git('rev-parse', 'HEAD', cwd=cwd)} ({rama}; {sucio})\n",
         encoding="utf-8", newline="\n",
     )  # fmt: skip
     (destino / "fecha-utc.txt").write_text(
@@ -129,12 +134,14 @@ def main() -> int:
     ap.add_argument("tipo")
     ap.add_argument("--version", required=True)
     ap.add_argument("--timeout", type=int, default=1800)
+    ap.add_argument("--cwd", default=None, help="directorio de ejecución y de git (un worktree)")
     ap.add_argument("--lineas", type=int, default=12, help="líneas finales que se muestran")
     a = ap.parse_args(argv[:corte])
     comando = " ".join(argv[corte + 1 :]).strip()
     if not comando:
         raise SystemExit("falta el comando después de --")
-    codigo, destino = registrar(a.item, a.tipo, comando, a.version, a.timeout)
+    cwd = Path(a.cwd).resolve() if a.cwd else RAIZ
+    codigo, destino = registrar(a.item, a.tipo, comando, a.version, a.timeout, cwd)
     cuantos = actualizar_manifiesto()
     cola = (destino / "salida.txt").read_text(encoding="utf-8").splitlines()[-a.lineas :]
     print(os.linesep.join(cola))

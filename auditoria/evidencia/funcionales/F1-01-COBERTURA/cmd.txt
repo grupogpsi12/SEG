@@ -1,0 +1,1 @@
+python '/c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/auditoria/scripts/cobertura-por-capa.py' --json '/c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/auditoria/evidencia/funcionales/F1-01-COBERTURA/cobertura.json'

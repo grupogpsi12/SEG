@@ -1,0 +1,1 @@
+bash infra/scripts/integracion-local.sh --junitxml='/c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/auditoria/evidencia/funcionales/F1-02-INTEGRACION/junit.xml'
