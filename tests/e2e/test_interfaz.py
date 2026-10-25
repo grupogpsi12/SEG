@@ -103,7 +103,7 @@ class Vigilada:
 
     def cerrar(self) -> None:
         self.contexto.close()
-        assert self.problemas == [], (self.problemas, [r for r in self.respuestas if 'static' in r])
+        assert self.problemas == [], (self.problemas, [r for r in self.respuestas if "static" in r])
 
 
 @pytest.fixture
