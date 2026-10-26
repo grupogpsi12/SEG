@@ -243,3 +243,12 @@ def test_B_01_la_ip_de_confianza_de_bunkerweb_esta_reservada_fuera_del_rango_din
     rango_dinamico = ipaddress.IPv4Network(config["ip_range"])  # falla si no se declaro
     assert rango_dinamico.subnet_of(subred)
     assert ip_fija not in rango_dinamico
+
+
+def test_B_38_el_volumen_de_soportes_se_monta_sin_ejecucion() -> None:
+    """Invariante 12 y RS-17: el soporte de vinculacion vive en un volumen `noexec`. Lo daba
+    `compose.azure.yaml` (un directorio del host con noexec); con ADR-031 no hay VM, y el volumen
+    con nombre de compose.yaml se montaba `ext4 rw` en web y worker (medido en /proc/mounts)."""
+    opciones = COMPOSE["volumes"]["soportes"]["driver_opts"]
+    assert opciones["type"] == "tmpfs"
+    assert {"noexec", "nosuid", "nodev"} <= set(opciones["o"].split(","))
