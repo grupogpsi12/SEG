@@ -1,0 +1,138 @@
+### PostgreSQL 17 (sustituto local de Supabase, ADR-028)
+                                                       version                                                        
+----------------------------------------------------------------------------------------------------------------------
+ PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+(1 row)
+
+                name                 |    setting    
+-------------------------------------+---------------
+ idle_in_transaction_session_timeout | 0
+ listen_addresses                    | *
+ log_connections                     | off
+ log_disconnections                  | off
+ log_statement                       | none
+ password_encryption                 | scram-sha-256
+ row_security                        | on
+ ssl                                 | off
+(8 rows)
+
+-- pg_hba (reglas efectivas)
+ type  |   database    | user_name |  address  |  auth_method  
+-------+---------------+-----------+-----------+---------------
+ local | {all}         | {all}     |           | trust
+ host  | {all}         | {all}     | 127.0.0.1 | trust
+ host  | {all}         | {all}     | ::1       | trust
+ local | {replication} | {all}     |           | trust
+ host  | {replication} | {all}     | 127.0.0.1 | trust
+ host  | {replication} | {all}     | ::1       | trust
+ host  | {all}         | {all}     | all       | scram-sha-256
+(7 rows)
+
+-- Roles: superusuario, BYPASSRLS, login
+    rolname    | rolsuper | rolbypassrls | rolcanlogin | rolcreaterole | rolcreatedb 
+---------------+----------+--------------+-------------+---------------+-------------
+ anon          | f        | f            | f           | f             | f
+ app_backend   | f        | t            | t           | f             | f
+ app_owner     | f        | f            | t           | f             | f
+ authenticated | f        | f            | f           | f             | f
+ postgres      | t        | t            | t           | t             | t
+ service_role  | f        | f            | f           | f             | f
+(6 rows)
+
+-- Tablas del esquema app: duenio y RLS
+          relname           |  duenio   | rls 
+----------------------------+-----------+-----
+ activo_asignado            | app_owner | t
+ auditoria                  | app_owner | t
+ auth_group                 | app_owner | f
+ auth_group_permissions     | app_owner | f
+ auth_permission            | app_owner | f
+ auth_user                  | app_owner | f
+ auth_user_groups           | app_owner | f
+ auth_user_user_permissions | app_owner | f
+ colaborador                | app_owner | t
+ consecutivo                | app_owner | t
+ cuenta                     | app_owner | t
+ cuenta_historial           | app_owner | t
+ decision                   | app_owner | t
+ django_content_type        | app_owner | f
+ django_migrations          | app_owner | f
+ django_session             | app_owner | f
+ licencia_asignada          | app_owner | t
+ outbox                     | app_owner | t
+ perfil_acceso              | app_owner | t
+ recurso_perfil             | app_owner | t
+ sincronizacion             | app_owner | t
+ solicitud                  | app_owner | t
+ solicitud_restringida      | app_owner | t
+ soporte                    | app_owner | t
+ ticket                     | app_owner | t
+ usuario_perfil             | app_owner | t
+(26 rows)
+
+-- Privilegios de app_backend sobre tablas sensibles
+      table_name       |         privilegios         
+-----------------------+-----------------------------
+ auditoria             | INSERT,SELECT
+ cuenta_historial      | INSERT,SELECT
+ decision              | INSERT,SELECT
+ solicitud             | DELETE,INSERT,SELECT,UPDATE
+ solicitud_restringida | DELETE,INSERT,SELECT,UPDATE
+(5 rows)
+
+-- Permisos a PUBLIC en el esquema app
+ grants_a_public 
+-----------------
+               0
+(1 row)
+
+-- Prueba negativa: app_backend no puede modificar la auditoria (RD-02) ni una solicitud aprobada (RF-14)
+BEGIN
+SET
+SAVEPOINT
+ERROR:  permission denied for table auditoria
+ROLLBACK
+SAVEPOINT
+ERROR:  permission denied for table auditoria
+ROLLBACK
+SAVEPOINT
+ERROR:  solicitud SOL-2026-000001 aprobada: su contenido es inmutable (RF-14)
+CONTEXT:  PL/pgSQL function app.app_solicitud_inmutable() line 20 at RAISE
+ROLLBACK
+SAVEPOINT
+ERROR:  solicitud SOL-2026-000001: transicion en_ejecucion -> pendiente_aprobacion no permitida (RF-14)
+CONTEXT:  PL/pgSQL function app.app_solicitud_inmutable() line 6 at RAISE
+ROLLBACK
+ROLLBACK
+
+### MariaDB 11.4 (base de GLPI)
++-------------------------+
+| version()               |
++-------------------------+
+| 11.4.13-MariaDB-ubu2404 |
++-------------------------+
++-----------------------------------------------------------------------------------------------------+
+| Grants for glpi@%                                                                                   |
++-----------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `glpi`@`%` IDENTIFIED BY PASSWORD '<oculto>' |
+| GRANT ALL PRIVILEGES ON `glpi`.* TO `glpi`@`%`                                                      |
++-----------------------------------------------------------------------------------------------------+
++--------------------------+-----------------+
+| Variable_name            | Value           |
++--------------------------+-----------------+
+| bind_address             |                 |
+| general_log              | OFF             |
+| have_ssl                 | YES             |
+| local_infile             | ON              |
+| log_warnings             | 2               |
+| require_secure_transport | OFF             |
+| secure_file_priv         |                 |
+| skip_name_resolve        | ON              |
+| tls_version              | TLSv1.2,TLSv1.3 |
++--------------------------+-----------------+
+--------------
+select user, host from mysql.user
+--------------
+
+ERROR 1142 (42000) at line 6: SELECT command denied to user 'glpi'@'localhost' for table `mysql`.`user`
+-- Usuarios anonimos o root remoto (si la consulta anterior no tiene permiso, se infiere de los GRANT)

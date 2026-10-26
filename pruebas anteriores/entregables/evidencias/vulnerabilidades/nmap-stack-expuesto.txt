@@ -1,0 +1,192 @@
+# Nmap 7.98 scan initiated Sat Oct 24 15:59:24 2026 as: /usr/bin/nmap -Pn -sV --script ssl-enum-ciphers,http-methods,http-security-headers,http-server-header -p 80,443,3000,24224 -oN /o/nmap-stack-expuesto.txt host.docker.internal
+Nmap scan report for host.docker.internal (192.168.65.254)
+Host is up (0.0018s latency).
+Other addresses for host.docker.internal (not scanned): fdc4:f303:9324::254
+
+PORT      STATE SERVICE   VERSION
+80/tcp    open  http
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+| fingerprint-strings: 
+|   GetRequest: 
+|     HTTP/1.1 200 OK
+|     Date: Sat, 24 Oct 2026 15:59:31 GMT
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 8756
+|     Connection: close
+|     Content-Security-Policy: default-src 'none'; style-src 'nonce-KhYbxjqqDYCoEBDLZ1RNWhat7ofHfFHk'; frame-ancestors 'none'; base-uri 'none'; img-src data:; font-src data:; require-trusted-types-for 'script';
+|     X-Content-Type-Options: nosniff
+|     Referrer-Policy: no-referrer
+|     Permissions-Policy: accelerometer=(), ambient-light-sensor=(), aria-notify=(), attribution-reporting=(), autoplay=(), bluetooth=(), browsing-topics=(), camera=(), captured-surface-control=(), ch-device-memory=(), ch-downlink=(), ch-dpr=(), ch-ect=(), ch-prefers-color-scheme=(), ch-prefers-reduced-motion=(), ch-prefers-reduced-transparency=(), ch-rtt=(), ch-save-data=(), ch-ua-arch=(), ch-ua-bitness=(), ch-ua-form-factors=(), ch-ua-full-version-list=(), ch-ua-full-version=(), ch-ua-high-entro
+|   HTTPOptions: 
+|     HTTP/1.1 200 OK
+|     Date: Sat, 24 Oct 2026 15:59:31 GMT
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 8756
+|     Connection: close
+|     Content-Security-Policy: default-src 'none'; style-src 'nonce-o63LweFrC0bzhMg1cBJUfxSjX8MjnFeu'; frame-ancestors 'none'; base-uri 'none'; img-src data:; font-src data:; require-trusted-types-for 'script';
+|     X-Content-Type-Options: nosniff
+|     Referrer-Policy: no-referrer
+|_    Permissions-Policy: accelerometer=(), ambient-light-sensor=(), aria-notify=(), attribution-reporting=(), autoplay=(), bluetooth=(), browsing-topics=(), camera=(), captured-surface-control=(), ch-device-memory=(), ch-downlink=(), ch-dpr=(), ch-ect=(), ch-prefers-color-scheme=(), ch-prefers-reduced-motion=(), ch-prefers-reduced-transparency=(), ch-rtt=(), ch-save-data=(), ch-ua-arch=(), ch-ua-bitness=(), ch-ua-form-factors=(), ch-ua-full-version-list=(), ch-ua-full-version=(), ch-ua-high-entro
+|_http-trane-info: Problem with XML parsing of /evox/about
+| http-security-headers: 
+|   X_Content_Type_Options: 
+|     Header: X-Content-Type-Options: nosniff
+|     Description: Will prevent the browser from MIME-sniffing a response away from the declared content-type. 
+|   Content_Security_Policy: 
+|     Header: Content-Security-Policy: default-src 'none'; style-src 'nonce-j7QPqHoujq1VhRxh1dukIhjlNf4E3Ufe'; frame-ancestors 'none'; base-uri 'none'; img-src data:; font-src data:; require-trusted-types-for 'script';
+|     Description: Define the base uri for relative uri.
+|     Description: Define loading policy for all resources type in case of a resource type dedicated directive is not defined (fallback).
+|     Description: Define which styles (CSS) the user applies to the protected resource.
+|     Description: Define from where the protected resource can load images.
+|     Description: Define from where the protected resource can be embedded in frames.
+|     Description: Define from where the protected resource can load fonts.
+|   Cache_Control: 
+|_    Header: Cache-Control: no-cache, no-store, must-revalidate
+443/tcp   open  ssl/https
+| http-security-headers: 
+|   Strict_Transport_Security: 
+|     Header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+|   X_Content_Type_Options: 
+|     Header: X-Content-Type-Options: nosniff
+|     Description: Will prevent the browser from MIME-sniffing a response away from the declared content-type. 
+|   Content_Security_Policy: 
+|     Header: Content-Security-Policy: default-src 'none'; style-src 'nonce-QKnuPYPo9u5ZI2rwu5iZBYUlyo6FQArx'; frame-ancestors 'none'; base-uri 'none'; img-src data:; font-src data:; require-trusted-types-for 'script'; upgrade-insecure-requests;
+|     Description: Define the base uri for relative uri.
+|     Description: Define loading policy for all resources type in case of a resource type dedicated directive is not defined (fallback).
+|     Description: Define which styles (CSS) the user applies to the protected resource.
+|     Description: Define from where the protected resource can load images.
+|     Description: Define from where the protected resource can be embedded in frames.
+|     Description: Define from where the protected resource can load fonts.
+|     Description: Instructs user agent to download insecure resources using HTTPS.
+|   Cache_Control: 
+|_    Header: Cache-Control: no-cache, no-store, must-revalidate
+|_http-trane-info: Problem with XML parsing of /evox/about
+| ssl-enum-ciphers: 
+|   TLSv1.2: 
+|     ciphers: 
+|       TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 (ecdh_x25519) - A
+|     compressors: 
+|       NULL
+|     cipher preference: server
+|     warnings: 
+|       Key exchange (ecdh_x25519) of lower strength than certificate key
+|_  least strength: A
+| fingerprint-strings: 
+|   GetRequest: 
+|     HTTP/1.1 200 OK
+|     Date: Sat, 24 Oct 2026 15:59:37 GMT
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 8756
+|     Connection: close
+|     Content-Security-Policy: default-src 'none'; style-src 'nonce-F9ZX350WC9nmBlkCOjhctU8mgHeZKj8y'; frame-ancestors 'none'; base-uri 'none'; img-src data:; font-src data:; require-trusted-types-for 'script'; upgrade-insecure-requests;
+|     Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+|     X-Content-Type-Options: nosniff
+|     Referrer-Policy: no-referrer
+|     Permissions-Policy: accelerometer=(), ambient-light-sensor=(), aria-notify=(), attribution-reporting=(), autoplay=(), bluetooth=(), browsing-topics=(), camera=(), captured-surface-control=(), ch-device-memory=(), ch-downlink=(), ch-dpr=(), ch-ect=(), ch-prefers-color-scheme=(), ch-prefers-reduced-motion=(), ch-prefers-reduced-transparency=(), ch-rtt=(), ch-save-data=(), ch-ua-arch=(), ch-ua-bi
+|   HTTPOptions: 
+|     HTTP/1.1 200 OK
+|     Date: Sat, 24 Oct 2026 15:59:37 GMT
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 8756
+|     Connection: close
+|     Content-Security-Policy: default-src 'none'; style-src 'nonce-dVreKxHipW5U09QIRxGssuHRvpSmiWo5'; frame-ancestors 'none'; base-uri 'none'; img-src data:; font-src data:; require-trusted-types-for 'script'; upgrade-insecure-requests;
+|     Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+|     X-Content-Type-Options: nosniff
+|     Referrer-Policy: no-referrer
+|_    Permissions-Policy: accelerometer=(), ambient-light-sensor=(), aria-notify=(), attribution-reporting=(), autoplay=(), bluetooth=(), browsing-topics=(), camera=(), captured-surface-control=(), ch-device-memory=(), ch-downlink=(), ch-dpr=(), ch-ect=(), ch-prefers-color-scheme=(), ch-prefers-reduced-motion=(), ch-prefers-reduced-transparency=(), ch-rtt=(), ch-save-data=(), ch-ua-arch=(), ch-ua-bi
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+3000/tcp  open  http      Grafana http
+| http-security-headers: 
+|   X_Frame_Options: 
+|     Header: X-Frame-Options: deny
+|     Description: The browser must not display this content in any frame.
+|   X_XSS_Protection: 
+|     Header: X-XSS-Protection: 1; mode=block
+|     Description: The browser will prevent the rendering of the page when XSS is detected.
+|   X_Content_Type_Options: 
+|     Header: X-Content-Type-Options: nosniff
+|     Description: Will prevent the browser from MIME-sniffing a response away from the declared content-type. 
+|   Cache_Control: 
+|_    Header: Cache-Control: no-store
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-trane-info: Problem with XML parsing of /evox/about
+24224/tcp open  unknown
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port80-TCP:V=7.98%I=7%D=10/24%Time=6ADCD5E3%P=x86_64-unknown-linux-gnu%
+SF:r(GetRequest,2B80,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024\x20Oct
+SF:\x202026\x2015:59:31\x20GMT\r\nContent-Type:\x20text/html;\x20charset=u
+SF:tf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nContent-Secu
+SF:rity-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-KhYbxjqqD
+SF:YCoEBDLZ1RNWhat7ofHfFHk';\x20frame-ancestors\x20'none';\x20base-uri\x20
+SF:'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-trusted-t
+SF:ypes-for\x20'script';\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer
+SF:-Policy:\x20no-referrer\r\nPermissions-Policy:\x20accelerometer=\(\),\x
+SF:20ambient-light-sensor=\(\),\x20aria-notify=\(\),\x20attribution-report
+SF:ing=\(\),\x20autoplay=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),
+SF:\x20camera=\(\),\x20captured-surface-control=\(\),\x20ch-device-memory=
+SF:\(\),\x20ch-downlink=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefer
+SF:s-color-scheme=\(\),\x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-r
+SF:educed-transparency=\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-u
+SF:a-arch=\(\),\x20ch-ua-bitness=\(\),\x20ch-ua-form-factors=\(\),\x20ch-u
+SF:a-full-version-list=\(\),\x20ch-ua-full-version=\(\),\x20ch-ua-high-ent
+SF:ro")%r(HTTPOptions,2B80,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024\
+SF:x20Oct\x202026\x2015:59:31\x20GMT\r\nContent-Type:\x20text/html;\x20cha
+SF:rset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nConten
+SF:t-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-o63
+SF:LweFrC0bzhMg1cBJUfxSjX8MjnFeu';\x20frame-ancestors\x20'none';\x20base-u
+SF:ri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-tru
+SF:sted-types-for\x20'script';\r\nX-Content-Type-Options:\x20nosniff\r\nRe
+SF:ferrer-Policy:\x20no-referrer\r\nPermissions-Policy:\x20accelerometer=\
+SF:(\),\x20ambient-light-sensor=\(\),\x20aria-notify=\(\),\x20attribution-
+SF:reporting=\(\),\x20autoplay=\(\),\x20bluetooth=\(\),\x20browsing-topics
+SF:=\(\),\x20camera=\(\),\x20captured-surface-control=\(\),\x20ch-device-m
+SF:emory=\(\),\x20ch-downlink=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-
+SF:prefers-color-scheme=\(\),\x20ch-prefers-reduced-motion=\(\),\x20ch-pre
+SF:fers-reduced-transparency=\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x
+SF:20ch-ua-arch=\(\),\x20ch-ua-bitness=\(\),\x20ch-ua-form-factors=\(\),\x
+SF:20ch-ua-full-version-list=\(\),\x20ch-ua-full-version=\(\),\x20ch-ua-hi
+SF:gh-entro");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port443-TCP:V=7.98%T=SSL%I=7%D=10/24%Time=6ADCD5E9%P=x86_64-unknown-lin
+SF:ux-gnu%r(GetRequest,2BE4,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024
+SF:\x20Oct\x202026\x2015:59:37\x20GMT\r\nContent-Type:\x20text/html;\x20ch
+SF:arset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nConte
+SF:nt-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-F9
+SF:ZX350WC9nmBlkCOjhctU8mgHeZKj8y';\x20frame-ancestors\x20'none';\x20base-
+SF:uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-tr
+SF:usted-types-for\x20'script';\x20upgrade-insecure-requests;\r\nStrict-Tr
+SF:ansport-Security:\x20max-age=31536000;\x20includeSubDomains;\x20preload
+SF:\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer-Policy:\x20no-referr
+SF:er\r\nPermissions-Policy:\x20accelerometer=\(\),\x20ambient-light-senso
+SF:r=\(\),\x20aria-notify=\(\),\x20attribution-reporting=\(\),\x20autoplay
+SF:=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),\x20camera=\(\),\x20c
+SF:aptured-surface-control=\(\),\x20ch-device-memory=\(\),\x20ch-downlink=
+SF:\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefers-color-scheme=\(\),\
+SF:x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-reduced-transparency=\
+SF:(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-ua-arch=\(\),\x20ch-ua
+SF:-bi")%r(HTTPOptions,2BE4,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024
+SF:\x20Oct\x202026\x2015:59:37\x20GMT\r\nContent-Type:\x20text/html;\x20ch
+SF:arset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nConte
+SF:nt-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-dV
+SF:reKxHipW5U09QIRxGssuHRvpSmiWo5';\x20frame-ancestors\x20'none';\x20base-
+SF:uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-tr
+SF:usted-types-for\x20'script';\x20upgrade-insecure-requests;\r\nStrict-Tr
+SF:ansport-Security:\x20max-age=31536000;\x20includeSubDomains;\x20preload
+SF:\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer-Policy:\x20no-referr
+SF:er\r\nPermissions-Policy:\x20accelerometer=\(\),\x20ambient-light-senso
+SF:r=\(\),\x20aria-notify=\(\),\x20attribution-reporting=\(\),\x20autoplay
+SF:=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),\x20camera=\(\),\x20c
+SF:aptured-surface-control=\(\),\x20ch-device-memory=\(\),\x20ch-downlink=
+SF:\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefers-color-scheme=\(\),\
+SF:x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-reduced-transparency=\
+SF:(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-ua-arch=\(\),\x20ch-ua
+SF:-bi");
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 24 15:59:43 2026 -- 1 IP address (1 host up) scanned in 18.34 seconds

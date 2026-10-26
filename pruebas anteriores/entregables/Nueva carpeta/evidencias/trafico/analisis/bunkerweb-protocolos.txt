@@ -1,0 +1,25 @@
+
+===================================================================
+Protocol Hierarchy Statistics
+Filter: 
+
+frame                                    frames:3264 bytes:2099090
+  sll                                    frames:3264 bytes:2099090
+    ip                                   frames:3258 bytes:2098802
+      tcp                                frames:3248 bytes:2098014
+        x11                              frames:25 bytes:5725
+          x11                            frames:25 bytes:5725
+            x11                          frames:25 bytes:5725
+              x11                        frames:25 bytes:5725
+        tls                              frames:758 bytes:1379263
+          tls                            frames:3 bytes:54734
+        http                             frames:252 bytes:244951
+          data-text-lines                frames:83 bytes:163204
+          urlencoded-form                frames:22 bytes:15165
+          json                           frames:40 bytes:9197
+          mime_multipart                 frames:4 bytes:8686
+          media                          frames:1 bytes:632
+      udp                                frames:10 bytes:788
+        dns                              frames:10 bytes:788
+    arp                                  frames:6 bytes:288
+===================================================================

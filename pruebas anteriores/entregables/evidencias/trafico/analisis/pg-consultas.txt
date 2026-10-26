@@ -1,0 +1,40 @@
+    241 172.18.0.3	BEGIN
+    235 172.18.0.3	COMMIT
+    135 172.18.0.3	SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user
+    120 172.18.0.3	SELECT "colaborador"."id", "colaborador"."documento", "colaborador"."nombres", "colaborador"."apellidos", "colaborador"."vinculacion", "colaborador"."departamento", "colaborador"."cargo", "colaborador"."sede",
+     87 172.18.0.3	SELECT set_config('TimeZone', 'UTC', false)
+     80 172.18.0.4	SELECT "solicitud"."id", "solicitud"."colaborador_id", "solicitud"."tipo", "solicitud"."subtipo", "solicitud"."fecha_efectiva", "solicitud"."datos", "solicitud"."solicitante_id", "solicitud"."estado", "solicit
+     66 172.18.0.3	SELECT "usuario_perfil"."usuario_id", "usuario_perfil"."colaborador_id" FROM "usuario_perfil" WHERE "usuario_perfil"."usuario_id" = 2 ORDER BY "usuario_perfil"."usuario_id" ASC LIMIT 1
+     66 172.18.0.3	SELECT "auth_group"."name" AS "name" FROM "auth_group" INNER JOIN "auth_user_groups" ON ("auth_group"."id" = "auth_user_groups"."group_id") WHERE "auth_user_groups"."user_id" = 2
+     65 172.18.0.3	SELECT "solicitud"."id", "solicitud"."colaborador_id", "solicitud"."tipo", "solicitud"."subtipo", "solicitud"."fecha_efectiva", "solicitud"."datos", "solicitud"."solicitante_id", "solicitud"."estado", "solicit
+     51 172.18.0.4	COMMIT
+     51 172.18.0.4	BEGIN
+     48 172.18.0.4	SELECT "outbox"."ticket_id", "outbox"."estado", "outbox"."intentos", "outbox"."proximo_intento", "outbox"."ultimo_error", "ticket"."clave", "ticket"."solicitud_id", "ticket"."cola", "ticket"."clase", "ticket".
+     41 172.18.0.4	SELECT "ticket"."clave", "ticket"."solicitud_id", "ticket"."cola", "ticket"."clase", "ticket"."accion", "ticket"."prioridad", "ticket"."emitido_en", "ticket"."vence_en", "ticket"."activo_desde", "ticket"."defi
+     38 172.18.0.3	SELECT "cuenta"."id", "cuenta"."colaborador_id", "cuenta"."sistema", "cuenta"."estado", "cuenta"."ticket_origen", "cuenta"."origen_emitido_en", "cuenta"."origen_vence_en", "cuenta"."desde", "cuenta"."marca" FR
+     26 172.18.0.3	SELECT "usuario_perfil"."usuario_id", "usuario_perfil"."colaborador_id" FROM "usuario_perfil" WHERE "usuario_perfil"."usuario_id" = 3 ORDER BY "usuario_perfil"."usuario_id" ASC LIMIT 1
+     26 172.18.0.3	SELECT "auth_group"."name" AS "name" FROM "auth_group" INNER JOIN "auth_user_groups" ON ("auth_group"."id" = "auth_user_groups"."group_id") WHERE "auth_user_groups"."user_id" = 3
+     25 172.18.0.4	SELECT "consecutivo"."clave", "consecutivo"."ultimo" FROM "consecutivo" WHERE "consecutivo"."clave" = 'auditoria' LIMIT 21 FOR UPDATE
+     25 172.18.0.4	SELECT "colaborador"."id", "colaborador"."documento", "colaborador"."nombres", "colaborador"."apellidos", "colaborador"."vinculacion", "colaborador"."departamento", "colaborador"."cargo", "colaborador"."sede",
+     25 172.18.0.4	SELECT "auditoria"."secuencia", "auditoria"."fecha", "auditoria"."actor", "auditoria"."accion", "auditoria"."objeto", "auditoria"."datos", "auditoria"."hash_anterior", "auditoria"."hash" FROM "auditoria" ORDER
+     24 172.18.0.4	SELECT "solicitud_restringida"."solicitud_id", "solicitud_restringida"."contenido" FROM "solicitud_restringida" WHERE "solicitud_restringida"."solicitud_id" = 'SOL-2026-000005' ORDER BY "solicitud_restringida"
+     24 172.18.0.4	SELECT "solicitud_restringida"."solicitud_id", "solicitud_restringida"."contenido" FROM "solicitud_restringida" WHERE "solicitud_restringida"."solicitud_id" = 'SOL-2026-000004' ORDER BY "solicitud_restringida"
+     23 172.18.0.3	SELECT "ticket"."clave", "ticket"."solicitud_id", "ticket"."cola", "ticket"."clase", "ticket"."accion", "ticket"."prioridad", "ticket"."emitido_en", "ticket"."vence_en", "ticket"."activo_desde", "ticket"."defi
+     23 172.18.0.3	SELECT "auditoria"."secuencia", "auditoria"."fecha", "auditoria"."actor", "auditoria"."accion", "auditoria"."objeto", "auditoria"."datos", "auditoria"."hash_anterior", "auditoria"."hash" FROM "auditoria" ORDER
+     22 172.18.0.3	SELECT "recurso_perfil"."id", "recurso_perfil"."perfil_id", "recurso_perfil"."ruta", "recurso_perfil"."serie", "recurso_perfil"."perfil_de_recurso", "recurso_perfil"."grupo" FROM "recurso_perfil" WHERE "recurs
+     21 172.18.0.4	SELECT "soporte"."solicitud_id", "soporte"."nombre_original", "soporte"."tamano", "soporte"."sha256", "soporte"."nombre_almacenado", "soporte"."estado", "soporte"."id_documento_glpi" FROM "soporte" WHERE "sopo
+     20 172.18.0.3	INSERT INTO "ticket" ("clave", "solicitud_id", "cola", "clase", "accion", "prioridad", "emitido_en", "vence_en", "activo_desde", "definicion", "id_externo", "estado_glpi", "tiene_solucion", "documentos", "obse
+     18 172.18.0.3	SELECT "consecutivo"."clave", "consecutivo"."ultimo" FROM "consecutivo" WHERE "consecutivo"."clave" = 'auditoria' LIMIT 21 FOR UPDATE
+     12 172.18.0.4	SELECT "solicitud_restringida"."solicitud_id", "solicitud_restringida"."contenido" FROM "solicitud_restringida" WHERE "solicitud_restringida"."solicitud_id" = 'SOL-2026-000003' ORDER BY "solicitud_restringida"
+     12 172.18.0.4	SELECT "solicitud_restringida"."solicitud_id", "solicitud_restringida"."contenido" FROM "solicitud_restringida" WHERE "solicitud_restringida"."solicitud_id" = 'SOL-2026-000001' ORDER BY "solicitud_restringida"
+     11 172.18.0.3	SELECT "usuario_perfil"."usuario_id", "usuario_perfil"."colaborador_id" FROM "usuario_perfil" WHERE "usuario_perfil"."usuario_id" = 7 ORDER BY "usuario_perfil"."usuario_id" ASC LIMIT 1
+     11 172.18.0.3	SELECT "usuario_perfil"."usuario_id", "usuario_perfil"."colaborador_id" FROM "usuario_perfil" WHERE "usuario_perfil"."usuario_id" = 4 ORDER BY "usuario_perfil"."usuario_id" ASC LIMIT 1
+     11 172.18.0.3	SELECT "auth_group"."name" AS "name" FROM "auth_group" INNER JOIN "auth_user_groups" ON ("auth_group"."id" = "auth_user_groups"."group_id") WHERE "auth_user_groups"."user_id" = 7
+     11 172.18.0.3	SELECT "auth_group"."name" AS "name" FROM "auth_group" INNER JOIN "auth_user_groups" ON ("auth_group"."id" = "auth_user_groups"."group_id") WHERE "auth_user_groups"."user_id" = 4
+     10 172.18.0.3	SELECT "usuario_perfil"."usuario_id", "usuario_perfil"."colaborador_id" FROM "usuario_perfil" WHERE "usuario_perfil"."usuario_id" = 5 ORDER BY "usuario_perfil"."usuario_id" ASC LIMIT 1
+     10 172.18.0.3	SELECT "auth_group"."name" AS "name" FROM "auth_group" INNER JOIN "auth_user_groups" ON ("auth_group"."id" = "auth_user_groups"."group_id") WHERE "auth_user_groups"."user_id" = 5
+      8 172.18.0.3	SELECT "usuario_perfil"."usuario_id", "usuario_perfil"."colaborador_id" FROM "usuario_perfil" WHERE "usuario_perfil"."usuario_id" = 8 ORDER BY "usuario_perfil"."usuario_id" ASC LIMIT 1
+      8 172.18.0.3	SELECT "solicitud_restringida"."solicitud_id", "solicitud_restringida"."contenido" FROM "solicitud_restringida" WHERE "solicitud_restringida"."solicitud_id" = 'SOL-2026-000002' ORDER BY "solicitud_restringida"
+      8 172.18.0.3	SELECT "solicitud_restringida"."solicitud_id", "solicitud_restringida"."contenido" FROM "solicitud_restringida" WHERE "solicitud_restringida"."solicitud_id" = 'SOL-2026-000001' ORDER BY "solicitud_restringida"
+      8 172.18.0.3	SELECT "auth_group"."name" AS "name" FROM "auth_group" INNER JOIN "auth_user_groups" ON ("auth_group"."id" = "auth_user_groups"."group_id") WHERE "auth_user_groups"."user_id" = 8
+      6 172.18.0.4	UPDATE "solicitud" SET "colaborador_id" = 'col-014', "tipo" = 'RET', "subtipo" = 'fin_de_contrato', "fecha_efectiva" = '2026-10-27'::date, "datos" = '{}'::jsonb, "solicitante_id" = '00000000-0000-4000-8000-000

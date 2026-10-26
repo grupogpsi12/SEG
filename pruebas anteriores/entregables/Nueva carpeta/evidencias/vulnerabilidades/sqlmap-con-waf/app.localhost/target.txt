@@ -1,0 +1,1 @@
+https://app.localhost/cuentas?nombre=Ana&departamento=Finanzas (GET)  # /usr/local/bin/sqlmap -u https://app.localhost/cuentas?nombre=Ana&departamento=Finanzas --cookie=sessionid=m5m49mrkp781pmhomnrs566e7i6s8mu6 --level=3 --risk=1 --batch --dbms=PostgreSQL --flush-session --delay=0.6 --output-dir=/o/sqlmap-con-waf --disable-coloring

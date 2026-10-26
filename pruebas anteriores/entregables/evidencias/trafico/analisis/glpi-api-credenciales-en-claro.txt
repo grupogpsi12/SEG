@@ -1,0 +1,7 @@
+10.20.40.5	GET	/apirest.php/initSession	Host: glpi\r\n,Accept: */*\r\n,Accept-Encoding: gzip, deflate\r\n,Connection: keep-alive\r\n,User-Agent: python-httpx/0.28.1\r\n,App-Token: <oculto>\r\n,Authorization: user_token <oculto>\r\n
+10.20.40.5	GET	/apirest.php/User?range=0-999&searchText%5Bregistration_number%5D=col-012	Host: glpi\r\n,Accept: */*\r\n,Accept-Encoding: gzip, deflate\r\n,Connection: keep-alive\r\n,User-Agent: python-httpx/0.28.1\r\n,App-Token: <oculto>\r\n,Session-Token: <oculto>\r\n
+10.20.40.5	POST	/apirest.php/User	Host: glpi\r\n,Accept: */*\r\n,Accept-Encoding: gzip, deflate\r\n,Connection: keep-alive\r\n,User-Agent: python-httpx/0.28.1\r\n,App-Token: <oculto>\r\n,Session-Token: <oculto>\r\n,Content-Length: 164\r\n,Content-Type: application/json\r\n
+
+    130 App-Token: <oculto>\r\n
+      1 Authorization: user_token <oculto>\r\n
+    129 Session-Token: <oculto>\r\n

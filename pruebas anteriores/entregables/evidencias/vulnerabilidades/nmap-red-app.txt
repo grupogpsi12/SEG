@@ -1,0 +1,189 @@
+# Nmap 7.98 scan initiated Sat Oct 24 16:18:13 2026 as: /usr/bin/nmap -Pn -sV -p- -oN /o/nmap-red-app.txt 10.20.40.0/24
+Nmap scan report for 10.20.40.1
+Host is up (0.0000090s latency).
+Not shown: 65531 closed tcp ports (reset)
+PORT      STATE SERVICE   VERSION
+80/tcp    open  http
+111/tcp   open  rpcbind   2-4 (RPC #100000)
+443/tcp   open  ssl/https
+34831/tcp open  status    1 (RPC #100024)
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port80-TCP:V=7.98%I=7%D=10/24%Time=6ADCDA53%P=x86_64-unknown-linux-gnu%
+SF:r(GetRequest,2B80,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024\x20Oct
+SF:\x202026\x2016:18:27\x20GMT\r\nContent-Type:\x20text/html;\x20charset=u
+SF:tf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nContent-Secu
+SF:rity-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-hE9Zyvrkw
+SF:z3OPYfpeCe9OEd8X8MrPrLO';\x20frame-ancestors\x20'none';\x20base-uri\x20
+SF:'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-trusted-t
+SF:ypes-for\x20'script';\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer
+SF:-Policy:\x20no-referrer\r\nPermissions-Policy:\x20accelerometer=\(\),\x
+SF:20ambient-light-sensor=\(\),\x20aria-notify=\(\),\x20attribution-report
+SF:ing=\(\),\x20autoplay=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),
+SF:\x20camera=\(\),\x20captured-surface-control=\(\),\x20ch-device-memory=
+SF:\(\),\x20ch-downlink=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefer
+SF:s-color-scheme=\(\),\x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-r
+SF:educed-transparency=\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-u
+SF:a-arch=\(\),\x20ch-ua-bitness=\(\),\x20ch-ua-form-factors=\(\),\x20ch-u
+SF:a-full-version-list=\(\),\x20ch-ua-full-version=\(\),\x20ch-ua-high-ent
+SF:ro")%r(HTTPOptions,2B80,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024\
+SF:x20Oct\x202026\x2016:18:27\x20GMT\r\nContent-Type:\x20text/html;\x20cha
+SF:rset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nConten
+SF:t-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-EGs
+SF:kmTUPksSB4iOTRiqu74uzT7ZLWvLr';\x20frame-ancestors\x20'none';\x20base-u
+SF:ri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-tru
+SF:sted-types-for\x20'script';\r\nX-Content-Type-Options:\x20nosniff\r\nRe
+SF:ferrer-Policy:\x20no-referrer\r\nPermissions-Policy:\x20accelerometer=\
+SF:(\),\x20ambient-light-sensor=\(\),\x20aria-notify=\(\),\x20attribution-
+SF:reporting=\(\),\x20autoplay=\(\),\x20bluetooth=\(\),\x20browsing-topics
+SF:=\(\),\x20camera=\(\),\x20captured-surface-control=\(\),\x20ch-device-m
+SF:emory=\(\),\x20ch-downlink=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-
+SF:prefers-color-scheme=\(\),\x20ch-prefers-reduced-motion=\(\),\x20ch-pre
+SF:fers-reduced-transparency=\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x
+SF:20ch-ua-arch=\(\),\x20ch-ua-bitness=\(\),\x20ch-ua-form-factors=\(\),\x
+SF:20ch-ua-full-version-list=\(\),\x20ch-ua-full-version=\(\),\x20ch-ua-hi
+SF:gh-entro");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port443-TCP:V=7.98%T=SSL%I=7%D=10/24%Time=6ADCDA59%P=x86_64-unknown-lin
+SF:ux-gnu%r(GetRequest,2BE4,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024
+SF:\x20Oct\x202026\x2016:18:33\x20GMT\r\nContent-Type:\x20text/html;\x20ch
+SF:arset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nConte
+SF:nt-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-5l
+SF:Vsim54kCT1RyTdJtT0qDkZ9blj3fOk';\x20frame-ancestors\x20'none';\x20base-
+SF:uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-tr
+SF:usted-types-for\x20'script';\x20upgrade-insecure-requests;\r\nStrict-Tr
+SF:ansport-Security:\x20max-age=31536000;\x20includeSubDomains;\x20preload
+SF:\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer-Policy:\x20no-referr
+SF:er\r\nPermissions-Policy:\x20accelerometer=\(\),\x20ambient-light-senso
+SF:r=\(\),\x20aria-notify=\(\),\x20attribution-reporting=\(\),\x20autoplay
+SF:=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),\x20camera=\(\),\x20c
+SF:aptured-surface-control=\(\),\x20ch-device-memory=\(\),\x20ch-downlink=
+SF:\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefers-color-scheme=\(\),\
+SF:x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-reduced-transparency=\
+SF:(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-ua-arch=\(\),\x20ch-ua
+SF:-bi")%r(HTTPOptions,2BE4,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024
+SF:\x20Oct\x202026\x2016:18:33\x20GMT\r\nContent-Type:\x20text/html;\x20ch
+SF:arset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nConte
+SF:nt-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-3K
+SF:zFnIjdW3W32wbSb0eOs1C24aBeUnXE';\x20frame-ancestors\x20'none';\x20base-
+SF:uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-tr
+SF:usted-types-for\x20'script';\x20upgrade-insecure-requests;\r\nStrict-Tr
+SF:ansport-Security:\x20max-age=31536000;\x20includeSubDomains;\x20preload
+SF:\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer-Policy:\x20no-referr
+SF:er\r\nPermissions-Policy:\x20accelerometer=\(\),\x20ambient-light-senso
+SF:r=\(\),\x20aria-notify=\(\),\x20attribution-reporting=\(\),\x20autoplay
+SF:=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),\x20camera=\(\),\x20c
+SF:aptured-surface-control=\(\),\x20ch-device-memory=\(\),\x20ch-downlink=
+SF:\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefers-color-scheme=\(\),\
+SF:x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-reduced-transparency=\
+SF:(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-ua-arch=\(\),\x20ch-ua
+SF:-bi");
+MAC Address: 02:42:A4:FA:95:E4 (Unknown)
+
+Nmap scan report for jml-bunkerweb-1.jml_app (10.20.40.2)
+Host is up (0.000011s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE       VERSION
+5000/tcp open  http          nginx
+8080/tcp open  http-proxy
+8443/tcp open  ssl/https-alt
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port8080-TCP:V=7.98%I=7%D=10/24%Time=6ADCDA53%P=x86_64-unknown-linux-gn
+SF:u%r(GetRequest,2B80,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x2024\x20O
+SF:ct\x202026\x2016:18:27\x20GMT\r\nContent-Type:\x20text/html;\x20charset
+SF:=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nContent-Se
+SF:curity-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-T03RQpM
+SF:7AAEkI1siBDspkZNz76AVc0wf';\x20frame-ancestors\x20'none';\x20base-uri\x
+SF:20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-trusted
+SF:-types-for\x20'script';\r\nX-Content-Type-Options:\x20nosniff\r\nReferr
+SF:er-Policy:\x20no-referrer\r\nPermissions-Policy:\x20accelerometer=\(\),
+SF:\x20ambient-light-sensor=\(\),\x20aria-notify=\(\),\x20attribution-repo
+SF:rting=\(\),\x20autoplay=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\
+SF:),\x20camera=\(\),\x20captured-surface-control=\(\),\x20ch-device-memor
+SF:y=\(\),\x20ch-downlink=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-pref
+SF:ers-color-scheme=\(\),\x20ch-prefers-reduced-motion=\(\),\x20ch-prefers
+SF:-reduced-transparency=\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch
+SF:-ua-arch=\(\),\x20ch-ua-bitness=\(\),\x20ch-ua-form-factors=\(\),\x20ch
+SF:-ua-full-version-list=\(\),\x20ch-ua-full-version=\(\),\x20ch-ua-high-e
+SF:ntro")%r(HTTPOptions,2B80,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x202
+SF:4\x20Oct\x202026\x2016:18:27\x20GMT\r\nContent-Type:\x20text/html;\x20c
+SF:harset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nCont
+SF:ent-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-i
+SF:GFc8oPGRDQfP85NWQJo8ZS17IqRspOy';\x20frame-ancestors\x20'none';\x20base
+SF:-uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-t
+SF:rusted-types-for\x20'script';\r\nX-Content-Type-Options:\x20nosniff\r\n
+SF:Referrer-Policy:\x20no-referrer\r\nPermissions-Policy:\x20accelerometer
+SF:=\(\),\x20ambient-light-sensor=\(\),\x20aria-notify=\(\),\x20attributio
+SF:n-reporting=\(\),\x20autoplay=\(\),\x20bluetooth=\(\),\x20browsing-topi
+SF:cs=\(\),\x20camera=\(\),\x20captured-surface-control=\(\),\x20ch-device
+SF:-memory=\(\),\x20ch-downlink=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20c
+SF:h-prefers-color-scheme=\(\),\x20ch-prefers-reduced-motion=\(\),\x20ch-p
+SF:refers-reduced-transparency=\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),
+SF:\x20ch-ua-arch=\(\),\x20ch-ua-bitness=\(\),\x20ch-ua-form-factors=\(\),
+SF:\x20ch-ua-full-version-list=\(\),\x20ch-ua-full-version=\(\),\x20ch-ua-
+SF:high-entro");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port8443-TCP:V=7.98%T=SSL%I=7%D=10/24%Time=6ADCDA59%P=x86_64-unknown-li
+SF:nux-gnu%r(GetRequest,2BE4,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x202
+SF:4\x20Oct\x202026\x2016:18:33\x20GMT\r\nContent-Type:\x20text/html;\x20c
+SF:harset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nCont
+SF:ent-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-l
+SF:jk6UITmcUvESS90xucTu0FHbkhyQKYD';\x20frame-ancestors\x20'none';\x20base
+SF:-uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-t
+SF:rusted-types-for\x20'script';\x20upgrade-insecure-requests;\r\nStrict-T
+SF:ransport-Security:\x20max-age=31536000;\x20includeSubDomains;\x20preloa
+SF:d\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer-Policy:\x20no-refer
+SF:rer\r\nPermissions-Policy:\x20accelerometer=\(\),\x20ambient-light-sens
+SF:or=\(\),\x20aria-notify=\(\),\x20attribution-reporting=\(\),\x20autopla
+SF:y=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),\x20camera=\(\),\x20
+SF:captured-surface-control=\(\),\x20ch-device-memory=\(\),\x20ch-downlink
+SF:=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefers-color-scheme=\(\),
+SF:\x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-reduced-transparency=
+SF:\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-ua-arch=\(\),\x20ch-u
+SF:a-bi")%r(HTTPOptions,2BE4,"HTTP/1\.1\x20200\x20OK\r\nDate:\x20Sat,\x202
+SF:4\x20Oct\x202026\x2016:18:33\x20GMT\r\nContent-Type:\x20text/html;\x20c
+SF:harset=utf-8\r\nContent-Length:\x208756\r\nConnection:\x20close\r\nCont
+SF:ent-Security-Policy:\x20default-src\x20'none';\x20style-src\x20'nonce-p
+SF:Pnw62L32ctNx1wG5eWJdTIp0VdwyfZT';\x20frame-ancestors\x20'none';\x20base
+SF:-uri\x20'none';\x20img-src\x20data:;\x20font-src\x20data:;\x20require-t
+SF:rusted-types-for\x20'script';\x20upgrade-insecure-requests;\r\nStrict-T
+SF:ransport-Security:\x20max-age=31536000;\x20includeSubDomains;\x20preloa
+SF:d\r\nX-Content-Type-Options:\x20nosniff\r\nReferrer-Policy:\x20no-refer
+SF:rer\r\nPermissions-Policy:\x20accelerometer=\(\),\x20ambient-light-sens
+SF:or=\(\),\x20aria-notify=\(\),\x20attribution-reporting=\(\),\x20autopla
+SF:y=\(\),\x20bluetooth=\(\),\x20browsing-topics=\(\),\x20camera=\(\),\x20
+SF:captured-surface-control=\(\),\x20ch-device-memory=\(\),\x20ch-downlink
+SF:=\(\),\x20ch-dpr=\(\),\x20ch-ect=\(\),\x20ch-prefers-color-scheme=\(\),
+SF:\x20ch-prefers-reduced-motion=\(\),\x20ch-prefers-reduced-transparency=
+SF:\(\),\x20ch-rtt=\(\),\x20ch-save-data=\(\),\x20ch-ua-arch=\(\),\x20ch-u
+SF:a-bi");
+MAC Address: 02:42:0A:14:28:02 (Unknown)
+
+Nmap scan report for jml-web-1.jml_app (10.20.40.3)
+Host is up (0.000010s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT     STATE SERVICE VERSION
+8000/tcp open  http    Gunicorn
+MAC Address: 02:42:0A:14:28:03 (Unknown)
+
+Nmap scan report for jml-glpi-1.jml_app (10.20.40.4)
+Host is up (0.000011s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd
+MAC Address: 02:42:0A:14:28:04 (Unknown)
+
+Nmap scan report for jml-worker-1.jml_app (10.20.40.5)
+Host is up (0.000012s latency).
+All 65535 scanned ports on jml-worker-1.jml_app (10.20.40.5) are in ignored states.
+Not shown: 65535 closed tcp ports (reset)
+MAC Address: 02:42:0A:14:28:05 (Unknown)
+
+Nmap scan report for 911db9c47666 (10.20.40.6)
+Host is up.
+All 65535 scanned ports on 911db9c47666 (10.20.40.6) are in ignored states.
+Not shown: 65535 filtered tcp ports (no-response)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 24 19:57:24 2026 -- 256 IP addresses (6 hosts up) scanned in 13150.36 seconds

@@ -22,3 +22,15 @@ infra/.env
 build/
 .contrato-tmp/
 auditoria/.captura-local/
+
+# Capturas de tráfico y su paquete de la entrega anterior: llevan tokens de GLPI y contraseñas en claro (invariante 10)
+*.pcap
+*.pcapng
+pruebas anteriores/entregables/Evidencia.zip
+# Cuerpos de formularios con csrfmiddlewaretoken (tokens) y JSON de Trivy con falsos positivos de gitleaks
+pruebas anteriores/entregables/evidencias/trafico/analisis/interno-web-formularios.txt
+pruebas anteriores/entregables/evidencias/vulnerabilidades/trivy/glpi.json
+pruebas anteriores/entregables/evidencias/vulnerabilidades/trivy/mariadb.json
+pruebas anteriores/entregables/Nueva carpeta/evidencias/trafico/analisis/interno-web-formularios.txt
+pruebas anteriores/entregables/Nueva carpeta/evidencias/vulnerabilidades/trivy/glpi.json
+pruebas anteriores/entregables/Nueva carpeta/evidencias/vulnerabilidades/trivy/mariadb.json

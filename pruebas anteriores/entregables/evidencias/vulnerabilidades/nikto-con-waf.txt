@@ -1,0 +1,22 @@
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          192.168.65.254
++ Target Hostname:    app.localhost
++ Target Port:        443
+---------------------------------------------------------------------------
++ SSL Info:           Subject:  /CN=www.example.com
+                      Ciphers:  TLS_AES_256_GCM_SHA384
+                      Issuer:   /CN=www.example.com
++ Start Time:         2026-10-24 16:34:00 (GMT0)
+---------------------------------------------------------------------------
++ Server: No banner retrieved
++ /: Uncommon header(s) 'x-request-id' found, with contents: 3607dc511d894433b1601e3585423331.
++ /: An alt-svc header was found which is advertising HTTP/3. The endpoint is: ':443'. Nikto cannot test HTTP/3 over QUIC. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/alt-svc
++ All CGI directories 'found', use '-C none' to test none
++ Hostname 'app.localhost' does not match certificate's names: www.example.com. See: https://cwe.mitre.org/data/definitions/297.html
++ /: Suggested security header missing: content-security-policy. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
++ ERROR: Host maximum execution time of 240 seconds reached
++ Scan terminated: 0 error(s) and 4 item(s) reported on remote host
++ End Time:           2026-10-24 16:38:01 (GMT0) (241 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested

@@ -1,0 +1,23 @@
+digraph S {
+  graph [rankdir=LR, fontname="Helvetica", nodesep=0.4, ranksep=0.55, pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#FDE3D1", color="#B5541B"];
+  edge [fontname="Helvetica", fontsize=8, color="#555555"];
+  inicio [shape=point, width=0.12];
+  pend [label="pendiente_aprobacion"];
+  apr  [label="aprobada"];
+  eje  [label="en_ejecucion"];
+  err  [label="error"];
+  cer  [label="cerrada", fillcolor="#E8E4DC", color="#777777"];
+  rec  [label="rechazada", fillcolor="#E8E4DC", color="#777777"];
+  can  [label="cancelada", fillcolor="#E8E4DC", color="#777777"];
+  inicio -> pend [label="solicitante registra"];
+  inicio -> apr  [label="RRHH registra y emite\n(con justificación)"];
+  pend -> apr [label="RRHH aprueba"];
+  pend -> rec [label="RRHH rechaza"];
+  pend -> can [label="solicitante cancela"];
+  apr -> eje [label="tickets creados en GLPI"];
+  apr -> err [label="GLPI rechaza tras reintentos"];
+  err -> apr [label="administrador reintenta"];
+  apr -> can [label="RRHH cancela"];
+  eje -> cer [label="tickets de cierre resueltos\ncon solución (+ acta en Inventario)"];
+}

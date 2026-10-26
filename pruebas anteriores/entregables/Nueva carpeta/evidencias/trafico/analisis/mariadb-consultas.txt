@@ -1,0 +1,30 @@
+    283 N.N.0.3	SET SESSION time_zone = 'UTC'
+    249 N.N.0.3	SELECT * FROM `glpi_itilcategories` WHERE `glpi_itilcategories`.`id` = 'N' LIMIT 1
+    142 N.N.0.3	SET SESSION sql_mode = (SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))
+    142 N.N.0.3	SET NAMES utf8mb4
+    142 N.N.0.3	SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
+    142 N.N.0.3	SELECT `table_name` AS `TABLE_NAME` FROM `information_schema`.`tables` WHERE `table_schema` = 'glpi' AND `table_type` = 'BASE TABLE' AND `table_name` LIKE 'glpi\\\\_%'
+    142 N.N.0.3	SELECT * FROM `glpi_assets_assetdefinitions`
+    141 N.N.0.3	SELECT * FROM `glpi_plugins` WHERE `state` IN ('1', '3')
+    141 N.N.0.3	SELECT * FROM `glpi_plugins` WHERE `state` = '1'
+    141 N.N.0.3	SELECT * FROM `glpi_dropdowns_dropdowndefinitions`
+    141 N.N.0.3	SELECT * FROM `glpi_configs` WHERE `name` = 'must_unsanitize_db_data' AND `context` = 'core'
+    141 N.N.0.3	SELECT * FROM `glpi_configs`
+    130 N.N.0.3	SELECT * FROM `glpi_tickets` WHERE `glpi_tickets`.`id` = 'N' LIMIT 1
+    129 N.N.0.3	SELECT * FROM `glpi_apiclients` WHERE `is_active` = '1' AND (`ipv4_range_start` IS NULL OR (`ipv4_range_start` <= 'N' AND `ipv4_range_end` >= 'N'))
+    129 N.N.0.3	SELECT * FROM `glpi_apiclients` WHERE `glpi_apiclients`.`id` = '2' LIMIT 1
+    116 N.N.0.3	SELECT * FROM `glpi_rules` WHERE `glpi_rules`.`id` = 'N' LIMIT 1
+    115 N.N.0.3	SELECT * FROM `glpi_rulecriterias` WHERE `rules_id` = 'N' ORDER BY `id`
+    115 N.N.0.3	SELECT * FROM `glpi_ruleactions` WHERE `rules_id` = 'N' ORDER BY `id`
+     96 N.N.0.3	SELECT * FROM `glpi_users` WHERE `id` = '7'
+     93 N.N.0.3	SELECT * FROM `glpi_tickets_users` WHERE `tickets_id` = 'N' ORDER BY `id` ASC
+     88 N.N.0.3	SELECT * FROM `glpi_groups_tickets` WHERE `tickets_id` = 'N' ORDER BY `id` ASC
+     78 N.N.0.3	SELECT * FROM `glpi_suppliers_tickets` WHERE `tickets_id` = 'N' ORDER BY `id` ASC
+     74 N.N.0.3	SHOW COLUMNS FROM `glpi_tickets`
+     68 N.N.0.3	SELECT `glpi_itilcategories`.`completename`, `glpi_itilcategories`.`comment`, '' AS `transname` FROM `glpi_itilcategories` WHERE `glpi_itilcategories`.`id` = 'N'
+     64 N.N.0.3	SELECT `id` FROM `glpi_calendars` WHERE ((`entities_id` = '0' OR (`is_recursive` = '1' AND `entities_id` IN ('0'))))
+     64 N.N.0.3	SELECT * FROM `glpi_calendars` WHERE `glpi_calendars`.`id` = '1' LIMIT 1
+     45 N.N.0.3	SELECT * FROM `glpi_tickettemplates` WHERE `glpi_tickettemplates`.`id` = '1' LIMIT 1
+     45 N.N.0.3	SELECT * FROM `glpi_tickettemplatereadonlyfields` WHERE `tickettemplates_id` = '1' ORDER BY `id`
+     45 N.N.0.3	SELECT * FROM `glpi_tickettemplatepredefinedfields` WHERE `tickettemplates_id` = '1' ORDER BY `id`
+     45 N.N.0.3	SELECT * FROM `glpi_tickettemplatemandatoryfields` WHERE `tickettemplates_id` = '1' ORDER BY `id`

@@ -1,0 +1,499 @@
+[
+  {
+    "cu": "CU-01",
+    "descripcion": "Pagina de ingreso por HTTPS",
+    "rol": "anonimo",
+    "metodo": "GET",
+    "ruta": "/ingreso",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "contiene «csrfmiddlewaretoken»: True",
+    "requisitos": [
+      "RF-01",
+      "RS-01"
+    ]
+  },
+  {
+    "cu": "CU-01",
+    "descripcion": "Ruta protegida sin sesion redirige al ingreso",
+    "rol": "anonimo",
+    "metodo": "GET",
+    "ruta": "/bandeja",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /ingreso",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-01",
+    "descripcion": "Formulario de ingreso invalido: error del formulario, sin llamar a Supabase",
+    "rol": "anonimo",
+    "metodo": "POST",
+    "ruta": "/ingreso",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-01",
+      "RS-05"
+    ]
+  },
+  {
+    "cu": "CU-01",
+    "descripcion": "POST sin token CSRF es rechazado",
+    "rol": "anonimo",
+    "metodo": "POST",
+    "ruta": "/ingreso",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RS-04"
+    ]
+  },
+  {
+    "cu": "CU-02",
+    "descripcion": "Solicitante registra vacaciones con fecha futura",
+    "rol": "sol",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/VAC",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /solicitudes | mensaje: Solicitud SOL-2026-000001 registrada: queda pendiente de aprobación de RRHH.",
+    "requisitos": [
+      "RF-07",
+      "RF-08"
+    ]
+  },
+  {
+    "cu": "CU-03",
+    "descripcion": "Segunda VAC abierta del mismo colaborador es rechazada con el id existente",
+    "rol": "sol",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/VAC",
+    "esperado": "200/302",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "contiene «SOL-2026-000001»: True",
+    "requisitos": [
+      "RF-09",
+      "RD-01"
+    ]
+  },
+  {
+    "cu": "CU-04",
+    "descripcion": "Jefe registra CDP de su subordinado",
+    "rol": "jefe",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/CDP",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /solicitudes | mensaje: Solicitud SOL-2026-000002 registrada: queda pendiente de aprobación de RRHH.",
+    "requisitos": [
+      "RF-07",
+      "§4.1"
+    ]
+  },
+  {
+    "cu": "CU-05",
+    "descripcion": "Bandeja de RRHH lista las pendientes",
+    "rol": "rrhh",
+    "metodo": "GET",
+    "ruta": "/bandeja",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "contiene «SOL-2026-000001»: True",
+    "requisitos": [
+      "RF-12",
+      "RF-28"
+    ]
+  },
+  {
+    "cu": "CU-05",
+    "descripcion": "RRHH aprueba la VAC",
+    "rol": "rrhh",
+    "metodo": "POST",
+    "ruta": "/solicitudes/SOL-2026-000001/aprobar",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /bandeja | mensaje: Solicitud SOL-2026-000001 aprobada.",
+    "requisitos": [
+      "RF-12"
+    ]
+  },
+  {
+    "cu": "CU-05",
+    "descripcion": "RRHH rechaza el CDP con justificacion",
+    "rol": "rrhh",
+    "metodo": "POST",
+    "ruta": "/solicitudes/SOL-2026-000002/rechazar",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /bandeja | mensaje: Solicitud SOL-2026-000002 rechazada.",
+    "requisitos": [
+      "RF-12"
+    ]
+  },
+  {
+    "cu": "CU-05",
+    "descripcion": "Solicitante no puede aprobar (control de rol)",
+    "rol": "sol",
+    "metodo": "POST",
+    "ruta": "/solicitudes/SOL-2026-000001/aprobar",
+    "esperado": "302/403",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /solicitudes | mensaje: No tiene permiso para realizar esta acción.",
+    "requisitos": [
+      "RF-03",
+      "T15"
+    ]
+  },
+  {
+    "cu": "CU-06",
+    "descripcion": "Ingreso con archivo no PDF renombrado .pdf es rechazado",
+    "rol": "rrhh",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/ING",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-39",
+      "RS-17",
+      "CA-18",
+      "T17"
+    ]
+  },
+  {
+    "cu": "CU-06",
+    "descripcion": "RRHH emite el ingreso con soporte PDF valido",
+    "rol": "rrhh",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/ING",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /solicitudes | mensaje: Solicitud SOL-2026-000003 emitida: se enviaron 4 tickets a la cola.",
+    "requisitos": [
+      "RF-13",
+      "RF-39"
+    ]
+  },
+  {
+    "cu": "CU-07",
+    "descripcion": "RRHH emite RET de un contratista con motivo restringido",
+    "rol": "rrhh",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/RET",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /solicitudes | mensaje: Solicitud SOL-2026-000004 emitida: se enviaron 6 tickets a la cola.",
+    "requisitos": [
+      "RF-13",
+      "RD-05"
+    ]
+  },
+  {
+    "cu": "CU-07",
+    "descripcion": "RRHH ve el motivo restringido en el detalle",
+    "rol": "rrhh",
+    "metodo": "GET",
+    "ruta": "/solicitudes/SOL-2026-000004",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "contiene «CENTINELA-MOTIVO-RET-7f3a»: True",
+    "requisitos": [
+      "RD-05"
+    ]
+  },
+  {
+    "cu": "CU-08",
+    "descripcion": "RRHH emite EMG (fuga detectada)",
+    "rol": "rrhh",
+    "metodo": "POST",
+    "ruta": "/solicitudes/nueva/EMG",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /solicitudes | mensaje: Solicitud SOL-2026-000005 emitida: se enviaron 6 tickets a la cola.",
+    "requisitos": [
+      "RF-10",
+      "RF-13",
+      "CA-06"
+    ]
+  },
+  {
+    "cu": "CU-09",
+    "descripcion": "Dashboard del tecnico",
+    "rol": "tec_ad",
+    "metodo": "GET",
+    "ruta": "/dashboard",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "sin «CENTINELA-DESCRIPCION-EMG-9c1b»: True",
+    "requisitos": [
+      "RF-29",
+      "RF-30"
+    ]
+  },
+  {
+    "cu": "CU-09",
+    "descripcion": "Busqueda de cuentas con filtro",
+    "rol": "tec_ad",
+    "metodo": "GET",
+    "ruta": "/cuentas?departamento=Finanzas",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-32"
+    ]
+  },
+  {
+    "cu": "CU-09",
+    "descripcion": "Ficha del colaborador retirado sin el motivo",
+    "rol": "tec_ad",
+    "metodo": "GET",
+    "ruta": "/colaboradores/col-014",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "sin «CENTINELA-MOTIVO-RET-7f3a»: True",
+    "requisitos": [
+      "RF-33",
+      "CA-10",
+      "T7"
+    ]
+  },
+  {
+    "cu": "CU-09",
+    "descripcion": "Exportacion CSV auditada",
+    "rol": "tec_inv",
+    "metodo": "GET",
+    "ruta": "/cuentas.csv",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-34",
+      "T10"
+    ]
+  },
+  {
+    "cu": "CU-09",
+    "descripcion": "Tecnico no ve el detalle restringido del RET",
+    "rol": "tec_ad",
+    "metodo": "GET",
+    "ruta": "/solicitudes/SOL-2026-000004",
+    "esperado": "403/404",
+    "obtenido": "404",
+    "resultado": "PASA",
+    "evidencia": "sin «CENTINELA-MOTIVO-RET-7f3a»: True",
+    "requisitos": [
+      "RD-05",
+      "CA-10"
+    ]
+  },
+  {
+    "cu": "CU-10",
+    "descripcion": "sol no accede a /bandeja",
+    "rol": "sol",
+    "metodo": "GET",
+    "ruta": "/bandeja",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-10",
+    "descripcion": "sol no accede a /dashboard",
+    "rol": "sol",
+    "metodo": "GET",
+    "ruta": "/dashboard",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-10",
+    "descripcion": "tec_ad no accede a /auditoria",
+    "rol": "tec_ad",
+    "metodo": "GET",
+    "ruta": "/auditoria",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-10",
+    "descripcion": "rrhh no accede a /administracion/perfiles",
+    "rol": "rrhh",
+    "metodo": "GET",
+    "ruta": "/administracion/perfiles",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-10",
+    "descripcion": "auditor no accede a /bandeja",
+    "rol": "auditor",
+    "metodo": "GET",
+    "ruta": "/bandeja",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-10",
+    "descripcion": "admin no accede a /dashboard",
+    "rol": "admin",
+    "metodo": "GET",
+    "ruta": "/dashboard",
+    "esperado": "403",
+    "obtenido": "403",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-03"
+    ]
+  },
+  {
+    "cu": "CU-11",
+    "descripcion": "Auditor consulta la auditoria",
+    "rol": "auditor",
+    "metodo": "GET",
+    "ruta": "/auditoria",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "sin «CENTINELA-MOTIVO-RET-7f3a»: True",
+    "requisitos": [
+      "RF-36",
+      "RF-35"
+    ]
+  },
+  {
+    "cu": "CU-11",
+    "descripcion": "Auditor verifica la cadena de hashes",
+    "rol": "auditor",
+    "metodo": "POST",
+    "ruta": "/auditoria",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "contiene «ntegra»: True | mensaje: La cadena es íntegra: los 104 registros encadenan desde el génesis. | repetido con pausa de 2 s: la primera corrida recibio 429 (limite RS-08)",
+    "requisitos": [
+      "RF-36",
+      "CA-09"
+    ]
+  },
+  {
+    "cu": "CU-12",
+    "descripcion": "Matriz de perfiles",
+    "rol": "admin",
+    "metodo": "GET",
+    "ruta": "/administracion/perfiles",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-37"
+    ]
+  },
+  {
+    "cu": "CU-12",
+    "descripcion": "Usuarios y roles",
+    "rol": "admin",
+    "metodo": "GET",
+    "ruta": "/administracion/usuarios",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-37"
+    ]
+  },
+  {
+    "cu": "CU-12",
+    "descripcion": "Solicitudes en error (reintento)",
+    "rol": "admin",
+    "metodo": "GET",
+    "ruta": "/errores",
+    "esperado": "200",
+    "obtenido": "200",
+    "resultado": "PASA",
+    "evidencia": "",
+    "requisitos": [
+      "RF-38"
+    ]
+  },
+  {
+    "cu": "CU-13",
+    "descripcion": "Cerrar sesion",
+    "rol": "jefe",
+    "metodo": "POST",
+    "ruta": "/salir",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /ingreso",
+    "requisitos": [
+      "RF-04"
+    ]
+  },
+  {
+    "cu": "CU-13",
+    "descripcion": "La sesion cerrada ya no da acceso",
+    "rol": "jefe",
+    "metodo": "GET",
+    "ruta": "/solicitudes",
+    "esperado": "302",
+    "obtenido": "302",
+    "resultado": "PASA",
+    "evidencia": "Location: /ingreso",
+    "requisitos": [
+      "RF-04"
+    ]
+  }
+]

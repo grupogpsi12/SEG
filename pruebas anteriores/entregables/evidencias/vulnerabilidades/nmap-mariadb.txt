@@ -1,0 +1,20 @@
+# Nmap 7.98 scan initiated Sat Oct 24 16:18:11 2026 as: /usr/bin/nmap -Pn -sV -p- --script mysql-info,mysql-empty-password,mysql-users -oN /o/nmap-mariadb.txt mariadb
+Nmap scan report for mariadb (172.19.0.2)
+Host is up (0.000015s latency).
+rDNS record for 172.19.0.2: jml-mariadb-1.jml_db_net
+Not shown: 65534 closed tcp ports (reset)
+PORT     STATE SERVICE VERSION
+3306/tcp open  mysql   MariaDB 11.4.13
+| mysql-info: 
+|   Protocol: 10
+|   Version: 11.4.13-MariaDB-ubu2404
+|   Thread ID: 714
+|   Capabilities flags: 65534
+|   Some Capabilities: LongColumnFlag, Speaks41ProtocolOld, Speaks41ProtocolNew, SupportsTransactions, FoundRows, SupportsLoadDataLocal, IgnoreSigpipes, ODBCClient, SwitchToSSLAfterHandshake, Support41Auth, DontAllowDatabaseTableColumn, IgnoreSpaceBeforeParenthesis, SupportsCompression, ConnectWithDatabase, InteractiveClient, SupportsMultipleStatments, SupportsMultipleResults, SupportsAuthPlugins
+|   Status: Autocommit
+|   Salt: ]>[3+yF/XOc%*DXk3[Qb
+|_  Auth Plugin Name: mysql_native_password
+MAC Address: 02:42:AC:13:00:02 (Unknown)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 24 16:18:13 2026 -- 1 IP address (1 host up) scanned in 2.04 seconds

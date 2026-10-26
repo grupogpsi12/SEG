@@ -1,0 +1,7 @@
+  🔒 10.20.40.6 [local]
+     ⏱ Banned on 2026-10-24 at 11:18:35 for 40 minutes and 32 seconds
+     ℹ️ Reason: bad behavior
+--
+  🔒 10.20.40.1 [local] - Service: app.localhost
+     ⏱ Banned on 2026-10-24 at 11:37:54 for 59 minutes and 49 seconds
+     ℹ️ Reason: bad behavior

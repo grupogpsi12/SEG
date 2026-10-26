@@ -1,0 +1,147 @@
+
+Report Summary
+
+┌──────────────────────────────────────────────────────────────────────────────────┬────────────┬─────────────────┐
+│                                      Target                                      │    Type    │ Vulnerabilities │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ bunkerity/bunkerweb:1.6.15@sha256:1b96f672660cc32bfae93604ac297371222dc9039b2b0- │   alpine   │       24        │
+│ 9b8eee5e40ba9d35c35 (alpine 3.24.1)                                              │            │                 │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/async_timeout-5.0.1.dist-info/METADATA           │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/certifi-2026.7.22.dist-info/METADATA             │ python-pkg │        1        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/charset_normalizer-3.5.1.dist-info/METADATA      │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/hiredis-3.4.1.dist-info/METADATA                 │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/idna-3.20.dist-info/METADATA                     │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/jinja2-3.1.6.dist-info/METADATA                  │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/markupsafe-3.0.3.dist-info/METADATA              │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/packaging-26.3.dist-info/METADATA                │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/pytz-2026.3.dist-info/METADATA                   │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/redis-8.1.0.dist-info/METADATA                   │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/requests-2.34.2.dist-info/METADATA               │ python-pkg │        0        │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┤
+│ usr/share/bunkerweb/deps/python/urllib3-2.8.0.dist-info/METADATA                 │ python-pkg │        0        │
+└──────────────────────────────────────────────────────────────────────────────────┴────────────┴─────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+bunkerity/bunkerweb:1.6.15@sha256:1b96f672660cc32bfae93604ac297371222dc9039b2b09b8eee5e40ba9d35c35 (alpine 3.24.1)
+==================================================================================================================
+Total: 24 (HIGH: 24, CRITICAL: 0)
+
+┌──────────────────────┬─────────────────┬──────────┬────────┬───────────────────┬───────────────┬──────────────────────────────────────────────────────────────┐
+│       Library        │  Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version │                            Title                             │
+├──────────────────────┼─────────────────┼──────────┼────────┼───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ brotli               │ CVE-2026-111497 │ HIGH     │ fixed  │ 1.2.0-r1          │ 1.2.1-r0      │ brotli: Out-of-Bounds Write in Google Brotli Decoder         │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-111497                  │
+├──────────────────────┤                 │          │        │                   │               │                                                              │
+│ brotli-libs          │                 │          │        │                   │               │                                                              │
+│                      │                 │          │        │                   │               │                                                              │
+├──────────────────────┼─────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ expat                │ CVE-2026-77214  │          │        │ 2.8.4-r0          │ 2.9.0-r0      │ expat: expat: Information disclosure via heap buffer         │
+│                      │                 │          │        │                   │               │ over-read in XML_ParseBuffer                                 │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-77214                   │
+│                      ├─────────────────┤          │        │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-93990  │          │        │                   │ 2.8.5-r0      │ expat: Expat: XML Injection via Malformed UTF-16 Input       │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-93990                   │
+├──────────────────────┼─────────────────┤          │        │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│ libexpat             │ CVE-2026-77214  │          │        │                   │ 2.9.0-r0      │ expat: expat: Information disclosure via heap buffer         │
+│                      │                 │          │        │                   │               │ over-read in XML_ParseBuffer                                 │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-77214                   │
+│                      ├─────────────────┤          │        │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-93990  │          │        │                   │ 2.8.5-r0      │ expat: Expat: XML Injection via Malformed UTF-16 Input       │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-93990                   │
+├──────────────────────┼─────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ libx11               │ CVE-2026-88806  │          │        │ 1.8.13-r0         │ 1.8.14-r0     │ libX11: libX11: Heap-based buffer overflow via malicious X   │
+│                      │                 │          │        │                   │               │ server                                                       │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-88806                   │
+├──────────────────────┼─────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ nginx                │ CVE-2026-15176  │          │        │ 1.30.5-r1         │ 1.30.6-r0     │ nginx: nginx: heap-based buffer overflow in                  │
+│                      │                 │          │        │                   │               │ ngx_http_core_module via alias with rewrite referencing...   │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-15176                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-93479  │          │        │                   │               │ nginx: NGINX map directive and regex matching vulnerability  │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-93479                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-97205  │          │        │                   │               │ nginx: NGINX ngx_http_core_module vulnerability              │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-97205                   │
+├──────────────────────┼─────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ pcre2                │ CVE-2026-103111 │          │        │ 10.48-r0          │ 10.49-r0      │ pcre2: pcre2: Out-of-bounds write via crafted regular        │
+│                      │                 │          │        │                   │               │ expression                                                   │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-103111                  │
+├──────────────────────┼─────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ pyc                  │ CVE-2026-19445  │          │        │ 3.14.7-r1         │ 3.14.8-r0     │ python: Use-after-free of a server-side SSLContext when      │
+│                      │                 │          │        │                   │               │ sni_callback switches contexts                               │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19445                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-19553  │          │        │                   │               │ python: python: Certificate verification bypass via missing  │
+│                      │                 │          │        │                   │               │ server_hostname validation in SSLContext.wrap_bio()          │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19553                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-82049  │          │        │                   │               │ python: Python tarfile module: File modification and content │
+│                      │                 │          │        │                   │               │ disclosure via crafted archives...                           │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-82049                   │
+├──────────────────────┼─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│ python3              │ CVE-2026-19445  │          │        │                   │               │ python: Use-after-free of a server-side SSLContext when      │
+│                      │                 │          │        │                   │               │ sni_callback switches contexts                               │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19445                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-19553  │          │        │                   │               │ python: python: Certificate verification bypass via missing  │
+│                      │                 │          │        │                   │               │ server_hostname validation in SSLContext.wrap_bio()          │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19553                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-82049  │          │        │                   │               │ python: Python tarfile module: File modification and content │
+│                      │                 │          │        │                   │               │ disclosure via crafted archives...                           │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-82049                   │
+├──────────────────────┼─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│ python3-pyc          │ CVE-2026-19445  │          │        │                   │               │ python: Use-after-free of a server-side SSLContext when      │
+│                      │                 │          │        │                   │               │ sni_callback switches contexts                               │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19445                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-19553  │          │        │                   │               │ python: python: Certificate verification bypass via missing  │
+│                      │                 │          │        │                   │               │ server_hostname validation in SSLContext.wrap_bio()          │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19553                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-82049  │          │        │                   │               │ python: Python tarfile module: File modification and content │
+│                      │                 │          │        │                   │               │ disclosure via crafted archives...                           │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-82049                   │
+├──────────────────────┼─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│ python3-pycache-pyc0 │ CVE-2026-19445  │          │        │                   │               │ python: Use-after-free of a server-side SSLContext when      │
+│                      │                 │          │        │                   │               │ sni_callback switches contexts                               │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19445                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-19553  │          │        │                   │               │ python: python: Certificate verification bypass via missing  │
+│                      │                 │          │        │                   │               │ server_hostname validation in SSLContext.wrap_bio()          │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-19553                   │
+│                      ├─────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│                      │ CVE-2026-82049  │          │        │                   │               │ python: Python tarfile module: File modification and content │
+│                      │                 │          │        │                   │               │ disclosure via crafted archives...                           │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-82049                   │
+├──────────────────────┼─────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ tiff                 │ CVE-2026-4775   │          │        │ 4.7.1-r0          │ 4.7.2-r0      │ libtiff: libtiff: Arbitrary code execution or denial of      │
+│                      │                 │          │        │                   │               │ service via signed integer...                                │
+│                      │                 │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-4775                    │
+└──────────────────────┴─────────────────┴──────────┴────────┴───────────────────┴───────────────┴──────────────────────────────────────────────────────────────┘
+
+Python (python-pkg)
+===================
+Total: 1 (HIGH: 0, CRITICAL: 1)
+
+┌────────────────────┬─────────────────────┬──────────┬────────┬───────────────────┬───────────────┬───────────────────────────────────────────────────┐
+│      Library       │    Vulnerability    │ Severity │ Status │ Installed Version │ Fixed Version │                       Title                       │
+├────────────────────┼─────────────────────┼──────────┼────────┼───────────────────┼───────────────┼───────────────────────────────────────────────────┤
+│ certifi (METADATA) │ GHSA-6q48-6c7w-9gw2 │ CRITICAL │ fixed  │ 2026.7.22         │ 2026.10.19    │ certifi bundles emSign root CAs with compromised  │
+│                    │                     │          │        │                   │               │ intermediate CA keys                              │
+│                    │                     │          │        │                   │               │ https://github.com/advisories/GHSA-6q48-6c7w-9gw2 │
+└────────────────────┴─────────────────────┴──────────┴────────┴───────────────────┴───────────────┴───────────────────────────────────────────────────┘

@@ -1,0 +1,55 @@
+digraph G {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=11, nodesep=0.4, ranksep=0.5, pad=0.2, compound=true];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#FFFFFF", color="#555555"];
+  edge  [fontname="Helvetica", fontsize=8, color="#555555"];
+
+  usuario [label="Navegador\n(RRHH, solicitantes, técnicos,\nauditor, administrador)", fillcolor="#F4F4F4"];
+  cf [label="Cloudflare (ADR-024, pendiente)\nTunnel + Access solo para glpi.*", style="rounded,dashed", fillcolor="#FFFFFF", color="#C26B00", fontcolor="#C26B00"];
+
+  subgraph cluster_azure {
+    label="Azure (Azure for Students)"; style="rounded,dashed"; color="#1F6FB2"; fontcolor="#1F6FB2";
+    subgraph cluster_vm {
+      label="VM Linux · Docker Compose  (NSG: 80/443 públicos; 22 solo IP del equipo)"; style="rounded"; color="#333333"; fontcolor="#333333";
+      subgraph cluster_bw { label="red bw-universe (aislada; API con API_TOKEN)"; style="rounded,filled"; fillcolor="#EAF6EF"; color="#2E8B57";
+        bunkerweb [label="bunkerweb 1.6.15\nWAF + proxy inverso\nModSecurity + OWASP CRS 4 · TLS\nlímites · mal comportamiento", fillcolor="#D7F0E1"];
+        sched [label="bw-scheduler\nconfiguración como código\nLet's Encrypt · SQLite", fillcolor="#D7F0E1"];
+        sched -> bunkerweb [label="API interna", style=dashed];
+      }
+      subgraph cluster_app { label="red app"; style="rounded,filled"; fillcolor="#FFF4EC"; color="#D2691E";
+        web    [label="web\nDjango 5.2 + gunicorn\n(núcleo hexagonal)", fillcolor="#FDE3D1"];
+        worker [label="worker\noutbox, sincronización,\nexport. auditoría", fillcolor="#FDE3D1"];
+        glpi   [label="GLPI 11\nservicio integrado", fillcolor="#FDE3D1"];
+      }
+      subgraph cluster_db { label="red db_net (internal: true)"; style="rounded,filled"; fillcolor="#F2F0EB"; color="#8B7D6B";
+        maria [label="MariaDB\nBD de GLPI", shape=cylinder, fillcolor="#E8E4DC"]; }
+      subgraph cluster_logs { label="red waf-logs · reportería del WAF (debería)"; style="rounded,filled"; fillcolor="#F5EEF8"; color="#7D3C98";
+        fb [label="fluent-bit\nclasificar.lua", fillcolor="#EBDEF0"];
+        loki [label="loki\n30 días", fillcolor="#EBDEF0"];
+        graf [label="grafana\n127.0.0.1:3000\n(túnel SSH)", fillcolor="#EBDEF0"];
+        fb -> loki; graf -> loki [style=dashed, label="consulta"];
+      }
+    }
+    kv   [label="Key Vault\nsecretos", fillcolor="#E3EEF9"];
+    blob [label="Blob Storage\nauditoría inmutable · respaldos\nlogs del WAF", fillcolor="#E3EEF9"];
+  }
+  subgraph cluster_supa {
+    label="Supabase (plan gratuito)"; style="rounded,dashed"; color="#3E8E5E"; fontcolor="#3E8E5E";
+    pg   [label="PostgreSQL\nesquema app", shape=cylinder, fillcolor="#E4F3EA"];
+    auth [label="Supabase Auth\ncontraseña + TOTP", fillcolor="#E4F3EA"];
+  }
+
+  usuario -> bunkerweb [label="HTTPS 443"];
+  usuario -> cf [style=dashed, color="#C26B00"];
+  cf -> bunkerweb [label="túnel saliente (si se adopta)", style=dashed, color="#C26B00"];
+  bunkerweb -> web  [label="app.*"];
+  bunkerweb -> glpi [label="glpi.*"];
+  glpi -> maria;
+  web -> pg [label="session pooler · TLS"]; worker -> pg;
+  web -> auth [label="login + MFA"];
+  worker -> glpi [label="API REST (único cliente)"];
+  worker -> blob [label="export diario"];
+  bunkerweb -> fb [label="logs (driver fluentd)", style=dotted];
+  sched -> fb [style=dotted];
+  loki -> blob [label="identidad administrada", style=dashed];
+  kv -> web [label="secretos vía VM (tmpfs)", style=dotted];
+}

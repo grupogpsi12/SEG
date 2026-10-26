@@ -1,0 +1,27 @@
+Objetivo: https://app.localhost (IP 127.0.0.1)
+
+Trafico normal
+  200  Salud                                          (esperado 200)
+  200  Pagina de ingreso                              (esperado 200)
+  302  Sin sesion redirige al ingreso                 (esperado 302)
+  200  Estatico servido por WhiteNoise                (esperado 200)
+  301  HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  403  Inyeccion SQL (GET)                            (esperado 403)
+  403  Inyeccion SQL (POST)                           (esperado 403)
+  403  XSS                                            (esperado 403)
+  403  Recorrido de rutas                             (esperado 403)
+  403  Inyeccion de comandos                          (esperado 403)
+  403  Log4Shell en cabecera                          (esperado 403)
+  403  Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  OK   puerto 8000 cerrado
+  OK   puerto 3306 cerrado
+  OK   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  OK   sin token: cerrada · token malo: cerrada · token correcto: 200
+
+Todo segun lo esperado.
