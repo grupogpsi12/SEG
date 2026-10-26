@@ -15,7 +15,7 @@ set -euo pipefail
 
 RAIZ="$(cd "$(dirname "$0")/../.." && pwd)"
 CARPETA="$(cd "${1:?uso: $0 <carpeta-de-respaldos> [AAAA-MM-DD]}" && pwd)"
-FECHA="${2:-$(TZ=America/Bogota date +%Y-%m-%d)}"
+FECHA="${2:-$(TZ='<-05>5' date +%Y-%m-%d)}"  # desfase fijo: ver respaldo.sh
 IMAGEN="${JML_IMAGEN:-jml-app:local}"
 PG_IMAGEN=postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
 MARIADB_IMAGEN=mariadb:11.4@sha256:1292844148b311e4ed4300022a996d39083f415a963e970cf47cad1b3b18e3a6

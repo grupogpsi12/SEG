@@ -41,7 +41,7 @@ Scripts: `scripts/captura-trafico.sh` (GLPI) y `scripts/captura-trafico-web.sh` 
 | Suite que fija el servidor | `0x1302` (TLS_AES_256_GCM_SHA384) en los 10 |
 | Tramas con el centinela en el tramo cifrado | **0** |
 
-El borde ofrece solo TLS 1.2 y 1.3 (`testssl.sh`: sin SSLv2/3, TLS 1.0 ni 1.1; HSTS de un año; sin Heartbleed, ROBOT, POODLE, BEAST, SWEET32 ni RC4). La redirección del puerto 80 a HTTPS se midió aparte en la matriz de puertos (301). **Cumple RS-01 y descarta T19 en este tramo.** El certificado local es autofirmado (CN `www.example.com`); en Azure lo emite Let's Encrypt, y eso no se pudo verificar aquí.
+El borde ofrece solo TLS 1.2 y 1.3 (`testssl.sh`: sin SSLv2/3, TLS 1.0 ni 1.1; HSTS de un año; sin Heartbleed, ROBOT, POODLE, BEAST, SWEET32 ni RC4). La redirección del puerto 80 a HTTPS se midió aparte en la matriz de puertos (301). **Cumple RS-01 y descarta T19 en este tramo.** El certificado es autofirmado (CN `www.example.com`), como pide RS-01 desde ADR-031.
 
 ## 4. Tramo interno: WAF → aplicación
 
@@ -61,7 +61,7 @@ Cookies de respuesta observadas (valores enmascarados): `sessionid` con `HttpOnl
 | Medida | Valor |
 |---|---|
 | Tramas | 3 150 |
-| `SSLRequest` y conexiones con TLS | 0 y 0 (PostgreSQL local sin TLS; Supabase usa `verify-full`) |
+| `SSLRequest` y conexiones con TLS | 0 y 0 (PostgreSQL local sin TLS, en la red interna `pg_net`: ADR-031) |
 | Autenticación SCRAM vista / contraseña en claro | 21 / **0** |
 | `BEGIN` / `COMMIT` | 127 / 127 |
 | Tramas con el centinela hacia la base (control positivo) | 36 |
@@ -73,7 +73,7 @@ El centinela viaja a PostgreSQL porque ahí **debe** guardarse (`solicitud_restr
 La Entrega 3 dijo que el tráfico mostraba «sentencias con identificadores entre comillas y valores ligados». Medido ahora: **0 mensajes `Parse` y 0 `Bind`, 1 332 consultas simples**. Django 5.2 con `psycopg` 3 enlaza los parámetros **del lado del cliente**: `psycopg` escapa cada valor y arma el texto de la consulta antes de enviarla. Consecuencias:
 
 - **No hay inyección**: el escape es del controlador, y el código solo usa el ORM o `cursor.execute(sql, params)`; `bandit`, las reglas `S` de `ruff` y sqlmap hasta nivel 5 coinciden.
-- **El valor viaja dentro del texto SQL.** Si la base registrara sentencias (`log_statement`, o el texto de una consulta fallida), el campo restringido aparecería en esos registros. Con enlace en el servidor aparecería como `$1`. Es una razón para la opción `server_side_binding` de Django, a evaluar frente a su compatibilidad con el *session pooler* de Supabase. No se abrió hallazgo: no hay una fuga medida, solo una condición.
+- **El valor viaja dentro del texto SQL.** Si la base registrara sentencias (`log_statement`, o el texto de una consulta fallida), el campo restringido aparecería en esos registros. Con enlace en el servidor aparecería como `$1`. Es una razón para la opción `server_side_binding` de Django; con la base local (ADR-031) ya no hay un *pooler* que lo impida. No se abrió hallazgo: no hay una fuga medida, solo una condición.
 
 ## 7. Worker ↔ GLPI: los tokens viajan en claro (N-1)
 
@@ -110,6 +110,6 @@ La diferencia de severidad no es de medición sino de método: aquí cada hallaz
 
 ## 10. Límites
 
-- El stack local no cifra PostgreSQL ni MariaDB; el tramo real hacia Supabase (`verify-full`) **no se capturó** (Supabase en solo lectura de catálogo).
-- Se capturó dentro del equipo, no en una interfaz física: el tramo de internet no existe en el laboratorio.
+- El stack local no cifra PostgreSQL ni MariaDB: ambos tramos dependen de redes internas de Docker (ADR-031). El tramo hacia Supabase Auth (HTTPS) **no se capturó** (tercero).
+- Se capturó dentro del equipo, no en una interfaz física: el sistema no tiene exposición pública (ADR-031), así que no existe un tramo de internet.
 - En la segunda corrida del recorrido Playwright, un caso (RET) recibió un 429 del WAF; las aserciones de tráfico son válidas, pero el recorrido no fue 4 de 4. Ver **B-36**.

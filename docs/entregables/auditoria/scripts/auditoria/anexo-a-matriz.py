@@ -69,7 +69,7 @@ def evidencia(carpeta: str) -> str:
 
 
 # --- especificaciones por fila ---------------------------------------------------------------------
-# estado base: CUMPLE | PARCIAL | NO CUMPLE | NO VERIFICABLE EN LOCAL. `nota` explica las salvedades.
+# estado base: CUMPLE | PARCIAL | NO CUMPLE | NO VERIFICABLE EN LOCAL | NO APLICA (ADR-031: la fila describe Azure o Cloudflare). `nota` explica las salvedades.
 SPEC = {}
 
 
@@ -94,7 +94,7 @@ fila(
         "tests/seguridad/test_matriz_authz.py",
         "tests/seguridad/test_segundo_factor.py",
     ],
-    nota="B-28: el JWT se lee sin verificar la firma (riesgo acotado por TLS verify-full)",
+    nota="B-28: el JWT se lee sin verificar la firma (riesgo acotado por HTTPS hacia Supabase Auth)",
 )
 fila(
     "I",
@@ -146,8 +146,8 @@ ADR_LOCAL = {
     "2": (
         [],
         ["F7-01-NMAP"],
-        "PARCIAL",
-        "Docker Compose: sí (10 servicios, `infra/compose.yaml`); la VM de Azure no se puede verificar en local",
+        "NO APLICA (ADR-031)",
+        "reemplazada por ADR-031: Docker Compose en la máquina local (verificado, 10 servicios); no hay VM de Azure",
     ),
     "3": (
         [T + "test_tabla_II_adr_003_004_010_019"],
@@ -186,8 +186,8 @@ ADR_LOCAL = {
     "9": (
         ["tests/adaptadores/test_secretos.py", "tests/seguridad/test_despliegue.py"],
         [],
-        "PARCIAL",
-        "secretos como archivos en /run/secrets: sí; Key Vault de Azure: no verificable en local (aquí SOPS + age, ADR-029)",
+        "CUMPLE",
+        "secretos como archivos en /run/secrets: sí; el origen pasa de Key Vault a Docker secrets locales (ADR-031) y SOPS + age para el equipo (ADR-029)",
     ),
     "10": ([T + "test_tabla_II_adr_003_004_010_019"], [], "CUMPLE", "reemplazada por ADR-019"),
     "11": ([T + "test_tabla_II_adr_011"], [], "CUMPLE", ""),
@@ -273,9 +273,9 @@ for numero, (pruebas, evid, estado, nota) in ADR_LOCAL.items():
 
 # III: la clave es el numero de fila (1..20) del Excel
 PUERTOS = {
-    1: ("CUMPLE", "TLS autofirmado en local; Let's Encrypt solo en Azure"),
+    1: ("CUMPLE", "TLS autofirmado, que es lo que exige RS-01 desde ADR-031"),
     2: ("CUMPLE", "responde 301 hacia HTTPS"),
-    3: ("NO VERIFICABLE EN LOCAL", "sshd y NSG son de la VM de Azure"),
+    3: ("NO APLICA (ADR-031)", "sin VM ni acceso remoto: la administración es local"),
     4: ("CUMPLE", ""),
     5: ("CUMPLE", ""),
     6: (
@@ -285,22 +285,25 @@ PUERTOS = {
     7: ("CUMPLE", "B-32: los tokens de GLPI viajan en claro en este tramo"),
     8: ("CUMPLE", "B-30: sin TLS entre GLPI y MariaDB (red `internal: true`)"),
     9: (
-        "PARCIAL",
-        "TLS `verify-full` y puerto 5432 comprobados en la configuración; catálogo de Supabase leído en F3; no se abre una conexión desde los contenedores",
+        "NO APLICA (ADR-031)",
+        "la base es PostgreSQL 17 local en la red interna `pg_net`, sin puertos publicados (fila verificada en la matriz de puertos y CA-13)",
     ),
     10: ("NO VERIFICABLE EN LOCAL", "Supabase Auth solo se prueba con un servidor simulado"),
     11: ("NO VERIFICABLE EN LOCAL", "idem; `admin-usuarios` se prueba con el servidor simulado"),
-    12: ("NO VERIFICABLE EN LOCAL", "Azure Key Vault"),
-    13: ("NO VERIFICABLE EN LOCAL", "Azure Blob Storage"),
-    14: ("NO VERIFICABLE EN LOCAL", "Let's Encrypt (en local, certificado autofirmado)"),
+    12: ("NO APLICA (ADR-031)", "sin Key Vault: Docker secrets en `secrets/`"),
+    13: (
+        "NO APLICA (ADR-031)",
+        "sin Blob: exportes y respaldos van a un disco externo (L-01, verificado)",
+    ),
+    14: ("NO APLICA (ADR-031)", "sin Let's Encrypt: certificado autofirmado (RS-01)"),
     15: ("CUMPLE", ""),
     16: ("CUMPLE", ""),
     17: (
         "CUMPLE",
         "Grafana solo en 127.0.0.1 (B-27: es una excepción no escrita al invariante 14)",
     ),
-    18: ("NO VERIFICABLE EN LOCAL", "Loki con identidad administrada hacia Blob (Azure)"),
-    19: ("NO VERIFICABLE EN LOCAL", "Cloudflare es una propuesta (ADR-024), no desplegada"),
+    18: ("NO APLICA (ADR-031)", "Loki guarda en un volumen local"),
+    19: ("NO APLICA (ADR-031)", "Cloudflare descartada (ADR-024)"),
     20: ("CUMPLE", ""),
 }
 for i, (estado, nota) in PUERTOS.items():
@@ -664,16 +667,16 @@ fila(
     "RI-05",
     [],
     [],
-    "NO VERIFICABLE EN LOCAL",
-    "Azure Key Vault con identidad administrada; en local los secretos salen de `/run/secrets` (SOPS + age, ADR-029)",
+    "NO APLICA (ADR-031)",
+    "sin Key Vault: el RI-05 vigente (SRS v2.5) son Docker secrets en `secrets/` montados en `/run/secrets`",
 )
 fila(
     "XVIII",
     "RI-06",
     ["tests/adaptadores/test_exportacion_auditoria.py"],
     ["F7-05-RESPALDO-Y-RESTAURACION"],
-    "NO VERIFICABLE EN LOCAL",
-    "Azure Blob (contenedores inmutables e identidad administrada) no existe en local; la exportación de auditoría escribe a un directorio y su cadena se verifica sin la base",
+    "NO APLICA (ADR-031)",
+    "sin Blob: el RI-06 vigente (SRS v2.5) es el volumen `exportes` más un disco externo; la exportación de auditoría escribe a un directorio y su cadena se verifica sin la base",
 )
 
 

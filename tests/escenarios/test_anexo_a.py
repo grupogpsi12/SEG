@@ -702,6 +702,12 @@ def test_tabla_II_los_adr_del_excel_estan_en_decisiones_con_el_mismo_estado() ->
         clase = n(estado).split(" ")[0]
         if numero == 14:
             continue  # el Excel dice «Pendiente (sprint 0)»; decisiones.md ya la tiene «Aceptada (spike 0.3)» (desfase del Excel)
+        if numero in (2, 15, 24):
+            # El Excel es anterior a ADR-031 (despliegue local): la 2 y la 15 quedan reemplazadas y la 24 descartada.
+            esperado = "descartada" if numero == 24 else "reemplazada"
+            assert esperado in n(fila.group(0)), fila.group(0)
+            assert "adr-031" in n(fila.group(0)), fila.group(0)
+            continue
         assert clase in n(fila.group(0)), (
             f"ADR-{numero:03d}: Excel «{estado}» frente a decisiones.md"
         )
@@ -717,7 +723,7 @@ def test_tabla_II_adr_003_004_010_019_el_sistema_no_actua_sobre_directorios_ni_s
     compose = (RAIZ / "infra/compose.yaml").read_text(encoding="utf-8")
     assert not re.search(
         r"(?i)samba|cloudflared|\bldap\b", compose
-    )  # ADR-024 es solo una propuesta
+    )  # ADR-024 quedo descartada (ADR-031)
 
 
 def test_tabla_II_adr_008_012_020_no_hay_oidc_ni_fastapi_ni_react_ni_tiempo_real() -> None:

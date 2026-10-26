@@ -1,0 +1,10 @@
+tmpfs /var/lib/jml/soportes tmpfs rw,nosuid,nodev,noexec,relatime,size=262144k,mode=700,uid=10001,gid=10001 0 0
+tmpfs /var/lib/jml/soportes tmpfs rw,nosuid,nodev,noexec,relatime,size=262144k,mode=700,uid=10001,gid=10001 0 0
+......................                                                   [100%]
+22 passed in 0.09s
+prueba de navegador: == Playwright por el WAF .                                                                        [100%] 1 passed, 3 deselected in 16.40s 
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 3 · documentos subidos (POST /apirest.php/Document): 0
+         2 POST	/apirest.php/Document_Item
+################ restauracion
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+limpieza final de GLPI: tickets purgados (solicitud >= SOL-2026-000022): 4

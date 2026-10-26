@@ -2,13 +2,13 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `auditoria/entrega` · commit `c6e6490` · generado el 25/10/2026
+Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `auditoria/entrega` · commit `82eaf49` · generado el 25/10/2026
 
 ## 1. Resumen ejecutivo
 
-**Qué se auditó.** La aplicación JML (Django 5.2, arquitectura hexagonal), su integración con GLPI 11, la base PostgreSQL, el borde BunkerWeb (WAF), las imágenes de contenedores y los documentos del proyecto, **en un stack local** de Docker. No se tocó Azure, Cloudflare ni ningún tercero; Supabase se leyó solo en su catálogo, con autorización escrita del equipo.
+**Qué se auditó.** La aplicación JML (Django 5.2, arquitectura hexagonal), su integración con GLPI 11, la base PostgreSQL, el borde BunkerWeb (WAF), las imágenes de contenedores y los documentos del proyecto, **en un stack local** de Docker. Desde el 25/10/2026 ese stack es la arquitectura de destino (ADR-031, SRS v2.5): Docker Desktop, PostgreSQL 17 local y Supabase solo para Auth; Azure y Cloudflare quedan fuera del diseño. No se tocó ningún tercero; Supabase se leyó solo en su catálogo, con autorización escrita del equipo.
 
-**Resultado.** No se encontró ninguna vulnerabilidad Crítica ni Alta. Hay **36 hallazgos**: 15 Medios, 15 Bajos y 6 Informativos. De ellos, 18 siguen en pie (abiertos o aceptados) y 18 están verificados o corregidos. El **score global es 1,3 de 100** (escala: 0–20 aceptable), calculado sobre **144 controles de ASVS verificados**. La aplicación resistió ZAP activo (0 FAIL según su propia clasificación en las tres corridas; la única alerta Alta, de confianza baja, era un falso positivo triado), sqlmap hasta el nivel 5 (0 inyecciones en 8 objetivos, directo y sin WAF), y su cadena de auditoría sobrevivió a una restauración con la misma cabeza.
+**Resultado.** No se encontró ninguna vulnerabilidad Crítica ni Alta. Hay **38 hallazgos**: 15 Medios, 17 Bajos y 6 Informativos. De ellos, 18 siguen en pie (abiertos o aceptados) y 20 están verificados o corregidos. El último, B-38, salió al alinear la infraestructura con la arquitectura local (ADR-031): el volumen de los soportes había perdido `noexec`; ya está corregido. El **score global es 1,3 de 100** (escala: 0–20 aceptable), calculado sobre **147 controles de ASVS verificados**. La aplicación resistió ZAP activo (0 FAIL según su propia clasificación en las tres corridas; la única alerta Alta, de confianza baja, era un falso positivo triado), sqlmap hasta el nivel 5 (0 inyecciones en 8 objetivos, directo y sin WAF), y su cadena de auditoría sobrevivió a una restauración con la misma cabeza.
 
 | Medida | Valor |
 |---|---|
@@ -17,12 +17,12 @@ Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `a
 | Mutación | dominio 97,8 % · aplicación 92,7 % · seguridad 96,1 % |
 | Defectos sembrados detectados | 6 de 6 |
 | Celdas de autorización | 440 contrastadas, 0 distintas de lo esperado |
-| Anexo A (Excel de 18 hojas) | 157 filas: 138 cumplen, 9 parciales, 10 no verificables en local, 0 fallan |
+| Anexo A (Excel de 18 hojas) | 157 filas: 139 cumplen, 6 parciales, 2 no verificables en local, 10 no aplican (ADR-031), 0 fallan |
 | Rendimiento (RNF-06) | p95 de 466 a 649 ms por página; dashboard 786 ms |
 
 **Los tres riesgos que importan** (ordenados por DREAD × factor, solo los abiertos):
 
-1. **B-36 (Medio, 6,4). El limitador del WAF banea a una persona real.** Con menos de un segundo entre páginas llega un 429; varios seguidos terminan en un baneo de una hora. En una emergencia (EMG) es una baja de acceso que no se emite a tiempo. Si se adopta Cloudflare Tunnel (ADR-024) y el WAF ve una sola IP, una persona rápida bloquearía a todos. Salió de repasar la Entrega 3 y de repetir el recorrido por navegador.
+1. **B-36 (Medio, 6,4). El limitador del WAF banea a una persona real.** Con menos de un segundo entre páginas llega un 429; varios seguidos terminan en un baneo de una hora. En una emergencia (EMG) es una baja de acceso que no se emite a tiempo. Salió de repasar la Entrega 3 y de repetir el recorrido por navegador.
 2. **B-06 (Medio, 6,0). Un solo proceso de `gunicorn`.** Los desafíos del segundo factor viven en memoria; un reinicio los pierde. Es una decisión de diseño (ADR-017 / S-29), aceptable a esta escala, pero debe quedar escrita.
 3. **B-10 (Medio, 6,0). La política mínima de contraseña de Supabase y su asesor de seguridad no se han ejecutado.** Es una acción humana en un panel que esta auditoría no podía tocar. Arrastra 12 requisitos de ASVS pendientes.
 
@@ -38,7 +38,7 @@ Les sigue una familia coherente: **el worker y GLPI se tratan como de confianza,
 
 | Fuera | Motivo |
 |---|---|
-| Azure (VM, Key Vault, Blob, NSG), Let's Encrypt, Cloudflare | Sin autorización ni cuenta; el plan los marca como `[PENDIENTE]` con su guion listo (§15) |
+| Azure (VM, Key Vault, Blob, NSG), Let's Encrypt, Cloudflare | No forman parte de la arquitectura vigente (ADR-031): no aplican |
 | Pruebas activas contra Supabase | Es un tercero. Solo lectura de catálogo, autorizada el 24/10/2026 |
 | Evaluación de accesibilidad con lector de pantalla | Exige a una persona; se midió lo mecánico |
 | Revisión del 10 % de la clasificación de ASVS por una segunda persona | Exige a una persona distinta de quien clasificó |
@@ -139,8 +139,8 @@ Mutación (`mutmut`): dominio **97,8 %**, aplicación **92,7 %** (de 77,8 % en l
 | Métrica | Valor | Contramétrica |
 |---|---|---|
 | Cobertura de ramas | 95,25 % total | Mutación 92,7 % a 97,8 %: las pruebas notan los cambios |
-| Hallazgos | 36 | 144 controles de ASVS verificados; el score solo vale con ese número |
-| Controles ASVS | 144 verificados · 36 parciales · 19 pendientes · 54 no aplican | 72,4 % de los aplicables |
+| Hallazgos | 37 | 147 controles de ASVS verificados; el score solo vale con ese número |
+| Controles ASVS | 147 verificados · 36 parciales · 14 pendientes · 56 no aplican | 74,6 % de los aplicables |
 | Pruebas | 2 574 | 20 de 20 corridas estables, sin reintentos |
 | Rendimiento | p95 ≤ 649 ms | Una corrida de 10 vueltas dio 1 126 ms: se conserva |
 
@@ -159,18 +159,20 @@ Mutación (`mutmut`): dominio **97,8 %**, aplicación **92,7 %** (de 77,8 % en l
 | B-24 | Baja | verificado (rojo→verde, evidencia B-24-ROJO / B- | 5,0 | ×1,0 | 5,0 | 1,0 |
 | B-31 | Media | aceptado con exención escrita (`exenciones-trivy | 4,8 | ×1,0 | 4,8 | 3,0 |
 | B-34 | Baja | corregido — `--borde-campo` (3,74:1) y relleno d | 4,6 | ×1,0 | 4,6 | 0,0 |
+| B-37 | Baja | abierto — los guiones de la auditoría ya purgan  | 4,4 | ×1,0 | 4,4 | 4,4 |
 | B-16 | Media | verificado (rojo→verde, evidencia B-16-ROJO / B- | 4,2 | ×1,0 | 4,2 | 2,0 |
 | B-20 | Media | verificado (rojo→verde, evidencia B-20-ROJO / B- | 4,2 | ×1,0 | 4,2 | 2,0 |
 | B-19 | Media | verificado (rojo→verde, evidencia B-19-ROJO / B- | 4,0 | ×1,0 | 4,0 | 2,0 |
 | B-25 | Media | verificado (rojo→verde: 118 celdas de la matriz  | 5,4 | ×0,7 (exige una sesión) | 3,8 | 1,8 |
 | B-13 | Baja | verificado (cobertura de ramas de `seguridad:ing | 3,6 | ×1,0 | 3,6 | n/a |
 | B-21 | Baja | verificado (rojo→verde, evidencia B-21-ROJO / B- | 3,4 | ×1,0 | 3,4 | 1,0 |
+| B-38 | Baja | verificado (rojo→verde, evidencia B-38-ROJO / B- | 4,6 | ×0,7 (exige una sesión de RRHH y otra vulnerabilidad que ejecute el archivo) | 3,2 | 1,0 |
 | B-18 | Baja | aceptado — sin parche en Debian 13,7; se revisa  | 3,0 | ×1,0 | 3,0 | 3,0 |
 | B-27 | Baja | abierto — decisión del equipo: ADR-023 e invaria | 3,0 | ×1,0 | 3,0 | 3,0 |
 | B-33 | Baja | abierto — endurecimiento de ejecución de contene | 3,0 | ×1,0 | 3,0 | 3,0 |
 | B-22 | Informativa | aceptado — límite conocido de ADR-021 (sin antiv | 2,8 | ×1,0 | 2,8 | 2,8 |
 | B-32 | Media | abierto — propuesta de ADR en F8-04 (red dedicad | 5,4 | ×0,5 (exige un contenedor comprometido en la red interna) | 2,7 | 5,4 |
-| B-23 | Baja | corregido en el código (migración 0006); falta a | 2,6 | ×1,0 | 2,6 | 1,0 |
+| B-23 | Baja | verificado (rojo→verde, B-23-VERDE; migración 00 | 2,6 | ×1,0 | 2,6 | 1,0 |
 | B-01 | Media | verificado | 5,0 | ×0,5 (exige acceso al host) | 2,5 | 4,0 |
 | B-29 | Informativa | abierto — corregir RS-19 y la descripción de la  | 5,0 | ×0,5 (exige la red interna) | 2,5 | 2,0 |
 | B-28 | Baja | abierto — decisión del equipo (ASVS V9,1, V9,2 y | 3,6 | ×0,5 (exige interponerse en el tramo servidor→Supabase) | 1,8 | 3,6 |
@@ -179,7 +181,7 @@ Mutación (`mutmut`): dominio **97,8 %**, aplicación **92,7 %** (de 77,8 % en l
 | B-03 | Informativa | corregido (sin prueba automática viable) | n/a | ×1,0 | — | n/a |
 | B-04 | Media | verificado (F6-02 con la exención registrada y F | n/a | ×1,0 | — | n/a |
 | B-08 | Informativa | verificado (reglas S de ruff activas en toda la  | n/a | ×1,0 | — | n/a |
-| B-09 | Baja | abierto — F8 | n/a | ×1,0 | — | n/a |
+| B-09 | Baja | corregido — medido en F8-02: `aplicacion` 92,7 % | n/a | ×1,0 | — | n/a |
 | B-11 | Media | verificado (matriz de 440 celdas y U-03 en F5; u | n/a | ×1,0 | — | 3,0 |
 | B-12 | Informativa | abierto — F8 | n/a | ×1,0 | — | n/a |
 | B-14 | Informativa | abierto — F8 | n/a | ×1,0 | — | n/a |
@@ -215,7 +217,7 @@ Distribución:
 | B-20 | Media | Una respuesta inesperada de GLPI detiene la bandeja de salida: la entrada no suma intentos y bloquea a las demás | verificado |
 | B-21 | Baja | El filtro de logs no reconocía claves prohibidas con acento (`contraseña`, `descripción`) | verificado |
 | B-22 | Informativa | Un PDF políglota (firma `%PDF-` más carga adicional) pasa la validación del soporte de vinculación | aceptado |
-| B-23 | Baja | Las nueve tablas de Django (`auth_*`, `django_*`) no tienen RLS, contra el invariante 8 | corregido en el código |
+| B-23 | Baja | Las nueve tablas de Django (`auth_*`, `django_*`) no tienen RLS, contra el invariante 8 | verificado |
 | B-24 | Baja | Si Supabase cae al inscribir el TOTP, la página del segundo factor responde 500 en vez del aviso de servicio | verificado |
 | B-25 | Media | Una denegación por rol no dejaba rastro: ni usuario, ni ruta, ni evento | verificado |
 | B-26 | Baja | El Auditor no puede leer solicitudes sin campos restringidos, como dice el SRS | abierto |
@@ -229,6 +231,8 @@ Distribución:
 | B-34 | Baja | El borde de los campos (1,39:1) y las barras del gráfico (2,07:1) no llegan a 3:1 (WCAG 1.4.11, RI-01) | corregido |
 | B-35 | Baja | La cuenta de servicio de GLPI puede borrar y purgar tickets, y RI-02 no lo necesita | abierto |
 | B-36 | Media | Dos páginas seguidas en menos de un segundo agotan el límite del WAF: la tercera recibe 429 y varias seguidas terminan en un baneo de 1 hora | abierto |
+| B-37 | Baja | La prueba de navegador puede pasar sin que se cree ningún ticket: encuentra los de una corrida anterior con el mismo identificador | abierto |
+| B-38 | Baja | Con la arquitectura local, el volumen de los soportes de vinculación se montaba con permisos de ejecución, contra el invariante 12 | verificado |
 
 Cada hallazgo tiene su archivo `hallazgos/B-nn.md` con DREAD, evidencia, impacto, corrección, prueba de regresión, observación de primer principio, falsabilidad, indicador temprano y esfuerzo.
 
@@ -254,9 +258,8 @@ Además, **acciones que solo el equipo puede hacer**: hacer `git push` de la ram
 
 | Pendiente | Motivo | Guion o decisión |
 |---|---|---|
-| Azure: VM, NSG, Key Vault, Blob inmutable, Let's Encrypt (RS-16) | Sin cuenta ni autorización | `[PENDIENTE: ventana de despliegue]`; los guiones de respaldo, secretos y `pruebas.sh` ya apuntan a esas piezas |
-| Cloudflare Tunnel (ADR-024) | Propuesta del equipo, no desplegada | Antes de adoptarla, resolver B-36 y la IP real del cliente |
-| Supabase real: autenticación y Data API | Terceros, solo lectura de catálogo | Escenarios omitidos con S-38; la petición con la clave `anon` queda como CA-13 parcial |
+| Copia de la auditoría y de los respaldos al disco externo real (RD-04, RD-06) | Los guiones están hechos y verificados contra una carpeta que simula el disco (`L-01-COPIAS-AL-MEDIO-EXTERNO`) | Programar las dos tareas diarias en el equipo de operación con el disco conectado |
+| Supabase Auth real | Tercero, solo lectura de catálogo | Escenarios omitidos con S-38. CA-13 ya no depende de Supabase: se midió en el PostgreSQL local (ADR-031) |
 | Evaluación WCAG con lector de pantalla | Exige a una persona | RI-01 parcial; lo mecánico está en verde |
 | Revisión del 10 % de ASVS por una segunda persona | Exige a una persona distinta | `[PENDIENTE: segunda persona]` |
 | Compuertas G1b y G4 en la CI de GitHub | El flujo de trabajo no se probó en la nube: exige `git push` | Los comandos corren en local; ver §16 |

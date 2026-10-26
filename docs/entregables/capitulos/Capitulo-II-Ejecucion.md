@@ -83,7 +83,7 @@ El orden fue deliberado: el núcleo se construyó **primero**, completo y con do
 
 ### La auditoría como parte de la ejecución
 
-Con el sistema construido, se ejecutó una auditoría de seguridad y calidad en diez fases (F0 a F9) bajo un plan escrito, con un ciclo de doce pasos por ítem (leer, planear, buscar, neutralizar, control positivo, ejecutar con evidencia, romper, clasificar, actualizar, confirmar, compuerta, siguiente). Resultado: **36 hallazgos**, sin Críticos ni Altos; 18 quedaron verificados o corregidos durante la auditoría (los corregidos, con su prueba en rojo y luego en verde) y 18 siguen abiertos o aceptados.
+Con el sistema construido, se ejecutó una auditoría de seguridad y calidad en diez fases (F0 a F9) bajo un plan escrito, con un ciclo de doce pasos por ítem (leer, planear, buscar, neutralizar, control positivo, ejecutar con evidencia, romper, clasificar, actualizar, confirmar, compuerta, siguiente). Resultado: **38 hallazgos**, sin Críticos ni Altos; 20 quedaron verificados o corregidos durante la auditoría (los corregidos, con su prueba en rojo y luego en verde) y 18 siguen abiertos o aceptados.
 
 ## 2.3 Cumplimiento de objetivos y procedimientos
 
@@ -104,7 +104,7 @@ Con el sistema construido, se ejecutó una auditoría de seguridad y calidad en 
 
 ### Procedimientos y criterios de aceptación
 
-De los 21 criterios de aceptación (CA-01 a CA-21), **20 cumplen y 1 es parcial** (CA-13: la petición con la clave pública de Supabase a la Data API quedó sin hacer porque Supabase se leyó solo en su catálogo). La tabla completa con su evidencia está en el informe 4 de la auditoría. Frente al Excel del Anexo A, de 157 filas **138 cumplen, 9 son parciales, 10 no se pueden verificar en un entorno local y ninguna falla**.
+De los 21 criterios de aceptación (CA-01 a CA-21), **los 21 cumplen**. CA-13 se midió con la definición del SRS v2.5, en la que la base es un PostgreSQL 17 local (ADR-031). La tabla completa con su evidencia está en el informe 4 de la auditoría. Frente al Excel del Anexo A, de 157 filas **139 cumplen, 6 son parciales, 2 no se pueden verificar sin el servicio real de Supabase Auth, 10 no aplican porque describen Azure, Let's Encrypt o Cloudflare (descartados por ADR-031) y ninguna falla**.
 
 ## 2.4 Metodología
 
@@ -153,7 +153,7 @@ Desarrollo incremental dirigido por especificación, con arquitectura hexagonal 
 | Capa | Tecnología y versión |
 |---|---|
 | Aplicación | Python 3.12, Django 5.2.18 (LTS), gunicorn 23.0.0, WhiteNoise 6.12.0, plantillas generadas en el servidor |
-| Datos | PostgreSQL 17 (sustituto local de Supabase); `psycopg` 3.3.6 |
+| Datos | PostgreSQL 17 en contenedor local, base de la aplicación (ADR-031); `psycopg` 3.3.6 |
 | Integración | GLPI 11.0.11 por API REST (v1) con `httpx` 0.28.1; MariaDB 11.4 |
 | Identidad | Supabase Auth (contraseña y TOTP), mediado por el servidor |
 | Borde | BunkerWeb 1.6.15 (nginx, ModSecurity, OWASP CRS 4) |
@@ -175,7 +175,7 @@ Desarrollo incremental dirigido por especificación, con arquitectura hexagonal 
 
 ### Materiales
 
-SRS v2.4 y 30 ADR; el plan de auditoría v2.0; la Entrega 3 (cinco PDF y su evidencia); el Excel «AnexoA. Tablas.xlsx» (18 hojas); el CSV oficial de ASVS 5.0; y un conjunto de datos ficticios (30 colaboradores de semilla y 300 para la medición de rendimiento).
+SRS v2.4 y 30 ADR (hoy SRS v2.5 y 31 ADR, tras ADR-031); el plan de auditoría v2.0; la Entrega 3 (cinco PDF y su evidencia); el Excel «AnexoA. Tablas.xlsx» (18 hojas); el CSV oficial de ASVS 5.0; y un conjunto de datos ficticios (30 colaboradores de semilla y 300 para la medición de rendimiento).
 
 ## 2.6 Recolección y análisis de los datos
 
@@ -198,6 +198,6 @@ Toda medición se registra con **un mismo protocolo**: una carpeta de evidencia 
 
 - **Contraste con lo documentado.** Cada cifra que el proyecto declaraba se remidió; toda diferencia mayor de 1 % es un hallazgo (por ejemplo, la «cobertura de ramas 99 %» era la métrica combinada; las ramas puras son 97,74 % y 94,83 %).
 - **Estadística descriptiva.** Mediana, percentil 95 y máximo por página en las mediciones de rendimiento; 20 corridas consecutivas para la estabilidad; repetición de las mediciones sospechosas (dos corridas más de rendimiento, dos del recorrido por navegador).
-- **Clasificación de hallazgos.** Severidad por DREAD (daño, reproducibilidad, explotabilidad, usuarios afectados, descubrimiento) multiplicada por un factor según la posición del atacante; el *score* global es la exposición ponderada de lo abierto dividida por diez veces los controles verificados: 19 / (144 × 10) × 100 = 1,3.
+- **Clasificación de hallazgos.** Severidad por DREAD (daño, reproducibilidad, explotabilidad, usuarios afectados, descubrimiento) multiplicada por un factor según la posición del atacante; el *score* global es la exposición ponderada de lo abierto dividida por diez veces los controles verificados: 19 / (147 × 10) × 100 = 1,3.
 - **Triage.** Cada alerta de severidad media o superior de un escáner se contrastó con el código y se reprodujo a mano antes de aceptarla o descartarla (por ejemplo, la alerta «Path Traversal» de ZAP se reprodujo con siete valores y se descartó).
-- **Validez.** Se declaran sus límites: el stack es local; el certificado es autofirmado; Azure, Cloudflare y el servicio real de Supabase Auth no se midieron; y una evaluación de accesibilidad con lector de pantalla quedó pendiente.
+- **Validez.** Se declaran sus límites: el stack local es la arquitectura de destino (ADR-031), así que lo medido es lo que se entrega; el servicio real de Supabase Auth no se midió; la copia al disco externo se verificó contra una carpeta que lo simula, no contra el disco real; y una evaluación de accesibilidad con lector de pantalla quedó pendiente.

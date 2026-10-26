@@ -1,22 +1,24 @@
 {
  "filas": 157,
  "resultados": {
-  "CUMPLE": 138,
-  "PARCIAL": 9,
-  "NO VERIFICABLE EN LOCAL": 10
+  "CUMPLE": 139,
+  "NO APLICA (ADR-031)": 10,
+  "PARCIAL": 6,
+  "NO VERIFICABLE EN LOCAL": 2
  },
  "por_tabla": {
   "I": {
    "CUMPLE": 8
   },
   "II": {
-   "CUMPLE": 25,
-   "PARCIAL": 3
+   "CUMPLE": 26,
+   "NO APLICA (ADR-031)": 1,
+   "PARCIAL": 1
   },
   "III": {
    "CUMPLE": 11,
-   "NO VERIFICABLE EN LOCAL": 8,
-   "PARCIAL": 1
+   "NO APLICA (ADR-031)": 7,
+   "NO VERIFICABLE EN LOCAL": 2
   },
   "IV": {
    "PARCIAL": 2,
@@ -64,7 +66,7 @@
   "XVIII": {
    "PARCIAL": 3,
    "CUMPLE": 1,
-   "NO VERIFICABLE EN LOCAL": 2
+   "NO APLICA (ADR-031)": 2
   }
  }
 }

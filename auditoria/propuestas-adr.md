@@ -54,7 +54,7 @@ Ordenadas por la prioridad de los hallazgos que las originan (`score-global.md`)
 
 ## P-5 · Verificar la firma del JWT de Supabase (B-28)
 
-**Contexto.** `_claims` lee `aal` y `sub` del JWT sin verificar su firma ni `exp`/`iss`. El token llega por TLS `verify-full` en respuesta a una petición del servidor, lo que acota el riesgo (3,6).
+**Contexto.** `_claims` lee `aal` y `sub` del JWT sin verificar su firma ni `exp`/`iss`. El token llega por HTTPS verificado desde Supabase Auth en respuesta a una petición del servidor, lo que acota el riesgo (3,6).
 
 **Decisión propuesta.** Verificar la firma HS256 con el secreto JWT del proyecto (`hmac` y `hashlib`, unas 30 líneas, sin dependencia nueva) y comprobar `exp` e `iss`. El secreto entra como un secreto nuevo en `/run/secrets` (SOPS).
 

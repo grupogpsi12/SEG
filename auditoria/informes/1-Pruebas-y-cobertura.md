@@ -120,5 +120,5 @@ Seis defectos, de uno en uno, con restauración byte a byte: SQL por f-string (`
 ## 10. Lo que no se pudo medir
 
 - Pruebas contra el **Supabase real** de autenticación: solo existe un servidor simulado (Supabase en solo lectura de catálogo).
-- Cobertura de los adaptadores contra Azure (Key Vault, Blob).
+- La copia de exportes y respaldos al disco externo real: verificada contra una carpeta que lo simula (L-01, ADR-031).
 - El recorrido Playwright es sensible al limitador del WAF (2 r/s): en dos de tres corridas el caso RET recibió un 429. No es un defecto del código probado sino del ritmo del navegador (B-36).

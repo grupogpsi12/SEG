@@ -1,0 +1,32 @@
+== 1. primera copia
+copiados: 8 · ya estaban: 0 · con otro contenido: 0
+OK    codigo 0 y 8 archivos en el medio externo
+== 2. segunda copia (idempotente)
+copiados: 0 · ya estaban: 8 · con otro contenido: 0
+OK    no copia nada de nuevo
+== 3. control negativo: una copia alterada
+ALARMA: /destino/ancla-2026-10-10.json existe con otro contenido; no se sobrescribe
+copiados: 0 · ya estaban: 7 · con otro contenido: 1
+OK    sale con error y da la alarma
+OK    no sobrescribe la copia alterada
+== 4. respaldo en el medio externo, retencion y restauracion
+respaldado: /c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/.contrato-tmp/medio-externo/respaldos/app-2026-10-25.dump (136K)
+respaldado: /c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/.contrato-tmp/medio-externo/respaldos/glpi-2026-10-25.sql.gz (164K)
+retirado por retencion: /c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/.contrato-tmp/medio-externo/respaldos/app-2026-09-01.dump
+retirado por retencion: /c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/.contrato-tmp/medio-externo/respaldos/glpi-2026-09-01.sql.gz
+OK    respaldo con codigo 0
+OK    retira los respaldos de mas de 30 dias
+OK    no toca archivos ajenos
+== 1. PostgreSQL nuevo con los roles de Supabase y el duenio separado
+== 2. pg_restore del esquema app como app_owner
+== 3. migrar (como en docs/operacion.md: aplica lo que falte)
+== 4. MariaDB nuevo con el volcado de GLPI
+== 5. Comprobaciones contra el origen
+  filas por tabla: iguales en 24 tablas (sincronizacion y django_session las escribe el sistema solo)
+  cabeza de la cadena: igual (secuencia 414)
+  cadena de auditoria: VALIDA segun la aplicacion, leida como app_backend
+  app_backend no puede modificar la auditoria (RD-02, CA-13)
+  GLPI (tickets, categorias, grupos, reglas, usuarios, documentos): iguales (6 114 5 97 50 5)
+RESTAURACION COMPLETA Y VERIFICADA: 21 s de restauracion, 23 s con las comprobaciones (RTO exigido: 4 h)
+OK    el simulacro de restauracion pasa
+fallos: 0

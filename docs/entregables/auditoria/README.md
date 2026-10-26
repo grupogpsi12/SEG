@@ -2,7 +2,7 @@
 
 Andina Servicios S.A.S. es una empresa ficticia y todos los datos lo son. Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01.
 
-Generada el 25/10/2026 desde el commit `c6e6490` de la rama `auditoria/entrega` (base auditada: `5fa3f32`). Todo lo de esta carpeta se regenera con un comando: `uv run python auditoria/scripts/generar-entrega.py`.
+Generada el 25/10/2026 desde el commit `82eaf49` de la rama `auditoria/entrega` (base auditada: `5fa3f32`). Todo lo de esta carpeta se regenera con un comando: `uv run python auditoria/scripts/generar-entrega.py`.
 
 ## Qué hay aquí
 

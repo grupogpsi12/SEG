@@ -16,25 +16,30 @@ import re
 import shutil
 import subprocess
 import sys
+import textwrap
 from datetime import datetime
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.platypus import (
-    Image as RLImage,
-)
-from reportlab.platypus import (
+    BaseDocTemplate,
+    Frame,
+    NextPageTemplate,
+    PageBreak,
+    PageTemplate,
     Paragraph,
     Preformatted,
-    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
+)
+from reportlab.platypus import (
+    Image as RLImage,
 )
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -49,7 +54,7 @@ INFORMES = [
 ]
 # Caracteres fuera de cp1252 (la fuente base de PDF): se escriben con su equivalente legible.
 TRADUCCION = {
-    "→": "->", "←": "<-", "≥": ">=", "≤": "<=", "≠": "!=", "≈": "~", "‖": "||", "✔": "OK", "✖": "no",
+    "→": "->", "←": "<-", "↔": "<->", "≥": ">=", "≤": "<=", "≠": "!=", "≈": "~", "‖": "||", "✔": "OK", "✖": "no",
     "◐": "parcial", "○": "pendiente", "⛔": "bloqueado", "−": "-", "‑": "-", " ": " ", "ǁ": "|",
     "▲": "^", "…": "...", "‐": "-", "ʼ": "'", "⁻": "-", "¹": "1", "²": "2", "³": "3",
 }  # fmt: skip
@@ -91,9 +96,7 @@ def tabla_de_hallazgos() -> str:
         assert m, ruta.name
         assert estado, ruta.name
         corto = re.split(r"\s+[—(]\s*|\s*\(", estado.group(1))[0].strip()
-        filas.append(
-            f"| {m.group(1)} | {m.group(2)} | {m.group(3).replace('|', '/')[:150]} | {corto[:60]} |"
-        )
+        filas.append(f"| {m.group(1)} | {m.group(2)} | {m.group(3).replace('|', '/')} | {corto} |")
     return "\n".join(filas)
 
 
@@ -210,6 +213,14 @@ def estilos() -> dict[str, ParagraphStyle]:
     )
     return {
         "n": n,
+        "leyenda": ParagraphStyle(
+            "leyenda",
+            parent=n,
+            fontName="Helvetica-Bold",
+            keepWithNext=1,
+            spaceBefore=4,
+            spaceAfter=3,
+        ),
         "h1": ParagraphStyle(
             "h1",
             parent=n,
@@ -221,6 +232,7 @@ def estilos() -> dict[str, ParagraphStyle]:
         ),
         "h2": ParagraphStyle(
             "h2",
+            keepWithNext=1,
             parent=n,
             fontName="Helvetica-Bold",
             fontSize=13.5,
@@ -231,6 +243,7 @@ def estilos() -> dict[str, ParagraphStyle]:
         ),
         "h3": ParagraphStyle(
             "h3",
+            keepWithNext=1,
             parent=n,
             fontName="Helvetica-Bold",
             fontSize=10.8,
@@ -252,12 +265,31 @@ def estilos() -> dict[str, ParagraphStyle]:
     }
 
 
+def anchos_de_columna(filas: list[list[str]], columnas: int, ancho_util: float) -> list[float]:
+    """Reparte el ancho: cada columna recibe al menos lo que ocupa su palabra mas larga (sin partirla) y el resto se
+    reparte segun cuanto texto tiene. Si ni los minimos caben, se escalan."""
+    ancho_car = 4.3  # puntos por caracter a 7,6 pt (mayusculas y negrita incluidas)
+    relleno = 8.0
+    minimos, deseados = [], []
+    for i in range(columnas):
+        celdas = [re.sub(r"[`*]", "", f[i]) for f in filas]
+        mas_larga = max((len(w) for c in celdas for w in c.split()), default=1)
+        total = max((len(c) for c in celdas), default=1)
+        minimos.append(mas_larga * ancho_car + relleno)
+        deseados.append(min(total, 70) * ancho_car + relleno)
+    if sum(minimos) >= ancho_util:
+        escala = ancho_util / sum(minimos)
+        return [m * escala for m in minimos]
+    sobra = ancho_util - sum(minimos)
+    falta = [max(d - m, 0.0) for d, m in zip(deseados, minimos, strict=True)]
+    reparto = sum(falta) or 1.0
+    return [m + sobra * f / reparto for m, f in zip(minimos, falta, strict=True)]
+
+
 def tabla(filas: list[list[str]], est: dict[str, ParagraphStyle], ancho_util: float) -> Table:
     columnas = max(len(f) for f in filas)
     filas = [f + [""] * (columnas - len(f)) for f in filas]
-    pesos = [max(6, min(60, max(len(f[i]) for f in filas))) for i in range(columnas)]
-    suma = sum(pesos)
-    anchos = [ancho_util * p / suma for p in pesos]
+    anchos = anchos_de_columna(filas, columnas, ancho_util)
     datos = [
         [Paragraph(inline(c), est["cab" if i == 0 else "celda"]) for c in f]
         for i, f in enumerate(filas)
@@ -275,7 +307,12 @@ def tabla(filas: list[list[str]], est: dict[str, ParagraphStyle], ancho_util: fl
 
 
 def md_a_pdf(
-    md: str, destino: Path, titulo: str, grafico: Path | None = None, base: Path | None = None
+    md: str,
+    destino: Path,
+    titulo: str,
+    grafico: Path | None = None,
+    base: Path | None = None,
+    pie_prefijo: str = "JML · Auditoría",
 ) -> None:
     est = estilos()
     pagina_ancho = A4[0] - 4 * cm
@@ -286,7 +323,12 @@ def md_a_pdf(
 
     def vaciar() -> None:
         if parrafo:
-            historia.append(Paragraph("<br/>".join(inline(p) for p in parrafo), est["n"]))
+            leyenda = parrafo[0].startswith(("**Tabla", "**Figura"))
+            historia.append(
+                Paragraph(
+                    "<br/>".join(inline(p) for p in parrafo), est["leyenda" if leyenda else "n"]
+                )
+            )
             parrafo.clear()
 
     while i < len(lineas):
@@ -296,7 +338,9 @@ def md_a_pdf(
             bloque = []
             i += 1
             while i < len(lineas) and not lineas[i].startswith("```"):
-                bloque.append(limpio(lineas[i])[:110])
+                bloque.extend(
+                    textwrap.wrap(limpio(lineas[i]), 105, subsequent_indent="    ") or [""]
+                )
                 i += 1
             historia.append(
                 Preformatted(
@@ -340,14 +384,27 @@ def md_a_pdf(
             if m and (base / m.group(2)).exists():
                 with Image.open(base / m.group(2)) as im:
                     ancho_px, alto_px = im.size
-                historia.append(
-                    RLImage(
-                        str(base / m.group(2)),
-                        width=pagina_ancho,
-                        height=pagina_ancho * alto_px / ancho_px,
+                if m.group(1).startswith("Figura"):
+                    # Las figuras llevan texto pequeno: en una pagina apaisada, a todo el ancho, se leen sin lupa.
+                    ancho_h = landscape(A4)[0] - 3 * cm
+                    historia += [NextPageTemplate("apaisada"), PageBreak()]
+                    historia.append(
+                        RLImage(
+                            str(base / m.group(2)),
+                            width=ancho_h,
+                            height=ancho_h * alto_px / ancho_px,
+                        )
                     )
-                )
-                historia.append(Spacer(1, 6))
+                    historia += [NextPageTemplate("normal"), PageBreak()]
+                else:
+                    historia.append(
+                        RLImage(
+                            str(base / m.group(2)),
+                            width=pagina_ancho,
+                            height=pagina_ancho * alto_px / ancho_px,
+                        )
+                    )
+                    historia.append(Spacer(1, 6))
         elif re.match(r"^(\s*)([-*]|\d+\.)\s+", linea):
             vaciar()
             m = re.match(r"^(\s*)([-*]|\d+\.)\s+(.*)", linea)
@@ -366,16 +423,31 @@ def md_a_pdf(
     vaciar()
 
     def pie(canvas, doc) -> None:  # type: ignore[no-untyped-def]
+        ancho_pagina = canvas._pagesize[0]
         canvas.saveState()
         canvas.setFont("Helvetica", 7.5)
         canvas.setFillColor(colors.HexColor("#52606d"))
-        canvas.drawString(2 * cm, 1.1 * cm, limpio(f"JML · Auditoría · {titulo}"))
-        canvas.drawRightString(A4[0] - 2 * cm, 1.1 * cm, f"Página {doc.page}")
+        canvas.drawString(2 * cm, 1.1 * cm, limpio(f"{pie_prefijo} · {titulo}"))
+        canvas.drawRightString(ancho_pagina - 2 * cm, 1.1 * cm, f"Página {doc.page}")
         canvas.restoreState()
 
-    doc = SimpleDocTemplate(str(destino), pagesize=A4, leftMargin=2 * cm, rightMargin=2 * cm, topMargin=1.8 * cm, bottomMargin=1.8 * cm,
-                            title=limpio(titulo), author="Grupo D01 · Politécnico Grancolombiano")  # fmt: skip
-    doc.build(historia, onFirstPage=pie, onLaterPages=pie)
+    doc = BaseDocTemplate(
+        str(destino),
+        pagesize=A4,
+        title=limpio(titulo),
+        author="Grupo D01 · Politécnico Grancolombiano",
+    )
+    vertical = Frame(2 * cm, 1.8 * cm, A4[0] - 4 * cm, A4[1] - 3.6 * cm, id="v")
+    horizontal = Frame(
+        1.5 * cm, 1.8 * cm, landscape(A4)[0] - 3 * cm, landscape(A4)[1] - 3.6 * cm, id="h"
+    )
+    doc.addPageTemplates(
+        [
+            PageTemplate(id="normal", frames=[vertical], onPage=pie, pagesize=A4),
+            PageTemplate(id="apaisada", frames=[horizontal], onPage=pie, pagesize=landscape(A4)),
+        ]
+    )
+    doc.build(historia)
 
 
 # --- carpeta de entrega -----------------------------------------------------------------------------------

@@ -82,7 +82,7 @@ Con el WAF delante, Nikto reportó 2 avisos informativos en 240 s (la CSP en `/`
 
 ## 7. TLS
 
-`testssl.sh` sobre `app.localhost`: solo TLS 1.2 y 1.3 (sin SSLv2/3 ni TLS 1.0/1.1), HSTS de un año, sin Heartbleed, ROBOT, POODLE, BEAST, SWEET32 ni RC4. El certificado es el autofirmado de BunkerWeb (CN `www.example.com`): válido solo para el borde local; en Azure lo emite Let's Encrypt, y eso **no se pudo verificar**.
+`testssl.sh` sobre `app.localhost`: solo TLS 1.2 y 1.3 (sin SSLv2/3 ni TLS 1.0/1.1), HSTS de un año, sin Heartbleed, ROBOT, POODLE, BEAST, SWEET32 ni RC4. El certificado es el autofirmado de BunkerWeb (CN `www.example.com`), que es lo que pide RS-01 desde ADR-031: no hay exposición pública.
 
 ## 8. Imágenes de contenedores (Trivy, con KEV y EPSS)
 
@@ -152,7 +152,7 @@ Imagen `docker/docker-bench-security` (digest `ddbdf4f8`) con la API 1.43 sobre 
 
 ## 14. Límites
 
-- El borde local usa un certificado autofirmado y PostgreSQL sin TLS; el comportamiento con Let's Encrypt y con Supabase por `verify-full` **no se midió**.
+- Los tramos internos (aplicación→PostgreSQL, worker→GLPI, GLPI→MariaDB) no usan TLS y dependen de redes internas de Docker (B-30, B-32).
 - La cobertura de la superficie de ZAP quedó en 90,9 %, por debajo del 95 % del plan.
 - Un escáner solo ve las rutas que alcanza con una sesión: lo no alcanzable lo cubren otras pruebas, pero no es lo mismo.
-- No se corrió ninguna prueba activa contra Supabase, GLPI en producción ni Azure.
+- No se corrió ninguna prueba activa contra Supabase Auth ni contra otros terceros.

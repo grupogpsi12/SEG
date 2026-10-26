@@ -1,0 +1,1 @@
+JML_GLPI_DE_PRUEBAS=si bash auditoria/scripts/captura-por-caso-de-uso.sh

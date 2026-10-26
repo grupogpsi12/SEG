@@ -25,6 +25,7 @@ FACTORES = {
     "B-35": (0.5, "exige el control del worker o de su token"),
     "B-25": (0.7, "exige una sesión"),
     "B-26": (0.7, "exige una sesión"),
+    "B-38": (0.7, "exige una sesión de RRHH y otra vulnerabilidad que ejecute el archivo"),
 }
 
 
@@ -102,7 +103,7 @@ def main() -> int:
         f"- Controles verificados (ASVS L1/L2 en «verificado»): **{ctrl}**.",
         f"- **Score global = {expo} / ({ctrl} × 10) × 100 = {f'{score:.1f}'.replace('.', ',')}** → {banda} (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).",
         "",
-        "Se reporta junto al número de controles verificados: con 144 probados el score tiene sentido; con 10 no lo tendría.",
+        "Se reporta junto al número de controles verificados: con 147 probados el score tiene sentido; con 10 no lo tendría.",
     ]
     texto = "\n".join(lineas) + "\n"
     (RAIZ / "auditoria" / "score-global.md").write_text(texto, encoding="utf-8", newline="\n")

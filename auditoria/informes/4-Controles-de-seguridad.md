@@ -8,7 +8,7 @@ Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · @@COMM
 
 Cada control se presenta con tres cosas: **qué promete** el SRS o el ADR, **cómo se comprobó** y **qué pasó cuando se quitó**. Un control que ninguna prueba nota que falta no está verificado, aunque el código parezca correcto. Por eso cada fila cita una prueba que se rompe al quitar el control, o una medición reproducible.
 
-Resultado global: **36 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 15 Bajos, 6 Informativos), **score global 1,3 de 100** (aceptable) con **144 controles de ASVS verificados**. El score se reporta junto a ese número: con pocos controles probados, un score bajo no significaría nada.
+Resultado global: **38 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 17 Bajos, 6 Informativos), **score global 1,3 de 100** (aceptable) con **147 controles de ASVS verificados**. El score se reporta junto a ese número: con pocos controles probados, un score bajo no significaría nada.
 
 ## 2. Confidencialidad
 
@@ -41,7 +41,7 @@ Resultado global: **36 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 15 Bajos, 6
 | Control | Promesa | Comprobación | Resultado |
 |---|---|---|---|
 | Doble factor | La sesión se crea solo después de verificar el TOTP (AAL2) (RF-01) | Un código usado no vuelve a servir; un desafío ajeno no entra; el defecto «segundo uso» se detecta | **Verificado** |
-| Sin tokens guardados | Los tokens de Supabase no se guardan (invariante 9) | Tras llegar a AAL2 no queda ningún token ni sesión de Supabase | **Verificado**; B-28: el JWT se lee sin verificar la firma (riesgo acotado por TLS `verify-full`) |
+| Sin tokens guardados | Los tokens de Supabase no se guardan (invariante 9) | Tras llegar a AAL2 no queda ningún token ni sesión de Supabase | **Verificado**; B-28: el JWT se lee sin verificar la firma (riesgo acotado por HTTPS verificado hacia Supabase Auth) |
 | Errores genéricos | El inicio de sesión no distingue «no existe» de «clave mala» (RS-08) | Pruebas de identidad y 14 cabeceras hostiles | **Verificado** |
 | Sesión | 30 minutos de inactividad o 8 horas, con rotación del identificador (RF-04) | Pruebas de ingreso web | **Verificado** |
 | Autorización por rol | Cada vista verifica el rol (RF-03) | **440 celdas** (22 rutas × 2 métodos × 10 roles) generadas desde el SRS: 0 resultados distintos del esperado; 403 frente a 404 comprobado | **Verificado**; una excepción documentada: B-26 (el Auditor no lee solicitudes) |
@@ -89,7 +89,7 @@ Resultado global: **36 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 15 Bajos, 6
 | CA-10 | El centinela del motivo no llega a GLPI | cumple | evidencias/trafico/F7-04-CAPTURA-TRAFICO |
 | CA-11 | Detección de la caída de GLPI y de la base | cumple | evidencias/disponibilidad/F7-08-DETECCION-BASE |
 | CA-12 | ZAP y sqlmap sin hallazgo | cumple | evidencias/vulnerabilidades/F6-04-SQLMAP-NIVEL5 |
-| CA-13 | La clave pública de Supabase no lee tablas | parcial | catálogo verificado en F3-PAR; la petición a la Data API quedó omitida (S-38) |
+| CA-13 | PostgreSQL solo en `pg_net`; `anon` y `authenticated` sin permisos; `app_backend` sin modificar la auditoría; `service_role` fuera de web y worker | cumple | evidencias/controles-positivos/ADR-031-CA-13-POSTGRES-LOCAL |
 | CA-14 | Contraseña correcta sin TOTP no entra | cumple | evidencias/controles-positivos/F3-U01 |
 | CA-15 | El dashboard coincide con su oráculo | cumple | evidencias/disponibilidad/F9-05-RENDIMIENTO-20V |
 | CA-16 | Búsqueda y ficha correctas | cumple | evidencias/funcionales/ANEXO-A-JUNIT |
@@ -99,11 +99,11 @@ Resultado global: **36 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 15 Bajos, 6
 | CA-20 | `pruebas.sh` devuelve 200 y 403 donde corresponde | cumple | evidencias/vulnerabilidades/F6-01-PRUEBAS-SH |
 | CA-21 | Un ataque aparece clasificado `waf` en menos de 2 minutos | cumple | evidencias/disponibilidad/CA-21-REPORTERIA-WAF |
 
-CA-21 cumple en su parte local; que los datos queden en Blob es de Azure y no se pudo comprobar. CA-13 queda parcial por la petición a la Data API del proyecto de desarrollo, que no se hizo (Supabase en solo lectura).
+Los 21 criterios cumplen. CA-21: con ADR-031, Loki guarda en un volumen local y no hay parte en Blob. CA-13 se mide con la definición del SRS v2.5 (la base es PostgreSQL local); en esa medición se aplicó a la base local la migración 0006 que faltaba (B-23).
 
 ## 8. ASVS 5.0 (nivel 1 y 2)
 
-253 requisitos del CSV oficial: **144 verificados, 36 parciales, 19 pendientes y 54 que no aplican** con motivo escrito. Los verificados son el **72,4 %** de los aplicables (199). De los 19 pendientes, 12 son la política mínima de contraseña de Supabase (acción humana en el panel: B-10), 5 son el certificado de producción y el TLS del borde (Let's Encrypt en Azure) y 2 son un inventario criptográfico que no está escrito. Los 36 parciales se reparten entre la verificación de firma, `exp` e `iss` del JWT (B-28, 11), el tramo worker→GLPI en claro (N-1) y la API de BunkerWeb en la red `app` (N-2), el PDF políglota aceptado (B-22), las vulnerabilidades del sistema operativo sin parche (B-18), la copia inmutable en Azure Blob y el registro abierto deshabilitado con recuperación de cuenta por el Administrador. La revisión del 10 % de la clasificación por una segunda persona sigue pendiente `[PENDIENTE: segunda persona]`. Archivo: `asvs-l2.csv`.
+253 requisitos del CSV oficial: **147 verificados, 36 parciales, 14 pendientes y 56 que no aplican** con motivo escrito. Los verificados son el **74,6 %** de los aplicables (197). De los 14 pendientes, 12 son la política mínima de contraseña de Supabase (acción humana en el panel: B-10) y 2 son un inventario criptográfico que no está escrito. Con ADR-031, V12.1 pasa a verificado (TLS del borde medido con testssl) y V12.2 (certificados públicos para servicios expuestos a internet) no aplica. Los 36 parciales se reparten entre la verificación de firma, `exp` e `iss` del JWT (B-28, 11), el tramo worker→GLPI en claro (N-1) y la API de BunkerWeb en la red `app` (N-2), el PDF políglota aceptado (B-22), las vulnerabilidades del sistema operativo sin parche (B-18), la copia de la auditoría al disco externo (L-01) y el registro abierto deshabilitado con recuperación de cuenta por el Administrador. La revisión del 10 % de la clasificación por una segunda persona sigue pendiente `[PENDIENTE: segunda persona]`. Archivo: `asvs-l2.csv`.
 
 ## 9. El Anexo A (Excel «AnexoA. Tablas.xlsx»)
 
@@ -111,12 +111,13 @@ Las 18 hojas (157 filas) se contrastaron una a una con el SRS y con el sistema.
 
 | Resultado | Filas |
 |---|---|
-| Cumple | 138 |
-| Parcial | 9 |
-| No verificable en local | 10 |
+| Cumple | 139 |
+| Parcial | 6 |
+| No verificable en local | 2 |
+| No aplica (ADR-031) | 10 |
 | Falla | 0 |
 
-Parciales: el rol Solicitante del Excel promete crear y eliminar cuentas y mandar correos (el SRS y ADR-019 lo prohíben: es un error del Excel, no del sistema); el Auditor no lee solicitudes (B-26); la cuenta de servicio puede borrar tickets (B-35); WCAG AA sin evaluación manual (RI-01); Supabase Auth real no ejercido (RI-04); y tres ADR que dependen de Azure (002, 005, 009). El Excel además está desfasado respecto al SRS v2.4 en la Tabla I, los ADR-14, 28, 29 y 30, RF-06 y RI-03. Informe completo: `verificacion-anexo-a-excel.md` y `anexo-a-matriz.csv`.
+Parciales: el rol Solicitante del Excel promete crear y eliminar cuentas y mandar correos (el SRS y ADR-019 lo prohíben: es un error del Excel, no del sistema); el Auditor no lee solicitudes (B-26); la cuenta de servicio puede borrar tickets (B-35); WCAG AA sin evaluación manual (RI-01); Supabase Auth real no ejercido (RI-04); y ADR-005 (la cuenta única de RRHH se cumple por operación). Las diez filas que describen Azure, Let's Encrypt o Cloudflare no aplican desde ADR-031. El Excel además está desfasado respecto al SRS v2.5 en la Tabla I, los ADR-14, 28 a 31, RF-06, RI-03, RI-05 y RI-06. Informe completo: `verificacion-anexo-a-excel.md` y `anexo-a-matriz.csv`.
 
 ## 10. Controles que no existían y se agregaron
 

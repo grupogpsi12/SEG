@@ -102,12 +102,12 @@
     "criticos": 0,
     "altos": 0,
     "medios": 15,
-    "bajos": 15,
+    "bajos": 17,
     "informativos": 6,
-    "total": 36,
-    "abiertos": 14,
-    "verificados": 15,
-    "corregidos": 4,
+    "total": 38,
+    "abiertos": 15,
+    "verificados": 17,
+    "corregidos": 3,
     "aceptados": 3
   },
   "celdas_matriz_authz": {
@@ -127,9 +127,10 @@
   "score_global": null,
   "anexo_a_excel": {
     "filas": 157,
-    "cumple": 138,
-    "parcial": 9,
-    "no_verificable_en_local": 10,
+    "cumple": 139,
+    "parcial": 6,
+    "no_verificable_en_local": 2,
+    "no_aplica_adr_031": 10,
     "falla": 0
   }
 }

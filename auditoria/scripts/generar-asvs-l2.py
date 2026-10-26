@@ -124,14 +124,17 @@ S: dict[str, tuple[str, str]] = {
     "V11.4": (V, "cadena SHA-256 (RD-03); las contraseñas las guarda Supabase"),
     "V11.5": (V, "secrets.token_urlsafe y token_hex para desafíos y nombres de archivo"),
     "V11.6": (N, "sin criptografía de clave pública propia"),
-    "V12.1": (X, "TLS del borde local autofirmado; testssl en F7-07"),
+    "V12.1": (
+        V,
+        "solo TLS 1.2 y 1.3 con suites AEAD y PFS en el borde (testssl F7-07); autofirmado conforme a RS-01 (ADR-031); sin mTLS",
+    ),
     "V12.2": (
-        X,
-        "certificado de producción con Let's Encrypt en Azure [PENDIENTE: ventana de despliegue]; testssl F7-07",
+        N,
+        "sin servicios expuestos a internet: el borde solo atiende app.localhost y glpi.localhost (ADR-031, RS-01)",
     ),
     "V12.3": (
         P,
-        "web→Supabase con verify-full; worker→GLPI en claro por la red interna: N-1, se mide en F7-04",
+        "web y worker→PostgreSQL y worker→GLPI sin TLS dentro de redes internas de Docker (ADR-031): N-1, medido en F7-04",
     ),
     "V13.1": (V, "docs/estado.md y compose documentan servicios y comunicaciones"),
     "V13.2": (P, "API de BunkerWeb alcanzable desde la red app con token (N-2): F7-02"),
@@ -154,7 +157,7 @@ S: dict[str, tuple[str, str]] = {
     "V16.3": (V, "sesion.fallida, decisiones, acceso.denegado (B-25), ficha.consultada"),
     "V16.4": (
         P,
-        "la cadena de auditoría es inalterable; la copia inmutable en Azure Blob (RD-04) [PENDIENTE: ventana de despliegue]",
+        "la cadena de auditoría es inalterable; la copia al disco externo sin sobrescribir está verificada (L-01), pero no es almacenamiento inmutable (riesgo aceptado en ADR-031)",
     ),
     "V16.5": (V, "mensajes genéricos; B-19, B-20 y B-24 corregidos"),
     "V17.1": (N, "sin WebRTC"),

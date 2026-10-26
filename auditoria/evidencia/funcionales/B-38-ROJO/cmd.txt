@@ -1,0 +1,1 @@
+docker exec jml-web-1 sh -c "grep /var/lib/jml/soportes /proc/mounts"; docker exec jml-worker-1 sh -c "grep /var/lib/jml/soportes /proc/mounts"; uv run pytest -q tests/adaptadores/test_infra.py -k B_38

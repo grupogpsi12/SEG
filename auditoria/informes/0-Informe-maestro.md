@@ -6,9 +6,9 @@ Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `a
 
 ## 1. Resumen ejecutivo
 
-**Qué se auditó.** La aplicación JML (Django 5.2, arquitectura hexagonal), su integración con GLPI 11, la base PostgreSQL, el borde BunkerWeb (WAF), las imágenes de contenedores y los documentos del proyecto, **en un stack local** de Docker. No se tocó Azure, Cloudflare ni ningún tercero; Supabase se leyó solo en su catálogo, con autorización escrita del equipo.
+**Qué se auditó.** La aplicación JML (Django 5.2, arquitectura hexagonal), su integración con GLPI 11, la base PostgreSQL, el borde BunkerWeb (WAF), las imágenes de contenedores y los documentos del proyecto, **en un stack local** de Docker. Desde el 25/10/2026 ese stack es la arquitectura de destino (ADR-031, SRS v2.5): Docker Desktop, PostgreSQL 17 local y Supabase solo para Auth; Azure y Cloudflare quedan fuera del diseño. No se tocó ningún tercero; Supabase se leyó solo en su catálogo, con autorización escrita del equipo.
 
-**Resultado.** No se encontró ninguna vulnerabilidad Crítica ni Alta. Hay **36 hallazgos**: 15 Medios, 15 Bajos y 6 Informativos. De ellos, 18 siguen en pie (abiertos o aceptados) y 18 están verificados o corregidos. El **score global es 1,3 de 100** (escala: 0–20 aceptable), calculado sobre **144 controles de ASVS verificados**. La aplicación resistió ZAP activo (0 FAIL según su propia clasificación en las tres corridas; la única alerta Alta, de confianza baja, era un falso positivo triado), sqlmap hasta el nivel 5 (0 inyecciones en 8 objetivos, directo y sin WAF), y su cadena de auditoría sobrevivió a una restauración con la misma cabeza.
+**Resultado.** No se encontró ninguna vulnerabilidad Crítica ni Alta. Hay **38 hallazgos**: 15 Medios, 17 Bajos y 6 Informativos. De ellos, 18 siguen en pie (abiertos o aceptados) y 20 están verificados o corregidos. El último, B-38, salió al alinear la infraestructura con la arquitectura local (ADR-031): el volumen de los soportes había perdido `noexec`; ya está corregido. El **score global es 1,3 de 100** (escala: 0–20 aceptable), calculado sobre **147 controles de ASVS verificados**. La aplicación resistió ZAP activo (0 FAIL según su propia clasificación en las tres corridas; la única alerta Alta, de confianza baja, era un falso positivo triado), sqlmap hasta el nivel 5 (0 inyecciones en 8 objetivos, directo y sin WAF), y su cadena de auditoría sobrevivió a una restauración con la misma cabeza.
 
 | Medida | Valor |
 |---|---|
@@ -17,12 +17,12 @@ Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `a
 | Mutación | dominio 97,8 % · aplicación 92,7 % · seguridad 96,1 % |
 | Defectos sembrados detectados | 6 de 6 |
 | Celdas de autorización | 440 contrastadas, 0 distintas de lo esperado |
-| Anexo A (Excel de 18 hojas) | 157 filas: 138 cumplen, 9 parciales, 10 no verificables en local, 0 fallan |
+| Anexo A (Excel de 18 hojas) | 157 filas: 139 cumplen, 6 parciales, 2 no verificables en local, 10 no aplican (ADR-031), 0 fallan |
 | Rendimiento (RNF-06) | p95 de 466 a 649 ms por página; dashboard 786 ms |
 
 **Los tres riesgos que importan** (ordenados por DREAD × factor, solo los abiertos):
 
-1. **B-36 (Medio, 6,4). El limitador del WAF banea a una persona real.** Con menos de un segundo entre páginas llega un 429; varios seguidos terminan en un baneo de una hora. En una emergencia (EMG) es una baja de acceso que no se emite a tiempo. Si se adopta Cloudflare Tunnel (ADR-024) y el WAF ve una sola IP, una persona rápida bloquearía a todos. Salió de repasar la Entrega 3 y de repetir el recorrido por navegador.
+1. **B-36 (Medio, 6,4). El limitador del WAF banea a una persona real.** Con menos de un segundo entre páginas llega un 429; varios seguidos terminan en un baneo de una hora. En una emergencia (EMG) es una baja de acceso que no se emite a tiempo. Salió de repasar la Entrega 3 y de repetir el recorrido por navegador.
 2. **B-06 (Medio, 6,0). Un solo proceso de `gunicorn`.** Los desafíos del segundo factor viven en memoria; un reinicio los pierde. Es una decisión de diseño (ADR-017 / S-29), aceptable a esta escala, pero debe quedar escrita.
 3. **B-10 (Medio, 6,0). La política mínima de contraseña de Supabase y su asesor de seguridad no se han ejecutado.** Es una acción humana en un panel que esta auditoría no podía tocar. Arrastra 12 requisitos de ASVS pendientes.
 
@@ -38,7 +38,7 @@ Les sigue una familia coherente: **el worker y GLPI se tratan como de confianza,
 
 | Fuera | Motivo |
 |---|---|
-| Azure (VM, Key Vault, Blob, NSG), Let's Encrypt, Cloudflare | Sin autorización ni cuenta; el plan los marca como `[PENDIENTE]` con su guion listo (§15) |
+| Azure (VM, Key Vault, Blob, NSG), Let's Encrypt, Cloudflare | No forman parte de la arquitectura vigente (ADR-031): no aplican |
 | Pruebas activas contra Supabase | Es un tercero. Solo lectura de catálogo, autorizada el 24/10/2026 |
 | Evaluación de accesibilidad con lector de pantalla | Exige a una persona; se midió lo mecánico |
 | Revisión del 10 % de la clasificación de ASVS por una segunda persona | Exige a una persona distinta de quien clasificó |
@@ -139,8 +139,8 @@ Mutación (`mutmut`): dominio **97,8 %**, aplicación **92,7 %** (de 77,8 % en l
 | Métrica | Valor | Contramétrica |
 |---|---|---|
 | Cobertura de ramas | 95,25 % total | Mutación 92,7 % a 97,8 %: las pruebas notan los cambios |
-| Hallazgos | 36 | 144 controles de ASVS verificados; el score solo vale con ese número |
-| Controles ASVS | 144 verificados · 36 parciales · 19 pendientes · 54 no aplican | 72,4 % de los aplicables |
+| Hallazgos | 37 | 147 controles de ASVS verificados; el score solo vale con ese número |
+| Controles ASVS | 147 verificados · 36 parciales · 14 pendientes · 56 no aplican | 74,6 % de los aplicables |
 | Pruebas | 2 574 | 20 de 20 corridas estables, sin reintentos |
 | Rendimiento | p95 ≤ 649 ms | Una corrida de 10 vueltas dio 1 126 ms: se conserva |
 
@@ -180,9 +180,8 @@ Además, **acciones que solo el equipo puede hacer**: hacer `git push` de la ram
 
 | Pendiente | Motivo | Guion o decisión |
 |---|---|---|
-| Azure: VM, NSG, Key Vault, Blob inmutable, Let's Encrypt (RS-16) | Sin cuenta ni autorización | `[PENDIENTE: ventana de despliegue]`; los guiones de respaldo, secretos y `pruebas.sh` ya apuntan a esas piezas |
-| Cloudflare Tunnel (ADR-024) | Propuesta del equipo, no desplegada | Antes de adoptarla, resolver B-36 y la IP real del cliente |
-| Supabase real: autenticación y Data API | Terceros, solo lectura de catálogo | Escenarios omitidos con S-38; la petición con la clave `anon` queda como CA-13 parcial |
+| Copia de la auditoría y de los respaldos al disco externo real (RD-04, RD-06) | Los guiones están hechos y verificados contra una carpeta que simula el disco (`L-01-COPIAS-AL-MEDIO-EXTERNO`) | Programar las dos tareas diarias en el equipo de operación con el disco conectado |
+| Supabase Auth real | Tercero, solo lectura de catálogo | Escenarios omitidos con S-38. CA-13 ya no depende de Supabase: se midió en el PostgreSQL local (ADR-031) |
 | Evaluación WCAG con lector de pantalla | Exige a una persona | RI-01 parcial; lo mecánico está en verde |
 | Revisión del 10 % de ASVS por una segunda persona | Exige a una persona distinta | `[PENDIENTE: segunda persona]` |
 | Compuertas G1b y G4 en la CI de GitHub | El flujo de trabajo no se probó en la nube: exige `git push` | Los comandos corren en local; ver §16 |
