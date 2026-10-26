@@ -9,8 +9,8 @@ lang: es-CO
 | Proyecto | Sistema integrado de eventos laborales con identidad, recursos humanos y accesos automatizados |
 | Documento | Especificación de Requisitos de Software (SRS) |
 | Norma de referencia | ISO/IEC/IEEE 29148:2018, adaptada al alcance académico |
-| Versión | 2.4 — Borrador para revisión |
-| Fecha | 24 de octubre de 2026 |
+| Versión | 2.5 — Borrador para revisión |
+| Fecha | 25 de octubre de 2026 |
 | Autores | Jhinnet Bravo, Carlos Ruiz, Luis Ceron, Jhon Leal y Cristian Caro |
 | Docente | José Eduardo Patiño Santafé |
 | Estado | Pendiente de aprobación por el equipo y el docente |
@@ -23,6 +23,7 @@ lang: es-CO
 | 2.2 | 10/10/2026 | El proxy inverso pasa a ser BunkerWeb (nginx + ModSecurity + OWASP CRS), tomando como referencia el proyecto `waf-stack` del equipo; se descarta Application Gateway por costo. Reportería de logs del WAF con Fluent Bit, Loki y Grafana. Cloudflare Tunnel + Access queda como propuesta pendiente (ADR-024). El SRS deja de generarse en Word. |
 | 2.3 | 11/10/2026 | Tras una revisión externa (ADR-028): las migraciones las corre un rol dueño separado (`app_owner`) y `app_backend` solo opera, sin poder cambiar permisos ni disparadores (RI-03); el disparador de inmutabilidad valida también las transiciones de estado (RF-14). Sin cambios de alcance. Las consultas nuevas de los puertos para las vistas quedan en ADR-025 a ADR-027. |
 | 2.4 | 24/10/2026 | Precisiones de seguridad y operación tras la auditoría del 12/10/2026 y la revisión del 24/10/2026, sin cambios de alcance. La API de GLPI solo es interna (RS-02). Los logs del WAF no guardan cabeceras, cuerpos ni campos sensibles (RS-09). El chequeo del worker también pregunta a GLPI (RNF-01). Los secretos compartidos del equipo van cifrados con SOPS + age (RS-06, ADR-029). La auditoría y las listas de solicitudes se leen por páginas (RF-36, ADR-030). Una cuenta existente se vincula a otra base (RF-06). La CSP agrega `base-uri` y `form-action`, y BunkerWeb envía CORP y COEP (RS-07). La rotación de logs sin reportería es por tamaño (RNF-16, S-36). Los estáticos tienen su propio límite de peticiones (RS-08). |
+| 2.5 | 25/10/2026 | Cambio de arquitectura alineado con el documento de la primera entrega de Desarrollo Seguro (ADR-031): todo el despliegue corre en la máquina local con Docker Desktop; la base de la aplicación es PostgreSQL 17 en contenedor y Supabase queda solo para la autenticación; los secretos son Docker secrets en `secrets/`; certificado autofirmado para `app.localhost` y `glpi.localhost`; la auditoría exportada y los respaldos se copian a un medio externo al equipo. Se descartan Azure (VM, Key Vault, Blob, NSG), Let's Encrypt, DuckDNS y Cloudflare Tunnel (ADR-024). Afecta RD-04, RD-06, RD-10, RD-12, RI-03, RI-05, RI-06, RS-01, RS-02, RS-06, RS-19, RS-20, RNF-01, RNF-02, RNF-04, RNF-05, RNF-08, RNF-09, RNF-15, RNF-16, T2, T6, T8, T12, T19, CA-11, CA-13, CA-21, SUP-01, SUP-02, R1 a R3 y R11. |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -157,21 +158,21 @@ Los roles se gestionan como grupos de Django, que asigna el Administrador del si
 
 | Elemento | Especificación |
 |---|---|
-| Nube | Microsoft Azure, suscripción Azure for Students (crédito de USD 100 por 12 meses, sin tarjeta de crédito). Región East US, a confirmar entre las permitidas en el sprint 0. |
-| Cómputo | Una VM Linux (Ubuntu Server 24.04 LTS), tamaño B2s (2 vCPU, 4 GiB), con apagado automático nocturno. |
-| Orquestación | Docker Engine y Docker Compose v2. |
-| Base de datos de la aplicación | Proyecto de Supabase en el plan gratuito, región `us-east-1`, cercana a la VM. Un proyecto para desarrollo y otro para la entrega (el plan permite 2 activos). |
-| Autenticación | Supabase Auth del mismo proyecto: correo y contraseña con TOTP. Registro abierto deshabilitado. |
-| Base de datos de GLPI | MariaDB en contenedor. GLPI 11 solo admite MySQL 8.0+ o MariaDB 10.6+. |
+| Equipo | Máquina local con Windows 11 y Docker Desktop (motor WSL2). No se usan servicios de nube para el cómputo (ADR-031). |
+| Cómputo | Contenedores de Docker Desktop con al menos 4 GiB de RAM libres y los puertos 80 y 443 disponibles. |
+| Orquestación | Docker Desktop y Docker Compose v2 con `infra/compose.yaml` más `infra/compose.local.yaml` (y `compose.reporteria.yaml`, opcional). |
+| Base de datos de la aplicación | PostgreSQL 17 en contenedor (la misma versión mayor de Supabase), con volumen `postgres-datos` y red interna `pg_net`. Reproduce los roles y el dueño separado (ADR-028). |
+| Autenticación | Supabase Auth (plan gratuito): correo y contraseña con TOTP. Registro abierto deshabilitado. Es el único servicio externo. |
+| Base de datos de GLPI | MariaDB 11.4 en contenedor. GLPI 11 solo admite MySQL 8.0+ o MariaDB 10.6+. |
 | Navegadores | Últimas dos versiones de Chrome, Edge y Firefox. |
-| Desarrollo local | El mismo `docker compose`. Las pruebas usan PostgreSQL en contenedor con la misma versión mayor que el proyecto de Supabase. |
+| Nombres de host | `app.localhost` y `glpi.localhost`, apuntando a `127.0.0.1` en el archivo hosts del equipo. |
 
 ## Restricciones de diseño e implementación
 
-1. Toda la solución debe correr con servicios gratuitos o cubiertos por el crédito de Azure for Students.
+1. Toda la solución debe correr en la máquina local con software libre o gratuito; el único servicio externo es Supabase Auth en su plan gratuito.
 2. La aplicación propia es el núcleo; GLPI 11 es un servicio integrado. No se desarrollan en la aplicación funciones de tickets o inventario que GLPI ya ofrece.
 3. La aplicación no ejecuta acciones sobre directorios ni servicios de identidad. Solo se automatiza dentro de GLPI o en la integración aplicación↔GLPI (ADR-019).
-4. La base de datos de la aplicación es Supabase (PostgreSQL). GLPI conserva su propia MariaDB.
+4. La base de datos de la aplicación es PostgreSQL 17 en contenedor local. GLPI conserva su propia MariaDB.
 5. Arquitectura hexagonal: el dominio y los casos de uso no importan Django, el ORM ni clientes HTTP (ADR-016).
 6. Backend en Python con Django 5.2 LTS. Interfaz generada en el servidor, sin SPA ni JavaScript de terceros (ADR-018).
 7. Todo ticket de evento laboral se origina en RRHH: lo emite RRHH directamente o se emite cuando RRHH aprueba.
@@ -182,8 +183,8 @@ Los roles se gestionan como grupos de Django, que asigna el Administrador del si
 
 | ID | Supuesto o dependencia | Si no se cumple |
 |---|---|---|
-| SUP-01 | Un integrante activa Azure for Students. | Despliegue solo local con Docker Compose para la sustentación. Se pierde la URL pública y la copia en Blob pasa a Supabase Storage. |
-| SUP-02 | La actividad periódica del worker contra la base de datos impide que Supabase pause el proyecto (pausa tras 1 semana de inactividad en el plan gratuito). | Se valida en el sprint 0. Alternativa: reactivar el proyecto antes de cada demo y documentarlo en el manual de operación. |
+| SUP-01 | Cada integrante cuenta con un equipo con Docker Desktop, WSL2 y unos 4 GiB de RAM libres. | Se levanta sin el perfil de reportería para reducir memoria, o se usa el equipo de otro integrante con la misma guía. |
+| SUP-02 | El proyecto de Supabase usado para Auth está activo (el plan gratuito pausa los proyectos inactivos). | Reactivar el proyecto desde el panel de Supabase antes de cada demostración, según el manual de operación. |
 | SUP-03 | La API de GLPI 11 permite autenticarse como servicio para crear tickets, seguimientos y usuarios; subir documentos y vincularlos a tickets; y leer tickets, soluciones, documentos, activos y licencias. | Se valida en el sprint 0. Alternativa: API v1 con token de aplicación y token de usuario de servicio. |
 | SUP-04 | GLPI permite exigir una solución con plantilla por categoría al resolver un ticket. | Se valida en el sprint 0. Si no se puede forzar en GLPI, la aplicación no cuenta como resuelto un ticket sin solución (RF-24). |
 | SUP-05 | El flujo de Supabase Auth con MFA (contraseña, inscripción, desafío y verificación del TOTP) se puede ejecutar desde el servidor con la biblioteca oficial de Python. | Se valida en el sprint 0. Alternativa: llamar directamente a la API REST de Supabase Auth. |
@@ -217,7 +218,8 @@ Los roles se gestionan como grupos de Django, que asigna el Administrador del si
 | V9 | El estado de las cuentas se deriva de los tickets resueltos. | RF-26 a RF-28 |
 | V10 | (v2.1) Soporte de vinculación PDF obligatorio en el ingreso, validado por la aplicación y adjuntado a los tickets de AD y Licencias en GLPI. La aplicación no lo almacena de forma permanente. | RF-39, RF-40, RD-12, RS-17, ADR-021 |
 | V11 | (v2.1) Los permisos sobre recursos compartidos se especifican con ruta, serie documental y perfil dentro de la matriz de perfiles, y viajan en los tickets de los eventos. No hay un tipo de solicitud de acceso independiente. | §4.9, RF-16, ADR-022 |
-| V12 | (v2.2) BunkerWeb reemplaza a nginx como proxy inverso y WAF; se descarta Application Gateway por costo. Reportería del WAF con Fluent Bit, Loki y Grafana (debería). Cloudflare Tunnel + Access como propuesta pendiente. | RS-01, RS-02, RS-07, RS-08, RS-17 a RS-20, RNF-16, ADR-023, ADR-024 |
+| V12 | (v2.2) BunkerWeb reemplaza a nginx como proxy inverso y WAF; se descarta Application Gateway por costo. Reportería del WAF con Fluent Bit, Loki y Grafana (debería). Cloudflare Tunnel + Access como propuesta pendiente (descartada en v2.5). | RS-01, RS-02, RS-07, RS-08, RS-17 a RS-20, RNF-16, ADR-023, ADR-024 |
+| V13 | (v2.5) Todo el despliegue corre en la máquina local con Docker Desktop. La base de la aplicación pasa a PostgreSQL 17 en contenedor y Supabase queda solo para la autenticación. Secretos como Docker secrets; copias de auditoría y respaldos en un medio externo al equipo. Sin dominio ni certificados públicos, sin Azure y sin Cloudflare. | ADR-031 (reemplaza ADR-002, precisa ADR-009 y ADR-015, descarta ADR-024), RD-04, RD-06, RD-10, RI-03, RI-05, RI-06, RS-01, RS-02, RS-06 |
 
 # Modelo del proceso
 
@@ -484,15 +486,15 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RD-01 | La deduplicación debe implementarse con una restricción única parcial sobre (`colaborador_id`, `tipo`) con la condición `estado IN ('pendiente_aprobacion','aprobada','en_ejecucion','error')`. | Debe |
 | RD-02 | El rol de base de datos de la aplicación no debe tener `UPDATE`, `DELETE` ni `TRUNCATE` sobre `auditoria`, `decision` y `cuenta_historial`. | Debe |
 | RD-03 | Cada registro de auditoría debe incluir `hash = SHA-256(hash_anterior ‖ contenido canónico)`, de modo que cualquier alteración rompa la cadena. | Debe |
-| RD-04 | La auditoría debe exportarse diariamente a un contenedor de Azure Blob con política de inmutabilidad de 365 días. La retención mínima exigida es de dos meses; se adopta un año. | Debe |
+| RD-04 | La auditoría debe exportarse diariamente, con el ancla de la cadena de hashes, al volumen local `exportes`, y copiarse a un medio externo al equipo (disco externo) donde no se sobrescribe, con retención de 365 días. La retención mínima exigida es de dos meses; se adopta un año. | Debe |
 | RD-05 | Los campos restringidos deben guardarse solo en `solicitud_restringida` y no deben aparecer en logs, tickets, dashboard ni fichas. | Debe |
-| RD-06 | El plan gratuito de Supabase no incluye respaldos. Por eso se debe hacer un `pg_dump` diario del esquema de la aplicación y un volcado diario de MariaDB, ambos guardados en Blob con 30 días de retención. | Debe |
+| RD-06 | El PostgreSQL local no tiene respaldos automáticos. Por eso se debe hacer un `pg_dump` diario del esquema de la aplicación y un volcado diario de MariaDB, ambos guardados fuera del equipo (disco externo) con 30 días de retención. | Debe |
 | RD-07 | Los datos de prueba deben ser ficticios y generarse con un comando de semillas reproducible. | Debe |
 | RD-08 | Solo se deben registrar los datos personales necesarios para el proceso (minimización, Ley 1581 de 2012). | Debe |
 | RD-09 | El número de documento del colaborador debe ser único. Un ingreso para un documento que ya existe y no está `retirado` se rechaza con referencia al registro existente. | Debe |
-| RD-10 | Las tablas de la aplicación deben vivir en el esquema `app`, que no se expone en la Data API de Supabase. No se otorgan permisos a los roles `anon` ni `authenticated`, y todas las tablas tienen RLS activado sin políticas, como segunda barrera. | Debe |
+| RD-10 | Las tablas de la aplicación deben vivir en el esquema `app` del PostgreSQL local, que solo es accesible desde la red interna `pg_net`. No se otorgan permisos a los roles `anon` ni `authenticated`, y todas las tablas tienen RLS activado sin políticas, como segunda barrera. | Debe |
 | RD-11 | El estado de las cuentas solo debe cambiar por la sincronización de tickets. Una corrección exige una solicitud nueva o la reapertura del ticket en GLPI. | Debe |
-| RD-12 | El soporte de vinculación se guarda temporalmente en un volumen de la VM compartido solo por web y worker, sin permisos de ejecución y fuera de la raíz web. Se borra tras subirse a GLPI o al cancelarse la solicitud. Si la copia temporal se pierde antes de subirse, la solicitud pasa a `error` y RRHH debe volver a registrar el ingreso. | Debe |
+| RD-12 | El soporte de vinculación se guarda temporalmente en un volumen Docker local compartido solo por web y worker, sin permisos de ejecución y fuera de la raíz web. Se borra tras subirse a GLPI o al cancelarse la solicitud. Si la copia temporal se pierde antes de subirse, la solicitud pasa a `error` y RRHH debe volver a registrar el ingreso. | Debe |
 
 # Requisitos de interfaces externas
 
@@ -500,10 +502,10 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 |---|---|---|---|
 | RI-01 | Usuario (web) | Páginas generadas en el servidor, en español y adaptables a distintos tamaños de pantalla: inicio de sesión y MFA, nueva solicitud por tipo, mis solicitudes, bandeja de RRHH, dashboard, búsqueda y ficha de colaborador, auditoría y administración. Sin JavaScript de terceros; los gráficos del dashboard se generan como SVG en el servidor. Cumplimiento de WCAG 2.1 nivel AA en contraste y navegación por teclado. | Debe |
 | RI-02 | GLPI 11 (API REST) | Crear tickets con categoría, prioridad, estado, vencimiento y contenido; subir un documento y vincularlo a varios tickets; leer estado, solución y documentos de un ticket; crear y actualizar usuarios; leer activos y licencias por usuario. El único cliente es el worker, con una cuenta de servicio cuyo perfil de GLPI se limita a esas operaciones. | Debe |
-| RI-03 | Supabase PostgreSQL | Conexión desde web y worker por el *session pooler* (puerto 5432), con TLS y verificación del certificado. El rol `app_backend` no es dueño de ningún objeto: tiene solo `SELECT`, `INSERT`, `UPDATE` y `DELETE`, sin modificar ni borrar en las tablas de RD-02, y `BYPASSRLS` porque RLS no tiene políticas. Las migraciones las corre `app_owner`, dueño del esquema, solo desde un contenedor de una sola vez (ADR-028). Nunca se usan `postgres` ni `service_role` en ejecución normal. | Debe |
+| RI-03 | PostgreSQL 17 local | Conexión desde web y worker al contenedor `postgres` por la red interna `pg_net` (puerto 5432, sin publicar en el host). El rol `app_backend` no es dueño de ningún objeto: tiene solo `SELECT`, `INSERT`, `UPDATE` y `DELETE`, sin modificar ni borrar en las tablas de RD-02, y `BYPASSRLS` porque RLS no tiene políticas. Las migraciones las corre `app_owner`, dueño del esquema, solo desde un contenedor de una sola vez (ADR-028). Nunca se usan `postgres` ni `service_role` en ejecución normal. | Debe |
 | RI-04 | Supabase Auth | Desde el servidor: inicio de sesión con contraseña e inscripción, desafío y verificación de TOTP. La API de administración (creación y desactivación de usuarios) usa la clave `service_role`, disponible solo para el comando de administración, nunca en los contenedores web ni worker. | Debe |
-| RI-05 | Azure Key Vault | La VM lee los secretos con su identidad administrada al arrancar y los entrega a los contenedores como archivos en un sistema de archivos en memoria (tmpfs). | Debe |
-| RI-06 | Azure Blob Storage | Escritura con identidad administrada en dos contenedores: `auditoria` (inmutable) y `respaldos`. | Debe |
+| RI-05 | Docker secrets (directorio `secrets/`) | Los secretos se generan con `infra/scripts/preparar-entorno.sh` en el directorio `secrets/` del equipo, que no se versiona, y Docker Compose los monta como archivos en `/run/secrets` solo en los contenedores que los necesitan. | Debe |
+| RI-06 | Almacenamiento local de exportes y respaldos | El worker escribe la auditoría diaria y su ancla en el volumen `exportes`; los respaldos se generan en el host. Ambos se copian a un medio externo al equipo. | Debe |
 
 # Requisitos no funcionales
 
@@ -511,12 +513,12 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 
 | ID | Requisito | Prioridad |
 |---|---|---|
-| RS-01 | Todo el tráfico externo debe usar TLS 1.2 o superior, terminado en BunkerWeb con certificados de Let's Encrypt (`AUTO_LETS_ENCRYPT`). El puerto 80 solo atiende el desafío de Let's Encrypt y redirige a 443. Si se adopta Cloudflare (ADR-024), TLS lo termina Cloudflare y el túnel cifra el tramo hasta la VM. | Debe |
-| RS-02 | Solo BunkerWeb publica puertos (443 y 80). web, worker, GLPI, MariaDB, el scheduler y la reportería no publican puertos al exterior; Grafana solo escucha en `127.0.0.1` y se consulta por túnel SSH. La API de GLPI (`/apirest.php` y `/api.php`) solo se usa desde la red interna: BunkerWeb la bloquea en `glpi.*`, el cliente de API de GLPI excluye la IP del WAF y no se admite el inicio de sesión por usuario y contraseña en la API, que no pide el doble factor. El SSH a la VM se restringe por NSG a las IP del equipo y solo con llaves. | Debe |
+| RS-01 | Todo el tráfico hacia la aplicación y GLPI debe usar TLS 1.2 o superior, terminado en BunkerWeb. En la máquina local, BunkerWeb usa un certificado autofirmado para `app.localhost` y `glpi.localhost`. El puerto 80 solo redirige a 443. | Debe |
+| RS-02 | Solo BunkerWeb publica puertos (443 y 80). web, worker, GLPI, MariaDB, el scheduler y la reportería no publican puertos al exterior; los puertos de reportería (Grafana y Fluent Bit) se publican solo en `127.0.0.1`. La API de GLPI (`/apirest.php` y `/api.php`) solo se usa desde la red interna: BunkerWeb la bloquea en `glpi.*`, el cliente de API de GLPI excluye la IP del WAF y no se admite el inicio de sesión por usuario y contraseña en la API, que no pide el doble factor. No hay acceso remoto: la administración se hace en la propia máquina con Docker Compose. | Debe |
 | RS-03 | La red `db_net` debe declararse `internal: true`, y MariaDB no debe publicar puertos. | Debe |
 | RS-04 | Django en producción debe tener `DEBUG=False`, `ALLOWED_HOSTS` explícito, cookies de sesión y CSRF con `Secure`, `HttpOnly` y `SameSite=Lax`, HSTS, `X-Frame-Options: DENY` y protección CSRF en todos los formularios. | Debe |
 | RS-05 | Todo input externo, incluidas las cabeceras HTTP, se valida con formularios de Django o esquemas. Las consultas usan el ORM o SQL con parámetros, incluidas las escrituras de auditoría y logs. Django confía en `X-Forwarded-For` y `X-Forwarded-Proto` solo cuando vienen del contenedor de BunkerWeb. | Debe |
-| RS-06 | Los secretos de producción viven en Key Vault y se rotan cada 90 días: clave secreta de Django, contraseña de `app_backend`, token de GLPI y claves de Supabase. Los que el equipo comparte durante el desarrollo se versionan cifrados con SOPS + age, por persona, y se rotan al quitar a alguien (ADR-029). | Debe |
+| RS-06 | Los secretos viven en el directorio `secrets/` del equipo (excluido de Git), se montan como Docker secrets y se rotan cada 90 días: clave secreta de Django, contraseña de `app_backend`, token de GLPI y claves de Supabase. Los que el equipo comparte durante el desarrollo se versionan cifrados con SOPS + age, por persona, y se rotan al quitar a alguien (ADR-029). | Debe |
 | RS-07 | Cabeceras de seguridad con una sola fuente por cabecera. Django envía la CSP de la aplicación (`default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`) y `X-Frame-Options: DENY`; BunkerWeb las conserva (`KEEP_UPSTREAM_HEADERS`). BunkerWeb envía HSTS, `Referrer-Policy`, `X-Content-Type-Options` y `Permissions-Policy` en ambos sitios, `Cross-Origin-Resource-Policy` y `Cross-Origin-Embedder-Policy` de mismo origen en `app.*` y la CSP por defecto de GLPI, y elimina `Server` y `X-Powered-By`. Los estáticos no abren CORS. | Debe |
 | RS-08 | Límite de peticiones en BunkerWeb (`USE_LIMIT_REQ`): 5 por minuto por IP en inicio de sesión y verificación TOTP, y 2 por segundo por IP en general (valor por defecto de BunkerWeb), salvo los estáticos de la aplicación (`/static/`, inmutables), con 10 por segundo, más bloqueo por mal comportamiento (`USE_BAD_BEHAVIOR`, 1 hora). Los errores de inicio de sesión deben ser genéricos (no revelan si el correo existe). | Debe |
 | RS-09 | Los logs son JSON con identificador de correlación y sin secretos, contraseñas, códigos TOTP, tokens ni campos restringidos. Los del WAF tampoco los guardan: el log de auditoría de ModSecurity no copia cabeceras ni cuerpo, y la reportería tapa el valor de los campos sensibles que disparan una regla. | Debe |
@@ -529,18 +531,18 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RS-16 | En Supabase Auth: registro abierto deshabilitado, contraseña de al menos 12 caracteres y MFA TOTP habilitado. Revisar sin hallazgos el asesor de seguridad de Supabase antes de la entrega. | Debe |
 | RS-17 | Carga del soporte: solo el rol RRHH puede subirlo. Límite de 21 MB en BunkerWeb (`MAX_CLIENT_SIZE`, cuyo valor por defecto es 10 MB) y de 20 MB en Django; la carga debe pasar por ModSecurity en modo bloqueo sin falsos positivos. Validación de extensión y firma de contenido, nombre aleatorio en disco y volumen montado con `noexec`. El contenido nunca se interpreta en el servidor. | Debe |
 | RS-18 | BunkerWeb 1.6.15 o superior (las versiones anteriores a 1.6.13 tienen avisos de seguridad altos en su API interna y su interfaz), con imagen fijada por digest, ModSecurity con OWASP CRS 4 en `SECURITY_MODE=block` en ambos sitios. Las exclusiones de reglas por falsos positivos se versionan como archivos de configuración, con la ruta y la regla exactas, nunca desactivando el CRS completo. | Debe |
-| RS-19 | La API interna de BunkerWeb exige `API_TOKEN` (por defecto viene vacío) y solo es accesible en la red aislada `bw-universe`. La interfaz web de BunkerWeb no se despliega en Azure: la configuración vive en el compose y los desbloqueos se hacen desde el scheduler por línea de comandos. | Debe |
-| RS-20 | Los secretos del WAF y de la reportería (token de la API de BunkerWeb y credenciales de Grafana) siguen ADR-009: Key Vault → tmpfs. Ningún archivo `.env` con valores se versiona. Loki escribe en Blob con la identidad administrada de la VM, no con la cadena de conexión de la cuenta (que da acceso total). | Debe |
+| RS-19 | La API interna de BunkerWeb exige `API_TOKEN` (por defecto viene vacío) y solo es accesible en la red aislada `bw-universe`. La interfaz web de BunkerWeb no se despliega: la configuración vive en el compose y los desbloqueos se hacen desde el scheduler por línea de comandos. | Debe |
+| RS-20 | Los secretos del WAF y de la reportería (token de la API de BunkerWeb y credenciales de Grafana) son Docker secrets en `secrets/` (ADR-031). Ningún archivo `.env` con valores se versiona. Loki guarda sus datos en un volumen local. | Debe |
 
 ## Disponibilidad, respaldo y recuperación
 
 | ID | Requisito | Prioridad |
 |---|---|---|
-| RNF-01 | Cada contenedor tiene un chequeo de salud. El de web verifica también la conexión con Supabase y el de worker la hora de la última sincronización y que GLPI responda. Un fallo simulado de GLPI o de Supabase debe detectarse en menos de 2 minutos. | Debe |
-| RNF-02 | Si GLPI no está disponible, la aplicación sigue aceptando y aprobando solicitudes y encola los tickets. Si Supabase no está disponible, la aplicación muestra una página de mantenimiento sin exponer errores internos. | Debe |
+| RNF-01 | Cada contenedor tiene un chequeo de salud. El de web verifica también la conexión con PostgreSQL y el de worker la hora de la última sincronización y que GLPI responda. Un fallo simulado de GLPI o de PostgreSQL debe detectarse en menos de 2 minutos. | Debe |
+| RNF-02 | Si GLPI no está disponible, la aplicación sigue aceptando y aprobando solicitudes y encola los tickets. Si PostgreSQL no está disponible, la aplicación muestra una página de mantenimiento sin exponer errores internos. | Debe |
 | RNF-03 | Disponibilidad objetivo: 99 % en horario hábil (lunes a viernes, de 7:00 a 19:00, hora de Colombia). | Debe |
-| RNF-04 | RPO de 24 horas y RTO de 4 horas. La restauración desde los respaldos (`pg_restore` en un proyecto de Supabase y restauración de MariaDB) se prueba al menos una vez antes de la entrega, con evidencia. | Debe |
-| RNF-05 | El worker debe mantener actividad periódica contra la base de datos para evitar la pausa del proyecto gratuito (SUP-02). | Debe |
+| RNF-04 | RPO de 24 horas y RTO de 4 horas. La restauración desde los respaldos (`pg_restore` en un contenedor PostgreSQL 17 limpio y restauración de MariaDB) se prueba al menos una vez antes de la entrega, con evidencia. | Debe |
+| RNF-05 | Antes de cada demostración se debe verificar que el proyecto de Supabase usado para Auth esté activo y reactivarlo si el plan gratuito lo pausó por inactividad (SUP-02). | Debe |
 
 ## Rendimiento y capacidad
 
@@ -548,8 +550,8 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 |---|---|---|
 | RNF-06 | El percentil 95 del tiempo de respuesta de las páginas debe ser menor a 800 ms, y el del dashboard menor a 2 s, con 300 colaboradores y 20 usuarios concurrentes. | Debe |
 | RNF-07 | Los tickets se crean en GLPI en menos de 2 minutos desde la emisión, si GLPI está disponible. | Debe |
-| RNF-08 | La base de datos de la aplicación debe ocupar menos de 250 MB con los datos de prueba (la mitad del límite del plan gratuito). | Debe |
-| RNF-09 | Todo el stack de la VM, incluidos BunkerWeb y la reportería, debe funcionar en 4 GiB de RAM con límites de memoria por contenedor. Si la medición del sprint 0 lo excede, la reportería se recorta antes de cambiar el tamaño de la VM. | Debe |
+| RNF-08 | La base de datos de la aplicación debe ocupar menos de 250 MB con los datos de prueba. | Debe |
+| RNF-09 | Todo el stack debe funcionar con 4 GiB de RAM asignados a Docker Desktop (sin el perfil de reportería), con límites de memoria por contenedor. | Debe |
 
 ## Mantenibilidad, calidad y usabilidad
 
@@ -560,32 +562,32 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RNF-12 | La integración continua ejecuta lint, verificación de tipos, `import-linter`, pruebas y escaneos de seguridad en cada pull request. | Debe |
 | RNF-13 | Los cambios de esquema se versionan con migraciones de Django, incluidas las restricciones, disparadores, permisos y RLS (con `RunSQL` cuando el ORM no los expresa). | Debe |
 | RNF-14 | La interfaz está en español, con mensajes de error comprensibles para usuarios no técnicos. | Debe |
-| RNF-15 | El despliegue completo desde cero se hace con un procedimiento documentado de máximo 10 pasos. | Debe |
-| RNF-16 | Los logs de BunkerWeb y del scheduler se clasifican (waf, protección, acceso, sistema) con Fluent Bit, se guardan en Loki con almacenamiento en Blob durante 30 días y se consultan en un dashboard de Grafana, reutilizando la configuración de `waf-stack`. Sin reportería, los logs quedan en Docker con rotación (por tamaño, 7 archivos de 10 MB por contenedor: S-36). | Debería |
+| RNF-15 | La instalación local completa desde un clon limpio se hace con un procedimiento documentado (`docs/probar-localmente.md`) de máximo 10 pasos. | Debe |
+| RNF-16 | Los logs de BunkerWeb y del scheduler se clasifican (waf, protección, acceso, sistema) con Fluent Bit, se guardan en Loki, en un volumen local, durante 30 días y se consultan en un dashboard de Grafana, reutilizando la configuración de `waf-stack`. Sin reportería, los logs quedan en Docker con rotación (por tamaño, 7 archivos de 10 MB por contenedor: S-36). | Debería |
 
 # Análisis de amenazas (STRIDE)
 
 | # | Categoría | Amenaza | Componente | Mitigación | Requisitos |
 |---|---|---|---|---|---|
 | T1 | Suplantación | Robo de credenciales de RRHH para emitir retiros falsos | Inicio de sesión | Supabase Auth con TOTP obligatorio; límite de intentos; el técnico revisa antes de actuar | RF-01, RF-02, RS-08 |
-| T2 | Suplantación | Uso de credenciales de servicio fuera del sistema (token de GLPI, rol de base de datos) | Integraciones | Secretos en Key Vault; permisos mínimos; cuenta de GLPI sin acceso a la interfaz | RS-06, RS-10, RI-02, RI-03 |
+| T2 | Suplantación | Uso de credenciales de servicio fuera del sistema (token de GLPI, rol de base de datos) | Integraciones | Docker secrets fuera del repositorio; permisos mínimos; cuenta de GLPI sin acceso a la interfaz | RS-06, RS-10, RI-02, RI-03 |
 | T3 | Manipulación | Modificar una solicitud aprobada | Base de datos | Disparador de inmutabilidad; corrección con una solicitud nueva | RF-14 |
 | T4 | Manipulación | Inyección SQL o de cabeceras | Aplicación | ORM y formularios; sqlmap nivel 3 | RS-05, RS-13 |
 | T5 | Manipulación | Un técnico marca como resuelto un ticket sin hacer la acción, y la cuenta aparece deshabilitada sin estarlo | GLPI y sincronización | Plantilla de solución obligatoria; tickets sin solución no cuentan; historial de GLPI; auditoría de cambios de cuenta; rótulo «según tickets» | RF-24, RF-27, RD-11 |
-| T6 | Repudio | RRHH o un técnico niegan una decisión o acción | Auditoría | Solo inserción; cadena de hashes; copia inmutable en Blob; historial de GLPI | RD-02, RD-03, RD-04 |
+| T6 | Repudio | RRHH o un técnico niegan una decisión o acción | Auditoría | Solo inserción; cadena de hashes; ancla diaria copiada fuera del equipo; historial de GLPI | RD-02, RD-03, RD-04 |
 | T7 | Divulgación | TI ve el motivo de un retiro | Tickets, dashboard y fichas | Tabla restringida; tickets y fichas solo con datos técnicos | RF-20, RD-05 |
-| T8 | Divulgación | Lectura de tablas a través de la Data API de Supabase con la clave pública `anon` | Supabase | Esquema `app` no expuesto; sin permisos a `anon` ni `authenticated`; RLS sin políticas | RD-10 |
+| T8 | Divulgación | Conexión directa a la base de datos de la aplicación desde fuera de los contenedores | PostgreSQL local | Sin puertos publicados; red interna `pg_net`; dueño separado; esquema `app` no expuesto; sin permisos a `anon` ni `authenticated`; RLS sin políticas | RD-10 |
 | T9 | Divulgación | Contraseñas escritas en tickets o soluciones | GLPI | Las plantillas no tienen campo de contraseña; entrega por canal externo; revisión en la prueba de aceptación | RF-20, sección 4.6 |
 | T10 | Divulgación | Consulta masiva de fichas de colaboradores | Búsqueda de cuentas | Solo roles técnicos; consultas de fichas auditadas; paginación | RF-29, RF-35 |
 | T11 | Denegación de servicio | GLPI caído bloquea una emergencia | Integración | Bandeja de salida con reintentos; estado `error` visible; el técnico puede crear el ticket a mano en GLPI | RF-18, RNF-02 |
-| T12 | Denegación de servicio | Supabase pausado o caído | Base de datos | Actividad periódica; chequeo de salud; procedimiento de reactivación | RNF-01, RNF-05 |
+| T12 | Denegación de servicio | PostgreSQL local caído o proyecto de Supabase Auth pausado | Base de datos | Chequeo de salud; reinicio automático del contenedor; reactivación del proyecto de Auth antes de cada demostración | RNF-01, RNF-05 |
 | T13 | Denegación de servicio | Solicitudes duplicadas o masivas | Aplicación | Deduplicación en la base de datos; límite de peticiones | RF-09, RS-08 |
 | T14 | Elevación de privilegios | Filtración de la clave `service_role` (acceso total al proyecto) | Supabase | Solo en el comando de administración; nunca en web ni worker; rotación | RS-15, RS-06 |
 | T15 | Elevación de privilegios | RRHH aprueba eventos sobre sí misma, o alguien obtiene roles incompatibles | Aprobación y roles | Bloqueo de autoaprobación; verificación de incompatibilidades; cambios de rol auditados | RF-05, RF-15, RF-35 |
 | T16 | Elevación de privilegios | Cadena de suministro (dependencias o imágenes maliciosas) | Construcción | Dependencias mínimas y fijadas; sin JavaScript de terceros; escaneos | RS-11, RS-14 |
 | T17 | Manipulación | Archivo malicioso disfrazado de PDF en el soporte de vinculación | Carga de soportes | Validación de firma y tamaño; el servidor no lo abre ni lo sirve; volumen `noexec`; los técnicos lo abren en GLPI desde equipos con antivirus (riesgo residual) | RF-39, RS-17 |
 | T18 | Divulgación | El soporte de vinculación (datos personales) queda visible para más personas de las necesarias | GLPI | Solo se vincula a los tickets de AD y Licencias; el acceso a GLPI es por perfil; no se muestra en la aplicación | RF-40, RD-12 |
-| T19 | Manipulación | Saltarse el WAF accediendo directamente a web o GLPI | Red | Ningún servicio salvo BunkerWeb publica puertos; NSG; si se adopta Cloudflare, ni siquiera BunkerWeb queda expuesto | RS-02 |
+| T19 | Manipulación | Saltarse el WAF accediendo directamente a web o GLPI | Red | Ningún servicio salvo BunkerWeb publica puertos; redes internas de Docker | RS-02 |
 | T20 | Elevación de privilegios | Compromiso de BunkerWeb por su API interna o su interfaz (avisos de 2026 de recorrido de rutas y ejecución remota) | WAF | Versión 1.6.15 o superior; `API_TOKEN`; red `bw-universe` aislada; sin interfaz desplegada | RS-18, RS-19 |
 | T21 | Denegación de servicio | Falsos positivos del CRS que bloquean a usuarios legítimos (formularios de GLPI, carga de PDF) o baneos por pruebas | WAF | Ajuste en modo `detect` en desarrollo y exclusiones puntuales versionadas; pruebas de los flujos completos a través del WAF; desbloqueo por línea de comandos | RS-18, CA-20 |
 
@@ -593,6 +595,8 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 
 - **Cuenta única de RRHH.** Si se compromete, se podría emitir un retiro falso. Lo mitigan el TOTP, la revisión del técnico y la auditoría (ADR-005).
 - **Ejecución manual.** El tiempo de exposición en retiros y emergencias depende de la atención humana. Lo mitigan el SLA de 1 hora con escalamiento en GLPI y el indicador de exposición del dashboard (ADR-019).
+- **Sin almacenamiento inmutable externo.** En la máquina local la copia de la auditoría no está en un almacenamiento inmutable; la integridad se sustenta en la cadena de hashes y en el ancla diaria copiada fuera del equipo (RD-03, RD-04).
+- **Disponibilidad ligada a un solo equipo.** Si la máquina local se apaga o falla, el sistema no está disponible; se mitiga con la guía de instalación reproducible y los respaldos fuera del equipo (RNF-04, RNF-15).
 
 # Arquitectura de referencia
 
@@ -612,10 +616,10 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | Puerto | Implementación real | Doble de prueba |
 |---|---|---|
 | `SistemaDeTickets` | GLPI 11 | En memoria |
-| `Repositorios` y `Auditoria` | ORM de Django sobre Supabase | En memoria |
+| `Repositorios` y `Auditoria` | ORM de Django sobre PostgreSQL 17 local | En memoria |
 | `ProveedorDeIdentidad` | Supabase Auth | Doble |
 | `Reloj` | Reloj del sistema | Reloj fijo |
-| `AlmacenDeSoportes` | Volumen de la VM (sistema de archivos) | En memoria |
+| `AlmacenDeSoportes` | Volumen Docker local (sistema de archivos) | En memoria |
 
 No se crean más puertos sin una segunda implementación real o de prueba.
 
@@ -624,48 +628,48 @@ No se crean más puertos sin una segunda implementación real o de prueba.
 | Contenedor | Imagen base | Redes | Función |
 |---|---|---|---|
 | `bunkerweb` | bunkerity/bunkerweb 1.6.15 | bw-universe, app | WAF y proxy inverso: TLS, ModSecurity + CRS, límites, mal comportamiento y cabeceras. Modo multisitio: `app.*` → web:8000 y `glpi.*` → glpi |
-| `bw-scheduler` | bunkerity/bunkerweb-scheduler 1.6.15 | bw-universe | Genera y aplica la configuración de BunkerWeb a partir de las variables del compose; certificados de Let's Encrypt; base de datos SQLite propia en un volumen |
+| `bw-scheduler` | bunkerity/bunkerweb-scheduler 1.6.15 | bw-universe | Genera y aplica la configuración de BunkerWeb a partir de las variables del compose; certificado autofirmado; base de datos SQLite propia en un volumen |
 | `fluent-bit` | fluent/fluent-bit (fijada) | waf-logs | Recibe los logs de bunkerweb y bw-scheduler (driver `fluentd`, solo en `127.0.0.1:24224`), los clasifica con `clasificar.lua` y los envía a Loki |
-| `loki` | grafana/loki (fijada) | waf-logs | Base de datos de logs del WAF con almacenamiento en Blob (30 días), autenticada con la identidad administrada |
+| `loki` | grafana/loki (fijada) | waf-logs | Base de datos de logs del WAF en un volumen local (30 días) |
 | `grafana` | grafana/grafana (fijada) | waf-logs | Dashboard del WAF reutilizado de `waf-stack`; solo en `127.0.0.1:3000` |
-| `web` | python:3.12-slim + Django 5.2 LTS + gunicorn + WhiteNoise | app | Vistas, casos de uso y núcleo; sirve sus archivos estáticos con WhiteNoise |
-| `worker` | La misma imagen que `web` | app | Bandeja de salida (incluida la subida de soportes), sincronización cada 5 minutos, exportación de auditoría y actividad contra Supabase |
-| `glpi` | GLPI 11 (oficial) | app, db_net | Colas, SLA, inventario y licencias |
-| `mariadb` | mariadb:11 LTS | db_net | Base de datos de GLPI |
+| `web` | python:3.12-slim + Django 5.2 LTS + gunicorn + WhiteNoise | app, pg_net | Vistas, casos de uso y núcleo; sirve sus archivos estáticos con WhiteNoise |
+| `worker` | La misma imagen que `web` | app, pg_net | Bandeja de salida (incluida la subida de soportes), sincronización cada 5 minutos y exportación de auditoría al volumen `exportes` |
+| `glpi` | GLPI 11.0.11 (oficial) | app, db_net | Colas, SLA, inventario y licencias |
+| `mariadb` | mariadb:11.4 | db_net | Base de datos de GLPI |
+| `postgres` | postgres:17 | pg_net | Base de datos de la aplicación (esquema `app`) |
 
-Se reutiliza de `waf-stack` la estructura de BunkerWeb y scheduler, la clasificación de Fluent Bit, la configuración de Loki y el dashboard de Grafana, con estos ajustes: sin interfaz de BunkerWeb ni MariaDB para el WAF (SQLite), `API_TOKEN` obligatorio, imágenes fijadas por digest, identidad administrada en lugar de cadena de conexión, sin Azurite en Azure y sin archivos `.env` versionados (ADR-023).
+Se reutiliza de `waf-stack` la estructura de BunkerWeb y scheduler, la clasificación de Fluent Bit, la configuración de Loki y el dashboard de Grafana, con estos ajustes: sin interfaz de BunkerWeb ni MariaDB para el WAF (SQLite), `API_TOKEN` obligatorio, imágenes fijadas por digest, almacenamiento local de Loki y sin archivos `.env` versionados (ADR-023, ADR-031).
 
-web y worker comparten el volumen `soportes_pendientes` (`noexec`) para los soportes de vinculación en tránsito. Supabase (PostgreSQL y Auth) es externo. Los respaldos los ejecuta un script en la VM con `pg_dump` y `mariadb-dump` en contenedores temporales.
+web y worker comparten el volumen `soportes_pendientes` (`noexec`) para los soportes de vinculación en tránsito. Supabase Auth es el único servicio externo. Los respaldos los ejecuta un script del host con `pg_dump` y `mariadb-dump` en contenedores temporales y se copian a un disco externo.
 
 ## Dominios y certificados
 
-Sin Cloudflare: dominio gratuito de DuckDNS con dos nombres (`app.<nombre>.duckdns.org` y `glpi.<nombre>.duckdns.org`) apuntando a la IP pública de la VM, y certificados de Let's Encrypt emitidos por BunkerWeb con el desafío HTTP. Con Cloudflare (ADR-024, pendiente): hace falta un dominio propio administrado en Cloudflare, `cloudflared` abre un túnel saliente y la VM no expone los puertos 80 ni 443.
+En la máquina local se usan los nombres `app.localhost` y `glpi.localhost`, que el archivo hosts del equipo resuelve a `127.0.0.1`. BunkerWeb genera un certificado autofirmado y el navegador muestra una advertencia que se acepta una vez. No se usa dominio público ni Let's Encrypt, y no hay exposición pública (ADR-031; ADR-024 descartada).
 
 ## Costo estimado
 
-Valores de referencia que deben confirmarse con la calculadora de precios de Azure en el sprint 0:
+El entorno local no requiere pagos por infraestructura:
 
 | Recurso | Supuesto | Costo mensual aproximado |
 |---|---|---|
-| VM B2s Linux | 12 h/día en días hábiles, con apagado automático | USD 8–12 |
-| Disco administrado SSD estándar de 64 GiB | Permanente | USD 5 |
-| IP pública estática | Permanente | USD 3–4 |
-| Key Vault y Blob Storage | Uso bajo | Menos de USD 1 |
-| Supabase | Plan gratuito | USD 0 |
-| **Total** | | **USD 17–22 al mes**, dentro del crédito de USD 100 |
+| Máquina local | Equipo existente con Docker Desktop | USD 0 |
+| Volúmenes Docker | Disco del equipo | USD 0 |
+| Red | Solo localhost, sin IP pública | USD 0 |
+| Secretos, exportes y respaldos | Directorio `secrets/` y disco externo | USD 0 |
+| Supabase | Plan gratuito (solo Auth) | USD 0 |
+| **Total** | | **USD 0 al mes** |
 
 # Herramientas y servicios externos
 
 | Categoría | Herramienta | Uso | Costo |
 |---|---|---|---|
-| Nube | Azure for Students | VM, Key Vault, Blob Storage e IP pública | Crédito de USD 100 |
-| Base de datos y autenticación | Supabase (plan gratuito) | PostgreSQL de la aplicación y Supabase Auth con TOTP | Gratis |
+| Entorno de ejecución | Docker Desktop (WSL2) | Contenedores de toda la solución en la máquina local | Gratis (uso personal y educativo) |
+| Autenticación | Supabase (plan gratuito) | Supabase Auth con TOTP; la base de la aplicación es PostgreSQL 17 local | Gratis |
 | Mesa de servicio | GLPI 11 + MariaDB | Tickets, colas, SLA, inventario, licencias y doble factor | Libre |
 | Backend | Python 3.12, Django 5.2 LTS, psycopg 3, gunicorn, httpx, biblioteca oficial de Supabase Auth | Aplicación, núcleo e integraciones | Libre |
-| Infraestructura | Docker, Docker Compose, DuckDNS | Despliegue y nombres de dominio | Libre |
-| WAF y proxy | BunkerWeb 1.6.15 (nginx + ModSecurity + OWASP CRS 4) | Proxy inverso, TLS con Let's Encrypt, WAF, límites y cabeceras | Libre |
-| Reportería del WAF | Fluent Bit, Loki, Grafana (reutilizados de `waf-stack`) | Clasificación, almacenamiento en Blob y dashboard de los logs del WAF | Libre |
-| Borde opcional | Cloudflare Tunnel + Access (ADR-024, pendiente) | Sin puertos abiertos en la VM; inicio de sesión previo para GLPI | Gratis según plan; requiere dominio propio |
+| Infraestructura | Docker Compose, PostgreSQL 17 | Despliegue local y base de datos de la aplicación | Libre |
+| WAF y proxy | BunkerWeb 1.6.15 (nginx + ModSecurity + OWASP CRS 4) | Proxy inverso, TLS autofirmado, WAF, límites y cabeceras | Libre |
+| Reportería del WAF | Fluent Bit, Loki, Grafana (reutilizados de `waf-stack`) | Clasificación, almacenamiento local y dashboard de los logs del WAF | Libre |
 | Calidad | pytest, pytest-django, Playwright, Ruff, mypy + django-stubs, import-linter, `pruebas.sh` de `waf-stack` adaptado | Pruebas, análisis estático y límites de la arquitectura | Libre |
 | Seguridad | gitleaks, pip-audit, Trivy, Bandit, OWASP ZAP, sqlmap, asesor de seguridad de Supabase | SAST, SCA, secretos, contenedores y DAST | Libre |
 | Repositorio y CI | GitHub y GitHub Actions | Código, pull requests y pipeline | Gratis |
@@ -686,9 +690,9 @@ Valores de referencia que deben confirmarse con la calculadora de precios de Azu
 | CA-08 | Cierre verificado: un ticket resuelto sin solución, o de Inventario sin acta, no cierra la solicitud y aparece como «cierre incompleto»; un ticket reabierto se refleja en la cuenta y en el dashboard. | Prueba de integración | RF-24, RF-25 |
 | CA-09 | Auditoría: alterar un registro directamente en la base de datos hace fallar la verificación e indica el primer registro afectado. | Prueba de integración | RD-02, RD-03, RF-36 |
 | CA-10 | Divulgación: un valor centinela del motivo de retiro no aparece en GLPI, logs, dashboard, fichas ni respuestas para roles distintos de RRHH. | Prueba automatizada | RF-20, RD-05 |
-| CA-11 | Disponibilidad: el fallo simulado de GLPI y de Supabase se detecta en menos de 2 minutos, y la restauración completa desde los respaldos tarda menos de 4 horas. | Prueba manual con evidencia | RNF-01, RNF-04, RD-06 |
+| CA-11 | Disponibilidad: el fallo simulado de GLPI y de PostgreSQL se detecta en menos de 2 minutos, y la restauración completa desde los respaldos tarda menos de 4 horas. | Prueba manual con evidencia | RNF-01, RNF-04, RD-06 |
 | CA-12 | Seguridad: ZAP baseline sin alertas altas; sqlmap nivel 3 sin hallazgos; gitleaks, Trivy y pip-audit sin críticos; asesor de Supabase sin hallazgos. | Informes adjuntos | RS-11 a RS-13, RS-16 |
-| CA-13 | Supabase: con la clave `anon` pública, las peticiones a la Data API sobre las tablas de la aplicación fallan; el rol `app_backend` no puede modificar `auditoria`; la clave `service_role` no está en web ni worker. | Prueba automatizada e inspección de contenedores | RD-02, RD-10, RS-15 |
+| CA-13 | Base de datos: PostgreSQL no es accesible fuera de la red interna `pg_net` y los roles `anon` y `authenticated` no tienen permisos sobre las tablas de la aplicación; el rol `app_backend` no puede modificar `auditoria`; la clave `service_role` no está en web ni worker. | Prueba automatizada e inspección de contenedores | RD-02, RD-10, RS-15 |
 | CA-14 | Autenticación: un inicio de sesión con contraseña correcta pero sin TOTP no crea sesión; el primer ingreso exige inscribir TOTP; el sexto intento en un minuto se bloquea. | Pruebas de extremo a extremo | RF-01, RF-02, RS-08 |
 | CA-15 | Dashboard: con los datos de semilla, cada indicador coincide con su consulta de verificación; se muestra la hora de actualización; la página no abre conexiones persistentes ni se recarga sola; un usuario de RRHH recibe 403. | Prueba automatizada y revisión con las herramientas del navegador | RF-29 a RF-31 |
 | CA-16 | Búsqueda y ficha: los filtros devuelven los colaboradores correctos y la ficha muestra cuentas, equipos, licencias e historial sin campos restringidos; cada consulta de ficha queda en auditoría. | Pruebas de extremo a extremo | RF-32, RF-33, RF-35 |
@@ -696,7 +700,7 @@ Valores de referencia que deben confirmarse con la calculadora de precios de Azu
 | CA-18 | Soporte de vinculación: un ingreso sin soporte, con un archivo que no es PDF (aunque se haya renombrado a `.pdf`) o con más de 20 MB se rechaza. Uno válido aparece en GLPI vinculado a los tickets de AD y Licencias con el mismo hash, y la copia temporal desaparece. | Pruebas de integración contra GLPI | RF-39, RF-40, RD-12, RS-17 |
 | CA-19 | Recursos compartidos: el ticket AD de un ingreso lista cada recurso del perfil con ruta, serie, perfil y grupo; un CDP lista los recursos nuevos y «Retiro de accesos» en los anteriores; un RET lista «Retiro de accesos» en todos. | Pruebas unitarias del dominio y de integración | RF-16, §4.9 |
 | CA-20 | WAF: el script de pruebas adaptado de `waf-stack` devuelve 200 en tráfico normal y 403 en inyección SQL, XSS, recorrido de rutas, inyección de comandos, Log4Shell en cabecera y escáner, en `app.*` y en `glpi.*`; los flujos ING, RET y EMG completos (incluida la carga de un PDF de 20 MB) pasan sin bloqueos; web y GLPI no responden desde fuera de BunkerWeb; la API interna rechaza peticiones sin `API_TOKEN`. | Script de pruebas y pruebas de extremo a extremo a través del WAF | RS-02, RS-08, RS-17 a RS-19 |
-| CA-21 | Reportería del WAF: un ataque de prueba aparece clasificado como `waf` en Grafana en menos de 2 minutos y sus datos están en Blob. | Prueba manual con evidencia | RNF-16 |
+| CA-21 | Reportería del WAF: un ataque de prueba aparece clasificado como `waf` en Grafana en menos de 2 minutos y sus datos están en el volumen de Loki. | Prueba manual con evidencia | RNF-16 |
 
 # Matriz de trazabilidad
 
@@ -712,9 +716,9 @@ Valores de referencia que deben confirmarse con la calculadora de precios de Azu
 
 | ID | Riesgo | Probabilidad | Impacto | Mitigación |
 |---|---|---|---|---|
-| R1 | Supabase pausa el proyecto o se alcanza el límite del plan gratuito | Media | Alto | Actividad del worker (RNF-05); límite de tamaño (RNF-08); procedimiento de reactivación |
-| R2 | Pérdida de datos por falta de respaldos en el plan gratuito | Media | Alto | Volcado diario propio y restauración probada (RD-06, RNF-04) |
-| R3 | El crédito de Azure se agota | Baja | Alto | Apagado automático; alerta de presupuesto al 50 %; desarrollo local |
+| R1 | Supabase pausa el proyecto de Auth por inactividad y nadie puede iniciar sesión | Media | Alto | Verificación y reactivación antes de cada demostración (RNF-05, SUP-02) |
+| R2 | Pérdida de datos por falla del disco del equipo local | Media | Alto | Volcado diario fuera del equipo y restauración probada (RD-06, RNF-04) |
+| R3 | El equipo local no está disponible o no tiene recursos suficientes (RAM, puertos 80 y 443 ocupados) | Media | Alto | Requisitos mínimos documentados; levantar sin reportería; equipo alterno de otro integrante con la misma guía |
 | R4 | La API de GLPI 11 no cubre alguna operación | Media | Medio | Prueba técnica en el sprint 0; alternativa con la API v1 |
 | R5 | El flujo de MFA de Supabase Auth desde el servidor no funciona como se espera | Baja | Alto | Prueba técnica en el sprint 0; alternativa con la API REST directa |
 | R6 | GLPI no permite forzar la plantilla de solución | Media | Medio | La aplicación no cuenta tickets sin solución (RF-24); revisión en el dashboard |
@@ -722,7 +726,7 @@ Valores de referencia que deben confirmarse con la calculadora de precios de Azu
 | R8 | Exposición prolongada en retiros por atención manual | Media | Alto | SLA de 1 hora con escalamiento; indicador de exposición |
 | R9 | Compromiso de la cuenta única de RRHH | Baja | Alto | TOTP, revisión del técnico y auditoría (ADR-005) |
 | R10 | La API de GLPI no permite subir o vincular documentos como se necesita | Baja | Medio | Prueba técnica en el sprint 0; alternativa: bucket privado en Supabase Storage con enlace temporal en el ticket (requiere ADR) |
-| R11 | El stack con BunkerWeb y la reportería excede los 4 GiB de la VM | Media | Medio | Medición en el sprint 0 con límites por contenedor; se recorta la reportería antes de cambiar de tamaño (RNF-09) |
+| R11 | El stack con BunkerWeb y la reportería excede los 4 GiB asignados a Docker Desktop | Media | Medio | Límites por contenedor; se levanta sin el perfil de reportería (RNF-09) |
 | R12 | Falsos positivos del CRS en GLPI (contenido enriquecido de tickets) o en la carga de PDF | Alta | Medio | Modo `detect` y exclusiones puntuales versionadas en desarrollo; CA-20 a través del WAF |
 | R13 | Nuevas vulnerabilidades en BunkerWeb (hubo 8 avisos en julio de 2026) | Media | Alto | Sin interfaz desplegada, `API_TOKEN`, red aislada, seguimiento de avisos y actualización dentro de la misma versión menor |
 
@@ -765,8 +769,6 @@ GLPI Project. (2026). *GLPI installation: Prerequisites*. Teclib'. https://glpi-
 International Organization for Standardization. (2018). *ISO/IEC/IEEE 29148:2018 Systems and software engineering — Life cycle processes — Requirements engineering*. ISO.
 
 Ley 1581 de 2012. Por la cual se dictan disposiciones generales para la protección de datos personales. 17 de octubre de 2012. Diario Oficial No. 48.587.
-
-Microsoft. (2026). *Azure for Students*. https://azure.microsoft.com/free/students
 
 OWASP Foundation. (2021). *OWASP Application Security Verification Standard 4.0.3*. https://owasp.org/www-project-application-security-verification-standard/
 

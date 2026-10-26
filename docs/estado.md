@@ -1,26 +1,28 @@
 # Estado del proyecto y traspaso
 
-**Última actualización:** 24/10/2026 · rama `master`.
+**Última actualización:** 25/10/2026 · rama `auditoria/entrega`.
 
 Este documento existe para que otra persona, u otra sesión de Claude Code con otra cuenta, retome el trabajo sin el historial de la conversación. Todo lo que afirma está respaldado por commits, pruebas o documentos del repositorio. **Léase junto con:**
 - `CLAUDE.md` (reglas).
-- `docs/SRS.md` (v2.4).
+- `docs/SRS.md` (v2.5).
 - `tasks/todo.md` (estado y evidencia de cada ítem).
 - `tasks/lessons.md` (65 lecciones).
 - `docs/supuestos-nucleo.md` (S-01 a S-36).
-- `docs/decisiones.md` (hasta ADR-029).
+- `docs/decisiones.md` (hasta ADR-031).
 - `docs/operacion.md`, `docs/probar-localmente.md` y `docs/manual-usuario.md`.
 - `docs/auditoria-2026-10-12.md` (auditoría de funcionalidad y seguridad: 12 hallazgos corregidos).
 
 ## 1. Resumen
 
+**25/10/2026: arquitectura 100 % local (ADR-031, SRS v2.5).** Según el documento de la primera entrega de Desarrollo Seguro, el sistema corre en la máquina local con Docker Desktop: PostgreSQL 17 en contenedor (`compose.yaml` + `compose.local.yaml`), Supabase solo para Auth, Docker secrets en `secrets/`, certificado autofirmado y copias de auditoría y respaldos en un disco externo. Azure, Let's Encrypt, DuckDNS y Cloudflare quedan fuera. Lo que figuraba «pendiente de Azure» ya no aplica; los scripts de copia ya están adecuados (L-01).
+
 | Fase | Estado |
 |---|---|
 | 1. Núcleo (`dominio` + `aplicacion`) | **Congelado** en el Hito N (etiqueta `nucleo-v1`). Cobertura de ramas: 99 %; mutación del dominio: 93,6 % (el dominio no cambió desde entonces) |
-| 2. Adaptadores base y seguridad | **Hechos 2.1 a 2.3 y 2.5 a 2.14**, con Docker y a través del WAF (2.2 y 2.9 verificados en 11 y 12/10/2026). 2.4 hecho salvo la subida diaria a Blob, que necesita Azure |
+| 2. Adaptadores base y seguridad | **Hechos 2.1 a 2.3 y 2.5 a 2.14**, con Docker y a través del WAF (2.2 y 2.9 verificados en 11 y 12/10/2026). 2.4 hecho; la copia diaria al disco externo está hecha y verificada contra una carpeta que lo simula (L-01, ADR-031) |
 | 3. GLPI | **3.1 a 3.4 hechos y verificados contra GLPI 11.0.11 real** (spike 0.3 cerrado). ING, VAC, RET, EMG y la caída de GLPI funcionan de punta a punta (5.1) |
 | 4. Dashboard y búsqueda | **4.1 a 4.4 hechos.** RNF-06 medido y cumplido: 300 colaboradores y 20 usuarios concurrentes |
-| 5. Entrega | 5.1 y 5.8 (Playwright) hechos. 5.3 y 5.4 hechos en local (CA-11 y CA-12 con evidencia en `docs/evidencia/`); falta repetirlos en Azure. 5.9 (GLPI real en la CI) escrito, falta verlo en GitHub. 5.6: SRS v2.4. Falta Azure (5.2) |
+| 5. Entrega | 5.1 y 5.8 (Playwright) hechos. 5.3 y 5.4 hechos en local (CA-11 y CA-12 con evidencia en `docs/evidencia/`), que es el entorno de destino desde ADR-031. 5.9 (GLPI real en la CI) escrito, falta verlo en GitHub. 5.6: SRS v2.5. 5.2 (Azure) ya no aplica |
 
 **24/10/2026 (segunda parte): evidencia de entrega en local.** Cada punto deja un script reproducible y un documento en `docs/evidencia/`:
 - **RNF-06** (`rendimiento-2026-10-24.md`). Con 300 colaboradores y 20 usuarios concurrentes sin pausa, todas las páginas quedan por debajo de 800 ms y el dashboard en 791 ms.
@@ -116,7 +118,7 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 1. **Supabase**: contraseña mínima de 12 en el Dashboard y correr el asesor de seguridad antes de la entrega (RS-16). El registro abierto y la clave `service_role` ya están hechos.
 2. **Docker en el equipo de desarrollo**: ya funciona (se habilitó la plataforma de máquina virtual y se reinició). `docker.exe` no está en el PATH de Git Bash: `export PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin"`. Para probar: `docs/probar-localmente.md`. Falta agregar `127.0.0.1 app.localhost glpi.localhost` al archivo `hosts` para usar el navegador.
 3. **GitHub** (0.1): falta la protección de `master` y un pre-commit con gitleaks; gitleaks ya corre en la CI. **Decidir si el paquete de GHCR se hace público**: no contiene secretos y le ahorra al equipo el `docker login`.
-4. Decisiones: 0.0 (aprobar el SRS v2.4), 0.7 (Cloudflare), los supuestos **S-28 a S-36**, y revisar ADR-025 a ADR-030.
+4. Decisiones: 0.0 (aprobar el SRS v2.5), los supuestos **S-28 a S-40**, y revisar ADR-025 a ADR-031. La 0.7 (Cloudflare) quedó resuelta: descartada por ADR-031.
 5. **Rotar la contraseña de `postgres`** al terminar el desarrollo (se compartió en una conversación).
 6. **Hacer `git push`.** Los commits del 24/10/2026 están solo en local: Git pide iniciar sesión con la cuenta nueva. Tras el push, comprobar en GitHub los jobs `seguridad` y `glpi-real`, y que se publique la imagen.
 
@@ -124,18 +126,15 @@ La CI (`.github/workflows/verificar.yml`) corre todo contra un `postgres:17` loc
 7. **(hecho)** ~~VAC, RET y EMG de extremo a extremo~~, también por la interfaz con Playwright (5.8). La suite real de GLPI ya está en la CI (job `glpi-real`, 5.9): falta verla pasar en GitHub tras el primer push.
 8. **(hecho)** ~~0.3 Spike de GLPI 11~~: confirmar cada punto marcado «spike 0.3» en `adaptadores/salida/glpi/` (tabla en `docs/spikes/glpi-puerto.md`). La suite de contrato debe pasar **sin cambios** contra GLPI en contenedor (Toxiproxy para los fallos). Correr `configurar_glpi` contra un GLPI limpio.
 9. **(hecho)** ~~2.9 / CA-18 / CA-20~~: el PDF de 20 MB sube a través del WAF hasta GLPI (11/10/2026).
-10. **(hecho en local)** ~~4.1, 5.3 y 5.4~~: repetir en Azure `carga.sh`, `deteccion.sh`, `respaldo.sh` con `restaurar-prueba.sh` y `seguridad-dinamica.sh` (`docs/operacion.md` §4).
+10. **(hecho en local)** ~~4.1, 5.3 y 5.4~~: `carga.sh`, `deteccion.sh`, `respaldo.sh` con `restaurar-prueba.sh` y `seguridad-dinamica.sh` (`docs/operacion.md` §4). Con ADR-031 no hay que repetirlos en otro entorno.
 11. **5.10, mutación aplazada.** El dominio no cambió desde el 93,6 %. Repetirla con la máquina libre (`tasks/todo.md` 5.10).
 
 ### B2. Secretos (5.7)
 - El Administrador cifra los secretos reales (comandos en 5.7 de `tasks/todo.md`) y agrega las claves públicas de cada integrante.
 - Después, nadie vuelve a pasar secretos por chat.
 
-### C. Azure
-12. 0.5 y 5.2 (seguir `docs/operacion.md` §3). Allí, con los mismos scripts:
-    - las evidencias de 4.1, 5.3 y 5.4;
-    - Loki sobre Blob con identidad administrada (5.5);
-    - el proyecto de Supabase de entrega, con la restauración probada en él (0.2 y CA-11).
+### C. Despliegue local (ADR-031)
+12. Azure (0.5 y 5.2) ya no aplica. L-01 hecho: `copiar-exportes.sh` y `respaldo.sh` copian al disco externo (`docs/operacion.md` §3); `compose.azure.yaml` y `subir-exportes.sh` se retiraron. Falta programar las dos tareas diarias en el equipo de operación con el disco conectado. B-38: el volumen de soportes es tmpfs con `noexec`.
 
 ### D. Documentación
 13. Actualizar `docs/operacion.md` con lo que se aprenda al desplegar.
@@ -169,12 +168,11 @@ GLPI_DB_PASSWORD=<aleatorio: secrets/glpi_db_password>
 APP_DOMINIO=app.localhost
 GLPI_DOMINIO=glpi.localhost
 SECURITY_MODE=block
-JML_DB_HOST=aws-0-us-east-1.pooler.supabase.com
-JML_DB_USUARIO=app_backend.<ref>
-JML_DB_USUARIO_DUENIO=app_owner.<ref>
+JML_DB_HOST=postgres          # PostgreSQL 17 local (ADR-031); JML_MODO=local lo fija
+JML_DB_USUARIO=app_backend
+JML_DB_USUARIO_DUENIO=app_owner
 JML_SUPABASE_URL=https://<ref>.supabase.co
 JML_SUPABASE_CLAVE_PUBLICA=sb_publishable_<...>
-# Solo en Azure: EMAIL_LETS_ENCRYPT=<correo del equipo>
 ```
 
 ## 7. Advertencias para quien continúe

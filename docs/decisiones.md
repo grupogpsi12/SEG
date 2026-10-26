@@ -5,20 +5,20 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | ADR | Título | Estado | Fecha |
 |---|---|---|---|
 | 001 | Aplicación propia + GLPI | Aceptada (precisada por ADR-016) | 05/10/2026 |
-| 002 | Docker Compose en una VM de Azure | Aceptada | 05/10/2026 |
+| 002 | Docker Compose en una VM de Azure | **Reemplazada** por ADR-031 | 05/10/2026 |
 | 003 | Samba AD DC + Entra ID sin sincronización | **Reemplazada** por ADR-019 | 05/10/2026 |
 | 004 | Automatización con autorización humana | **Reemplazada** por ADR-019 | 05/10/2026 |
 | 005 | Cuenta única de RRHH (con disidencia) | Aceptada | 05/10/2026 |
 | 006 | Deduplicación con índice único parcial | Aceptada | 05/10/2026 |
-| 007 | Auditoría de solo inserción con cadena de hashes | Aceptada | 05/10/2026 |
+| 007 | Auditoría de solo inserción con cadena de hashes | Aceptada (copia externa precisada por ADR-031) | 05/10/2026 |
 | 008 | OIDC con Entra ID y BFF | **Reemplazada** por ADR-017 | 05/10/2026 |
-| 009 | Secretos en Key Vault como archivos en tmpfs | Aceptada | 05/10/2026 |
+| 009 | Secretos en Key Vault como archivos en tmpfs | Aceptada en el principio (archivos en `/run/secrets`); el origen pasa a Docker secrets locales por ADR-031 | 05/10/2026 |
 | 010 | Licencias de M365 registradas en GLPI | **Reemplazada** por ADR-019 | 05/10/2026 |
 | 011 | Sincronización con GLPI por consulta periódica | Aceptada | 05/10/2026 |
 | 012 | Stack FastAPI + React + PostgreSQL | **Reemplazada** por ADR-015 y ADR-018 | 05/10/2026 |
 | 013 | Exclusión del monitoreo del DC | Aceptada | 05/10/2026 |
 | 014 | Autenticación de servicio contra la API de GLPI: API v1 con App-Token y token de usuario | Aceptada (spike 0.3) | 11/10/2026 |
-| 015 | Supabase como base de datos de la aplicación | Aceptada | 07/10/2026 |
+| 015 | Supabase como base de datos de la aplicación | **Reemplazada** en la base de datos por ADR-031 (Supabase queda solo para Auth, ADR-017) | 07/10/2026 |
 | 016 | Arquitectura hexagonal con la solicitud y sus tickets como núcleo | Aceptada | 07/10/2026 |
 | 017 | Supabase Auth con TOTP mediado por el servidor | Aceptada | 07/10/2026 |
 | 018 | Django 5.2 LTS con interfaz generada en el servidor | Aceptada | 07/10/2026 |
@@ -27,13 +27,14 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 021 | Soporte de vinculación adjunto a GLPI, sin almacenamiento permanente en la aplicación | Aceptada | 07/10/2026 |
 | 022 | Permisos sobre recursos compartidos dentro de los eventos laborales | Aceptada | 07/10/2026 |
 | 023 | BunkerWeb como WAF y proxy inverso (en lugar de nginx y de Application Gateway) | Aceptada | 10/10/2026 |
-| 024 | Cloudflare Tunnel + Access delante de BunkerWeb | **Propuesta** (pendiente del equipo) | 10/10/2026 |
+| 024 | Cloudflare Tunnel + Access delante de BunkerWeb | **Descartada** por ADR-031 (sin exposición pública) | 10/10/2026 |
 | 025 | Tres consultas de lectura nuevas en los repositorios para las vistas (2.7) | Aceptada | 10/10/2026 |
 | 026 | Consulta de solicitudes en `error` para el reintento del Administrador (2.12) | Aceptada | 11/10/2026 |
 | 027 | Matriz y usuarios completos para el área de administración (2.13) | Aceptada | 11/10/2026 |
 | 028 | Dueño del esquema separado de `app_backend`, disparador con transiciones y bloqueo al decidir (revisión externa H1 a H3) | Aceptada | 11/10/2026 |
 | 029 | Secretos compartidos del equipo cifrados en el repositorio con SOPS + age | Aceptada | 24/10/2026 |
 | 030 | Lecturas paginadas de la auditoría y de las solicitudes de un usuario (RNF-06) | Aceptada | 24/10/2026 |
+| 031 | Despliegue local con Docker Desktop: PostgreSQL 17 en contenedor, Supabase solo para Auth, Docker secrets y copias en un medio externo | Aceptada | 25/10/2026 |
 
 ---
 
@@ -45,7 +46,10 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 
 **Consecuencias.** Los técnicos trabajan en GLPI y consultan el dashboard en la aplicación. ADR-016 precisa la relación: GLPI es un adaptador del núcleo.
 
-## ADR-002 — Docker Compose en una sola VM de Azure
+## ADR-002 — Docker Compose en una sola VM de Azure · REEMPLAZADA
+
+Reemplazada por ADR-031: el despliegue corre en la máquina local con Docker Desktop. Se conserva el texto original como registro.
+
 
 **Decisión.** Una VM B2s con Docker Compose y apagado automático aloja el borde (BunkerWeb desde ADR-023), web, worker, GLPI y MariaDB. Key Vault y Blob Storage como servicios gestionados de bajo costo. Desde v2.0 la base de datos de la aplicación vive en Supabase (ADR-015).
 
@@ -124,7 +128,10 @@ Se decidía en el sprint 0 (tarea 0.3): API v2 con OAuth2 si admitía autenticac
 
 **Decisión (11/10/2026).** API v1 con `App-Token` y `Authorization: user_token`, con el usuario `jml-servicio` y un perfil acotado. La v2 no hacía falta. La auditoría del 12/10/2026 la cerró a la red interna: el cliente de API excluye la IP del WAF, no se admite usuario y contraseña, y BunkerWeb responde 403 a `/apirest.php` y `/api.php` (`docs/spikes/glpi.md`).
 
-## ADR-015 — Supabase como base de datos de la aplicación
+## ADR-015 — Supabase como base de datos de la aplicación · REEMPLAZADA (base de datos)
+
+Reemplazada en la parte de base de datos por ADR-031: la aplicación usa PostgreSQL 17 en contenedor local. Siguen vigentes, ahora sobre el PostgreSQL local, el esquema `app`, el rol `app_backend`, la ausencia de permisos a `anon` y `authenticated` y RLS sin políticas. Se conserva el texto original como registro.
+
 
 **Contexto.** El equipo decidió usar Supabase (plan gratuito) como base de datos de la aplicación. Se verificó el 07/10/2026 en fuentes oficiales:
 - GLPI 11 solo admite MySQL 8.0+ y MariaDB 10.6+.
@@ -303,7 +310,10 @@ Se reutiliza de `waf-stack`: la estructura de bunkerweb y scheduler, `clasificar
 
 Fuentes: prices.azure.com (Application Gateway, eastus) · learn.microsoft.com/azure/application-gateway/overview-v2 · github.com/bunkerity/bunkerweb/security · definiciones de ajustes en `src/common/core/*/plugin.json` de la etiqueta v1.6.15 (MAX_CLIENT_SIZE=10m, API_TOKEN vacío, DATABASE_URI sqlite, KEEP_UPSTREAM_HEADERS, LIMIT_REQ_RATE=2r/s, BAD_BEHAVIOR_BAN_TIME=86400).
 
-## ADR-024 — Cloudflare Tunnel + Access delante de BunkerWeb · PROPUESTA
+## ADR-024 — Cloudflare Tunnel + Access delante de BunkerWeb · DESCARTADA
+
+Descartada por ADR-031: sin exposición pública no hay borde externo que proteger. Se conserva el análisis como registro por si el sistema llegara a publicarse.
+
 
 **Contexto.** El equipo analiza Cloudflare. Datos verificados el 10/10/2026:
 - El plan gratuito incluye solo la «Cloudflare Free Managed Ruleset»; el OWASP Core Ruleset y el Managed Ruleset completos requieren Pro.
@@ -447,3 +457,26 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 - **Cursor por secuencia:** es más eficiente en tablas enormes, pero la cadena es contigua y, al volumen del proyecto, OFFSET/LIMIT sobre el índice de la secuencia alcanza.
 
 **Consecuencias.** El núcleo congelado (`nucleo-v1`) cambia en dos puertos y dos casos de uso, igual que con ADR-025 a ADR-027. La lista de solicitudes cambia de orden: ahora va de la más reciente a la más antigua.
+
+## ADR-031 — Despliegue local con Docker Desktop: PostgreSQL 17 en contenedor, Supabase solo para Auth
+
+**Contexto.** El documento de la primera entrega del Taller de Desarrollo Seguro (`DS_1eraEntrega_Local (2).docx`, 13/10/2026) fija que todo el sistema corre en la máquina local del equipo. En ese documento la decisión aparece como «ADR-29», pero en este registro ADR-029 ya era SOPS + age (24/10/2026); para no renumerar decisiones vigentes se registra aquí como ADR-031. Razones del equipo: costo cero, sin cuenta de Azure, sin exposición pública y un entorno reproducible para la sustentación. La auditoría del 24 y 25/10/2026 ya se ejecutó sobre este mismo stack local (`compose.yaml` + `compose.local.yaml`).
+
+**Decisión.**
+1. **Cómputo.** Docker Desktop (motor WSL2) con Docker Compose v2 en la máquina local: `infra/compose.yaml` + `infra/compose.local.yaml` (y `compose.reporteria.yaml`, opcional). Reemplaza ADR-002.
+2. **Base de datos.** PostgreSQL 17 en el contenedor `postgres`, en la red interna `pg_net`, sin puertos publicados. Se conservan el esquema `app`, el dueño separado `app_owner` y el rol operativo `app_backend` (ADR-028), sin permisos a `anon` ni a `authenticated` y con RLS sin políticas. Reemplaza la parte de base de datos de ADR-015.
+3. **Autenticación.** Supabase Auth (plan gratuito) es el único servicio externo (ADR-017 sin cambios). Antes de cada demostración se verifica que el proyecto no esté pausado (RNF-05).
+4. **Secretos.** Docker secrets generados por `infra/scripts/preparar-entorno.sh` en `secrets/` (no versionado) y montados en `/run/secrets`. El principio de ADR-009 se mantiene (la aplicación solo lee archivos); cambia el origen. ADR-029 sigue vigente para los secretos compartidos del equipo.
+5. **Borde.** BunkerWeb con certificado autofirmado para `app.localhost` y `glpi.localhost`; sin dominio público, Let's Encrypt ni DuckDNS. ADR-024 (Cloudflare) se descarta.
+6. **Copias.** La auditoría diaria y su ancla quedan en el volumen `exportes` y se copian a un disco externo sin sobrescribir (RD-04, 365 días); los respaldos de PostgreSQL y MariaDB también van al disco externo (RD-06, 30 días). Loki guarda sus datos en un volumen local.
+
+**Alternativas descartadas.**
+- VM de Azure con Key Vault y Blob (ADR-002 y ADR-009 originales): exige suscripción y presupuesto, y no se pudo verificar durante el proyecto.
+- Supabase PostgreSQL como base: agrega latencia, pausa por inactividad y un tercero con los datos, sin beneficio en un despliegue local.
+
+**Consecuencias.**
+- Ya no aplican: el *session pooler*, el TLS hacia Supabase con `verify-full`, la identidad administrada, la política de inmutabilidad de Blob, el NSG y el SSH por llaves.
+- Riesgos residuales nuevos: la copia de la auditoría no está en almacenamiento inmutable (la integridad se sustenta en la cadena y el ancla fuera del equipo) y la disponibilidad depende de un solo equipo (RNF-04, RNF-15).
+- Los elementos de la auditoría marcados «pendiente de Azure» pasan a «no aplica». La copia al disco externo se verificó contra una carpeta que lo simula (L-01).
+- Código (L-01, hecho el 25/10/2026): `copiar-exportes.sh` reemplaza a `subir-exportes.sh`; `respaldo.sh` solo tiene el modo local, con retención de 30 días; se retiró `compose.azure.yaml`. Al retirarlo se perdió el `noexec` del volumen de soportes (B-38): ahora es tmpfs con `noexec,nosuid,nodev`.
+- SRS v2.5.
