@@ -1,0 +1,7 @@
+OK    marcadores sin reemplazar
+OK    criterios de aceptación con su evidencia
+OK    manifiesto y hashes
+OK    cifras de metricas.json
+OK    PDF de cada informe
+OK    corridas con fallos citadas como exitosas
+ENTREGA VERIFICADA

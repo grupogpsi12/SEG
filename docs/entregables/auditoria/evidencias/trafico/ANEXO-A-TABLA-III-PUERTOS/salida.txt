@@ -1,0 +1,48 @@
+== flujos que la Tabla III permite
+OK   F1 Usuarios -> bunkerweb 443       host         -> 127.0.0.1:443          esperado=abre   real=abre  
+OK   F2 Usuarios -> bunkerweb 80        host         -> 127.0.0.1:80           esperado=abre   real=abre  
+OK   F4 bunkerweb -> web 8000           jml_app      -> web:8000               esperado=abre   real=abre  
+OK   F5 bunkerweb -> glpi 80            jml_app      -> glpi:80                esperado=abre   real=abre  
+OK   F6 bw-scheduler -> bunkerweb 5000  jml_bw-universe -> bunkerweb:5000         esperado=abre   real=abre  
+OK   F7 worker -> glpi 80               jml_app      -> glpi:80                esperado=abre   real=abre  
+OK   F8 glpi -> mariadb 3306            jml_db_net   -> mariadb:3306           esperado=abre   real=abre  
+OK   F15/F16 fluent-bit y grafana -> loki 3100 jml_waf-logs -> loki:3100              esperado=abre   real=abre  
+OK   F17 tunel SSH -> grafana (127.0.0.1) host         -> 127.0.0.1:3000         esperado=abre   real=abre  
+OK   F20 web, worker -> postgres:17 (local) jml_pg_net   -> postgres:5432          esperado=abre   real=abre  
+== flujos que la tabla NO contempla: deben fallar
+OK   MariaDB solo por db_net            jml_app      -> mariadb:3306           esperado=cierra real=cierra
+OK   PostgreSQL solo por pg_net         jml_app      -> postgres:5432          esperado=cierra real=cierra
+OK   pg_net no llega a GLPI             jml_pg_net   -> glpi:80                esperado=cierra real=cierra
+OK   pg_net no llega al WAF             jml_pg_net   -> bunkerweb:8443         esperado=cierra real=cierra
+OK   la reporteria no llega a la aplicacion jml_waf-logs -> web:8000               esperado=cierra real=cierra
+OK   la reporteria no llega a GLPI      jml_waf-logs -> glpi:80                esperado=cierra real=cierra
+OK   bw-universe no llega a la aplicacion jml_bw-universe -> web:8000               esperado=cierra real=cierra
+OK   bw-universe no llega a MariaDB     jml_bw-universe -> mariadb:3306           esperado=cierra real=cierra
+== puertos que publica el stack (el host puede tener sus propios servicios en 3306, 22, etc.: se mira lo que publica Docker)
+publicados: jml-bunkerweb-1 0.0.0.0:80->8080;[::]:80->8080;0.0.0.0:443->8443;[::]:443->8443;jml-grafana-1 127.0.0.1:3000->3000;jml-fluent-bit-1 127.0.0.1:24224->24224;
+OK   jml-web-1 no publica ningun puerto
+OK   jml-worker-1 no publica ningun puerto
+OK   jml-glpi-1 no publica ningun puerto
+OK   jml-mariadb-1 no publica ningun puerto
+OK   jml-postgres-1 no publica ningun puerto
+OK   jml-loki-1 no publica ningun puerto
+OK   jml-bw-scheduler-1 no publica ningun puerto
+OK   jml-bunkerweb-1 publica: 8080/tcp 8443/tcp  (el unico expuesto a usuarios)
+== redes internas (sin salida a internet)
+OK   jml_db_net internal=true
+OK   jml_pg_net internal=true
+== redirect del puerto 80 y TLS del 443
+HTTP 80 -> 301 
+HTTPS 443 -> 200
+== no verificable en el stack local (Azure, Let's Encrypt, Cloudflare, Supabase)
+F3  Administrador -> VM (sshd) 22        Azure: NSG limitado a IPs del equipo
+F9  web, worker, migrar -> Supabase 5432  solo lectura de catalogo en F3 (no se ejercita desde los contenedores)
+F10 web -> Supabase Auth 443              cubierto por GoTrue simulado; no se llama al servicio real
+F11 admin-usuarios -> Supabase admin 443  idem
+F12 VM -> Key Vault 443                   Azure; localmente los secretos salen de /run/secrets (SOPS + age)
+F13 VM -> Blob 443                        Azure; localmente la exportacion de auditoria escribe a un directorio
+F14 bw-scheduler -> Let's Encrypt 443     localmente BunkerWeb usa un certificado autofirmado
+F18 loki -> Blob 443                      Azure con identidad administrada
+F19 cloudflared -> Cloudflare 7844        propuesta (ADR-024), no desplegada
+
+TABLA III: todos los flujos comprobables coinciden

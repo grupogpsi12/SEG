@@ -1,0 +1,227 @@
+### GET /cuentas (tecnico)
+
+[21:48:36] [WARNING] target URL content is not stable (i.e. content differs). sqlmap will base the page comparison on a sequence matcher. If no dynamic nor injectable parameters are detected, or in case of junk results, refer to user's manual paragraph 'Page comparison'
+
+[21:48:36] [WARNING] heuristic (basic) test shows that GET parameter 'nombre' might not be SQL injectable
+
+[21:48:56] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:49:08] [WARNING] GET parameter 'nombre' does not seem to be injectable
+
+[21:49:08] [WARNING] heuristic (basic) test shows that GET parameter 'documento' might not be SQL injectable
+
+[21:49:20] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:49:26] [INFO] 'ORDER BY' technique appears to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+
+[21:49:33] [WARNING] GET parameter 'documento' does not seem to be injectable
+
+[21:49:33] [WARNING] heuristic (basic) test shows that GET parameter 'usuario' might not be SQL injectable
+
+[21:49:48] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:49:54] [INFO] target URL appears to be UNION injectable with 1 columns
+
+[21:50:07] [WARNING] GET parameter 'usuario' does not seem to be injectable
+
+[21:50:07] [WARNING] heuristic (basic) test shows that GET parameter 'departamento' might not be SQL injectable
+
+[21:50:15] [INFO] GET parameter 'departamento' appears to be 'SQLite AND boolean-based blind - WHERE or HAVING clause (JSON)' injectable 
+
+[21:50:17] [WARNING] GET parameter 'departamento' does not seem to be injectable
+
+[21:50:17] [WARNING] heuristic (basic) test shows that GET parameter 'sede' might not be SQL injectable
+
+[21:50:21] [INFO] GET parameter 'sede' appears to be 'SQLite AND boolean-based blind - WHERE or HAVING clause (JSON)' injectable (with --string="Exportar CSV")
+
+[21:50:23] [WARNING] GET parameter 'sede' does not seem to be injectable
+
+[21:50:23] [INFO] GET parameter 'sistema' appears to be dynamic
+
+[21:50:23] [WARNING] heuristic (basic) test shows that GET parameter 'sistema' might not be SQL injectable
+
+[21:50:31] [WARNING] GET parameter 'sistema' does not seem to be injectable
+
+[21:50:31] [INFO] GET parameter 'estado_de_cuenta' appears to be dynamic
+
+[21:50:31] [WARNING] heuristic (basic) test shows that GET parameter 'estado_de_cuenta' might not be SQL injectable
+
+[21:50:40] [WARNING] GET parameter 'estado_de_cuenta' does not seem to be injectable
+
+[21:50:40] [WARNING] heuristic (basic) test shows that GET parameter 'pagina' might not be SQL injectable
+
+[21:50:48] [WARNING] GET parameter 'pagina' does not seem to be injectable
+
+[21:50:48] [WARNING] heuristic (basic) test shows that Cookie parameter 'sessionid' might not be SQL injectable
+
+[21:50:56] [WARNING] Cookie parameter 'sessionid' does not seem to be injectable
+
+[21:50:56] [WARNING] heuristic (basic) test shows that parameter 'User-Agent' might not be SQL injectable
+
+[21:51:11] [WARNING] parameter 'User-Agent' does not seem to be injectable
+
+[21:51:11] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be SQL injectable
+
+[21:51:26] [WARNING] parameter 'Referer' does not seem to be injectable
+
+[21:51:26] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. Also, you can try to rerun by providing a valid value for option '--string' as perhaps the string you have chosen does not match exclusively True responses. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+### ruta /colaboradores/<id> (tecnico)
+
+[21:51:27] [WARNING] target URL content is not stable (i.e. content differs). sqlmap will base the page comparison on a sequence matcher. If no dynamic nor injectable parameters are detected, or in case of junk results, refer to user's manual paragraph 'Page comparison'
+
+[21:51:27] [WARNING] heuristic (basic) test shows that URI parameter '#1*' might not be SQL injectable
+
+[21:51:41] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:51:50] [WARNING] URI parameter '#1*' does not seem to be injectable
+
+[21:51:50] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+### GET /solicitudes?pagina (rrhh)
+
+[21:51:50] [WARNING] target URL content is not stable (i.e. content differs). sqlmap will base the page comparison on a sequence matcher. If no dynamic nor injectable parameters are detected, or in case of junk results, refer to user's manual paragraph 'Page comparison'
+
+[21:51:51] [INFO] GET parameter 'pagina' appears to be dynamic
+
+[21:51:51] [WARNING] heuristic (basic) test shows that GET parameter 'pagina' might not be SQL injectable
+
+[21:52:03] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:52:11] [WARNING] GET parameter 'pagina' does not seem to be injectable
+
+[21:52:11] [WARNING] heuristic (basic) test shows that Cookie parameter 'sessionid' might not be SQL injectable
+
+[21:52:23] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:52:30] [WARNING] Cookie parameter 'sessionid' does not seem to be injectable
+
+[21:52:30] [WARNING] heuristic (basic) test shows that parameter 'User-Agent' might not be SQL injectable
+
+[21:53:00] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:53:14] [WARNING] parameter 'User-Agent' does not seem to be injectable
+
+[21:53:14] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be SQL injectable
+
+[21:53:44] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:53:57] [WARNING] parameter 'Referer' does not seem to be injectable
+
+[21:53:57] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+### ruta /solicitudes/<id> (rrhh)
+
+[21:53:58] [WARNING] target URL content is not stable (i.e. content differs). sqlmap will base the page comparison on a sequence matcher. If no dynamic nor injectable parameters are detected, or in case of junk results, refer to user's manual paragraph 'Page comparison'
+
+[21:53:58] [CRITICAL] target URL content appears to be heavily dynamic. sqlmap is going to retry the request(s)
+
+[21:54:07] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:54:13] [WARNING] URI parameter '#1*' does not seem to be injectable
+
+[21:54:13] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. You can give it a go with the switch '--text-only' if the target page has a low percentage of textual content (~21.46% of page content is text). If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+### GET /auditoria?pagina (auditor)
+
+[21:54:14] [WARNING] target URL content is not stable (i.e. content differs). sqlmap will base the page comparison on a sequence matcher. If no dynamic nor injectable parameters are detected, or in case of junk results, refer to user's manual paragraph 'Page comparison'
+
+[21:54:14] [INFO] GET parameter 'pagina' appears to be dynamic
+
+[21:54:14] [WARNING] heuristic (basic) test shows that GET parameter 'pagina' might not be SQL injectable
+
+[21:54:25] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:54:32] [WARNING] GET parameter 'pagina' does not seem to be injectable
+
+[21:54:32] [WARNING] heuristic (basic) test shows that Cookie parameter 'sessionid' might not be SQL injectable
+
+[21:54:44] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:54:51] [WARNING] Cookie parameter 'sessionid' does not seem to be injectable
+
+[21:54:51] [WARNING] heuristic (basic) test shows that parameter 'User-Agent' might not be SQL injectable
+
+[21:55:25] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:55:42] [WARNING] parameter 'User-Agent' does not seem to be injectable
+
+[21:55:42] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be SQL injectable
+
+[21:56:17] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:56:34] [WARNING] parameter 'Referer' does not seem to be injectable
+
+[21:56:34] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+### POST /ingreso (sin sesion)
+
+[21:56:34] [WARNING] target URL content is not stable (i.e. content differs). sqlmap will base the page comparison on a sequence matcher. If no dynamic nor injectable parameters are detected, or in case of junk results, refer to user's manual paragraph 'Page comparison'
+
+[21:56:34] [CRITICAL] target URL content appears to be heavily dynamic. sqlmap is going to retry the request(s)
+
+[21:56:35] [INFO] POST parameter 'correo' appears to be dynamic
+
+[21:56:42] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:56:46] [WARNING] POST parameter 'correo' does not seem to be injectable
+
+[21:56:56] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:57:00] [WARNING] POST parameter 'contrasena' does not seem to be injectable
+
+[21:57:10] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:57:14] [WARNING] parameter 'User-Agent' does not seem to be injectable
+
+[21:57:24] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:57:29] [WARNING] parameter 'Referer' does not seem to be injectable
+
+[21:57:29] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. You can give it a go with the switch '--text-only' if the target page has a low percentage of textual content (~20.59% of page content is text). If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'
+### POST /solicitudes/nueva/RET (rrhh)
+
+[21:57:29] [WARNING] heuristic (basic) test shows that POST parameter 'fecha_efectiva' might not be SQL injectable
+
+[21:58:04] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:58:25] [WARNING] POST parameter 'fecha_efectiva' does not seem to be injectable
+
+[21:58:25] [WARNING] heuristic (basic) test shows that POST parameter 'documento_del_colaborador' might not be SQL injectable
+
+[21:58:59] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[21:59:19] [WARNING] POST parameter 'documento_del_colaborador' does not seem to be injectable
+
+[21:59:19] [WARNING] heuristic (basic) test shows that POST parameter 'subtipo_elegido' might not be SQL injectable
+
+[21:59:52] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[22:00:12] [WARNING] POST parameter 'subtipo_elegido' does not seem to be injectable
+
+[22:00:12] [WARNING] heuristic (basic) test shows that POST parameter 'motivo' might not be SQL injectable
+
+[22:00:52] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[22:01:17] [WARNING] POST parameter 'motivo' does not seem to be injectable
+
+[22:01:17] [WARNING] heuristic (basic) test shows that POST parameter 'justificacion' might not be SQL injectable
+
+[22:01:57] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[22:02:23] [WARNING] POST parameter 'justificacion' does not seem to be injectable
+
+[22:02:23] [WARNING] heuristic (basic) test shows that Cookie parameter 'sessionid' might not be SQL injectable
+
+[22:02:49] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[22:03:06] [WARNING] Cookie parameter 'sessionid' does not seem to be injectable
+
+[22:03:06] [WARNING] heuristic (basic) test shows that parameter 'User-Agent' might not be SQL injectable
+
+[22:03:45] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[22:04:10] [WARNING] parameter 'User-Agent' does not seem to be injectable
+
+[22:04:10] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be SQL injectable
+
+[22:04:50] [INFO] testing 'Microsoft SQL Server error-based - Stacking (RAISERROR)'
+
+[22:05:15] [WARNING] parameter 'Referer' does not seem to be injectable
+
+[22:05:15] [CRITICAL] all tested parameters do not appear to be injectable. Try to increase values for '--level'/'--risk' options if you wish to perform more tests. If you suspect that there is some kind of protection mechanism involved (e.g. WAF) maybe you could try to use option '--tamper' (e.g. '--tamper=space2comment') and/or switch '--random-agent'

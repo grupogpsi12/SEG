@@ -1,0 +1,18 @@
+..........................F...                                           [100%]
+=================================== FAILURES ===================================
+______ test_RF_16_la_prioridad_y_el_vencimiento_del_dominio_llegan_a_glpi ______
+
+glpi = (<jml.adaptadores.salida.glpi.cliente.SistemaDeTicketsGlpi object at 0x74bb8fe565d0>, <tests.dobles.glpi_real.TecnicoGlpiReal object at 0x74bb8fec45c0>)
+
+>   ???
+E   AssertionError: assert None == '2026-10-20 04:59:59'
+E    +  where '2026-10-20 04:59:59' = <built-in method strftime of datetime.datetime object at 0x74bb8fe55230>('%Y-%m-%d %H:%M:%S')
+E    +    where <built-in method strftime of datetime.datetime object at 0x74bb8fe55230> = datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc).strftime
+E    +      where datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc) = <built-in method astimezone of datetime.datetime object at 0x74bb8fe55230>(datetime.timezone.utc)
+E    +        where <built-in method astimezone of datetime.datetime object at 0x74bb8fe55230> = datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc).astimezone
+E    +          where datetime.datetime(2026, 10, 20, 4, 59, 59, tzinfo=datetime.timezone.utc) = TicketDeCola(solicitud_id='SOL-2026-000001', cola=<Cola.AD: 'AD'>, clase=<ClaseTicket.CIERRE_INMEDIATO: 'cierre_inmedi...l='Finanzas / Bogotá', fecha_efectiva=datetime.date(2026, 10, 19), solicitud='SOL-2026-000001'), adjunta_soporte=False).vence_en
+
+C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\tests\integracion\test_glpi_real.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integracion/test_glpi_real.py::test_RF_16_la_prioridad_y_el_vencimiento_del_dominio_llegan_a_glpi
+1 failed, 29 passed, 48 deselected in 25.45s

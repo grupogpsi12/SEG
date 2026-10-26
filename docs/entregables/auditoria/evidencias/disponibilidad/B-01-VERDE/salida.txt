@@ -1,0 +1,4 @@
+IP de web en la red app:  10.20.40.129
+IP de bunkerweb:          10.20.40.2
+RESULTADO: bunkerweb ARRANCO con su IP fija
+IP de confianza declarada: JML_PROXIES_CONFIABLES: "10.20.40.2"

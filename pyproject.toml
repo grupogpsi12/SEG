@@ -67,6 +67,9 @@ skip_covered = true
 line-length = 100
 target-version = "py312"
 src = ["src", "tests"]
+# Copias generadas de scripts (la entrega) y material ajeno: el original ya se revisa en su carpeta.
+force-exclude = true
+extend-exclude = ["docs/entregables", "pruebas anteriores", ".contrato-tmp"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT", "S"]  # S: bandit en ruff (D-08)

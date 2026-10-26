@@ -1,0 +1,13 @@
+== flujos reales de RET y EMG contra GLPI 11 (con el centinela en el campo restringido)
+..                                                                       [100%]
+2 passed, 76 deselected in 7.58s
+== análisis
+tramas capturadas: 31240
+peticiones HTTP hacia GLPI (método y ruta):      40 GET	/apirest.php/Ticket;     20 GET	/apirest.php/SoftwareLicense;     20 GET	/apirest.php/Computer;     12 POST	/apirest.php/Ticket;     12 GET	/apirest.php/ITILCategory;      9 POST	/apirest.php/ITILSolution;
+T7  tramas con el centinela «SENTINELA-RESTRINGIDA-9f3a» (esperado 0): 0
+N-1 peticiones con App-Token en claro: 382
+N-1 peticiones con Session-Token en claro: 378
+N-1 peticiones con el user_token en la cabecera Authorization: 4
+V-04 tramas GLPI↔MariaDB (puerto 3306): 30133 · con TLS: 0
+V-04 consultas SQL legibles en claro (protocolo mysql): 11051
+ASERCION T7 CUMPLIDA: 0 tramas con el centinela

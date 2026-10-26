@@ -1,0 +1,28 @@
+== sqlmap nivel 3 contra la aplicacion sembrada (debe decir que es vulnerable)
+[03:57:04] [INFO] GET parameter 'id' appears to be dynamic
+[03:57:04] [INFO] heuristic (basic) test shows that GET parameter 'id' might be SQL injectable
+[03:57:04] [INFO] GET parameter 'id' appears to be 'AND boolean-based blind - WHERE or HAVING clause' injectable (with --string="ana")
+[03:57:04] [INFO] heuristic (extended) test shows that the back-end DBMS could be 'SQLite' 
+it looks like the back-end DBMS is 'SQLite'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+[03:57:04] [INFO] GET parameter 'id' is 'SQLite >= 3.9 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (JSON path)' injectable 
+[03:57:07] [INFO] GET parameter 'id' appears to be 'SQLite > 2.0 AND time-based blind (heavy query)' injectable 
+[03:57:07] [INFO] 'ORDER BY' technique appears to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+[03:57:07] [INFO] GET parameter 'id' is 'Generic UNION query (NULL) - 1 to 20 columns' injectable
+GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
+[03:57:07] [INFO] the back-end DBMS is SQLite
+back-end DBMS: SQLite
+OK    sqlmap ve la inyeccion SQL sembrada
+== ZAP baseline (pasivo) contra la aplicacion sembrada
+WARN-NEW: Missing Anti-clickjacking Header [10020] x 5 
+WARN-NEW: X-Content-Type-Options Header Missing [10021] x 5 
+WARN-NEW: Server Leaks Version Information via "Server" HTTP Response Header Field [10036] x 5 
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 5 
+WARN-NEW: Storable and Cacheable Content [10049] x 5 
+WARN-NEW: Permissions Policy Header Not Set [10063] x 5 
+OK    ZAP baseline reporta 8 alertas (cabeceras ausentes)
+== ZAP activo, 3 minutos como maximo (debe ver el XSS reflejado o la inyeccion SQL)
+WARN-NEW: Cross Site Scripting (Reflected) [40012] x 1 
+WARN-NEW: SQL Injection - SQLite [40018] x 1 
+WARN-NEW: Cross Site Scripting (DOM Based) [40026] x 1 
+OK    ZAP activo ve el XSS o la inyeccion sembrados
+CONTROL POSITIVO DINAMICO: sqlmap y ZAP ven lo sembrado

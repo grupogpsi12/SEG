@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe auditoria/scripts/defecto-sembrado.py F5-sin-decorador-de-rol

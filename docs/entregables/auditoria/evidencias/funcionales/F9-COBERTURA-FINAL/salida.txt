@@ -1,0 +1,22 @@
+SKIPPED [1] tests\bdd\test_borde.py:175: S-38 [PENDIENTE: F7] captura de tráfico con tshark (N-1)
+SKIPPED [1] tests\bdd\test_supabase_aislada.py:82: S-38 [PENDIENTE: F7] petición a la Data API del proyecto de desarrollo
+XFAIL tests/escenarios/test_anexo_a.py::test_tabla_IV_el_auditor_lee_solicitudes_sin_campos_restringidos - S-39 (B-26): el SRS dice que el Auditor lee solicitudes sin campos restringidos y la aplicacion responde 404
+2574 passed, 2 skipped, 1 xfailed in 128.76s (0:02:08)
+
+16 files skipped due to complete coverage.
+
+10 files skipped due to complete coverage.
+grupo                                      ramas  ramas %        líneas  comb. %
+dominio                                  303/310    97.74     1451/1454    99.43
+aplicacion                               220/232    94.83     1317/1326    98.65
+adaptadores                              380/406     93.6     2295/2343    97.31
+TOTAL                                    903/948    95.25     5063/5123    98.27
+seguridad:ingreso                          58/58    100.0       282/282    100.0
+seguridad:permisos                         32/32    100.0       103/103    100.0
+seguridad:auditoria                        30/30    100.0       138/138    100.0
+seguridad:soportes                         16/16    100.0         73/73    100.0
+seguridad:filtro-de-logs                   14/14    100.0         39/39    100.0
+seguridad:csv-y-vistas-tecnicas              8/8    100.0         92/92    100.0
+seguridad:middleware                         6/6    100.0         53/53    100.0
+
+Por debajo de la meta: ninguno

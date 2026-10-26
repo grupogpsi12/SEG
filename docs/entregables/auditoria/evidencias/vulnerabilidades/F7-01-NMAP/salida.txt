@@ -1,0 +1,19 @@
+### red jml_app (10.20.40.0/24 · interna=false)
+  jml-bunkerweb-1 10.20.40.2: 5000/upnp 8080/http-proxy 8443/https-alt 
+  jml-web-1 10.20.40.129: 8000/http-alt 
+  jml-glpi-1 10.20.40.130: 80/http 
+  jml-worker-1 10.20.40.131: ninguno
+### red jml_bw-universe (10.20.30.0/24 · interna=false)
+  jml-bunkerweb-1 10.20.30.2: 5000/upnp 8080/http-proxy 8443/https-alt 
+  jml-bw-scheduler-1 10.20.30.3: ninguno
+### red jml_db_net (172.20.0.0/16 · interna=true)
+  jml-glpi-1 172.20.0.3: 80/http 
+  jml-mariadb-1 172.20.0.2: 3306/mysql 
+### red jml_pg_net (172.18.0.0/16 · interna=true)
+  jml-web-1 172.18.0.3: 8000/http-alt 
+  jml-worker-1 172.18.0.4: ninguno
+  jml-postgres-1 172.18.0.2: 5432/postgresql 
+### red jml_waf-logs (172.19.0.0/16 · interna=false)
+  jml-fluent-bit-1 172.19.0.2: 24224/ 
+  jml-grafana-1 172.19.0.4: 3000/ppp 
+  jml-loki-1 172.19.0.3: 3100/opcon-xps 9096/ 

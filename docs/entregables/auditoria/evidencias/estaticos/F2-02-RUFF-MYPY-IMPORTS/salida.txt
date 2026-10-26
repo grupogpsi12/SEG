@@ -1,0 +1,41 @@
+E501 Line too long (102 > 100)
+   --> src\jml\adaptadores\salida\glpi\cliente.py:274:101
+    |
+272 |         )
+273 |         # GLPI responde 200 aunque rechace el cambio (p. ej. vencimiento anterior a la apertura):
+274 |         # el resultado va por item, `[{"<id>": false, "message": ...}]` (B-17); sin copiar el mensaje.
+    |                                                                                                     ^^
+275 |         if isinstance(respuesta, list) and any(
+276 |             isinstance(r, dict) and r.get(id_ticket) is False for r in respuesta
+    |
+
+Found 1 error.
+ruff=1
+241 files already formatted
+format=0
+Success: no issues found in 90 source files
+mypy=0
+
+╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
+╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
+ ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
+ ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
+╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
+╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
+  └──▶║║                    ▲ 
+      ╚╝────────────────────┘
+
+
+---------
+Contracts
+---------
+
+Analyzed 117 files, 499 dependencies.
+-------------------------------------
+
+dominio solo importa la biblioteca estandar (CA-17) KEPT
+aplicacion solo importa dominio (CA-17) KEPT
+capas del nucleo KEPT
+
+Contracts: 3 kept, 0 broken.
+imports=0

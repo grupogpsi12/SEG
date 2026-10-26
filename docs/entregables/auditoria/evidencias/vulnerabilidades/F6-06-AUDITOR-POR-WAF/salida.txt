@@ -1,0 +1,14 @@
+filas antes (auditoria/solicitud/ticket/colaborador): 410/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== ritmo humano: cinco verificaciones, una cada 12 segundos
+   verificación 1: [200, 200, 200]
+   verificación 2: [200, 200, 200]
+   verificación 3: [200, 200, 200]
+   verificación 4: [200, 200, 200]
+   verificación 5: [200, 200, 200]
+== ritmo de guion: doce verificaciones seguidas, sin pausa
+   códigos: [200, 429] · 429: 11 de 14
+RESULTADO humano sin 429 y todo 200: True · guion con 429: True
+filas despues (auditoria/solicitud/ticket/colaborador): 410/21/88/75
+web: healthy · worker: running

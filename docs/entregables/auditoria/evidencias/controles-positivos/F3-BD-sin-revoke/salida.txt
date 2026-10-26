@@ -1,0 +1,6 @@
+[BD-sin-revoke] sin defecto:
+    18 passed, 267 deselected in 0.95s
+[BD-sin-revoke] con el defecto sembrado en src/jml/adaptadores/salida/persistencia/migrations/0004_permisos_minimos_de_app_backend.py:
+    1 failed, 267 deselected in 0.70s
+[BD-sin-revoke] archivo restaurado: True
+[BD-sin-revoke] DETECTADO: verde sin defecto, rojo con él

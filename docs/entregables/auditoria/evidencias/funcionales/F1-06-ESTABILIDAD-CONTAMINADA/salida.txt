@@ -1,0 +1,22 @@
+corrida 1/20: 1632 passed in 45.17s
+corrida 2/20: 1632 passed in 47.84s
+corrida 3/20: 1632 passed in 47.43s
+corrida 4/20: 1632 passed in 45.70s
+corrida 5/20: 1632 passed in 45.94s
+corrida 6/20: 1632 passed in 45.89s
+corrida 7/20: 1632 passed in 49.87s
+corrida 8/20: 1632 passed in 45.51s
+corrida 9/20: 1632 passed in 44.78s
+corrida 10/20: 1 failed, 1632 passed in 45.80s
+  corrida 10: FAILED tests/aplicacion/test_defensas.py::test_B_19_un_error_que_no_es_de_dominio_tampoco_detiene_la_sincronizacion_de_las_demas
+corrida 11/20: 1633 passed in 44.83s
+corrida 12/20: 1634 passed in 45.19s
+corrida 13/20: 1634 passed in 44.84s
+corrida 14/20: 1634 passed in 45.44s
+corrida 15/20: 1634 passed in 45.50s
+corrida 16/20: 1634 passed in 45.68s
+corrida 17/20: 1634 passed in 44.60s
+corrida 18/20: 1634 passed in 45.33s
+corrida 19/20: 1634 passed in 45.72s
+corrida 20/20: 1634 passed in 44.33s
+corridas con fallos: 1 de 20

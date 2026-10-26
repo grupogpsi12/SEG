@@ -1,0 +1,87 @@
+⠇ 2199/2226  🎉 1710 🫥 153  ⏰ 0  🤔 0  🙁 336  🔇 0  🧙 0
+⠏ 2200/2226  🎉 1711 🫥 153  ⏰ 0  🤔 0  🙁 336  🔇 0  🧙 0
+⠋ 2201/2226  🎉 1712 🫥 153  ⏰ 0  🤔 0  🙁 336  🔇 0  🧙 0
+⠙ 2202/2226  🎉 1712 🫥 153  ⏰ 0  🤔 0  🙁 337  🔇 0  🧙 0
+⠹ 2203/2226  🎉 1712 🫥 153  ⏰ 0  🤔 0  🙁 338  🔇 0  🧙 0
+⠸ 2204/2226  🎉 1713 🫥 153  ⏰ 0  🤔 0  🙁 338  🔇 0  🧙 0
+⠼ 2205/2226  🎉 1713 🫥 153  ⏰ 0  🤔 0  🙁 339  🔇 0  🧙 0
+⠴ 2206/2226  🎉 1713 🫥 153  ⏰ 0  🤔 0  🙁 340  🔇 0  🧙 0
+⠦ 2207/2226  🎉 1713 🫥 153  ⏰ 0  🤔 0  🙁 341  🔇 0  🧙 0
+⠧ 2208/2226  🎉 1713 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠇ 2209/2226  🎉 1714 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠏ 2210/2226  🎉 1715 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠋ 2211/2226  🎉 1716 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠙ 2212/2226  🎉 1717 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠹ 2213/2226  🎉 1718 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠸ 2214/2226  🎉 1719 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠼ 2215/2226  🎉 1720 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠴ 2216/2226  🎉 1721 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠦ 2217/2226  🎉 1722 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠧ 2218/2226  🎉 1723 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠇ 2219/2226  🎉 1724 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠏ 2220/2226  🎉 1725 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠋ 2221/2226  🎉 1726 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+⠙ 2226/2226  🎉 1731 🫥 153  ⏰ 0  🤔 0  🙁 342  🔇 0  🧙 0
+2.95 mutations/second
+342
+/w/.venv/lib/python3.12/site-packages/mutmut/configuration.py:143: UserWarning: The config paths_to_mutate is deprecated. Please rename it to source_paths
+  warnings.warn("The config paths_to_mutate is deprecated. Please rename it to source_paths")
+/w/.venv/lib/python3.12/site-packages/mutmut/configuration.py:152: UserWarning: The config tests_dir is deprecated. Please add the path to pytest_add_cli_args_test_selection instead
+  warnings.warn(
+    jml.aplicacion.bandeja.x_espera_de_reintento__mutmut_3: survived
+    jml.aplicacion.bandeja.x_espera_de_reintento__mutmut_4: survived
+    jml.aplicacion.bandeja.x_espera_de_reintento__mutmut_7: survived
+    jml.aplicacion.bandeja.x_espera_de_reintento__mutmut_8: survived
+    jml.aplicacion.bandeja.x_espera_de_reintento__mutmut_9: survived
+    jml.aplicacion.bandeja.x_espera_de_reintento__mutmut_10: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁnueva__mutmut_11: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁnueva__mutmut_13: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁnueva__mutmut_14: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁnueva__mutmut_15: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁenviada__mutmut_5: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_7: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_8: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_11: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_12: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_23: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_25: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_26: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁfallo__mutmut_27: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_3: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_7: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_8: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_9: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_10: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_12: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_14: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_15: survived
+    jml.aplicacion.bandeja.xǁEntradaDeBandejaǁreiniciada__mutmut_16: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_3: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_4: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_7: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_8: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_9: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_10: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_15: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_16: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_19: survived
+    jml.aplicacion.dtos.xǁFiltroDeCuentasǁ__post_init____mutmut_20: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_6: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_7: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_10: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_11: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_12: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_13: survived
+    jml.aplicacion.casos.administracion.x__administrador__mutmut_14: survived
+    jml.aplicacion.casos.administracion.x__texto_de_roles__mutmut_5: survived
+    jml.aplicacion.casos.administracion.xǁGuardarPerfilǁejecutar__mutmut_25: survived
+    jml.aplicacion.casos.administracion.xǁConsultarUsuariosǁejecutar__mutmut_7: survived
+    jml.aplicacion.casos.administracion.xǁConsultarUsuariosǁejecutar__mutmut_25: survived
+    jml.aplicacion.casos.administracion.xǁConsultarUsuariosǁejecutar__mutmut_27: survived
+    jml.aplicacion.casos.administracion.xǁConsultarUsuariosǁejecutar__mutmut_28: survived
+    jml.aplicacion.casos.administracion.xǁCambiarRolesǁejecutar__mutmut_7: survived
+    jml.aplicacion.casos.administracion.xǁCambiarRolesǁejecutar__mutmut_8: survived
+    jml.aplicacion.casos.administracion.xǁCambiarRolesǁejecutar__mutmut_9: survived
+    jml.aplicacion.casos.administracion.xǁCambiarRolesǁejecutar__mutmut_16: survived
+    jml.aplicacion.casos.administracion.xǁCambiarRolesǁejecutar__mutmut_17: survived
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.

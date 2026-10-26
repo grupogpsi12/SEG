@@ -1,0 +1,4 @@
+PERFIL ACTIVO: JML - servicio | interfaz: central | id: 9
+{'ticket': 'RUCDP', 'document': 'RUC', 'user': 'RUC', 'profile': '-', 'config': '-', 'itilcategory': 'R', 'group': 'R', 'computer': 'R', 'software': 'R', 'rule_ticket': '-', 'entity': 'R', 'backup': '-', 'logs': '-', 'reservation': '-', 'knowbase': '-', 'problem': '-', 'change': '-', 'queuednotification': '-', 'notification': '-'}
+TOTAL permisos distintos de cero: 14 de 122
+PERFILES DISPONIBLES PARA LA CUENTA: ['JML - servicio', 'Self-Service']

@@ -1,0 +1,244 @@
+...F...                                                                  [100%]
+================================== FAILURES ===================================
+___ test_U01_si_supabase_cae_entre_la_contrasena_y_el_codigo_no_hay_sesion ____
+
+request = <WSGIRequest: GET '/ingreso/segundo-factor'>
+
+    @never_cache
+    @require_http_methods(["GET", "POST"])
+    def segundo_factor(request: HttpRequest) -> HttpResponse:
+        desafio = request.session.get(SESION_DESAFIO)
+        if not isinstance(desafio, str):
+            return redirect("ingreso")
+        casos = composicion.casos()
+        formulario = FormularioDeCodigo(request.POST or None)
+        secreto = ***enmascarado***
+        if request.method == "POST" and formulario.is_valid():
+            try:
+                usuario_id = casos.completar_ingreso.ejecutar(
+                    desafio,
+                    formulario.cleaned_data["codigo"],
+                    str(request.session.get(SESION_CANDIDATO, "-")),
+                )
+            except CredencialesInvalidas:
+                formulario.add_error(None, ERROR_CODIGO)
+            except NoAutorizado:
+                request.session.flush()
+                return render(
+                    request,
+                    "web/ingreso.html",
+                    {"formulario": FormularioDeIngreso(), "error": ERROR_ACCESO},
+                    status=403,
+                )
+            except IdentidadNoDisponible:
+                registro.exception("Supabase Auth no respondio al verificar el TOTP")
+                formulario.add_error(None, ERROR_SERVICIO)
+            else:
+                request.session.cycle_key()
+                for clave in (SESION_DESAFIO, SESION_INSCRIBIR, SESION_CANDIDATO):
+                    request.session.pop(clave, None)
+                request.session[SESION_USUARIO] = usuario_id
+                request.session[SESION_INICIO] = composicion.reloj().ahora().timestamp()
+                return redirect("inicio")
+        elif request.method == "GET" and request.session.get(SESION_INSCRIBIR):
+            try:
+>               secreto = ***enmascarado***
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src\jml\adaptadores\entrada\web\ingreso.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\jml\aplicacion\casos\ingreso.py:56: in ejecutar
+    return self._proveedor.inscribir_totp(desafio_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\jml\adaptadores\salida\identidad\supabase.py:167: in inscribir_totp
+    self._borrar_no_verificados(p.token_aal1)
+src\jml\adaptadores\salida\identidad\supabase.py:183: in _borrar_no_verificados
+    r = self._pedir("GET", "/user", token)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <jml.adaptadores.salida.identidad.supabase.ProveedorSupabase object at 0x0000020E94A919D0>
+metodo = 'GET', ruta = '/user'
+token = '***enmascarado***'
+cuerpo = None
+
+    def _pedir(
+        self, metodo: str, ruta: str, token: str | None = None, cuerpo: object = None
+    ) -> httpx.Response:
+        cabeceras = {"apikey": ***enmascarado***
+        if token is not None:
+            cabeceras["Authorization"] = f"Bearer {token}"
+        try:
+            r = self._http.request(metodo, self._base + ruta, headers=cabeceras, json=cuerpo)
+        except httpx.HTTPError as e:
+            raise IdentidadNoDisponible(type(e).__name__) from None
+        if r.status_code >= 500 or r.status_code == 429:
+>           raise IdentidadNoDisponible(f"HTTP {r.status_code}")
+E           jml.aplicacion.puertos.IdentidadNoDisponible: HTTP 503
+
+src\jml\adaptadores\salida\identidad\supabase.py:89: IdentidadNoDisponible
+
+During handling of the above exception, another exception occurred:
+
+web = GoTrueSimulado(usuarios={'maria.gomez@andina.example': _Usuario(id='u-col', correo='maria.gomez@andina.example', contr...52d8d9e': ('u-col', 'aal1')}, llamadas=['POST /auth/v1/token', 'GET /auth/v1/user'], caido=True, respuesta_aal2='aal2')
+
+    @pytest.mark.django_db
+    def test_U01_si_supabase_cae_entre_la_contrasena_y_el_codigo_no_hay_sesion(
+        web: GoTrueSimulado,
+    ) -> None:
+        c = Client()
+        c.post("/ingreso", {"correo": CORREO, "contrasena": ***enmascarado***
+        web.caido = True
+>       r = c.get("/ingreso/segundo-factor")  # intenta inscribir el TOTP
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\seguridad\test_segundo_factor.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\django\test\client.py:1127: in get
+    response = super().get(
+.venv\Lib\site-packages\django\test\client.py:475: in get
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\views\decorators\cache.py:80: in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\views\decorators\http.py:64: in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\jml\adaptadores\entrada\web\ingreso.py:136: in segundo_factor
+    formulario.add_error(None, ERROR_SERVICIO)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <FormularioDeCodigo bound=False, valid=False, fields=(codigo)>
+field = '__all__'
+error = {'__all__': [ValidationError(['El servicio de ingreso no está disponible. Intente de nuevo en unos minutos.'])]}
+
+    def add_error(self, field, error):
+        """
+        Update the content of `self._errors`.
+    
+        The `field` argument is the name of the field to which the errors
+        should be added. If it's None, treat the errors as NON_FIELD_ERRORS.
+    
+        The `error` argument can be a single error, a list of errors, or a
+        dictionary that maps field names to lists of errors. An "error" can be
+        either a simple string or an instance of ValidationError with its
+        message attribute set and a "list or dictionary" can be an actual
+        `list` or `dict` or an instance of ValidationError with its
+        `error_list` or `error_dict` attribute set.
+    
+        If `error` is a dictionary, the `field` argument *must* be None and
+        errors will be added to the fields that correspond to the keys of the
+        dictionary.
+        """
+        if not isinstance(error, ValidationError):
+            # Normalize to ValidationError and let its constructor
+            # do the hard work of making sense of the input.
+            error = ValidationError(error)
+    
+        if hasattr(error, "error_dict"):
+            if field is not None:
+                raise TypeError(
+                    "The argument `field` must be `None` when the `error` "
+                    "argument contains errors for multiple fields."
+                )
+            else:
+                error = error.error_dict
+        else:
+            error = {field or NON_FIELD_ERRORS: error.error_list}
+    
+        for field, error_list in error.items():
+            if field not in self.errors:
+                if field != NON_FIELD_ERRORS and field not in self.fields:
+                    raise ValueError(
+                        "'%s' has no field named '%s'."
+                        % (self.__class__.__name__, field)
+                    )
+                if field == NON_FIELD_ERRORS:
+                    self._errors[field] = self.error_class(
+                        error_class="nonfield", renderer=self.renderer
+                    )
+                else:
+                    self._errors[field] = self.error_class(
+                        renderer=self.renderer,
+                        field_id=self[field].auto_id,
+                    )
+            self._errors[field].extend(error_list)
+>           if field in self.cleaned_data:
+                        ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FormularioDeCodigo' object has no attribute 'cleaned_data'. Did you mean: 'changed_data'?
+
+.venv\Lib\site-packages\django\forms\forms.py:315: AttributeError
+---------------------------- Captured stderr call -----------------------------
+{"fecha": "2026-10-25T03:19:43.864797Z", "nivel": "ERROR", "logger": "jml.adaptadores.entrada.web.ingreso", "mensaje": "Supabase Auth no respondio al inscribir el TOTP", "correlation_id": "2db51be41b36490abb51c21577d3feec", "excepcion": "Traceback (most recent call last):\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\entrada\\web\\ingreso.py\", line 130, in segundo_factor\n    secreto = ***enmascarado***                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\aplicacion\\casos\\ingreso.py\", line 56, in ejecutar\n    return self._proveedor.inscribir_totp(desafio_id)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\salida\\identidad\\supabase.py\", line 167, in inscribir_totp\n    self._borrar_no_verificados(p.token_aal1)\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\salida\\identidad\\supabase.py\", line 183, in _borrar_no_verificados\n    r = self._pedir(\"GET\", \"/user\", token)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\salida\\identidad\\supabase.py\", line 89, in _pedir\n    raise IdentidadNoDisponible(f\"HTTP {r.status_code}\")\njml.aplicacion.puertos.IdentidadNoDisponible: HTTP 503"}
+{"fecha": "2026-10-25T03:19:43.864797Z", "nivel": "ERROR", "logger": "django.request", "mensaje": "Internal Server Error: /ingreso/segundo-factor", "correlation_id": "2db51be41b36490abb51c21577d3feec", "status_code": 500, "request": "<WSGIRequest: GET '/ingreso/segundo-factor'>", "excepcion": "Traceback (most recent call last):\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\entrada\\web\\ingreso.py\", line 130, in segundo_factor\n    secreto = ***enmascarado***                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\aplicacion\\casos\\ingreso.py\", line 56, in ejecutar\n    return self._proveedor.inscribir_totp(desafio_id)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\salida\\identidad\\supabase.py\", line 167, in inscribir_totp\n    self._borrar_no_verificados(p.token_aal1)\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\salida\\identidad\\supabase.py\", line 183, in _borrar_no_verificados\n    r = self._pedir(\"GET\", \"/user\", token)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\salida\\identidad\\supabase.py\", line 89, in _pedir\n    raise IdentidadNoDisponible(f\"HTTP {r.status_code}\")\njml.aplicacion.puertos.IdentidadNoDisponible: HTTP 503\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py\", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py\", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\.venv\\Lib\\site-packages\\django\\views\\decorators\\cache.py\", line 80, in _view_wrapper\n    response = view_func(request, *args, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\.venv\\Lib\\site-packages\\django\\views\\decorators\\http.py\", line 64, in inner\n    return func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\src\\jml\\adaptadores\\entrada\\web\\ingreso.py\", line 136, in segundo_factor\n    formulario.add_error(None, ERROR_SERVICIO)\n  File \"C:\\Users\\Usuario 1\\Downloads\\proyecto-artefactos-v2.3\\.venv\\Lib\\site-packages\\django\\forms\\forms.py\", line 315, in add_error\n    if field in self.cleaned_data:\n                ^^^^^^^^^^^^^^^^^\nAttributeError: 'FormularioDeCodigo' object has no attribute 'cleaned_data'. Did you mean: 'changed_data'?"}
+------------------------------ Captured log call ------------------------------
+ERROR    jml.adaptadores.entrada.web.ingreso:ingreso.py:135 Supabase Auth no respondio al inscribir el TOTP
+Traceback (most recent call last):
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\entrada\web\ingreso.py", line 130, in segundo_factor
+    secreto = ***enmascarado***
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\aplicacion\casos\ingreso.py", line 56, in ejecutar
+    return self._proveedor.inscribir_totp(desafio_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\salida\identidad\supabase.py", line 167, in inscribir_totp
+    self._borrar_no_verificados(p.token_aal1)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\salida\identidad\supabase.py", line 183, in _borrar_no_verificados
+    r = self._pedir("GET", "/user", token)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\salida\identidad\supabase.py", line 89, in _pedir
+    raise IdentidadNoDisponible(f"HTTP {r.status_code}")
+jml.aplicacion.puertos.IdentidadNoDisponible: HTTP 503
+ERROR    django.request:log.py:253 Internal Server Error: /ingreso/segundo-factor
+Traceback (most recent call last):
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\entrada\web\ingreso.py", line 130, in segundo_factor
+    secreto = ***enmascarado***
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\aplicacion\casos\ingreso.py", line 56, in ejecutar
+    return self._proveedor.inscribir_totp(desafio_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\salida\identidad\supabase.py", line 167, in inscribir_totp
+    self._borrar_no_verificados(p.token_aal1)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\salida\identidad\supabase.py", line 183, in _borrar_no_verificados
+    r = self._pedir("GET", "/user", token)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\salida\identidad\supabase.py", line 89, in _pedir
+    raise IdentidadNoDisponible(f"HTTP {r.status_code}")
+jml.aplicacion.puertos.IdentidadNoDisponible: HTTP 503
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\src\jml\adaptadores\entrada\web\ingreso.py", line 136, in segundo_factor
+    formulario.add_error(None, ERROR_SERVICIO)
+  File "C:\Users\Usuario 1\Downloads\proyecto-artefactos-v2.3\.venv\Lib\site-packages\django\forms\forms.py", line 315, in add_error
+    if field in self.cleaned_data:
+                ^^^^^^^^^^^^^^^^^
+AttributeError: 'FormularioDeCodigo' object has no attribute 'cleaned_data'. Did you mean: 'changed_data'?
+=========================== short test summary info ===========================
+FAILED tests/seguridad/test_segundo_factor.py::test_U01_si_supabase_cae_entre_la_contrasena_y_el_codigo_no_hay_sesion
+1 failed, 6 passed in 0.67s

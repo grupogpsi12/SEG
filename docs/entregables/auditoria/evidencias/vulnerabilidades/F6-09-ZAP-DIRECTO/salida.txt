@@ -1,0 +1,23 @@
+filas antes (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== aplicacion directa en 10.20.40.129:8000 (Host app.localhost, sin WAF)
+   control: GET /ingreso -> 000
+== ZAP activo DIRECTO, autenticado como rrhh (hasta 8 minutos)
+WARN-NEW: HTTP Only Site [10106] x 1 
+WARN-NEW: Cross-Origin-Resource-Policy Header Missing or Invalid [90004] x 11 
+WARN-NEW: Cookie Slack Detector [90027] x 12 
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 5	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 138
+== ZAP activo DIRECTO, autenticado como tecnico (hasta 8 minutos)
+WARN-NEW: Path Traversal [6] x 1 
+WARN-NEW: Cross-Origin-Resource-Policy Header Missing or Invalid [90004] x 11 
+WARN-NEW: Cookie Slack Detector [90027] x 7 
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 6	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 137
+== resumen de alertas de ZAP (riesgo: cantidad)
+   directo-rrhh.json:       6 Informational       5 Low       1 Medium 
+   directo-tecnico.json:       1 High       6 Informational       5 Low       1 Medium 
+== cadena de auditoria despues de la corrida (antes de restaurar)
+registros: 603 · valida: True · primer afectado: None
+== neutralizar al terminar
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+web: healthy · worker: running

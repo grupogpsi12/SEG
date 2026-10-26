@@ -121,16 +121,28 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | F8-04 | Propuestas de ADR: N-1…N-5 al SRS §7, refresco de imágenes, TLS interno hacia GLPI, RNF-11 (B-12) | ADR redactados; el SRS sube de versión si cambia | F8-03 | ✔ 10 propuestas de ADR en `auditoria/propuestas-adr.md` (red dedicada worker↔GLPI, refresco de imágenes, MariaDB, N-1..N-5 al SRS con RS-19 y RNF-11, firma del JWT, un solo proceso, Auditor, reportería, denegaciones). Siguen como propuesta hasta que el equipo las acepte |
 | F8-05 | `asvs-l2.csv` desde el CSV oficial de ASVS 5.0 (nivel 2) | Ningún requisito L2 aplicable sin prueba o sin «no aplica» justificado | F8-03 | ◐ 253 requisitos L1/L2: 144 verificados, 36 parciales, 19 pendientes, 54 no aplican (72,4 % de los aplicables; el resto lo cierra F7 y las decisiones B-10, B-28). Clasificación por sección: revisión del 10 % [PENDIENTE: segunda persona] |
 
+## Adicionales del 25/10/2026: la Entrega 3 y el Excel del Anexo A
+
+| ID | Tarea | Criterio | Estado |
+|---|---|---|---|
+| X-01 | Repetir lo repetible de `pruebas anteriores/` (bases, Nikto, Docker Bench, capturas de `bunkerweb` y `postgres`) | Mismas conclusiones o hallazgo nuevo | ✔ bases idénticas; Nikto igual (truncado por el WAF); Docker Bench: B-33; capturas: B-32 confirmado y un matiz del enlace de parámetros |
+| X-02 | ZAP activo directo a Django, sin WAF (plan §9: «ZAP en las dos posiciones») | 0 FAIL y cadena de auditoría válida | ✔ RRHH 0 FAIL, 5 WARN, 138 PASS · técnico 0 FAIL, 6 WARN, 137 PASS · cadena válida (603 registros) (F6-09-ZAP-DIRECTO) |
+| X-03 | Reproducir a mano la alerta «Path Traversal» de ZAP | 0 contenido de `/etc/passwd` y 0 trazas | ✔ siete valores, falso positivo confirmado (F6-10-REPRO-PATH-TRAVERSAL) |
+| X-04 | CA-21: un ataque aparece clasificado `waf` en Loki en menos de 2 minutos | < 120 s | ✔ en el mismo segundo del bloqueo (CA-21-REPORTERIA-WAF); lo de Blob es de Azure |
+| X-05 | Verificar las 18 hojas del Excel «AnexoA. Tablas.xlsx» | Cada fila contrastada con el SRS y con el sistema | ✔ 157 filas: 138 cumplen, 9 parciales, 10 no verificables en local, 0 fallan (`verificacion-anexo-a-excel.md`); salieron B-34 (corregido) y B-35 |
+| X-06 | Repetir el recorrido por navegador y medir el limitador | 4 de 4 | ◐ 4 de 4 la primera vez y 3 de 4 las dos siguientes por un 429 del WAF: **B-36** (decisión del equipo) |
+| X-07 | Cobertura de ramas sobre el árbol final | dominio ≥ 95 %, aplicación ≥ 90 % | ✔ 97,74 % y 94,83 %; siete módulos de seguridad al 100 % (F9-COBERTURA-FINAL) |
+
 ## F9 — Empaquetado y informes
 
 | ID | Tarea | Criterio | Depende | Estado |
 |---|---|---|---|---|
-| F9-01 | Carpeta `docs/entregables/auditoria/` con los cinco documentos en `.md` | Estructura del §15 completa | F8 | ○ |
-| F9-02 | PDF por guion con `reportlab` y `pillow` (justificar en `tasks/todo.md`) | Los 5 PDF se regeneran con un comando | F9-01 | ○ |
-| F9-03 | `manifiesto.sha256`, enmascarado y `gitleaks` sobre la carpeta | El manifiesto cuadra y `gitleaks` limpio | F9-01 | ○ |
-| F9-04 | `verificar-entrega.py` | Falla ante un marcador, un CA sin evidencia o un hash que no cuadra; pasa sobre la entrega | F9-03 | ○ |
+| F9-01 | Carpeta `docs/entregables/auditoria/` con los cinco documentos en `.md` | Estructura del §15 completa | F8 | ✔ `docs/entregables/auditoria/` generada por `auditoria/scripts/generar-entrega.py` con los cinco informes en `.md`, las evidencias por tipo, los hallazgos, los scripts y los anexos |
+| F9-02 | PDF por guion con `reportlab` y `pillow` (justificar en `tasks/todo.md`) | Los 5 PDF se regeneran con un comando | F9-01 | ✔ los cinco PDF se regeneran con el mismo comando (reportlab 5.0.1 y pillow 12.3.0; el gráfico de hallazgos lo dibuja pillow) |
+| F9-03 | `manifiesto.sha256`, enmascarado y `gitleaks` sobre la carpeta | El manifiesto cuadra y `gitleaks` limpio | F9-01 | ✔ `manifiesto.sha256` con el hash de cada archivo de la entrega; `gitleaks` v8.30.1 sobre la carpeta: «no leaks found» en 6,30 MB; los `.pcap` no viajan |
+| F9-04 | `verificar-entrega.py` | Falla ante un marcador, un CA sin evidencia o un hash que no cuadra; pasa sobre la entrega | F9-03 | ✔ `verificar-entrega.py` rechazó la primera entrega (dos criterios de aceptación citaban una evidencia en la carpeta equivocada) y la aprobó tras corregirlas: marcadores, criterios con evidencia, hashes, cifras de `metricas.json`, PDF y corridas con fallos |
 | F9-05 | Remedir el rendimiento con `carga.sh` | p95 < 800 ms por página y dashboard < 2 s tras todas las correcciones | F8 | ✔ RNF-06 remedido con `carga.sh` (300 colaboradores, 20 usuarios, 20 vueltas, 1440 peticiones, 0 errores): p95 por página entre 466 y 649 ms (< 800) y dashboard 786 ms (< 2 s); documentado 791 ms. Dos corridas más dieron lo mismo (≤ 678 ms; dashboard 789 y 806 ms). Una corrida de **10 vueltas** dio 6 de 9 páginas sobre 800 ms (hasta 1126 ms): se conserva como `F9-05-RENDIMIENTO-10V-NO-CUMPLE`; la medición documentada usa 20 vueltas (F9-05-RENDIMIENTO-20V) |
-| F9-06 | **G0 a G5** en verde, seis defectos detectados, trazabilidad al 100 % de T1–T21 y N-1–N-5, 0 hallazgos Críticos o Altos abiertos | Los cinco criterios de término del prompt | F9-01…05 | ○ |
+| F9-06 | **G0 a G5** en verde, seis defectos detectados, trazabilidad al 100 % de T1–T21 y N-1–N-5, 0 hallazgos Críticos o Altos abiertos | Los cinco criterios de término del prompt | F9-01…05 | ◐ término: seis defectos detectados ✔, trazabilidad al 100 % de T1–T21 y N-1..N-5 ✔, 0 Críticos y 0 Altos ✔, entrega generada y verificada ✔, rendimiento sin degradación ✔. Compuertas: G0 ✔, G1 ✔ y G2 ✔ (los mismos comandos, en local), G3 ✔ (30 de 30 contra GLPI real), G5 ✔ (manual, esta auditoría). **G1b y G4 quedan a medias**: el control positivo estático no está en la CI y el flujo nocturno `.github/workflows/nocturno.yml` y el guion `mutacion-linux.sh` están escritos pero no se han ejecutado de extremo a extremo (las mediciones se hicieron con los mismos comandos a mano); ambos esperan al `git push` y a una primera corrida |
 
 ## Decisiones pendientes para el equipo (se acumulan; no bloquean el siguiente ítem independiente)
 

@@ -1,0 +1,45 @@
+
+F1. Inicio de sesión con Supabase Auth y TOTP obligatorio; permisos por rol.
+   pruebas: OK    602 passed in 20.35s
+   código:  OK    la sesión solo nace tras verificar el TOTP (src/jml/adaptadores/entrada/web/ingreso.py)
+   código:  OK    solo AAL2 abre una sesión (src/jml/aplicacion/casos/ingreso.py)
+
+F2. Registro con fecha efectiva, consulta, cancelación y deduplicación.
+   pruebas: OK    197 passed in 0.63s
+   código:  OK    cancelación (src/jml/aplicacion/casos/decidir.py)
+   código:  OK    deduplicación en la base (invariante 2) (src/jml/adaptadores/salida/persistencia/models.py)
+
+F3. Un ticket por cola involucrada, con lista de verificación, prioridad, SLA y, cuando aplica, fecha programada.
+   pruebas: OK    94 passed in 0.66s
+   código:  OK    lista de verificación en cada ticket (src/jml/dominio/tickets.py)
+   código:  OK    SLA (vencimiento) (src/jml/dominio/tickets.py)
+   código:  OK    fecha programada de los tickets que no son inmediatos (src/jml/dominio/tickets.py)
+
+F4. Estado de los tickets, soluciones, actas y activos desde GLPI, cada 5 minutos.
+   pruebas: OK    267 passed in 1.39s
+   código:  OK    cada 5 minutos (src/jml/adaptadores/entrada/worker/ciclo.py)
+   código:  OK    activos desde GLPI (src/jml/aplicacion/casos/sincronizar.py)
+
+F5. Estado de las cuentas por sistema, derivado de los tickets resueltos.
+   pruebas: OK    71 passed in 0.94s
+   código:  OK    escriben cuentas fuera de la sincronización: ninguno
+
+F6. Búsqueda de cuentas y ficha del colaborador (dashboard de los roles técnicos).
+   pruebas: OK    58 passed in 3.77s
+   código:  OK    búsqueda de cuentas (src/jml/aplicacion/casos/consultas.py)
+   código:  OK    ficha del colaborador (src/jml/aplicacion/casos/consultas.py)
+
+F7. Registro inalterable de cada decisión, emisión, cambio de estado y acceso a datos personales.
+   pruebas: OK    46 passed in 1.29s
+   código:  OK    acceso a datos personales: fichas (src/jml/aplicacion/casos/consultas.py)
+   código:  OK    acceso a datos personales: campo restringido (src/jml/aplicacion/casos/listados.py)
+   código:  OK    cambio de estado (src/jml/aplicacion/casos/sincronizar.py)
+   código:  OK    emisión (src/jml/aplicacion/casos/bandeja.py)
+   código:  OK    decisión (src/jml/aplicacion/casos/_emision.py)
+
+F8. Matriz de perfiles, catálogos (S-32: la propia matriz) y asignación de roles.
+   pruebas: OK    21 passed in 0.99s
+   código:  OK    área de administración de la matriz (src/config/urls.py)
+   código:  OK    asignación de roles (src/config/urls.py)
+
+ANEXO A, TABLA I: las 8 funciones se cumplen

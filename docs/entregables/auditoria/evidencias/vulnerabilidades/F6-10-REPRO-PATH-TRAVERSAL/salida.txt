@@ -1,0 +1,13 @@
+filas antes (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== referencia y valores de ZAP (tecnico, directo, sin WAF)
+documento inexistente (referencia): 200 2934 · passwd=0 · traza=0 · md5=303ea9af
+documento=cuentas (el valor que uso ZAP): 200 2932 · passwd=0 · traza=0 · md5=777b88f5
+documento=../../../../etc/passwd: 404 179 · passwd=0 · traza=0 · md5=64db5ad5
+documento=%2e%2e%2f%2e%2e%2fetc%2fpasswd: 200 2956 · passwd=0 · traza=0 · md5=17a8cd46
+documento=....//....//etc/passwd: 404 179 · passwd=0 · traza=0 · md5=64db5ad5
+nombre=../../../../etc/passwd: 200 2969 · passwd=0 · traza=0 · md5=7b320ee6
+ficha con ../ en la ruta: 404 179 · passwd=0 · traza=0 · md5=64db5ad5
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+web: healthy · worker: running

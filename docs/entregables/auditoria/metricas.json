@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "commit_auditado": "5fa3f32",
+  "nota": "documentado = lo que dicen docs/estado.md y docs/evidencia; medido = lo que midio la auditoria. Una diferencia de mas de 1 % es un hallazgo (plan F1-05).",
+  "linea_base": {
+    "pruebas_unitarias": {
+      "documentado": 1600,
+      "medido": 2574,
+      "nota": "suite sin integracion: dominio, aplicacion, contratos, escenarios, adaptadores, seguridad y bdd (junit ANEXO-A-JUNIT); la linea base del 12/10 era 1618 sin seguridad ni bdd"
+    },
+    "cobertura_ramas_dominio_pct": {
+      "documentado": 99,
+      "medido": 97.74,
+      "compuerta": 95
+    },
+    "cobertura_ramas_aplicacion_pct": {
+      "documentado": 99,
+      "medido": 94.83,
+      "compuerta": 90
+    },
+    "pruebas_glpi_real": {
+      "documentado": 30,
+      "medido": 30
+    },
+    "pruebas_e2e_playwright": {
+      "documentado": 4,
+      "medido": 4
+    },
+    "mutacion_dominio_pct": {
+      "documentado": 93.6,
+      "medido": 97.8,
+      "meta": 85
+    },
+    "mutacion_aplicacion_pct": {
+      "documentado": null,
+      "medido": 92.7,
+      "meta": 85,
+      "mutantes": 2226,
+      "muertos": 2063
+    },
+    "rnf06_dashboard_p95_ms": {
+      "documentado": 791,
+      "medido": 786,
+      "umbral": 2000
+    },
+    "rnf06_paginas_p95_max_ms": {
+      "documentado": 622,
+      "medido": 649,
+      "umbral": 800
+    },
+    "deteccion_glpi_s": {
+      "documentado": 63,
+      "medido": 63,
+      "umbral": 120
+    },
+    "deteccion_base_s": {
+      "documentado": 56,
+      "medido": 43,
+      "umbral": 120
+    },
+    "restauracion_s": {
+      "documentado": 23,
+      "medido": 19,
+      "umbral": 14400
+    },
+    "cobertura_combinada_dominio_pct": {
+      "medido": 99.43
+    },
+    "cobertura_combinada_aplicacion_pct": {
+      "medido": 98.46
+    },
+    "pruebas_integracion_postgresql": {
+      "medido": 251
+    },
+    "cobertura_ramas_seguridad_pct": {
+      "medido": 100
+    },
+    "mutacion_seguridad_pct": {
+      "documentado": null,
+      "medido": 96.1,
+      "meta": 85,
+      "mutantes": 512,
+      "muertos": 492
+    },
+    "cobertura_ramas_adaptadores_pct": {
+      "medido": 93.6
+    },
+    "cobertura_ramas_total_pct": {
+      "medido": 95.25
+    }
+  },
+  "trazabilidad": {
+    "filas": 141,
+    "por_estado": {
+      "prueba-nombrada": 111,
+      "solo-documento": 11,
+      "sin-prueba-nombrada": 19
+    },
+    "fuente": "auditoria/trazabilidad.csv (trazar.py)"
+  },
+  "hallazgos": {
+    "criticos": 0,
+    "altos": 0,
+    "medios": 15,
+    "bajos": 15,
+    "informativos": 6,
+    "total": 36,
+    "abiertos": 14,
+    "verificados": 15,
+    "corregidos": 4,
+    "aceptados": 3
+  },
+  "celdas_matriz_authz": {
+    "total": null,
+    "probadas": null,
+    "inesperadas": null
+  },
+  "asvs_l2": {
+    "aplicables": null,
+    "verificados": null
+  },
+  "defectos_sembrados": {
+    "total": 6,
+    "detectados": 6,
+    "sembrados": 6
+  },
+  "score_global": null,
+  "anexo_a_excel": {
+    "filas": 157,
+    "cumple": 138,
+    "parcial": 9,
+    "no_verificable_en_local": 10,
+    "falla": 0
+  }
+}

@@ -187,6 +187,25 @@ Además, **acciones que solo el equipo puede hacer**: hacer `git push` de la ram
 | Revisión del 10 % de ASVS por una segunda persona | Exige a una persona distinta | `[PENDIENTE: segunda persona]` |
 | Compuertas G1b y G4 en la CI de GitHub | El flujo de trabajo no se probó en la nube: exige `git push` | Los comandos corren en local; ver §16 |
 
+### Criterios de término del plan
+
+| Criterio | Estado | Evidencia |
+|---|---|---|
+| G0 · gancho previo al commit (`gitleaks` y `ruff`) | cumple | evidencias/controles-positivos/F2-10-G0-GANCHO |
+| G1 · compuertas (`make verificar`: ruff, mypy, import-linter, suite con cobertura, Gherkin y su trazabilidad) | cumple en local | evidencias/funcionales/F9-COBERTURA-FINAL |
+| G1b · análisis estático con su control positivo en la CI | **parcial** | el control positivo existe (evidencias/controles-positivos/F2-01-CONTROL-POSITIVO) pero no está en la CI de GitHub |
+| G2 · integración con roles de base de datos | cumple en local | evidencias/funcionales/F1-02-INTEGRACION |
+| G3 · GLPI real, con el centinela de punta a punta | cumple en local | evidencias/funcionales/F1-03-GLPI-REAL-3 |
+| G4 · nocturno (mutación e imágenes) | **parcial** | `.github/workflows/nocturno.yml` está escrito; las mediciones se hicieron con esos mismos comandos a mano, pero el guion que los empaqueta (`mutacion-linux.sh`) no se ejecutó de extremo a extremo; falta su primera ejecución en GitHub |
+| G5 · pre-entrega manual (escaneos en dos posiciones, sqlmap 5, matriz, paridad, respaldo y restauración, empaquetado) | cumple | evidencias/vulnerabilidades/F6-09-ZAP-DIRECTO |
+| Los seis defectos sembrados detectados | cumple | evidencias/controles-positivos/F3-U01 |
+| Trazabilidad al 100 % de T1 a T21 y N-1 a N-5 | cumple | evidencias/funcionales/ANEXO-A-JUNIT |
+| Cero hallazgos Críticos o Altos abiertos | cumple | metricas.json (0 y 0) |
+| Entrega generada y verificada | cumple | `verificar-entrega.py` y `gitleaks` sin hallazgos |
+| Rendimiento remedido sin degradación | cumple | evidencias/disponibilidad/F9-05-RENDIMIENTO-20V |
+
+G1, G2 y G3 se comprobaron con los mismos comandos que ejecuta la CI, en el equipo. **La CI de GitHub no ha corrido sobre estos cambios** y la rama sigue sin publicarse; mientras tanto el `master` remoto conserva el fallo de `pip-audit` que corrige B-15.
+
 ## 16. Anexos y cómo reproducir todo desde un clon limpio
 
 **Versiones fijadas** (`herramientas.lock`): ZAP `5ccfff9a`, Trivy 0.67.2 (`e2b22eac`), nmap (`96f6ed19`), netshoot (`b09d9b21`), testssl.sh (`d28eaa07`), `python:3.12-slim` (`a6e34c59`), sqlmap 1.10.10, mutmut 2.5.1 y 3.8.0, pytest 9.1.1, pytest-bdd 9.0.0, reportlab 5.0.1 y pillow 12.3.0.

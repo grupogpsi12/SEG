@@ -1,0 +1,59 @@
+Working... ---------------------------------------- 100% 0:00:01
+Run started:2026-10-25 02:27:53.441107+00:00
+
+Test results:
+>> Issue: [B324:hashlib] Use of weak SHA1 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: tests\dobles\glpi_api.py:215:27
+214	                "filename": entrada["_filename"][0],
+215	                "sha1sum": hashlib.sha1(contenido).hexdigest(),
+216	            },
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: tests\integracion\test_postgresql.py:101:18
+100	        u.auditoria.registrar("u", EventoDeAuditoria("a", "o", {}))
+101	    for sql in (f"UPDATE {tabla} SET id = id", f"DELETE FROM {tabla}", f"TRUNCATE {tabla}"):
+102	        with (
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: tests\integracion\test_postgresql.py:101:49
+100	        u.auditoria.registrar("u", EventoDeAuditoria("a", "o", {}))
+101	    for sql in (f"UPDATE {tabla} SET id = id", f"DELETE FROM {tabla}", f"TRUNCATE {tabla}"):
+102	        with (
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 21814
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 3
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 1985
+		Medium: 2
+		High: 1
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 2
+		Medium: 6
+		High: 1980
+Files skipped (0):
+bandit_medio_o_superior=1
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.12.13
+[tester]	WARNING	nosec encountered (B108), but no failed test on file src\config\settings.py:104

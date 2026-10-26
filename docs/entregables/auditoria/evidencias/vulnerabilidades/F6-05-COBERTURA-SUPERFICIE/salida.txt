@@ -1,0 +1,18 @@
+filas antes (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== EXENCION REGISTRADA (igual que F6-02): baneo y limites relajados en este stack de laboratorio
+   BunkerWeb sirve la aplicacion (formulario de ingreso visto)
+   comprobacion 1:      20 200 
+== ZAP como rrhh
+   lineas del WAF: 14376
+== neutralizar al terminar
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+web: healthy · worker: running
+administrador  10/22 rutas · no vistas: ['auditoria', 'bandeja', 'cuentas', 'cuentas_csv', 'dashboard', 'decidir', 'detalle', 'ficha', 'ingreso', 'reintentar', 'salir', 'segundo_factor']
+auditor         7/22 rutas · no vistas: ['admin_perfil', 'admin_perfiles', 'admin_roles', 'admin_usuarios', 'bandeja', 'cuentas', 'cuentas_csv', 'dashboard', 'decidir', 'detalle', 'en_error', 'ficha', 'nueva', 'reintentar', 'segundo_factor']
+rrhh           10/22 rutas · no vistas: ['admin_perfil', 'admin_perfiles', 'admin_roles', 'admin_usuarios', 'auditoria', 'cuentas', 'cuentas_csv', 'dashboard', 'en_error', 'ficha', 'reintentar', 'segundo_factor']
+solicitante     8/22 rutas · no vistas: ['admin_perfil', 'admin_perfiles', 'admin_roles', 'admin_usuarios', 'auditoria', 'bandeja', 'cuentas', 'cuentas_csv', 'dashboard', 'decidir', 'en_error', 'ficha', 'reintentar', 'segundo_factor']
+tecnico        10/22 rutas · no vistas: ['admin_perfil', 'admin_perfiles', 'admin_roles', 'admin_usuarios', 'auditoria', 'bandeja', 'decidir', 'detalle', 'en_error', 'nueva', 'reintentar', 'segundo_factor']
+
+UNIDOS (todos los roles): 20/22 = 90.9 % · no vistas por ningún rol: ['reintentar', 'segundo_factor']

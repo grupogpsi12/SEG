@@ -1,0 +1,1 @@
+docker 29.8.2 · compose local+reporteria · HEAD 5fa3f32

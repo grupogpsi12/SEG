@@ -1,0 +1,6 @@
+[BD-sin-disparador] sin defecto:
+    38 passed, 247 deselected in 1.67s
+[BD-sin-disparador] con el defecto sembrado en src/jml/adaptadores/salida/persistencia/migrations/0002_reglas_de_postgresql.py:
+    1 failed, 247 deselected in 0.74s
+[BD-sin-disparador] archivo restaurado: True
+[BD-sin-disparador] DETECTADO: verde sin defecto, rojo con él

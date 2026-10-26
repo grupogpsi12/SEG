@@ -1,0 +1,13 @@
+respaldado: /c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/.contrato-tmp/respaldos/app-2026-10-25.dump (132K)
+respaldado: /c/Users/Usuario 1/Downloads/proyecto-artefactos-v2.3/.contrato-tmp/respaldos/glpi-2026-10-25.sql.gz (152K)
+== 1. PostgreSQL nuevo con los roles de Supabase y el duenio separado
+== 2. pg_restore del esquema app como app_owner
+== 3. migrar (como en docs/operacion.md: aplica lo que falte)
+== 4. MariaDB nuevo con el volcado de GLPI
+== 5. Comprobaciones contra el origen
+  filas por tabla: iguales en 24 tablas (sincronizacion y django_session las escribe el sistema solo)
+  cabeza de la cadena: igual (secuencia 414)
+  cadena de auditoria: VALIDA segun la aplicacion, leida como app_backend
+  app_backend no puede modificar la auditoria (RD-02, CA-13)
+  GLPI (tickets, categorias, grupos, reglas, usuarios, documentos): iguales (6 114 5 97 26 5)
+RESTAURACION COMPLETA Y VERIFICADA: 19 s de restauracion, 21 s con las comprobaciones (RTO exigido: 4 h)

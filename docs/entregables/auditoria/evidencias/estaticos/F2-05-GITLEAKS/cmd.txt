@@ -1,0 +1,1 @@
+gitleaks git . --redact --no-banner; echo historial=$?; gitleaks dir . --redact --no-banner --max-target-megabytes 5; echo arbol=$?

@@ -1,0 +1,18 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_B_16_los_scripts_que_invoca_la_ci_son_ejecutables ____________
+
+    @pytest.mark.seguridad
+    def test_B_16_los_scripts_que_invoca_la_ci_son_ejecutables() -> None:
+        invocados = sorted(set(INVOCACION.findall(FLUJO.read_text(encoding="utf-8"))))
+        assert invocados, "el patrón no reconoce ninguna invocación: la prueba no vigila nada"
+        modos = _modos()
+        sin_permiso = [s for s in invocados if modos.get(s) != "100755"]
+>       assert not sin_permiso, f"git los guarda sin bit de ejecución: {sin_permiso}"
+E       AssertionError: git los guarda sin bit de ejecución: ['infra/glpi/preparar-glpi.sh', 'infra/scripts/contrato-glpi.sh', 'infra/scripts/preparar-entorno.sh']
+E       assert not ['infra/glpi/preparar-glpi.sh', 'infra/scripts/contrato-glpi.sh', 'infra/scripts/preparar-entorno.sh']
+
+tests\seguridad\test_compuertas.py:33: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/seguridad/test_compuertas.py::test_B_16_los_scripts_que_invoca_la_ci_son_ejecutables
+1 failed in 0.15s

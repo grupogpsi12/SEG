@@ -1,0 +1,1 @@
+Python urllib en python:3.12-slim; BunkerWeb 1.6.15

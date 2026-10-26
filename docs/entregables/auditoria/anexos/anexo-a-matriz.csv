@@ -1,0 +1,158 @@
+tabla,fila,exigencia,texto_frente_al_srs,pruebas_que_pasan,pruebas_que_fallan,xfail,evidencias,resultado,nota
+I,F1. Autenticación y roles,Inicio de sesión con Supabase Auth y TOTP obligatorio; permisos por rol.,COINCIDE,588,0,0,,CUMPLE,B-28: el JWT se lee sin verificar la firma (riesgo acotado por TLS verify-full)
+I,F2. Gestión de solicitudes,"Registro con fecha efectiva, consulta, cancelación y de duplicación.",DIFIERE,59,0,0,F1-02-INTEGRACION (codigo 0),CUMPLE,
+I,F3. Emisión de tickets,"Un ticket por cola involucrada, con lista de verificación, prioridad, SLA y, cuando aplica, fecha programada.",DIFIERE,64,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+I,F4. Sincronización,"Estado de los tickets, soluciones, actas y activos desde GLPI, cada 5 minutos.",DIFIERE,21,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+I,F5. Registro de cuentas,"Estado de las cuentas por sistema, derivado de los tickets resueltos.",DIFIERE,56,0,0,,CUMPLE,
+I,F6. DashBoards,Búsqueda de cuentas y ficha del colaborador.,DIFIERE,58,0,0,,CUMPLE,
+I,F7. Auditoría,"Registro inalterable de cada decisión, emisión, cambio de estado y acceso a datos personales.",DIFIERE,35,0,0,F7-05-RESPALDO-Y-RESTAURACION (codigo 0),CUMPLE,
+I,F8. Administración,"Matriz de perfiles, catálogos y asignación de roles.",DIFIERE,21,0,0,,CUMPLE,
+II,ADR - 01,Aplicación propia + GLPI | Aceptada (precisada por ADR-016),COINCIDE,51,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+II,ADR - 02,Docker Compose en una VM de Azure | Aceptada,COINCIDE,0,0,0,F7-01-NMAP (codigo 0),PARCIAL,"Docker Compose: sí (10 servicios, `infra/compose.yaml`); la VM de Azure no se puede verificar en local"
+II,ADR - 03,Samba AD DC + Entra ID sin sincronización | Reemplazada por ADR-019,COINCIDE,1,0,0,,CUMPLE,"reemplazada: no hay código ni dependencias de Samba, LDAP ni Graph"
+II,ADR - 04,Automatización con autorización humana | Reemplazada por ADR-019,COINCIDE,1,0,0,,CUMPLE,reemplazada por ADR-019
+II,ADR - 05,Cuenta única de RRHH (con disidencia) | Aceptada,COINCIDE,259,0,0,,PARCIAL,la «cuenta única» de RRHH se cumple por operación (el Administrador asigna el rol); el sistema no impide dar el rol a dos personas
+II,ADR - 06,Deduplicación con índice único parcial | Aceptada,COINCIDE,10,0,0,F1-02-INTEGRACION (codigo 0),CUMPLE,
+II,ADR - 07,Auditoría de solo inserción con cadena de hashes | Aceptada,COINCIDE,24,0,0,F7-05-RESPALDO-Y-RESTAURACION (codigo 0),CUMPLE,
+II,ADR - 08,OIDC con Entra ID y BFF | Reemplazada por ADR-017,COINCIDE,1,0,0,,CUMPLE,reemplazada por ADR-017: no hay OIDC
+II,ADR - 09,Secretos en Key Vault como archivos en tmpfs | Aceptada,COINCIDE,8,0,0,,PARCIAL,"secretos como archivos en /run/secrets: sí; Key Vault de Azure: no verificable en local (aquí SOPS + age, ADR-029)"
+II,ADR - 10,Licencias de M365 registradas en GLPI | Reemplazada por ADR-019,COINCIDE,1,0,0,,CUMPLE,reemplazada por ADR-019
+II,ADR - 11,Sincronización con GLPI por consulta periódica | Aceptada,COINCIDE,1,0,0,,CUMPLE,
+II,ADR - 12,Stack FastAPI + React + PostgreSQL | Reemplazada por ADR-015 y ADR-018,COINCIDE,1,0,0,,CUMPLE,reemplazada: no hay FastAPI ni React
+II,ADR - 13,Exclusión del monitoreo del DC | Aceptada,COINCIDE,1,0,0,,CUMPLE,no existe código de monitoreo del DC (fuera de alcance)
+II,ADR - 14,Autenticación de servicio contra la API de GLPI | Pendiente (sprint 0),DIFIERE,15,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,"el Excel dice «Pendiente (sprint 0)»; `docs/decisiones.md` ya la tiene «Aceptada (spike 0.3)» y el adaptador la implementa (API v1, App-Token y token de usuario): desfase del Excel"
+II,ADR - 15,Supabase como base de datos de la aplicación | Aceptada,COINCIDE,0,0,0,F3-PAR (codigo 1); F1-02-INTEGRACION (codigo 0),CUMPLE,paridad de catálogo PostgreSQL local frente a Supabase medida en F3 (solo lectura)
+II,ADR - 16,Arquitectura hexagonal con la solicitud y sus tickets como núcleo | Aceptada,COINCIDE,1,0,0,F2-02-RUFF-MYPY-IMPORTS (codigo 0),CUMPLE,
+II,ADR - 17,Supabase Auth con TOTP mediado por el servidor | Aceptada,COINCIDE,55,0,0,,CUMPLE,B-28 abierto; el servicio real de Supabase Auth no se ejerció en esta auditoría (solo simulado)
+II,ADR - 18,Django 5.2 LTS con interfaz generada en el servidor | Aceptada,COINCIDE,1,0,0,,CUMPLE,
+II,ADR - 19,Sin automatizaciones fuera de GLPI ni directorio montado | Aceptada,COINCIDE,1,0,0,,CUMPLE,
+II,ADR - 20,Dashboard sin tiempo real para técnicos | Aceptada,COINCIDE,1,0,0,,CUMPLE,
+II,ADR - 21,"Soporte de vinculación adjunto a GLPI, sin almacenamiento permanente en la aplicación | Aceptada",COINCIDE,29,0,0,,CUMPLE,
+II,ADR - 22,Permisos sobre recursos compartidos dentro de los eventos laborales | Aceptada,COINCIDE,52,0,0,,CUMPLE,
+II,ADR - 23,BunkerWeb como WAF y proxy inverso (en lugar de nginx y de Application Gateway) | Aceptada,COINCIDE,4,0,0,F6-01-PRUEBAS-SH (codigo 0); F6-02-ESCANER-EXENTO (codigo 0); F7-02-API-BUNKERWEB (codigo 0); F7-07-TESTSSL (codigo 0),CUMPLE,
+II,ADR - 24,Cloudflare Tunnel + Access delante de BunkerWeb | Propuesta (pendiente del equipo),COINCIDE,1,0,0,,CUMPLE,es una propuesta: correctamente no desplegada (no hay `cloudflared` en el compose)
+II,ADR - 25,Tres consultas de lectura nuevas en los repositorios para las vistas (2.7) | Aceptada,COINCIDE,147,0,0,,CUMPLE,
+II,ADR - 26,Consulta de solicitudes en error para el reintento del Administrador (2.12) | Aceptada,COINCIDE,24,0,0,,CUMPLE,
+II,ADR - 27,Matriz y usuarios completos para el área de administración (2.13) | Aceptada,COINCIDE,21,0,0,,CUMPLE,
+II,ADR - 28,"Dueño del esquema separado de app_backend, disparador con transiciones y bloqueo al decidir | Aceptada",DIFIERE,3,0,0,F1-02-INTEGRACION (codigo 0),CUMPLE,
+III,Usuarios → bunkerweb,"bunkerweb | 443 | HTTPS | Público | Sitios app.* y glpi.*, TLS de Let's Encrypt",sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,TLS autofirmado en local; Let's Encrypt solo en Azure
+III,Usuarios → bunkerweb,bunkerweb | 80 | HTTP | Público | Reto ACME y redirección a 443,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,responde 301 hacia HTTPS
+III,Administrador → VM (sshd),VM (sshd) | 22 | SSH | Restringido | Administración; NSG limitado a IPs del equipo,sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,sshd y NSG son de la VM de Azure
+III,bunkerweb → web,web | 8000 | HTTP | Interno | Proxy del sitio app.* hacia gunicorn,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,
+III,bunkerweb → glpi,glpi | 80 | HTTP | Interno | Proxy del sitio glpi.*,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,
+III,bw-scheduler → bunkerweb,bunkerweb | 5000 | HTTP + API_TOKEN | Interno | Envío de configuración y certificados,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,el puerto 5000 es alcanzable por TCP desde `bw-universe` y exige `API_TOKEN` (F7-02)
+III,worker → glpi,glpi | 80 | HTTP REST | Interno | http://glpi/apirest.php: crear y sincronizar tickets,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,B-32: los tokens de GLPI viajan en claro en este tramo
+III,glpi → mariadb,"mariadb | 3306 | MySQL | Interno | Base propia de GLPI, red internal: true",sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,B-30: sin TLS entre GLPI y MariaDB (red `internal: true`)
+III,"web, worker, migrar → Supabase PostgreSQL",Supabase PostgreSQL | 5432 | PostgreSQL + TLS | Saliente | Session pooler (no el 6543: lección n.º 9),sin tabla equivalente en el SRS,20,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),PARCIAL,TLS `verify-full` y puerto 5432 comprobados en la configuración; catálogo de Supabase leído en F3; no se abre una conexión desde los contenedores
+III,web → Supabase Auth,Supabase Auth | 443 | HTTPS | Saliente | Contraseña + TOTP (/auth/v1),sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,Supabase Auth solo se prueba con un servidor simulado
+III,admin-usuarios → Supabase Auth admin,"Supabase Auth admin | 443 | HTTPS | Saliente (admin) | Alta y baja de usuarios, único uso de service_role",sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,idem; `admin-usuarios` se prueba con el servidor simulado
+III,Host de la VM → Azure Key Vault,Azure Key Vault | 443 | HTTPS | Saliente | Bootstrap de secretos a /run/secrets,sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,Azure Key Vault
+III,Host de la VM → Azure Blob Storage,Azure Blob Storage | 443 | HTTPS | Saliente | Exportación de auditoría y respaldos,sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,Azure Blob Storage
+III,bw-scheduler → Let's Encrypt,Let's Encrypt | 443 | HTTPS | Saliente | Emisión y renovación de certificados,sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,"Let's Encrypt (en local, certificado autofirmado)"
+III,fluent-bit → loki,loki | 3100 | HTTP | Interno | Envío de logs del WAF,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,
+III,grafana → loki,loki | 3100 | HTTP | Interno | Consulta de logs para el tablero,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,
+III,Administrador (túnel SSH) → grafana,grafana | 3000 | HTTP | Localhost | Tablero solo en 127.0.0.1,sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,Grafana solo en 127.0.0.1 (B-27: es una excepción no escrita al invariante 14)
+III,loki → Azure Blob Storage,Azure Blob Storage | 443 | HTTPS | Saliente | Almacenamiento de logs con identidad administrada,sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,Loki con identidad administrada hacia Blob (Azure)
+III,cloudflared → Cloudflare,"Cloudflare | 7844 | QUIC / HTTP2 | Saliente | Si se acepta, el NSG cierra 80 y 443",sin tabla equivalente en el SRS,0,0,0,,NO VERIFICABLE EN LOCAL,"Cloudflare es una propuesta (ADR-024), no desplegada"
+III,"web, worker, migrar → postgres:17","postgres:17 | 5432 | PostgreSQL | Interno | compose.local.yaml, pruebas del equipo",sin tabla equivalente en el SRS,0,0,0,ANEXO-A-TABLA-III-PUERTOS (codigo 0),CUMPLE,
+IV,Solicitante,Cualquier colaborador activo con usuario | Generar correos electrónicos con los diferentes estados para la gestión de usuarios. Creación de cuentas. Cambios de departamento o sucursal. Solicitudes de vacaciones o Permisos. Modific,DIFIERE,2,0,0,,PARCIAL,"la fila del Excel NO es la del SRS: promete «creación de cuentas», «eliminaciones de cuentas» y «generar correos»; el sistema no lo hace ni debe (ADR-019, sin correos). Lo que sí cumple es lo del SRS: sus vacaciones y renuncia, los cambios de sus subordinados, consultar y cancelar sus pendientes"
+IV,RRHH,Una persona de Recursos Humanos (cuenta única) | Registrar y emitir cualquier tipo de evento. Aprobar o rechazar solicitudes. Ver campos restringidos. Consultar el estado de todas las solicitudes y los contratos próximos a vencer.,COINCIDE,60,0,0,,CUMPLE,
+IV,Técnico AD,"Cola AD | DashBoards, búsqueda de cuentas y fichas. Trabaja sus tickets en GLPI. | RRHH",DIFIERE,561,0,0,,CUMPLE,
+IV,Técnico Comunicaciones,Cola Comunicaciones | Igual que Técnico AD. | RRHH,COINCIDE,561,0,0,,CUMPLE,
+IV,Técnico Licencias,Cola Licencias (M365) | Igual que Técnico AD. | RRHH,COINCIDE,561,0,0,,CUMPLE,
+IV,Técnico Inventario,Cola Inventario | Igual que Técnico AD. | RRHH,COINCIDE,561,0,0,,CUMPLE,
+IV,Auditor,Docente o revisor | Leer la auditoría y verificar su integridad. Leer solicitudes sin campos restringidos. | Todos los demás,COINCIDE,1,0,1,,PARCIAL,"lee la auditoría y verifica su integridad; NO lee solicitudes (responde 404): B-26 / S-39, decisión del equipo (P-8)"
+IV,Administrador del sistema,"Responsable técnico del proyecto | Mantener la matriz de perfiles, los catálogos y los roles. Reintentar la emisión de solicitudes en error. No aprueba solicitudes. | RRHH y técnicos",COINCIDE,11,0,0,,CUMPLE,
+V,ING,Ingreso | Joiner | RRHH | Emitida por RRHH | Media | Resuelto antes de la fecha de ingreso,COINCIDE,8,0,0,,CUMPLE,
+V,VAC,Vacaciones | Mover (temporal) | El colaborador o RRHH | RRHH | Media | Suspensión resuelta el día de inicio; reactivación el día de regreso,COINCIDE,8,0,0,,CUMPLE,
+V,CDP,Cambio de departamento o cargo | Mover | El jefe del colaborador o RRHH | RRHH | Media | 1 día hábil desde la fecha efectiva,COINCIDE,8,0,0,,CUMPLE,
+V,CSU,Cambio de sucursal | Mover | El jefe del colaborador o RRHH | RRHH | Media | 1 día hábil desde la fecha efectiva,COINCIDE,8,0,0,,CUMPLE,
+V,RET,"Retiro (subtipos: renuncia, fin de contrato) | Leaver | El colaborador (renuncia) o RRHH | RRHH | Alta | Resuelto al final del último día laborado",COINCIDE,8,0,0,,CUMPLE,
+V,EMG,"Emergencia (subtipos: despido con justa causa, fuga detectada) | Leaver inmediato | Solo RRHH | Emitida por RRHH | Muy alta | 1 hora desde la emisión, con escalamiento en GLPI",COINCIDE,8,0,0,,CUMPLE,
+VI,pendiente_aprobacion,Abierto | Registrada por un solicitante; espera la decisión de RRHH.,COINCIDE,131,0,0,,CUMPLE,
+VI,aprobada,Abierto | Aprobada o emitida; los tickets están en la bandeja de salida hacia GLPI.,COINCIDE,131,0,0,,CUMPLE,
+VI,en_ejecucion,Abierto | Tickets creados en GLPI; las colas están trabajando.,COINCIDE,131,0,0,,CUMPLE,
+VI,error,Abierto | GLPI rechazó la creación de un ticket tras los reintentos. El Administrador revisa y reintenta.,COINCIDE,131,0,0,,CUMPLE,
+VI,cerrada,Final | Todos los tickets de cierre están resueltos con solución (y con acta en Inventario).,COINCIDE,131,0,0,,CUMPLE,
+VI,rechazada,"Final | RRHH la rechazó, con justificación.",COINCIDE,131,0,0,,CUMPLE,
+VI,cancelada,Final | La canceló el solicitante (antes de la aprobación) o RRHH (antes de que se creara algún ticket).,COINCIDE,131,0,0,,CUMPLE,
+VII,De cierre inmediato,En la emisión | Nuevo | Sí,COINCIDE,10,0,0,,CUMPLE,
+VII,De cierre programado,"En la emisión, con vencimiento en la fecha futura (p. ej., la reactivación tras vacaciones) | En espera, hasta la fecha | Sí",COINCIDE,10,0,0,,CUMPLE,
+VII,Posterior,"En la emisión de RET o EMG, con vencimiento a 90 días (eliminación de cuentas) | En espera, hasta la fecha | No",COINCIDE,10,0,0,,CUMPLE,
+VIII,ING,Verificar el soporte de vinculación adjunto; crear la cuenta con el usuario sugerido; agregar los grupos del perfil; aplicar en cada recurso compartido del perfil su perfil (Consulta o Edición) mediante el grupo FS-*; para contrat,COINCIDE,9,0,0,,CUMPLE,
+VIII,VAC,Deshabilitar la cuenta al inicio. (P) Habilitarla en la fecha de regreso. | — | Bloquear el inicio de sesión y revocar sesiones al inicio. (P) Desbloquear al regreso. | —,COINCIDE,9,0,0,,CUMPLE,
+VIII,CDP,Quitar los grupos del perfil anterior y agregar los del nuevo. En recursos compartidos: aplicar el perfil de los recursos nuevos y «Retiro de accesos» en los que ya no corresponden (la diferencia la calcula la aplicación). | Difer,COINCIDE,9,0,0,,CUMPLE,
+VIII,CSU,"Diferencia de los grupos de sede. | Quitar NET-VLAN-<sede anterior> y agregar NET-VLAN-<sede nueva>. | — | Trasladar el equipo, con acta.",COINCIDE,9,0,0,,CUMPLE,
+VIII,RET,"Deshabilitar la cuenta, cambiar la contraseña, quitar los grupos, «Retiro de accesos» en todos los recursos compartidos, mover a la OU Deshabilitados y dar al jefe perfil Consulta sobre la carpeta personal por 30 días. (Posterior)",COINCIDE,9,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+VIII,EMG,"Las mismas acciones de RET, de inmediato. (Posterior) Eliminar a los 90 días. | Las mismas de RET, de inmediato. | Las mismas de RET, de inmediato. (Posterior) Eliminar a los 90 días. | Recuperar el equipo con acta.",COINCIDE,9,0,0,,CUMPLE,
+IX,Cuenta,Deshabilitada | Deshabilitada y movida a la OU Deshabilitados,COINCIDE,2,0,0,,CUMPLE,
+IX,Contraseña,Sin cambios | Cambiada a un valor aleatorio que no se comunica a nadie,COINCIDE,2,0,0,,CUMPLE,
+IX,Grupos,Se conservan | Se quitan; el técnico lista en la solución los grupos retirados,COINCIDE,2,0,0,,CUMPLE,
+IX,Sesiones,Revocadas | Revocadas,COINCIDE,2,0,0,,CUMPLE,
+IX,Reversión,Ticket programado de reactivación | No se revierte. Un reingreso es un evento ING nuevo,COINCIDE,2,0,0,,CUMPLE,
+IX,Eliminación,No aplica | Ticket posterior a los 90 días,COINCIDE,2,0,0,,CUMPLE,
+X,AD,"Acción realizada; usuario (sAMAccountName); soporte de vinculación verificado (sí/no, solo en ingresos); grupos agregados; grupos retirados; recursos compartidos (ruta – perfil aplicado o retirado); OU final; fecha y hora de ejecu",COINCIDE,7,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+X,Comunicaciones,Acción realizada; grupos de red agregados; grupos de red retirados; fecha y hora; observaciones.,COINCIDE,7,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+X,Licencias,"Acción realizada; identidad (UPN); soporte de vinculación verificado (sí/no, solo en ingresos); grupos agregados o retirados; licencias asignadas o liberadas en GLPI; sesiones revocadas (sí/no); fecha y hora.",COINCIDE,7,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+X,Inventario,Acción realizada; número de serie; modelo; entregado o recibido; acta adjunta (sí/no); paz y salvo (sí/no).,COINCIDE,7,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+XI,ING,pendiente_alta | activa,COINCIDE,76,0,0,,CUMPLE,
+XI,"VAC, suspensión",pendiente_suspension | suspendida,COINCIDE,76,0,0,,CUMPLE,
+XI,"VAC, reactivación (programado)",suspendida | activa,COINCIDE,76,0,0,,CUMPLE,
+XI,CDP o CSU,"Conserva el estado actual y se marca «cambio pendiente» | activa, con el perfil nuevo",COINCIDE,76,0,0,,CUMPLE,
+XI,RET o EMG,pendiente_baja (cuenta como exposición) | deshabilitada,COINCIDE,76,0,0,,CUMPLE,
+XI,Eliminación (posterior),deshabilitada | eliminada,COINCIDE,76,0,0,,CUMPLE,
+XII,ING,"Nombres; apellidos; número de documento; tipo de vinculación (empleado, contratista(tercero), practicante o temporal); departamento; cargo; sede; jefe directo; fecha de ingreso; fecha de fin (obligatoria si no es empleado); requie",DIFIERE,5,0,0,,CUMPLE,
+XII,VAC,Fecha de inicio; fecha de regreso.,COINCIDE,5,0,0,,CUMPLE,
+XII,CDP,Departamento nuevo; cargo nuevo; jefe nuevo; fecha efectiva.,COINCIDE,5,0,0,,CUMPLE,
+XII,CSU,Sede nueva; fecha efectiva; ¿se traslada el equipo? (sí o no).,COINCIDE,5,0,0,,CUMPLE,
+XII,RET,Subtipo; último día laborado; motivo (R).,COINCIDE,5,0,0,,CUMPLE,
+XII,EMG,Subtipo; reportado por; descripción del hecho (R); hora del hecho.,COINCIDE,5,0,0,,CUMPLE,
+XIII,Gerencia,"GG-Gerencia, FS-Gerencia-RW, FS-Comun-RO | NET-VPN, NET-WIFI-CORP | M365-Gerencia | Suite ofimática, lector PDF | Portátil",COINCIDE,2,0,0,,CUMPLE,
+XIII,RRHH,"GG-RRHH, FS-RRHH-RW, FS-Comun-RO | NET-WIFI-CORP | M365-RRHH | Suite ofimática | Portátil",COINCIDE,2,0,0,,CUMPLE,
+XIII,Finanzas,"GG-Finanzas, FS-Finanzas-RW, FS-Presupuesto-RO, FS-Comun-RO | NET-WIFI-CORP | M365-Finanzas | Suite ofimática, software contable | Escritorio",COINCIDE,2,0,0,,CUMPLE,
+XIII,Comercial,"GG-Comercial, FS-Comercial-RW, FS-Comun-RO | NET-VPN, NET-WIFI-CORP | M365-Comercial | Suite ofimática, CRM | Portátil",COINCIDE,2,0,0,,CUMPLE,
+XIII,TI,"GG-TI, FS-TI-RW, FS-Comun-RW | NET-VPN, NET-WIFI-CORP, NET-ADMIN | M365-TI | Suite ofimática, herramientas de soporte | Portátil",COINCIDE,2,0,0,,CUMPLE,
+XIII,Operaciones,"GG-Operaciones, FS-Operaciones-RW, FS-Comun-RO | NET-WIFI-CORP | M365-Operaciones | Suite ofimática | Escritorio",COINCIDE,2,0,0,,CUMPLE,
+XIV,"Todos, salvo TI → \\fs01.ad.andina.test\comun",\\fs01.ad.andina.test\comun | Común | Consulta | FS-Comun-RO,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,TI → \\fs01.ad.andina.test\comun,\\fs01.ad.andina.test\comun | Común | Edición | FS-Comun-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,Gerencia → \\fs01.ad.andina.test\departamentos\Gerencia,\\fs01.ad.andina.test\departamentos\Gerencia | Gerencia | Edición | FS-Gerencia-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,RRHH → \\fs01.ad.andina.test\departamentos\RRHH\Hojas de vida,\\fs01.ad.andina.test\departamentos\RRHH\Hojas de vida | Historias laborales | Edición | FS-RRHH-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,Finanzas → \\fs01.ad.andina.test\departamentos\Finanzas\Contabilidad,\\fs01.ad.andina.test\departamentos\Finanzas\Contabilidad | Contabilidad | Edición | FS-Finanzas-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,Finanzas → \\fs01.ad.andina.test\departamentos\Gerencia\Presupuesto,\\fs01.ad.andina.test\departamentos\Gerencia\Presupuesto | Presupuesto | Consulta | FS-Presupuesto-RO,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,Comercial → \\fs01.ad.andina.test\departamentos\Comercial,\\fs01.ad.andina.test\departamentos\Comercial | Comercial | Edición | FS-Comercial-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,TI → \\fs01.ad.andina.test\departamentos\TI,\\fs01.ad.andina.test\departamentos\TI | TI | Edición | FS-TI-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XIV,Operaciones → \\fs01.ad.andina.test\departamentos\Operaciones,\\fs01.ad.andina.test\departamentos\Operaciones | Operaciones | Edición | FS-Operaciones-RW,sin tabla equivalente en el SRS,1,0,0,,CUMPLE,
+XV,RF-01,El sistema debe autenticar con Supabase Auth (correo y contraseña) desde el servidor. Solo debe crear la sesión de Django después de verificar un código TOTP (nivel AAL2). Los tokens de Supabase no se guardan en el navegador ni en,COINCIDE,37,0,0,,CUMPLE,B-28
+XV,RF-02,"En el primer ingreso, el sistema debe exigir la inscripción de un factor TOTP antes de permitir cualquier otra acción. | Debe",COINCIDE,4,0,0,,CUMPLE,
+XV,RF-03,"El sistema debe aplicar los permisos de la sección 3.3 en cada vista del servidor, según los grupos de Django del usuario. | Debe",COINCIDE,583,0,0,,CUMPLE,matriz de 100 % de las celdas ruta × rol; B-26 (Auditor) es la excepción documentada
+XV,RF-04,"El sistema debe cerrar la sesión tras 30 minutos de inactividad o 8 horas de duración total, y rotar el identificador de sesión al iniciarla. | Debe",COINCIDE,2,0,0,,CUMPLE,
+XV,RF-05,El sistema debe negar el acceso y registrar el evento en auditoría si un usuario tiene roles incompatibles. | Debe,COINCIDE,29,0,0,,CUMPLE,
+XV,RF-06,El registro abierto debe estar deshabilitado. Las cuentas de usuario solo se crean y desactivan con un comando de administración que ejecuta el Administrador del sistema. | Debe,DIFIERE,21,0,0,,CUMPLE,no hay `django.contrib.admin` ni ruta de registro; el alta solo la hace `admin-usuarios`
+XVI,RF-07,"El sistema debe permitir registrar solicitudes de los tipos de la sección 4.1, con los campos del catálogo (sección 4.8) y validación en el servidor. | Debe",COINCIDE,318,0,0,,CUMPLE,
+XVI,RF-08,El sistema debe aceptar una fecha efectiva futura. | Debe,COINCIDE,1,0,0,,CUMPLE,
+XVI,RF-09,El sistema debe rechazar una solicitud nueva cuando exista otra abierta para el mismo colaborador y el mismo tipo. La respuesta debe incluir el identificador de la solicitud existente. La regla la garantiza la base de datos (RD-01,COINCIDE,1,0,0,F1-02-INTEGRACION (codigo 0),CUMPLE,
+XVI,RF-10,"Las solicitudes EMG deben aceptarse, aunque existan otras abiertas de otros tipos para el mismo colaborador. Al emitirse, esas otras se marcan para que RRHH las revise. | Debe",DIFIERE,3,0,0,,CUMPLE,
+XVI,RF-11,El solicitante debe poder cancelar su solicitud mientras esté pendiente de aprobación. RRHH debe poder cancelar una solicitud aprobada mientras no se haya creado ningún ticket. | Debe,COINCIDE,2,0,0,,CUMPLE,
+XVI,RF-39,El registro de un ingreso debe exigir el soporte de vinculación. El sistema lo acepta solo si es PDF (extensión y firma %PDF- del contenido) y pesa como máximo 20 MB. Lo guarda con un nombre aleatorio fuera de la base de datos y r,COINCIDE,29,0,0,,CUMPLE,
+XVII,RF-12,RRHH debe poder aprobar o rechazar solicitudes pendientes. Rechazar exige justificación. | Debe,COINCIDE,60,0,0,,CUMPLE,
+XVII,RF-13,"RRHH debe poder registrar y emitir cualquier tipo de evento en un solo paso, con justificación obligatoria. | Debe",COINCIDE,25,0,0,,CUMPLE,
+XVII,RF-14,"Una vez aprobada, el contenido de la solicitud no debe poder modificarse; la base de datos lo impone con un disparador. Para corregirla, RRHH la cancela y registra una nueva vinculada a la anterior. | Debe",COINCIDE,4,0,0,F1-02-INTEGRACION (codigo 0),CUMPLE,el disparador se prueba contra PostgreSQL (integración)
+XVII,RF-15,El sistema debe impedir que RRHH apruebe o emita solicitudes cuyo sujeto sea la propia persona de RRHH. | Debe,COINCIDE,26,0,0,,CUMPLE,
+XVII,RF-16,"Al emitirse una solicitud, el dominio debe generar un ticket por cola según la matriz evento × cola (sección 4.4). Cada ticket lleva la lista de verificación calculada desde la matriz de perfiles (incluidos los recursos compartido",COINCIDE,76,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+XVII,RF-17,"Los tickets con fecha futura (reactivación de vacaciones y eliminación a los 90 días) deben crearse en la emisión, en estado «En espera» y con vencimiento en esa fecha. La aplicación no crea tickets después de la emisión. | Debe",COINCIDE,4,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+XVII,RF-18,"La creación de tickets en GLPI debe hacerse mediante una bandeja de salida (outbox) con reintentos e idempotencia, de modo que una caída de GLPI no pierda ni duplique tickets. Tras 10 intentos fallidos, la solicitud pasa a error. ",COINCIDE,32,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+XVII,RF-19,"Cada ticket se crea con su categoría ITIL. Una regla de negocio de GLPI asigna el grupo técnico según la categoría, y los tickets sin categoría reconocida van a «Revisión manual». | Debe",COINCIDE,7,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,contra GLPI real: `test_CA_03_cada_ticket_llega_al_grupo_de_su_cola` y `..._una_categoria_desconocida_va_a_revision_manual`
+XVII,RF-20,"El contenido del ticket debe limitarse a los datos técnicos necesarios: colaborador, usuario sugerido, perfil, fecha efectiva, lista de verificación y referencia a la solicitud. Nunca debe incluir campos restringidos ni contraseña",COINCIDE,5,0,0,F7-04-CAPTURA-TRAFICO (codigo 0),CUMPLE,0 tramas con el centinela entre 31 240 capturadas
+XVII,RF-40,"Al crear los tickets de un ingreso, el worker debe subir el soporte de vinculación a GLPI una sola vez y vincularlo a los tickets de AD y de Licencias. Después de confirmar la subida y el hash, debe borrar la copia temporal. Si la",COINCIDE,3,0,0,,CUMPLE,
+XVII,RF-21,"El sistema debe crear o actualizar en GLPI el usuario del colaborador, sin credenciales de inicio de sesión, para poder asignarle activos y licencias. | Debe",COINCIDE,1,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+XVII,RF-22,"El worker debe sincronizar cada 5 minutos el estado, la solución y los documentos adjuntos de los tickets creados por la aplicación. Los tickets que GLPI gestione por su cuenta se ignoran. | Debe",COINCIDE,26,0,0,F1-03-GLPI-REAL-3 (codigo 0),CUMPLE,
+XVII,RF-23,El worker debe sincronizar cada 5 minutos los activos y las licencias asignados en GLPI a cada colaborador con usuario de GLPI. | Debe,COINCIDE,1,0,0,,CUMPLE,
+XVII,RF-24,"Un ticket solo cuenta como resuelto si su estado en GLPI es «Resuelto» o «Cerrado» y tiene una solución registrada. Los tickets de Inventario además necesitan al menos un documento adjunto. Si no se cumple, el ticket se marca «cie",COINCIDE,51,0,0,,CUMPLE,
+XVII,RF-25,"Si un ticket se reabre en GLPI, la sincronización debe reflejarlo en el ticket, en la cuenta derivada y en el dashboard, y registrarlo en auditoría. | Debe",COINCIDE,3,0,0,,CUMPLE,
+XVII,RF-26,La solicitud debe pasar a cerrada cuando todos sus tickets de cierre cuenten como resueltos según RF-24. | Debe,COINCIDE,2,0,0,,CUMPLE,
+XVIII,RI-01,"Usuario (web) | Páginas generadas en el servidor, en español y adaptables a distintos tamaños de pantalla: inicio de sesión y MFA, nueva solicitud por tipo, mis solicitudes, bandeja de RRHH, dashboard, búsqueda y ficha de colabora",COINCIDE,50,0,0,B-34-VERDE (codigo 0),PARCIAL,"contraste de texto (≥ 6,09:1), de componentes (≥ 3:1 tras B-34), idioma, etiquetas, foco, orden de tabulación, sin JavaScript ni recursos externos: 50 de 50. La conformidad WCAG 2.1 AA completa exige además una evaluación manual con lector de pantalla, que no se hizo"
+XVIII,RI-02,"GLPI 11 (API REST) | Crear tickets con categoría, prioridad, estado, vencimiento y contenido; subir un documento y vincularlo a varios tickets; leer estado, solución y documentos de un ticket; crear y actualizar usuarios; leer act",COINCIDE,66,0,0,F1-03-GLPI-REAL-3 (codigo 0); RI-02-PERFIL-GLPI (codigo 0),PARCIAL,todas las operaciones de la fila funcionan contra GLPI 11 real (30 de 30); el perfil de la cuenta de servicio sobra en BORRAR y PURGAR de tickets: B-35 / P-11
+XVIII,RI-03,"Supabase PostgreSQL | Conexión desde web y worker por el session pooler (puerto 5432), con TLS y verificación del certificado. El rol app_backend tiene solo los permisos de RD-02. Nunca se usan postgres ni service_role en ejecució",DIFIERE,5,0,0,F1-02-INTEGRACION (codigo 0); F3-PAR (codigo 1),CUMPLE,TLS verify-full y session pooler (5432) en la configuración; permisos de `app_backend` medidos en PostgreSQL local y en el catálogo de Supabase (solo lectura); B-10: asesor de Supabase
+XVIII,RI-04,"Supabase Auth | Desde el servidor: inicio de sesión con contraseña e inscripción, desafío y verificación de TOTP. La API de administración (creación y desactivación de usuarios) usa la clave service_role, disponible solo para el c",COINCIDE,35,0,0,,PARCIAL,`service_role` solo en `admin-usuarios` (probado en el compose); el servicio real de Supabase Auth no se ejerció desde el servidor en esta auditoría
+XVIII,RI-05,Azure Key Vault | La VM lee los secretos con su identidad administrada al arrancar y los entrega a los contenedores como archivos en un sistema de archivos en memoria (tmpfs). | Debe,COINCIDE,0,0,0,,NO VERIFICABLE EN LOCAL,"Azure Key Vault con identidad administrada; en local los secretos salen de `/run/secrets` (SOPS + age, ADR-029)"
+XVIII,RI-06,Azure Blob Storage | Escritura con identidad administrada en dos contenedores: auditoria (inmutable) y respaldos. | Debe,COINCIDE,4,0,0,F7-05-RESPALDO-Y-RESTAURACION (codigo 0),NO VERIFICABLE EN LOCAL,Azure Blob (contenedores inmutables e identidad administrada) no existe en local; la exportación de auditoría escribe a un directorio y su cadena se verifica sin la base

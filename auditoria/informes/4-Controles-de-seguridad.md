@@ -90,11 +90,11 @@ Resultado global: **36 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 15 Bajos, 6
 | CA-11 | Detección de la caída de GLPI y de la base | cumple | evidencias/disponibilidad/F7-08-DETECCION-BASE |
 | CA-12 | ZAP y sqlmap sin hallazgo | cumple | evidencias/vulnerabilidades/F6-04-SQLMAP-NIVEL5 |
 | CA-13 | La clave pública de Supabase no lee tablas | parcial | catálogo verificado en F3-PAR; la petición a la Data API quedó omitida (S-38) |
-| CA-14 | Contraseña correcta sin TOTP no entra | cumple | evidencias/funcionales/F3-U01 |
+| CA-14 | Contraseña correcta sin TOTP no entra | cumple | evidencias/controles-positivos/F3-U01 |
 | CA-15 | El dashboard coincide con su oráculo | cumple | evidencias/disponibilidad/F9-05-RENDIMIENTO-20V |
 | CA-16 | Búsqueda y ficha correctas | cumple | evidencias/funcionales/ANEXO-A-JUNIT |
 | CA-17 | `import-linter` falla si se rompe la arquitectura | cumple | evidencias/estaticos/F2-02-RUFF-MYPY-IMPORTS |
-| CA-18 | Soporte de vinculación: solo PDF válido | cumple | evidencias/funcionales/F3-U02 |
+| CA-18 | Soporte de vinculación: solo PDF válido | cumple | evidencias/controles-positivos/F3-U02 |
 | CA-19 | El ticket AD lista cada recurso con ruta, serie, perfil y grupo | cumple | evidencias/funcionales/ANEXO-A-JUNIT |
 | CA-20 | `pruebas.sh` devuelve 200 y 403 donde corresponde | cumple | evidencias/vulnerabilidades/F6-01-PRUEBAS-SH |
 | CA-21 | Un ataque aparece clasificado `waf` en menos de 2 minutos | cumple | evidencias/disponibilidad/CA-21-REPORTERIA-WAF |

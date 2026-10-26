@@ -1,0 +1,97 @@
+F.FFFF                                                                   [100%]
+================================== FAILURES ===================================
+_________ test_U04_ningun_valor_bajo_una_clave_prohibida_llega_al_log _________
+
+    @settings(max_examples=1000, deadline=None, suppress_health_check=list(HealthCheck))
+>   @given(clave=claves_prohibidas(), numero=st.integers(min_value=0, max_value=10**9), data=st.data())
+                   ^^^
+
+tests\seguridad\test_filtro_de_logs.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+clave = 'contraseña', numero = 0, data = data(...)
+
+    @settings(max_examples=1000, deadline=None, suppress_health_check=list(HealthCheck))
+    @given(clave=claves_prohibidas(), numero=st.integers(min_value=0, max_value=10**9), data=st.data())
+    def test_U04_ningun_valor_bajo_una_clave_prohibida_llega_al_log(
+        clave: str, numero: int, data: st.DataObject
+    ) -> None:
+        centinela = f"VALOR-SECRETO-{numero}"
+        estructura = data.draw(envolver(clave, centinela))
+>       assert centinela not in registro_con(estructura), (clave, estructura)
+E       AssertionError: ('contraseña', {'contraseña': 'VALOR-SECRETO-0'})
+E       assert 'VALOR-SECRETO-0' not in '{"fecha": "...SECRETO-0"}}'
+E         
+E         'VALOR-SECRETO-0' is contained here:
+E           raseña": "VALOR-SECRETO-0"}}
+E       Failing test case: test_U04_ningun_valor_bajo_una_clave_prohibida_llega_al_log(
+E           clave='contraseña',
+E           numero=0,
+E           data=data(...),
+E       )
+E       Draw 1: {'contraseña': 'VALOR-SECRETO-0'}
+
+tests\seguridad\test_filtro_de_logs.py:66: AssertionError
+_ test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[contrase\xf1a] _
+
+clave = 'contraseña'
+
+    @pytest.mark.parametrize("clave", ["contraseña", "CONTRASEÑA", "descripción", "Descripción_Larga"])
+    def test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran(clave: str) -> None:
+        """Hypothesis encontró `contraseña`: la lista es ASCII y el filtro comparaba sin normalizar."""
+>       assert "VALOR-SECRETO" not in registro_con({clave: "VALOR-SECRETO"})
+E       assert 'VALOR-SECRETO' not in '{"fecha": "...R-SECRETO"}}'
+E         
+E         'VALOR-SECRETO' is contained here:
+E           raseña": "VALOR-SECRETO"}}
+
+tests\seguridad\test_filtro_de_logs.py:79: AssertionError
+_ test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[CONTRASE\xd1A] _
+
+clave = 'CONTRASEÑA'
+
+    @pytest.mark.parametrize("clave", ["contraseña", "CONTRASEÑA", "descripción", "Descripción_Larga"])
+    def test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran(clave: str) -> None:
+        """Hypothesis encontró `contraseña`: la lista es ASCII y el filtro comparaba sin normalizar."""
+>       assert "VALOR-SECRETO" not in registro_con({clave: "VALOR-SECRETO"})
+E       assert 'VALOR-SECRETO' not in '{"fecha": "...R-SECRETO"}}'
+E         
+E         'VALOR-SECRETO' is contained here:
+E           RASEÑA": "VALOR-SECRETO"}}
+
+tests\seguridad\test_filtro_de_logs.py:79: AssertionError
+_ test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[descripci\xf3n] _
+
+clave = 'descripción'
+
+    @pytest.mark.parametrize("clave", ["contraseña", "CONTRASEÑA", "descripción", "Descripción_Larga"])
+    def test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran(clave: str) -> None:
+        """Hypothesis encontró `contraseña`: la lista es ASCII y el filtro comparaba sin normalizar."""
+>       assert "VALOR-SECRETO" not in registro_con({clave: "VALOR-SECRETO"})
+E       assert 'VALOR-SECRETO' not in '{"fecha": "...R-SECRETO"}}'
+E         
+E         'VALOR-SECRETO' is contained here:
+E           ipción": "VALOR-SECRETO"}}
+
+tests\seguridad\test_filtro_de_logs.py:79: AssertionError
+_ test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[Descripci\xf3n_Larga] _
+
+clave = 'Descripción_Larga'
+
+    @pytest.mark.parametrize("clave", ["contraseña", "CONTRASEÑA", "descripción", "Descripción_Larga"])
+    def test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran(clave: str) -> None:
+        """Hypothesis encontró `contraseña`: la lista es ASCII y el filtro comparaba sin normalizar."""
+>       assert "VALOR-SECRETO" not in registro_con({clave: "VALOR-SECRETO"})
+E       assert 'VALOR-SECRETO' not in '{"fecha": "...R-SECRETO"}}'
+E         
+E         'VALOR-SECRETO' is contained here:
+E           _Larga": "VALOR-SECRETO"}}
+
+tests\seguridad\test_filtro_de_logs.py:79: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/seguridad/test_filtro_de_logs.py::test_U04_ningun_valor_bajo_una_clave_prohibida_llega_al_log
+FAILED tests/seguridad/test_filtro_de_logs.py::test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[contrase\xf1a]
+FAILED tests/seguridad/test_filtro_de_logs.py::test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[CONTRASE\xd1A]
+FAILED tests/seguridad/test_filtro_de_logs.py::test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[descripci\xf3n]
+FAILED tests/seguridad/test_filtro_de_logs.py::test_B_21_las_claves_prohibidas_con_acento_tambien_se_filtran[Descripci\xf3n_Larga]
+5 failed, 1 passed in 0.87s

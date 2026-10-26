@@ -1,0 +1,46 @@
+imagen: jml-app:local (sha256:252ca87353e3546d91549a610a4ee56a9a7e82dc698cf6a76a5c28bbbdb22770)
+2026-10-25T02:33:00Z	INFO	Detected OS	family="debian" version="13.7"
+2026-10-25T02:33:00Z	INFO	Number of language-specific files	num=1
+componentes: 115
+e47eaa05fc917722bb22ca7b987f091af2c171321edfff6647525d5ab61057c0 *auditoria/evidencia/estaticos/F2-07-SBOM/sbom.cdx.json
+== vulnerabilidades HIGH/CRITICAL de la imagen
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2026-78410                  │
+├───────────────┼────────────────┤          │              ├───────────────────────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+│ ncurses-base  │ CVE-2025-69720 │          │              │ 6.5+20250216-2                    │               │ ncurses: ncurses: Buffer overflow vulnerability may lead to │
+│               │                │          │              │                                   │               │ arbitrary code execution.                                   │
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2025-69720                  │
+├───────────────┤                │          │              │                                   ├───────────────┤                                                             │
+│ ncurses-bin   │                │          │              │                                   │               │                                                             │
+│               │                │          │              │                                   │               │                                                             │
+│               │                │          │              │                                   │               │                                                             │
+├───────────────┼────────────────┤          ├──────────────┼───────────────────────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+│ perl-base     │ CVE-2026-9538  │          │ fix_deferred │ 5.40.1-6+deb13u1                  │               │ perl-Archive-Tar: perl-Archive-Tar: Denial of Service via   │
+│               │                │          │              │                                   │               │ crafted tar header with large entry...                      │
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2026-9538                   │
+├───────────────┼────────────────┤          ├──────────────┼───────────────────────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+│ util-linux    │ CVE-2026-76642 │          │ affected     │ 2.41.5-0+deb13u1                  │               │ util-linux: util-linux: failed external mount helper still  │
+│               │                │          │              │                                   │               │ runs privileged X-mount post-hooks                          │
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2026-76642                  │
+│               ├────────────────┤          │              │                                   ├───────────────┼─────────────────────────────────────────────────────────────┤
+│               │ CVE-2026-78408 │          │              │                                   │               │ util-linux: util-linux: nsenter --join-cgroup leaks root    │
+│               │                │          │              │                                   │               │ cgroup migration authority                                  │
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2026-78408                  │
+│               ├────────────────┤          │              │                                   ├───────────────┼─────────────────────────────────────────────────────────────┤
+│               │ CVE-2026-78409 │          │              │                                   │               │ util-linux: util-linux: X-mount.subdir detached-tree        │
+│               │                │          │              │                                   │               │ resolution can escape via intermediate symlinks             │
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2026-78409                  │
+│               ├────────────────┤          │              │                                   ├───────────────┼─────────────────────────────────────────────────────────────┤
+│               │ CVE-2026-78410 │          │              │                                   │               │ util-linux: util-linux: restricted bind mounts do not pin   │
+│               │                │          │              │                                   │               │ the source, allowing X-mount.owner/group/mode...            │
+│               │                │          │              │                                   │               │ https://avd.aquasec.com/nvd/cve-2026-78410                  │
+└───────────────┴────────────────┴──────────┴──────────────┴───────────────────────────────────┴───────────────┴─────────────────────────────────────────────────────────────┘
+Python (python-pkg)
+===================
+Total: 1 (HIGH: 0, CRITICAL: 1)
+┌────────────────────┬─────────────────────┬──────────┬────────┬───────────────────┬───────────────┬───────────────────────────────────────────────────┐
+│      Library       │    Vulnerability    │ Severity │ Status │ Installed Version │ Fixed Version │                       Title                       │
+├────────────────────┼─────────────────────┼──────────┼────────┼───────────────────┼───────────────┼───────────────────────────────────────────────────┤
+│ certifi (METADATA) │ GHSA-6q48-6c7w-9gw2 │ CRITICAL │ fixed  │ 2026.7.22         │ 2026.10.19    │ certifi bundles emSign root CAs with compromised  │
+│                    │                     │          │        │                   │               │ intermediate CA keys                              │
+│                    │                     │          │        │                   │               │ https://github.com/advisories/GHSA-6q48-6c7w-9gw2 │
+└────────────────────┴─────────────────────┴──────────┴────────┴───────────────────┴───────────────┴───────────────────────────────────────────────────┘

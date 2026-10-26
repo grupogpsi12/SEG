@@ -1,0 +1,11 @@
+# desde la red app (10.20.40.0/24), FUERA de API_WHITELIST_IP (127.0.0.0/8 y 10.20.30.0/24)
+  /instances  token ninguno   -> sin respuesta: ConnectionResetError
+  /health     token ninguno   -> sin respuesta: ConnectionResetError
+  /instances  token malo      -> sin respuesta: ConnectionResetError
+  /health     token malo      -> sin respuesta: ConnectionResetError
+  /instances  token correcto  -> sin respuesta: ConnectionResetError
+  /health     token correcto  -> sin respuesta: ConnectionResetError
+# desde la red bw-universe (10.20.30.0/24), DENTRO de la lista blanca: el control positivo
+  /instances  token ninguno   -> sin respuesta: ConnectionResetError
+  /instances  token malo      -> sin respuesta: ConnectionResetError
+  /instances  token correcto  -> 404

@@ -1,0 +1,3 @@
+IP de web en la red app:  10.20.40.2
+RESULTADO: bunkerweb NO ARRANCO: failed to set up container networking: Address already in use
+IP de confianza declarada: JML_PROXIES_CONFIABLES: "10.20.40.2"

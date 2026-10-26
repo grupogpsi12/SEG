@@ -1,0 +1,23 @@
+IGUAL      columnas
+IGUAL      conectado_como
+IGUAL      disparadores
+IGUAL      esquema
+DIFERENTE  extensiones: solo en catalogo-local=0, solo en catalogo-supabase=4
+   > pg_stat_statements
+   > pgcrypto
+   > supabase_vault
+   > uuid-ossp
+IGUAL      funciones
+IGUAL      indices
+IGUAL      politicas
+IGUAL      privilegios
+IGUAL      restricciones
+IGUAL      rls
+DIFERENTE  roles: solo en catalogo-local=3, solo en catalogo-supabase=3
+   < anon | False | True | False | False | False | False | False | None
+   < authenticated | False | True | False | False | False | False | False | None
+   < service_role | False | True | False | False | False | False | False | None
+   > anon | False | True | False | False | False | False | False | {statement_timeout=3s}
+   > authenticated | False | True | False | False | False | False | False | {statement_timeout=8s}
+   > service_role | False | True | False | False | False | True | False | None
+IGUAL      version
