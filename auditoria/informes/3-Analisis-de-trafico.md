@@ -2,7 +2,7 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 26 de octubre de 2026 · rama `auditoria/entrega` · @@COMMIT@@
+Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · @@COMMIT@@
 
 ## 1. Resumen
 
@@ -94,7 +94,7 @@ La Entrega 3 midió 130, 129 y 1, con otro volumen de flujos; la **conducta es l
 
 ## 9. Comparación con la Entrega 3
 
-| Aspecto | Entrega 3 (24/10) | Esta auditoría (25–26/10) |
+| Aspecto | Entrega 3 (24/10) | Esta auditoría (24–25/10) |
 |---|---|---|
 | Puntos de captura | `bunkerweb`, `postgres`, `glpi` | los mismos |
 | Tramas (bunkerweb / postgres / glpi) | 3 264 / 6 537 / 15 093 | 821 / 3 150 / 31 240 |

@@ -16,7 +16,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -117,7 +117,7 @@ def zap_directo() -> dict[str, str]:
 
 def resolver(texto: str) -> str:
     commit = git("rev-parse", "--short", "HEAD")
-    fecha = datetime.now(UTC).strftime("%d/%m/%Y")
+    fecha = datetime.now().strftime("%d/%m/%Y")  # hora local del equipo, como el resto del proyecto
     texto = (
         texto.replace("@@COMMIT@@", f"commit `{commit}` · generado el {fecha}")
         .replace("@@TABLA_PRIORIDAD@@", tabla_de_prioridad())
@@ -426,7 +426,9 @@ def informes(solo_pdf: bool) -> None:
         if not fuente.exists():
             sys.exit(f"falta el informe fuente {fuente}")
         md = resolver(fuente.read_text(encoding="utf-8"))
-        publico = md.replace("@@GRAFICO@@", "![Hallazgos por severidad](hallazgos-por-severidad.png)")
+        publico = md.replace(
+            "@@GRAFICO@@", "![Hallazgos por severidad](hallazgos-por-severidad.png)"
+        )
         (DEST / "informes" / f"{nombre}.md").write_text(publico, encoding="utf-8", newline="\n")
         md_a_pdf(md, DEST / "informes" / f"{nombre}.pdf", nombre.replace("-", " "), grafico)
 
@@ -437,7 +439,7 @@ def readme() -> None:
 
 Andina Servicios S.A.S. es una empresa ficticia y todos los datos lo son. Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01.
 
-Generada el {datetime.now(UTC).strftime("%d/%m/%Y")} desde el commit `{commit}` de la rama `auditoria/entrega` (base auditada: `5fa3f32`). Todo lo de esta carpeta se regenera con un comando: `uv run python auditoria/scripts/generar-entrega.py`.
+Generada el {datetime.now().strftime("%d/%m/%Y")} desde el commit `{commit}` de la rama `auditoria/entrega` (base auditada: `5fa3f32`). Todo lo de esta carpeta se regenera con un comando: `uv run python auditoria/scripts/generar-entrega.py`.
 
 ## Qué hay aquí
 

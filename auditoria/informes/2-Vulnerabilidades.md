@@ -2,7 +2,7 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 26 de octubre de 2026 · rama `auditoria/entrega` · @@COMMIT@@
+Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · @@COMMIT@@
 
 ## 1. Resumen
 
@@ -86,7 +86,7 @@ Con el WAF delante, Nikto reportó 2 avisos informativos en 240 s (la CSP en `/`
 
 ## 8. Imágenes de contenedores (Trivy, con KEV y EPSS)
 
-Reescaneadas el 26/10/2026 **después de reconstruir la imagen propia** con el `certifi` corregido (B-15). El catálogo KEV de CISA (versión 2026.10.23) tiene 1 756 vulnerabilidades explotadas; las imágenes suman 139 CVE distintas, **ninguna en KEV**.
+Reescaneadas el 25/10/2026 **después de reconstruir la imagen propia** con el `certifi` corregido (B-15). El catálogo KEV de CISA (versión 2026.10.23) tiene 1 756 vulnerabilidades explotadas; las imágenes suman 139 CVE distintas, **ninguna en KEV**.
 
 | Imagen | Críticas | Altas | Con parche | EPSS ≥ 10 % |
 |---|---|---|---|---|

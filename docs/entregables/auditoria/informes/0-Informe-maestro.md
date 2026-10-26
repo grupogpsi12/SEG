@@ -2,7 +2,7 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 26 de octubre de 2026 · base auditada `5fa3f32` · rama `auditoria/entrega` · commit `547d8d5` · generado el 26/10/2026
+Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `auditoria/entrega` · commit `610fa6d` · generado el 25/10/2026
 
 ## 1. Resumen ejecutivo
 
