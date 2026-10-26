@@ -81,7 +81,7 @@ services:
       # Sin interfaz ni MariaDB propia: el scheduler usa SQLite (ADR-023, RS-19).
       - MULTISITE=yes
       - SERVER_NAME=${APP_DOMINIO:-app.localhost} ${GLPI_DOMINIO:-glpi.localhost}
-      # HTTPS: autofirmado en local; Let's Encrypt en Azure (compose.azure.yaml, RS-01)
+      # HTTPS con certificado autofirmado: no hay exposicion publica (RS-01, ADR-031)
       - GENERATE_SELF_SIGNED_SSL=${GENERATE_SELF_SIGNED_SSL:-yes}
       - AUTO_LETS_ENCRYPT=${AUTO_LETS_ENCRYPT:-no}
       - EMAIL_LETS_ENCRYPT=${EMAIL_LETS_ENCRYPT:-}
@@ -170,7 +170,7 @@ services:
       JML_EXPORTES_DIR: /var/lib/jml/exportes
     volumes:
       - soportes:/var/lib/jml/soportes
-      - exportes:/var/lib/jml/exportes  # RD-04: lo sube a Blob infra/scripts/subir-exportes.sh
+      - exportes:/var/lib/jml/exportes  # RD-04: lo copia al disco externo infra/scripts/copiar-exportes.sh
     healthcheck:  # RNF-01: ultima sincronizacion exitosa y GLPI que responde (menos de 2 minutos)
       test: ["CMD", "python", "manage.py", "worker", "--salud"]
       interval: 30s
@@ -278,8 +278,16 @@ secrets:
 
 volumes:
   bw-storage:
-  exportes:  # auditoria diaria + ancla (RD-04); en Azure, un directorio del host
-  soportes:  # en Azure, compose.azure.yaml lo monta desde un sistema de archivos noexec (RS-17)
+  exportes:  # auditoria diaria + ancla (RD-04); copia diaria al disco externo (ADR-031)
+  soportes:
+    # Invariante 12 y RS-17 (B-38): sin ejecucion. tmpfs porque Docker no monta un volumen con nombre
+    # con noexec; si Docker se reinicia, un soporte en transito se pierde y RD-12 lo cubre (la
+    # solicitud pasa a error y RRHH registra de nuevo). uid 10001 = usuario jml de la imagen.
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=256m,mode=0700,uid=10001,gid=10001,noexec,nosuid,nodev
   glpi-datos:
   mariadb-datos:
 
