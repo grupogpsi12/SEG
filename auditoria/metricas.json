@@ -5,7 +5,8 @@
   "linea_base": {
     "pruebas_unitarias": {
       "documentado": 1600,
-      "medido": 1618
+      "medido": 2574,
+      "nota": "suite sin integracion: dominio, aplicacion, contratos, escenarios, adaptadores, seguridad y bdd (junit ANEXO-A-JUNIT); la linea base del 12/10 era 1618 sin seguridad ni bdd"
     },
     "cobertura_ramas_dominio_pct": {
       "documentado": 99,
@@ -27,13 +28,15 @@
     },
     "mutacion_dominio_pct": {
       "documentado": 93.6,
-      "medido": null,
+      "medido": 97.8,
       "meta": 85
     },
     "mutacion_aplicacion_pct": {
       "documentado": null,
-      "medido": null,
-      "meta": 85
+      "medido": 92.7,
+      "meta": 85,
+      "mutantes": 2226,
+      "muertos": 2063
     },
     "rnf06_dashboard_p95_ms": {
       "documentado": 791,
@@ -71,6 +74,13 @@
     },
     "cobertura_ramas_seguridad_pct": {
       "medido": 100
+    },
+    "mutacion_seguridad_pct": {
+      "documentado": null,
+      "medido": 96.1,
+      "meta": 85,
+      "mutantes": 512,
+      "muertos": 492
     }
   },
   "trazabilidad": {
@@ -85,13 +95,13 @@
   "hallazgos": {
     "criticos": 0,
     "altos": 0,
-    "medios": 14,
-    "bajos": 12,
+    "medios": 15,
+    "bajos": 15,
     "informativos": 6,
-    "total": 32,
-    "abiertos": 16,
-    "verificados": 11,
-    "corregidos": 2,
+    "total": 36,
+    "abiertos": 15,
+    "verificados": 15,
+    "corregidos": 3,
     "aceptados": 3
   },
   "celdas_matriz_authz": {
@@ -108,5 +118,12 @@
     "detectados": 6,
     "sembrados": 6
   },
-  "score_global": null
+  "score_global": null,
+  "anexo_a_excel": {
+    "filas": 157,
+    "cumple": 138,
+    "parcial": 9,
+    "no_verificable_en_local": 10,
+    "falla": 0
+  }
 }
