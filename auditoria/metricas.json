@@ -15,7 +15,7 @@
     },
     "cobertura_ramas_aplicacion_pct": {
       "documentado": 99,
-      "medido": 93.97,
+      "medido": 94.83,
       "compuerta": 90
     },
     "pruebas_glpi_real": {
@@ -40,12 +40,12 @@
     },
     "rnf06_dashboard_p95_ms": {
       "documentado": 791,
-      "medido": null,
+      "medido": 786,
       "umbral": 2000
     },
     "rnf06_paginas_p95_max_ms": {
       "documentado": 622,
-      "medido": null,
+      "medido": 649,
       "umbral": 800
     },
     "deteccion_glpi_s": {
@@ -81,6 +81,12 @@
       "meta": 85,
       "mutantes": 512,
       "muertos": 492
+    },
+    "cobertura_ramas_adaptadores_pct": {
+      "medido": 93.6
+    },
+    "cobertura_ramas_total_pct": {
+      "medido": 95.25
     }
   },
   "trazabilidad": {
@@ -99,9 +105,9 @@
     "bajos": 15,
     "informativos": 6,
     "total": 36,
-    "abiertos": 15,
+    "abiertos": 14,
     "verificados": 15,
-    "corregidos": 3,
+    "corregidos": 4,
     "aceptados": 3
   },
   "celdas_matriz_authz": {
