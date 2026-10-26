@@ -274,7 +274,9 @@ def tabla(filas: list[list[str]], est: dict[str, ParagraphStyle], ancho_util: fl
     return t
 
 
-def md_a_pdf(md: str, destino: Path, titulo: str, grafico: Path | None = None) -> None:
+def md_a_pdf(
+    md: str, destino: Path, titulo: str, grafico: Path | None = None, base: Path | None = None
+) -> None:
     est = estilos()
     pagina_ancho = A4[0] - 4 * cm
     historia: list = []
@@ -332,6 +334,20 @@ def md_a_pdf(md: str, destino: Path, titulo: str, grafico: Path | None = None) -
         elif linea.startswith("### "):
             vaciar()
             historia.append(Paragraph(inline(linea[4:]), est["h3"]))
+        elif linea.startswith("![") and base is not None:
+            vaciar()
+            m = re.match(r"!\[([^\]]*)\]\(([^)]+)\)", linea)
+            if m and (base / m.group(2)).exists():
+                with Image.open(base / m.group(2)) as im:
+                    ancho_px, alto_px = im.size
+                historia.append(
+                    RLImage(
+                        str(base / m.group(2)),
+                        width=pagina_ancho,
+                        height=pagina_ancho * alto_px / ancho_px,
+                    )
+                )
+                historia.append(Spacer(1, 6))
         elif re.match(r"^(\s*)([-*]|\d+\.)\s+", linea):
             vaciar()
             m = re.match(r"^(\s*)([-*]|\d+\.)\s+(.*)", linea)
