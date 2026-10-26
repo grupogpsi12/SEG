@@ -1,18 +1,19 @@
-# Pruebas del equipo en un equipo propio, SIN la base de Supabase (docs/probar-localmente.md):
+# Despliegue de referencia (ADR-031): la base de la aplicacion es este PostgreSQL local
+# (docs/probar-localmente.md, docs/operacion.md §3):
 #
 #   JML_MODO=local infra/scripts/preparar-entorno.sh
 #   docker compose -f infra/compose.yaml -f infra/compose.local.yaml up -d --build
 #   docker compose -f infra/compose.yaml -f infra/compose.local.yaml run --rm migrar
 #   docker compose -f infra/compose.yaml -f infra/compose.local.yaml exec web python manage.py semillas
 #
-# Cambia solo la base: PostgreSQL 17 (la version de Supabase) en una red interna, con los mismos
-# roles y el duenio separado (ADR-028). Todo lo demas es igual a produccion: BunkerWeb delante,
+# Agrega la base: PostgreSQL 17 (la version mayor de Supabase) en una red interna, con los
+# roles y el duenio separado (ADR-028). Lo demas viene de compose.yaml: BunkerWeb delante,
 # unico servicio con puertos (invariante 14). El inicio de sesion sigue en Supabase Auth.
 # El worker esta en el perfil `glpi`: arranca despues de preparar GLPI (docs/probar-localmente.md).
 
 x-base-local: &base-local
   JML_DB_HOST: postgres
-  JML_DB_SSLMODE: disable  # red interna del mismo host; contra Supabase siempre verify-full
+  JML_DB_SSLMODE: disable  # red interna pg_net del mismo host, sin puertos publicados (ADR-031)
 
 services:
   postgres:

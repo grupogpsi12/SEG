@@ -1,7 +1,7 @@
 """Lectura de secretos montados como archivos (ADR-009, RS-06, invariante 10).
 
-En Azure, la VM los baja de Key Vault a un tmpfs en /run/secrets; en local, son archivos no
-versionados. Los mensajes de error nombran el secreto, nunca su contenido.
+Docker Compose los monta en /run/secrets desde el directorio secrets/ del equipo, que no se
+versiona (ADR-031). Los mensajes de error nombran el secreto, nunca su contenido.
 """
 
 import os

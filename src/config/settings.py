@@ -103,7 +103,7 @@ JML_SOPORTES_DIR = os.environ.get("JML_SOPORTES_DIR", "/var/lib/jml/soportes")  
 JML_SUPABASE_URL = os.environ.get("JML_SUPABASE_URL", "")
 # RNF-01. /tmp es el tmpfs noexec propio de cada contenedor (compose): nadie mas escribe ahi.
 JML_LATIDO_WORKER = os.environ.get("JML_LATIDO_WORKER", "/tmp/jml-worker-latido")  # nosec B108  # noqa: S108
-# RD-04: el worker deja aqui la exportacion diaria; el host la sube a Blob inmutable.
+# RD-04: el worker deja aqui la exportacion diaria; el host la copia al disco externo (ADR-031).
 JML_EXPORTES_DIR = os.environ.get("JML_EXPORTES_DIR", "/var/lib/jml/exportes")
 # Solo para enlazar tickets desde la ficha (RF-33); la web NUNCA llama a GLPI (CLAUDE.md).
 JML_GLPI_URL = os.environ.get("JML_GLPI_URL", "https://glpi.localhost")

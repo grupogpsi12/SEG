@@ -152,7 +152,7 @@ def verificar_cadena(registros: Sequence[RegistroDeAuditoria]) -> ResultadoDeVer
     """Recorre la cadena completa desde el genesis e indica el PRIMER registro afectado (CA-09).
 
     Limite conocido: quitar los registros del final no se detecta por la cadena sola; para eso
-    existe la copia inmutable en Blob (RD-04).
+    existe la copia del ancla fuera del equipo (RD-04).
     """
     previo = HASH_GENESIS
     for posicion, registro in enumerate(registros, start=1):

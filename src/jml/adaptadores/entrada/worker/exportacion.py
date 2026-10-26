@@ -1,7 +1,6 @@
 """RD-04: el worker deja cada dia la auditoria del dia anterior y el ancla de la cadena en un
-volumen. Un script del host (`infra/scripts/subir-exportes.sh`) la sube a Blob con politica de
-inmutabilidad usando la identidad administrada de la VM: la aplicacion no lleva SDK de Azure
-(ADR-009).
+volumen. Un script del host (`infra/scripts/copiar-exportes.sh`) la copia a un disco externo sin
+sobrescribir (ADR-031): la aplicacion no sabe adonde va la copia.
 
 Idempotente: si el ancla del dia ya existe, no se toca nada. Se escribe primero a un temporal y
 se renombra, y el ancla va al final: un ancla presente implica un archivo de registros completo.

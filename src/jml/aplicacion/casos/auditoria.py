@@ -60,7 +60,7 @@ class VerificarAuditoria:
 
 @dataclass(frozen=True, slots=True)
 class ExportacionDeAuditoria:
-    """RD-04: lo que el worker escribe cada dia para la copia inmutable en Blob.
+    """RD-04: lo que el worker escribe cada dia para la copia fuera del equipo.
 
     `lineas` son los registros del dia en su forma canonica con sus hashes (verificables sin la
     base); `ancla_*` es la cabeza de TODA la cadena en el momento de exportar. Guardada fuera de la
