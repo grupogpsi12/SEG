@@ -31,7 +31,7 @@ Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin e
 - [x] **0.4 Spike de Supabase Auth con MFA desde el servidor** (SUP-05). Adaptador hecho y probado contra un GoTrue simulado; contra el real: error genérico ✔, **registro abierto aún habilitado** ✘ y flujo completo pendiente de la clave `service_role` (`docs/spikes/supabase.md`). Inicio de sesión con contraseña → inscripción de TOTP (código QR) → desafío → verificación, desde Python. *Antes de la Fase 2.*
   ✔ Script que llega a AAL2 con un usuario de prueba; registro abierto deshabilitado comprobado.
   ✔✔ Cerrado el 11/10/2026 contra el Supabase real (`tests/integracion/test_supabase_auth.py`, 8 de 8): contraseña → inscripción del TOTP → AAL2; el segundo ingreso no reinscribe; con solo la contraseña no se agrega otro factor; error genérico; registro abierto **desactivado** (RS-16); la Data API no expone el esquema `app`. La cuenta de prueba se crea y se borra con `service_role`. Pendiente de RS-16: contraseña mínima de 12 en el Dashboard y el asesor de seguridad de Supabase antes de la entrega.
-- [ ] **0.5 Costos y región en Azure.** Confirmar la región permitida, configurar el apagado automático y una alerta de presupuesto al 50 %. *Antes de la Fase 5.*
+- [x] ~~**0.5 Costos y región en Azure.**~~ No aplica desde ADR-031 (todo local, costo USD 0). Confirmar la región permitida, configurar el apagado automático y una alerta de presupuesto al 50 %. *Antes de la Fase 5.*
   ✔ Capturas de la alerta y del apagado; tabla de costos del SRS actualizada.
 - [~] **0.6 Spike de BunkerWeb** (ADR-023, RS-17 a RS-19, R11, R12). *Antes de la Fase 2 (1.2 de infraestructura).* Partir de `waf-stack` y aplicar los ajustes de ADR-023 (sin interfaz, sin MariaDB para el WAF, `API_TOKEN`, digest, sin `.env` versionado). Modo multisitio `app.localhost` → web y `glpi.localhost` → GLPI.
   - Medir la RAM del stack completo con la reportería.
@@ -41,7 +41,7 @@ Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin e
 
   ✔ Informe en `docs/spikes/bunkerweb.md` con la RAM medida, las exclusiones necesarias (ruta y regla) y el `pruebas.sh` adaptado en verde.
   ✔✔ Hecho el 11/10/2026 (`docs/spikes/bunkerweb.md`): `pruebas.sh` en verde en `app.localhost` y `glpi.localhost`; PDF de 20 MB aceptado y de 22 MB cortado con 413; ejecutable disfrazado de PDF pasa el WAF y lo rechaza la aplicación; RAM ≈ 0,8 GB; `bwcli unban` confirmado; sin exclusiones necesarias hasta ahora. ⏳ Falta recorrer GLPI en modo `detect` con un ticket con texto enriquecido y adjunto (necesita GLPI configurado) y medir la reportería.
-- [ ] **0.7 Decidir Cloudflare** (ADR-024): el equipo decide si compra un dominio para Tunnel + Access. Solo afecta al despliegue (fase 5), no al desarrollo.
+- [x] ~~**0.7 Decidir Cloudflare**~~ Resuelta: descartada por ADR-031. (ADR-024): el equipo decide si compra un dominio para Tunnel + Access. Solo afecta al despliegue (fase 5), no al desarrollo.
   ✔ ADR-024 pasa a Aceptada o Rechazada.
 
 ## Fase 1 — Núcleo (`dominio` + `aplicacion`), sin Django, sin red, sin base de datos
@@ -343,7 +343,7 @@ Todo el código de esta fase es Python puro con dobles en memoria. Se construye 
   - **Qué:** un job con GLPI 11 y MariaDB como contenedores, `preparar-glpi.sh`, `configurar-glpi` y `contrato-glpi.sh`.
   - **Criterio:** las 30 pruebas en verde en GitHub Actions en cada push a `master`.
   ✔ Job `glpi-real` en `verificar.yml` (24/10/2026). Corre solo en los push a `master`, con secretos de un solo uso del runner, y sigue los mismos pasos que `docs/probar-localmente.md` §3, ya verificados en local. ⏳ Comprobar que pasa en GitHub con el primer push.
-- [ ] **5.10 Mutación antes de la entrega** (meta de 85 % en `dominio`; la última fue de 93,6 %).
+- [x] **5.10 Mutación antes de la entrega** Hecha en A-F8 (25/10/2026): dominio 97,8 %, aplicación 92,7 %. (meta de 85 % en `dominio`; la última fue de 93,6 %).
   - **Criterio:** `make mutacion` igual o mayor a 85 %, con el informe en `docs/spikes/mutacion.md`.
   ⏸ **Aplazado a pedido del equipo (24/10/2026).** Se lanzó y se detuvo a los 60 de 1341 mutantes: con Docker ocupando la CPU iba a tardar horas. `src/` se restauró con `git checkout`.
   - El dominio no cambió desde la corrida del 93,6 % (su último commit es del 10/10/2026, el mismo día del registro de mutación), así que ese resultado sigue valiendo.
@@ -392,7 +392,7 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Riesgo:** mutmut 3 no corre en Windows (`fork`): se usó un contenedor y se registró.
 - [x] **A-Extra Entrega 3 y Anexo A (Excel).** 25/10/2026: se repitió lo repetible de `pruebas anteriores/` (bases, Nikto, Docker Bench, capturas de `bunkerweb` y `postgres`, ZAP directo) y se verificó el Excel de 18 hojas fila por fila (157 filas: 138 cumplen, 9 parciales, 10 no verificables en local, 0 fallan; `auditoria/verificacion-anexo-a-excel.md`). Salieron B-33 a B-36, S-39 y S-40.
   - **Comandos:** `uv run pytest tests/escenarios/test_anexo_a.py`, `python auditoria/scripts/anexo-a-matriz.py`, `bash auditoria/scripts/anexo-a-puertos.sh`.
-- [ ] **A-F9 Empaquetado.** En curso: `uv run python auditoria/scripts/generar-entrega.py` arma `docs/entregables/auditoria/` (informes `.md` y `.pdf`, evidencias, manifiesto) y `verificar-entrega.py` lo valida; `gitleaks` sobre la carpeta. Rendimiento remedido: p95 de 466 a 649 ms, dashboard 786 ms.
+- [x] **A-F9 Empaquetado.** Hecho (regenerado y verificado tras ADR-031): `uv run python auditoria/scripts/generar-entrega.py` arma `docs/entregables/auditoria/` (informes `.md` y `.pdf`, evidencias, manifiesto) y `verificar-entrega.py` lo valida; `gitleaks` sobre la carpeta. Rendimiento remedido: p95 de 466 a 649 ms, dashboard 786 ms.
 - **Dependencias de F9 instaladas (solo `dev`):** `reportlab` **5.0.1** (BSD) y `pillow` **12.3.0** (MIT-CMU), con `charset-normalizer` 3.5.2 (MIT) como dependencia de reportlab. **Qué resuelve:** el plan exige que los cinco PDF se regeneren con un comando; sin una biblioteca de PDF habría que escribirlo a mano (miles de líneas). **Por qué no basta la biblioteca estándar:** no genera PDF. **Versión:** el plan decía 5.1.0 y 13.0.0, publicadas el 22 y el 16/10/2026; se usan las anteriores (20/08 y 01/07/2026) porque una versión de menos de dos semanas no ha tenido tiempo de que se detecte un paquete envenenado (T16). No entran a la imagen.
 - **Dependencias nuevas que autoriza el plan (§12.2), solo en `dev`:** `pytest-bdd` 9.0.0 (Gherkin ejecutable; F4), `reportlab` 5.1.0 y `pillow` 13.0.0 (PDF de los informes; F9). Licencia y versión se confirman en PyPI al instalarlas y se anota aquí; ninguna entra a la imagen de la aplicación.
 - [x] **A-DS Arquitectura local y entregables de Desarrollo Seguro** (25/10/2026). Hecho: SRS v2.5, ADR-031, informes, capítulos, entregables 1 a 4 con README, PDF revisados; evidencias X-08 a X-10 en `estado-auditoria.md`. El documento `DS_1eraEntrega_Local (2).docx` fija el despliegue 100 % local: SRS v2.5 y ADR-031 (reemplaza ADR-002 y la parte de base de datos de ADR-015; descarta ADR-024).
