@@ -83,7 +83,7 @@ El orden fue deliberado: el núcleo se construyó **primero**, completo y con do
 
 ### La auditoría como parte de la ejecución
 
-Con el sistema construido, se ejecutó una auditoría de seguridad y calidad en diez fases (F0 a F9) bajo un plan escrito, con un ciclo de doce pasos por ítem (leer, planear, buscar, neutralizar, control positivo, ejecutar con evidencia, romper, clasificar, actualizar, confirmar, compuerta, siguiente). Resultado: **38 hallazgos**, sin Críticos ni Altos; 20 quedaron verificados o corregidos durante la auditoría (los corregidos, con su prueba en rojo y luego en verde) y 18 siguen abiertos o aceptados.
+Con el sistema construido, se ejecutó una auditoría de seguridad y calidad en diez fases (F0 a F9) bajo un plan escrito, con un ciclo de doce pasos por ítem (leer, planear, buscar, neutralizar, control positivo, ejecutar con evidencia, romper, clasificar, actualizar, confirmar, compuerta, siguiente). Resultado: **39 hallazgos**, sin Críticos ni Altos; 22 quedaron verificados o corregidos durante la auditoría (los corregidos, con su prueba en rojo y luego en verde) y 18 siguen abiertos o aceptados.
 
 ## 2.3 Cumplimiento de objetivos y procedimientos
 
@@ -100,7 +100,7 @@ Con el sistema construido, se ejecutó una auditoría de seguridad y calidad en 
 | 7 | Dashboard para técnicos sin tiempo real, búsqueda y ficha | p95 de 466 a 649 ms por página y 786 ms el dashboard, con 300 colaboradores y 20 usuarios | `F9-05-RENDIMIENTO-20V` | Cumple |
 | 8 | Registro de auditoría inalterable | Cadena válida tras restaurar (secuencia 414) y tras una carga de 6 586 registros | Pruebas de integridad y restauración | Cumple |
 | 9 | Inicio de sesión con Supabase Auth y MFA obligatorio | La sesión se crea solo tras el TOTP; código usado no vuelve a servir | Pruebas de ingreso | Cumple, con la salvedad de que esta auditoría no ejercitó el servicio real |
-| 10 | WAF BunkerWeb con CRS, límite y bloqueo, más reportería | CRS en bloqueo sin exclusiones; ataque clasificado en Loki en el mismo segundo | `pruebas.sh`; CA-21 | Cumple, con B-36 (el límite de ritmo banea a quien navega rápido) |
+| 10 | WAF BunkerWeb con CRS, límite y bloqueo, más reportería | CRS en bloqueo con una sola exclusión puntual (B-39); ataque clasificado en Loki en el mismo segundo | `pruebas.sh`; CA-21 | Cumple; B-36 (el límite de ritmo baneaba a quien navegaba rápido) corregido con ADR-032 |
 
 ### Procedimientos y criterios de aceptación
 
@@ -198,6 +198,6 @@ Toda medición se registra con **un mismo protocolo**: una carpeta de evidencia 
 
 - **Contraste con lo documentado.** Cada cifra que el proyecto declaraba se remidió; toda diferencia mayor de 1 % es un hallazgo (por ejemplo, la «cobertura de ramas 99 %» era la métrica combinada; las ramas puras son 97,74 % y 94,83 %).
 - **Estadística descriptiva.** Mediana, percentil 95 y máximo por página en las mediciones de rendimiento; 20 corridas consecutivas para la estabilidad; repetición de las mediciones sospechosas (dos corridas más de rendimiento, dos del recorrido por navegador).
-- **Clasificación de hallazgos.** Severidad por DREAD (daño, reproducibilidad, explotabilidad, usuarios afectados, descubrimiento) multiplicada por un factor según la posición del atacante; el *score* global es la exposición ponderada de lo abierto dividida por diez veces los controles verificados: 19 / (147 × 10) × 100 = 1,3.
+- **Clasificación de hallazgos.** Severidad por DREAD (daño, reproducibilidad, explotabilidad, usuarios afectados, descubrimiento) multiplicada por un factor según la posición del atacante; el *score* global es la exposición ponderada de lo abierto dividida por diez veces los controles verificados: 17 / (147 × 10) × 100 = 1,2.
 - **Triage.** Cada alerta de severidad media o superior de un escáner se contrastó con el código y se reprodujo a mano antes de aceptarla o descartarla (por ejemplo, la alerta «Path Traversal» de ZAP se reprodujo con siete valores y se descartó).
 - **Validez.** Se declaran sus límites: el stack local es la arquitectura de destino (ADR-031), así que lo medido es lo que se entrega; el servicio real de Supabase Auth no se midió; la copia al disco externo se verificó contra una carpeta que lo simula, no contra el disco real; y una evaluación de accesibilidad con lector de pantalla quedó pendiente.

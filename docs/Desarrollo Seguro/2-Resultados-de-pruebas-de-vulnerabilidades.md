@@ -134,9 +134,11 @@ Se ejecutó Docker Bench for Security sobre las secciones de imágenes y de cont
 
 ## 10. Borde de protección (BunkerWeb)
 
-El script de pruebas del WAF envía tráfico normal y siete ataques a los dominios de la aplicación y de GLPI: inyección SQL por GET y por POST, secuencias de comandos entre sitios, recorrido de rutas, inyección de comandos, Log4Shell por cabecera y un escáner identificado por su User-Agent. En todos los casos el tráfico normal recibió 200 o 302 y cada ataque recibió 403. No fue necesario crear ninguna exclusión del conjunto de reglas. Catorce variantes de cabeceras hostiles fueron bloqueadas o atendidas sin error de servidor, y la base de datos permaneció íntegra.
+El script de pruebas del WAF envía tráfico normal y siete ataques a los dominios de la aplicación y de GLPI: inyección SQL por GET y por POST, secuencias de comandos entre sitios, recorrido de rutas, inyección de comandos, Log4Shell por cabecera y un escáner identificado por su User-Agent. En todos los casos el tráfico normal recibió 200 o 302 y cada ataque recibió 403. Durante la auditoría no fue necesario crear ninguna exclusión del conjunto de reglas; la única vigente se describe al final de esta sección. Catorce variantes de cabeceras hostiles fueron bloqueadas o atendidas sin error de servidor, y la base de datos permaneció íntegra.
 
-Se identificó una consecuencia indeseada del diseño del limitador: una persona que navega con rapidez puede recibir el código 429 y, si acumula varios, el bloqueo de su dirección durante una hora (hallazgo B-36, severidad media). La propuesta P-12 consiste en que el límite de frecuencia responda 429 sin activar el bloqueo por mal comportamiento.
+Se identificó una consecuencia indeseada del diseño del limitador: una persona que navega con rapidez puede recibir el código 429 y, si acumula varios, el bloqueo de su dirección durante una hora (hallazgo B-36, severidad media). Se corrigió con la decisión ADR-032: el límite de frecuencia sigue respondiendo 429, pero ese código ya no cuenta para el bloqueo por mal comportamiento. Una ráfaga de 26 respuestas 429 ya no bloquea, mientras que 25 respuestas 404 seguidas sí lo hacen, y el WAF siguió bloqueando los siete ataques en los dos dominios.
+
+Al usar GLPI a través del WAF apareció además un falso positivo del conjunto de reglas: la regla 953100, que busca mensajes de error de PHP en las respuestas, cortaba el catálogo de traducciones de GLPI (/front/locale.php) y el navegador recibía el código 500 (hallazgo B-39). Se resolvió con una exclusión puntual de esa regla, limitada a esa ruta del dominio de GLPI, sin desactivar el resto del conjunto de reglas.
 
 ## 11. Hallazgos de esta área
 
@@ -152,8 +154,9 @@ Se identificó una consecuencia indeseada del diseño del limitador: una persona
 | B-30 | Baja | local_infile activo y tramo GLPI–MariaDB sin TLS | Abierto |
 | B-31 | Media | Vulnerabilidades críticas en imágenes de terceros | Aceptado con exención |
 | B-33 | Baja | Doce avisos de endurecimiento de contenedores | Abierto |
-| B-36 | Media | El limitador del WAF puede bloquear a una persona legítima | Abierto, decisión del equipo |
+| B-36 | Media | El limitador del WAF puede bloquear a una persona legítima | Corregido (ADR-032) |
 | B-38 | Baja | En la arquitectura local, el volumen de los soportes de vinculación se montaba sin la opción noexec | Corregido y verificado |
+| B-39 | Baja | Una regla del CRS cortaba el catálogo de traducciones de GLPI | Corregido con una exclusión puntual |
 
 ## 12. Limitaciones
 

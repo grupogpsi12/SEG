@@ -102,12 +102,12 @@
     "criticos": 0,
     "altos": 0,
     "medios": 15,
-    "bajos": 17,
+    "bajos": 18,
     "informativos": 6,
-    "total": 38,
-    "abiertos": 15,
-    "verificados": 17,
-    "corregidos": 3,
+    "total": 39,
+    "abiertos": 14,
+    "verificados": 18,
+    "corregidos": 4,
     "aceptados": 3
   },
   "celdas_matriz_authz": {

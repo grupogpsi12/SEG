@@ -135,8 +135,8 @@ Aunque la propuesta se centra en las tres propiedades solicitadas, se incluyen l
 
 | Control | Descripción | Verificación |
 |---|---|---|
-| C-02 Cortafuegos de aplicaciones web | ModSecurity con el conjunto OWASP CRS 4 en modo de bloqueo, sin exclusiones | Tráfico normal 200 y siete ataques 403 en los dos dominios |
-| C-03 Límites de frecuencia y bloqueo | 2 peticiones por segundo, 5 por minuto en el inicio de sesión, y bloqueo de una hora por mal comportamiento | Medido; se identificó que puede bloquear a una persona legítima (hallazgo B-36) |
+| C-02 Cortafuegos de aplicaciones web | ModSecurity con el conjunto OWASP CRS 4 en modo de bloqueo, con una sola exclusión puntual (una regla de salida en una ruta de GLPI) | Tráfico normal 200 y siete ataques 403 en los dos dominios |
+| C-03 Límites de frecuencia y bloqueo | 2 peticiones por segundo y 5 por minuto en el inicio de sesión; bloqueo de una hora por mal comportamiento, en el que el código 429 del límite no cuenta | Ráfaga de 26 respuestas 429 sin bloqueo; 25 respuestas 404 sí bloquean (hallazgo B-36, corregido con ADR-032) |
 | C-13 Aislamiento de red | Solo el WAF publica puertos en el equipo; las redes de datos pg_net y db_net son internas y sin salida; la reportería escucha solo en 127.0.0.1 | Matriz de puertos: 28 comprobaciones sin diferencias |
 | Detección y recuperación | Comprobaciones de salud; respaldo con pg_dump y volcado de MariaDB; restauración en un contenedor PostgreSQL 17 limpio con la cadena íntegra | Detección en 63 s (GLPI) y 43 s (base); restauración en 19 s frente a un objetivo de 4 horas |
 | Rendimiento | Páginas con percentil 95 inferior a 800 ms y el panel inferior a 2 s | 466 a 649 ms por página; 786 ms el panel |
@@ -175,7 +175,7 @@ La eficacia de los controles se evaluó con cuatro tipos de evidencia:
 3. **Defectos sembrados.** Se retiró deliberadamente un control a la vez y se comprobó que alguna prueba fallara: los seis defectos (consulta construida por formato, ausencia del permiso de solo inserción, disparador apagado, rol omitido, PDF renombrado y segundo uso del código TOTP) fueron detectados.
 4. **Mediciones independientes.** Escaneo activo (ZAP y sqlmap), análisis de tráfico, escaneo de imágenes e inspección de privilegios y puertos en la base de datos local.
 
-El puntaje global de riesgo residual es 1,3 sobre 100 (clasificado como aceptable), calculado sobre 147 controles verificados de la norma OWASP ASVS 5.0. No hay hallazgos críticos ni altos.
+El puntaje global de riesgo residual es 1,2 sobre 100 (clasificado como aceptable), calculado sobre 147 controles verificados de la norma OWASP ASVS 5.0. No hay hallazgos críticos ni altos.
 
 ## 10. Controles adicionales propuestos
 
@@ -185,15 +185,14 @@ La auditoría identificó mejoras que no están implementadas; se proponen en or
 
 | Prioridad | Propuesta | Hallazgo | Beneficio | Esfuerzo |
 |---|---|---|---|---|
-| 1 | P-12. El límite de frecuencia responde 429 sin activar el bloqueo de una hora | B-36 | Evita bloquear a una persona legítima, en particular durante una emergencia | 1 h |
-| 2 | P-1. Red dedicada exclusiva entre el trabajador y GLPI | B-32 | Elimina la exposición de los tokens de GLPI a los demás contenedores | 3 h |
-| 3 | P-11. Perfil de servicio de GLPI sin permisos de borrado ni purga | B-35 | Impide que un token comprometido destruya tickets | 1,5 h |
-| 4 | Programar en el equipo de operación las tareas diarias de copia y respaldo hacia el disco externo real | Sección 6 | Hace efectiva la protección de la cadena fuera del equipo | 0,5 h |
-| 5 | P-5. Verificación de firma, expiración y emisor del token de Supabase | B-28 | Completa la verificación de autenticidad | 3 h |
-| 6 | P-8. Vista de solo lectura de solicitudes para el rol de auditoría | B-26 | Permite contrastar la cadena con la solicitud que describe | 3 h |
-| 7 | P-2. Revisión mensual de las imágenes de terceros y escaneo nocturno | B-31, B-18 | Reduce la acumulación de vulnerabilidades | 2 h |
-| 8 | Enlace de parámetros SQL en el servidor | Sección 4 | Evita que el valor de un campo restringido viaje dentro del texto de la consulta | A evaluar |
-| 9 | Endurecimiento de contenedores: sistema de archivos de solo lectura y límites de procesos y de CPU | B-33 | Reduce el impacto de un contenedor comprometido | 3 h |
+| 1 | P-1. Red dedicada exclusiva entre el trabajador y GLPI | B-32 | Elimina la exposición de los tokens de GLPI a los demás contenedores | 3 h |
+| 2 | P-11. Perfil de servicio de GLPI sin permisos de borrado ni purga | B-35 | Impide que un token comprometido destruya tickets | 1,5 h |
+| 3 | Programar en el equipo de operación las tareas diarias de copia y respaldo hacia el disco externo real | Sección 6 | Hace efectiva la protección de la cadena fuera del equipo | 0,5 h |
+| 4 | P-5. Verificación de firma, expiración y emisor del token de Supabase | B-28 | Completa la verificación de autenticidad | 3 h |
+| 5 | P-8. Vista de solo lectura de solicitudes para el rol de auditoría | B-26 | Permite contrastar la cadena con la solicitud que describe | 3 h |
+| 6 | P-2. Revisión mensual de las imágenes de terceros y escaneo nocturno | B-31, B-18 | Reduce la acumulación de vulnerabilidades | 2 h |
+| 7 | Enlace de parámetros SQL en el servidor | Sección 4 | Evita que el valor de un campo restringido viaje dentro del texto de la consulta | A evaluar |
+| 8 | Endurecimiento de contenedores: sistema de archivos de solo lectura y límites de procesos y de CPU | B-33 | Reduce el impacto de un contenedor comprometido | 3 h |
 
 ## 11. Conclusiones
 
@@ -201,4 +200,4 @@ La auditoría identificó mejoras que no están implementadas; se proponen en or
 2. La **confidencialidad** de los campos restringidos se verificó de extremo a extremo: ningún valor llegó a GLPI ni apareció en claro en el tramo cifrado. Sus principales limitaciones son de red interna: los tokens de GLPI y el campo restringido viajan sin cifrar dentro de la red «app».
 3. La **autenticidad** descansa en un segundo factor mediado por el servidor, con Supabase Auth como único servicio externo, y en una matriz de autorización de 440 celdas sin desviaciones. Su limitación principal es que el token de Supabase no se verifica criptográficamente en la aplicación.
 4. La **integridad** se impone en el motor de base de datos mediante una cadena de auditoría, disparadores e índices; sobrevivió a una restauración con la misma cabeza. Al no existir almacenamiento inmutable en el entorno local, la copia del ancla en un disco externo es la contramedida frente a una reescritura completa.
-5. Las mejoras de mayor valor son de bajo esfuerzo y se concentran en la red interna entre el trabajador y GLPI, en el perfil de la cuenta de servicio, en el comportamiento del limitador del WAF y en programar la copia diaria al disco externo.
+5. Las mejoras de mayor valor son de bajo esfuerzo y se concentran en la red interna entre el trabajador y GLPI, en el perfil de la cuenta de servicio y en programar la copia diaria al disco externo. El comportamiento del limitador del WAF, que bloqueaba a personas legítimas, ya se corrigió (ADR-032).

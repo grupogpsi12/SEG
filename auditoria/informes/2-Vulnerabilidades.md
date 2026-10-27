@@ -120,7 +120,7 @@ Imagen `docker/docker-bench-security` (digest `ddbdf4f8`) con la API 1.43 sobre 
 
 ## 11. El borde (BunkerWeb)
 
-`infra/waf/pruebas.sh` en `app.*` y `glpi.*`: tráfico normal 200/302 y siete ataques 403 (inyección SQL por GET y por POST, XSS, recorrido de rutas, inyección de comandos, Log4Shell por cabecera y un escáner por *User-Agent*); "nada responde por fuera de BunkerWeb" (los puertos 8000, 3306 y 5000 cerrados); y la API interna rechaza sin token y acepta con él. **0 exclusiones del CRS**: no hubo que silenciar ninguna regla. **Cabeceras hostiles:** 14 variantes (`User-Agent`, `Referer`, `Accept-Language`, `Cookie`) fueron bloqueadas por el WAF o atendidas sin error 5xx, con la base íntegra. **Ritmo:** a ritmo humano 5 de 5 verificaciones de la cadena dan 200; a ritmo de guion el límite de 2 r/s da 429, que es el diseño (RS-08). **B-36**: ese diseño tiene un costo para una persona real que navega rápido.
+`infra/waf/pruebas.sh` en `app.*` y `glpi.*`: tráfico normal 200/302 y siete ataques 403 (inyección SQL por GET y por POST, XSS, recorrido de rutas, inyección de comandos, Log4Shell por cabecera y un escáner por *User-Agent*); "nada responde por fuera de BunkerWeb" (los puertos 8000, 3306 y 5000 cerrados); y la API interna rechaza sin token y acepta con él. **0 exclusiones del CRS** durante la auditoría; el 26/10/2026, al usar GLPI, se agregó una exclusión puntual (regla 953100 en `/front/locale.php` de GLPI, B-39) con su prueba. **Cabeceras hostiles:** 14 variantes (`User-Agent`, `Referer`, `Accept-Language`, `Cookie`) fueron bloqueadas por el WAF o atendidas sin error 5xx, con la base íntegra. **Ritmo:** a ritmo humano 5 de 5 verificaciones de la cadena dan 200; a ritmo de guion el límite de 2 r/s da 429, que es el diseño (RS-08). **B-36**: ese diseño tiene un costo para una persona real que navega rápido.
 
 ## 12. Hallazgos de esta área
 
@@ -134,7 +134,8 @@ Imagen `docker/docker-bench-security` (digest `ddbdf4f8`) con la API 1.43 sobre 
 | B-30 | Baja | `local_infile` y GLPI→MariaDB sin TLS |
 | B-31 | Media | CVE críticas sin parche en las imágenes de terceros (exención escrita) |
 | B-33 | Baja | Doce avisos de endurecimiento de contenedores (CIS) |
-| B-36 | Media | El limitador del WAF banea a una persona real |
+| B-36 | Media | El limitador del WAF banea a una persona real (corregido: ADR-032) |
+| B-39 | Baja | El CRS cortaba el catálogo de traducciones de GLPI (corregido: exclusión puntual de 953100) |
 
 ## 13. Comparación con la Entrega 3
 

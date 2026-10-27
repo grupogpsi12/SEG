@@ -2,13 +2,13 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `auditoria/entrega` · commit `82eaf49` · generado el 25/10/2026
+Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `auditoria/entrega` · commit `0271b8e` · generado el 26/10/2026
 
 ## 1. Resumen ejecutivo
 
 **Qué se auditó.** La aplicación JML (Django 5.2, arquitectura hexagonal), su integración con GLPI 11, la base PostgreSQL, el borde BunkerWeb (WAF), las imágenes de contenedores y los documentos del proyecto, **en un stack local** de Docker. Desde el 25/10/2026 ese stack es la arquitectura de destino (ADR-031, SRS v2.5): Docker Desktop, PostgreSQL 17 local y Supabase solo para Auth; Azure y Cloudflare quedan fuera del diseño. No se tocó ningún tercero; Supabase se leyó solo en su catálogo, con autorización escrita del equipo.
 
-**Resultado.** No se encontró ninguna vulnerabilidad Crítica ni Alta. Hay **38 hallazgos**: 15 Medios, 17 Bajos y 6 Informativos. De ellos, 18 siguen en pie (abiertos o aceptados) y 20 están verificados o corregidos. El último, B-38, salió al alinear la infraestructura con la arquitectura local (ADR-031): el volumen de los soportes había perdido `noexec`; ya está corregido. El **score global es 1,3 de 100** (escala: 0–20 aceptable), calculado sobre **147 controles de ASVS verificados**. La aplicación resistió ZAP activo (0 FAIL según su propia clasificación en las tres corridas; la única alerta Alta, de confianza baja, era un falso positivo triado), sqlmap hasta el nivel 5 (0 inyecciones en 8 objetivos, directo y sin WAF), y su cadena de auditoría sobrevivió a una restauración con la misma cabeza.
+**Resultado.** No se encontró ninguna vulnerabilidad Crítica ni Alta. Hay **39 hallazgos**: 15 Medios, 18 Bajos y 6 Informativos. De ellos, 17 siguen en pie (abiertos o aceptados) y 22 están verificados o corregidos. El último, B-38, salió al alinear la infraestructura con la arquitectura local (ADR-031): el volumen de los soportes había perdido `noexec`; ya está corregido. El 26/10/2026, al usar GLPI por el WAF, se corrigieron B-36 (ADR-032: el límite de ritmo ya no banea) y B-39 (una exclusión puntual del CRS para el catálogo de traducciones de GLPI). El **score global es 1,2 de 100** (escala: 0–20 aceptable), calculado sobre **147 controles de ASVS verificados**. La aplicación resistió ZAP activo (0 FAIL según su propia clasificación en las tres corridas; la única alerta Alta, de confianza baja, era un falso positivo triado), sqlmap hasta el nivel 5 (0 inyecciones en 8 objetivos, directo y sin WAF), y su cadena de auditoría sobrevivió a una restauración con la misma cabeza.
 
 | Medida | Valor |
 |---|---|
@@ -22,9 +22,11 @@ Auditoría del 24 al 25 de octubre de 2026 · base auditada `5fa3f32` · rama `a
 
 **Los tres riesgos que importan** (ordenados por DREAD × factor, solo los abiertos):
 
-1. **B-36 (Medio, 6,4). El limitador del WAF banea a una persona real.** Con menos de un segundo entre páginas llega un 429; varios seguidos terminan en un baneo de una hora. En una emergencia (EMG) es una baja de acceso que no se emite a tiempo. Salió de repasar la Entrega 3 y de repetir el recorrido por navegador.
-2. **B-06 (Medio, 6,0). Un solo proceso de `gunicorn`.** Los desafíos del segundo factor viven en memoria; un reinicio los pierde. Es una decisión de diseño (ADR-017 / S-29), aceptable a esta escala, pero debe quedar escrita.
-3. **B-10 (Medio, 6,0). La política mínima de contraseña de Supabase y su asesor de seguridad no se han ejecutado.** Es una acción humana en un panel que esta auditoría no podía tocar. Arrastra 12 requisitos de ASVS pendientes.
+1. **B-06 (Medio, 6,0). Un solo proceso de `gunicorn`.** Los desafíos del segundo factor viven en memoria; un reinicio los pierde. Es una decisión de diseño (ADR-017 / S-29), aceptable a esta escala, pero debe quedar escrita.
+2. **B-10 (Medio, 6,0). La política mínima de contraseña de Supabase y su asesor de seguridad no se han ejecutado.** Es una acción humana en un panel que esta auditoría no podía tocar. Arrastra 12 requisitos de ASVS pendientes.
+3. **B-07 (Bajo, 5,2). `master` no tiene protección de rama.** Exige permisos de dueño del repositorio en GitHub.
+
+El que encabezaba esta lista, **B-36** (el limitador del WAF baneaba una hora a quien navegaba rápido), se corrigió con ADR-032 el 26/10/2026: abrir el panel de GLPI disparaba 19 respuestas 429 y baneaba la IP compartida de todo el equipo. Ahora el 429 frena, pero no banea.
 
 Les sigue una familia coherente: **el worker y GLPI se tratan como de confianza, pero el tramo entre ellos no lo es** (B-32: 382 tokens en claro en la red interna; B-35: la cuenta de servicio puede borrar y purgar tickets). Una sola red dedicada (propuesta P-1) y un perfil sin esos derechos (P-11) la cierran.
 
@@ -64,7 +66,7 @@ El proyecto llegó con cifras documentadas. Se remidieron todas.
 | Mutación del dominio 93,6 % | 97,8 % | Mejor que lo documentado |
 | Mutación de aplicación y seguridad | nunca medidas | Ahora 92,7 % y 96,1 % (B-09) |
 | 30 pruebas contra GLPI real | 30 de 30, tras B-16 y B-17 | Cierto, pero fallaba desde el 20/10 por un reloj fijo |
-| 4 pruebas Playwright por el WAF | 4 de 4; en dos corridas posteriores 3 de 4 | Intermitente por el limitador (B-36) |
+| 4 pruebas Playwright por el WAF | 4 de 4; en dos corridas posteriores 3 de 4 | Intermitente por un 429 del limitador (B-36; desde ADR-032 el 429 ya no banea) |
 | RNF-06: dashboard 791 ms | 786 ms | Cierto, a 20 vueltas |
 | Detección de GLPI 63 s · de la base 56 s | 63 s · 43 s | Cierto |
 | Restauración 23 s | 19 s | Cierto |
@@ -122,7 +124,7 @@ Detalle completo en el informe 1. En resumen: **2 574 pruebas** en siete capas; 
 | `testssl.sh` | borde local | TLS 1.2 y 1.3, sin ninguna de las vulnerabilidades probadas |
 | Nikto | por el WAF | 2 avisos informativos en 240 s (la CSP en `/` y el certificado autofirmado), el mismo resultado que la Entrega 3, que atribuyó el truncado al baneo del WAF |
 | Cobertura de la superficie | ZAP × 5 roles | 20 de 22 rutas (90,9 %); las otras dos son inalcanzables con una sesión inyectada y las cubre la matriz |
-| WAF | `pruebas.sh` | Tráfico normal 200 y ataques 403 en `app.*` y `glpi.*`; 0 exclusiones |
+| WAF | `pruebas.sh` | Tráfico normal 200 y ataques 403 en `app.*` y `glpi.*`; una exclusión puntual (regla 953100 en `/front/locale.php` de GLPI, B-39) con su prueba |
 
 **Control positivo de los escáneres:** antes de creerles, ZAP y sqlmap debieron ver lo sembrado en una aplicación vulnerable de laboratorio (la inyección SQL, el XSS y las cabeceras ausentes).
 
@@ -148,7 +150,7 @@ Mutación (`mutmut`): dominio **97,8 %**, aplicación **92,7 %** (de 77,8 % en l
 
 | ID | Severidad | Estado | DREAD inherente | Factor | Prioridad | DREAD residual |
 |---|---|---|---|---|---|---|
-| B-36 | Media | abierto — decisión del equipo (RS-08 fija 2 r/s; | 6,4 | ×1,0 | 6,4 | 6,4 |
+| B-36 | Media | corregido — el 429 ya no banea (ADR-032, P-12; e | 6,4 | ×1,0 | 6,4 | 3,0 |
 | B-06 | Media | abierto — decisión del equipo (ADR) en F8 | 6,0 | ×1,0 | 6,0 | n/a |
 | B-10 | Media | abierto — [PENDIENTE: acción humana en el Dashbo | 6,0 | ×1,0 | 6,0 | n/a |
 | B-15 | Media | verificado (rojo→verde, evidencia B-15-ROJO / B- | 6,0 | ×1,0 | 6,0 | 2,0 |
@@ -157,6 +159,7 @@ Mutación (`mutmut`): dominio **97,8 %**, aplicación **92,7 %** (de 77,8 % en l
 | B-07 | Baja | abierto — pre-commit verificado (F2-10); protecc | 5,2 | ×1,0 | 5,2 | n/a |
 | B-05 | Baja | verificado (U-06 en F3 y sqlmap nivel 5 con `Hos | 5,0 | ×1,0 | 5,0 | n/a |
 | B-24 | Baja | verificado (rojo→verde, evidencia B-24-ROJO / B- | 5,0 | ×1,0 | 5,0 | 1,0 |
+| B-39 | Baja | verificado (rojo→verde, evidencia W-01-ROJO / W- | 5,0 | ×1,0 | 5,0 | 1,0 |
 | B-31 | Media | aceptado con exención escrita (`exenciones-trivy | 4,8 | ×1,0 | 4,8 | 3,0 |
 | B-34 | Baja | corregido — `--borde-campo` (3,74:1) y relleno d | 4,6 | ×1,0 | 4,6 | 0,0 |
 | B-37 | Baja | abierto — los guiones de la auditoría ya purgan  | 4,4 | ×1,0 | 4,4 | 4,4 |
@@ -230,9 +233,10 @@ Distribución:
 | B-33 | Baja | Docker Bench (CIS) deja 12 avisos de ejecución: sistema de archivos de escritura, sin límite de procesos ni de CPU | abierto |
 | B-34 | Baja | El borde de los campos (1,39:1) y las barras del gráfico (2,07:1) no llegan a 3:1 (WCAG 1.4.11, RI-01) | corregido |
 | B-35 | Baja | La cuenta de servicio de GLPI puede borrar y purgar tickets, y RI-02 no lo necesita | abierto |
-| B-36 | Media | Dos páginas seguidas en menos de un segundo agotan el límite del WAF: la tercera recibe 429 y varias seguidas terminan en un baneo de 1 hora | abierto |
+| B-36 | Media | Dos páginas seguidas en menos de un segundo agotan el límite del WAF: la tercera recibe 429 y varias seguidas terminan en un baneo de 1 hora | corregido |
 | B-37 | Baja | La prueba de navegador puede pasar sin que se cree ningún ticket: encuentra los de una corrida anterior con el mismo identificador | abierto |
 | B-38 | Baja | Con la arquitectura local, el volumen de los soportes de vinculación se montaba con permisos de ejecución, contra el invariante 12 | verificado |
+| B-39 | Baja | El CRS cortaba el catálogo de traducciones de GLPI (/front/locale.php): el navegador recibía 500 | verificado |
 
 Cada hallazgo tiene su archivo `hallazgos/B-nn.md` con DREAD, evidencia, impacto, corrección, prueba de regresión, observación de primer principio, falsabilidad, indicador temprano y esfuerzo.
 
@@ -242,7 +246,7 @@ Doce propuestas (`anexos/propuestas-adr.md`), **ninguna vigente** hasta que el e
 
 | Prioridad | Propuesta | Cierra | Esfuerzo |
 |---|---|---|---|
-| Inmediata | **P-12** El límite de ritmo responde 429 sin banear a quien tiene sesión | B-36 | 1 h |
+| Hecha | **P-12** El límite de ritmo responde 429 sin banear (ADR-032, 26/10/2026) | B-36 | 1 h |
 | Inmediata | **P-1** Red dedicada `glpi_api` solo para `worker` y `glpi` | B-32 | 3 h |
 | Inmediata | **P-11** Perfil de servicio de GLPI sin borrar ni purgar | B-35 | 1,5 h |
 | Próxima | **P-5** Verificar la firma, `exp` e `iss` del JWT de Supabase | B-28 | 3 h |

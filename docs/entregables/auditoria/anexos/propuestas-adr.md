@@ -116,7 +116,7 @@ Ordenadas por la prioridad de los hallazgos que las originan (`score-global.md`)
 
 ---
 
-## P-12 · El límite de ritmo no debe banear a quien tiene sesión (B-36)
+## P-12 · El límite de ritmo no debe banear a quien tiene sesión (B-36) · **ACEPTADA: ADR-032 (26/10/2026)**
 
 **Contexto.** RS-08 fija 2 r/s por IP. Medido: sin espera, la tercera página recibe 429; con 0,4 s entre páginas, también; solo con 1 s o más no hay 429. Varios 429 seguidos activan `BAD_BEHAVIOR` y la IP queda baneada una hora (403). El recorrido Playwright por el WAF falló por esto en 2 de 3 corridas.
 

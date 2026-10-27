@@ -1,0 +1,16 @@
+FAILED tests/adaptadores/test_infra.py::test_ADR_032_el_limite_de_ritmo_no_banea_pero_los_errores_si
+FAILED tests/adaptadores/test_infra.py::test_B_39_exclusion_puntual_de_953100_para_el_catalogo_de_traducciones_de_glpi
+2 failed, 22 deselected in 0.24s
+== 1. /front/locale.php completo por el WAF (B-39: la regla 953100 cortaba el catalogo de traducciones)
+   en_GB: 200 390321 (codigo de curl 56)
+FALLA locale.php (en_GB) llega completo
+   es_419: 200 259393 (codigo de curl 56)
+FALLA locale.php (es_419) llega completo
+== 2. rafaga sobre el limite (P-12): 429 sin baneo
+   codigos: 200 200 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 200 200 403 403 403 403 403 403
+OK    la rafaga produce 429 (20)
+FALLA sin baneo tras 20 respuestas 429
+FALLA la siguiente pagina responde (403)
+== 3. control negativo: 404 repetidos SI banean
+OK    baneo tras 25 respuestas 404
+fallos: 4

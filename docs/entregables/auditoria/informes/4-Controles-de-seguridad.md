@@ -2,13 +2,13 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · commit `82eaf49` · generado el 25/10/2026
+Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · commit `0271b8e` · generado el 26/10/2026
 
 ## 1. Cómo leer este informe
 
 Cada control se presenta con tres cosas: **qué promete** el SRS o el ADR, **cómo se comprobó** y **qué pasó cuando se quitó**. Un control que ninguna prueba nota que falta no está verificado, aunque el código parezca correcto. Por eso cada fila cita una prueba que se rompe al quitar el control, o una medición reproducible.
 
-Resultado global: **38 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 17 Bajos, 6 Informativos), **score global 1,3 de 100** (aceptable) con **147 controles de ASVS verificados**. El score se reporta junto a ese número: con pocos controles probados, un score bajo no significaría nada.
+Resultado global: **39 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 18 Bajos, 6 Informativos), **score global 1,2 de 100** (aceptable) con **147 controles de ASVS verificados**. El score se reporta junto a ese número: con pocos controles probados, un score bajo no significaría nada.
 
 ## 2. Confidencialidad
 
@@ -60,14 +60,14 @@ Resultado global: **38 hallazgos** (0 Críticos, 0 Altos, 15 Medios, 17 Bajos, 6
 | Rendimiento (RNF-06) | p95 < 800 ms por página; dashboard < 2 s | p95 de 466 a 649 ms; dashboard 786 ms (1 440 peticiones, 0 errores) | **Cumple** a 20 vueltas; una corrida de 10 vueltas dio 6 páginas sobre 800 ms (se conserva) |
 | GLPI caído no pierde solicitudes | Bandeja de salida con reintentos e idempotencia (RF-18) | Pruebas de resiliencia y Gherkin | **Cumple**; B-20 corregido |
 | Proceso único de `gunicorn` | Sin punto único de falla | Un proceso con 8 hilos | **Aceptable a esta escala**; B-06, decisión del equipo |
-| Límite de ritmo del WAF | Frenar a un escáner sin frenar a una persona (RS-08) | La tercera página en menos de un segundo recibe 429; varios seguidos banean la IP una hora | **Parcial** → B-36 (Medio) |
+| Límite de ritmo del WAF | Frenar a un escáner sin frenar a una persona (RS-08) | La tercera página en menos de un segundo recibe 429; desde ADR-032 el 429 ya no banea, y 404 repetidos sí (W-01-VERDE) | **Verificado** (B-36 corregido) |
 
 ## 6. Defensa en el borde (BunkerWeb)
 
 | Control | Resultado |
 |---|---|
 | ModSecurity + OWASP CRS 4 en modo bloqueo | `infra/waf/pruebas.sh`: tráfico normal 200 y ataques 403, en `app.*` y `glpi.*`. Un ataque de inyección SQL se bloquea (403) y la misma operación legítima da 200 |
-| Exclusiones del CRS | 0 exclusiones, 0 pruebas necesarias |
+| Exclusiones del CRS | Una exclusión puntual (regla 953100 en `/front/locale.php` de GLPI, B-39) con su prueba (`test_infra.py` y `verificar-w01.sh`) |
 | Solo `bunkerweb` publica puertos | 28 comprobaciones de la matriz de puertos, 0 diferencias. Excepción no escrita: Grafana y fluent-bit en `127.0.0.1` (B-27) |
 | API interna de BunkerWeb | Responde en la red `app` (B-29), pero exige `API_TOKEN`: con y sin token, a dos rutas, desde `app`, las 6 combinaciones terminan en reinicio de conexión |
 | Reportería | Un ataque aparece clasificado `waf` en Loki en el mismo segundo del bloqueo (CA-21, parte local) |

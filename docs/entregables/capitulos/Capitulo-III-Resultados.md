@@ -43,7 +43,7 @@ Cada prueba que el plan y el SRS definen se relaciona con lo que midió y con su
 | Bases de datos (roles, disparadores, RLS) | impuestos por el motor | 15 pruebas por rol y paridad con el catálogo de Supabase | Cumple (B-23) |
 | Tráfico (centinela del campo restringido) | 0 tramas hacia GLPI | 0 de 31 240 | Cumple |
 | Tráfico (tokens de GLPI) | no viajan en claro | 382 en claro dentro de la red interna | **No cumple** (B-32) |
-| WAF (`pruebas.sh`) | 200 en tráfico normal, 403 en ataques | cumplido en `app.*` y `glpi.*`; 0 exclusiones | Cumple |
+| WAF (`pruebas.sh`) | 200 en tráfico normal, 403 en ataques | cumplido en `app.*` y `glpi.*`; una exclusión puntual (regla 953100 en `/front/locale.php` de GLPI, B-39) con su prueba | Cumple |
 | Reportería (CA-21) | ataque clasificado en < 2 min | en el mismo segundo | Cumple |
 
 ### 3.1.3 Pruebas de disponibilidad y rendimiento
@@ -58,8 +58,8 @@ Cada prueba que el plan y el SRS definen se relaciona con lo que midió y con su
 
 ### 3.1.4 Lectura de los resultados
 
-1. **No hay hallazgos Críticos ni Altos.** De los 38, 15 son Medios, 17 Bajos y 6 Informativos. Los Medios abiertos más relevantes son el limitador del WAF que banea a quien navega rápido (B-36), el proceso único de `gunicorn` (B-06), la política de contraseña de Supabase (B-10), los tokens de GLPI en claro dentro de la red interna (B-32) y las vulnerabilidades de las imágenes de terceros (B-31).
-2. **La exposición ponderada es pequeña.** El *score* global es 1,3 de 100 (la escala llama «aceptable» a 0 a 20), con **147 controles de ASVS verificados**. El número solo tiene sentido junto a esa cifra.
+1. **No hay hallazgos Críticos ni Altos.** De los 39, 15 son Medios, 18 Bajos y 6 Informativos. Los Medios abiertos más relevantes son el proceso único de `gunicorn` (B-06), la política de contraseña de Supabase (B-10), los tokens de GLPI en claro dentro de la red interna (B-32) y las vulnerabilidades de las imágenes de terceros (B-31).
+2. **La exposición ponderada es pequeña.** El *score* global es 1,2 de 100 (la escala llama «aceptable» a 0 a 20), con **147 controles de ASVS verificados**. El número solo tiene sentido junto a esa cifra.
 3. **La mayor parte del valor de la auditoría vino de medir, no de leer.** Seis hallazgos se encontraron al medir algo que el proyecto daba por cumplido: la API de GLPI con reloj fijo (B-17), el contraste de los campos (B-34), el perfil de la cuenta de servicio (B-35), el limitador de ritmo (B-36), el endurecimiento de contenedores (B-33) y las denegaciones sin rastro (B-25).
 4. **Una falla de método se detectó a tiempo.** La primera medición de rendimiento (10 vueltas) dio 6 de 9 páginas sobre 800 ms; con las 20 vueltas de la medición original cumple, tres veces seguidas. Se conservó la corrida que no cumple como evidencia.
 
@@ -81,7 +81,7 @@ Cada prueba que el plan y el SRS definen se relaciona con lo que midió y con su
 
 | Aspecto | Auditoría del 12/10 | Esta auditoría |
 |---|---|---|
-| Hallazgos | 12 (1 Alta, 5 Medias, 4 Bajas, 2 Informativas), todos corregidos | 38 (0 Altas, 15 Medios, 17 Bajos, 6 Informativos) |
+| Hallazgos | 12 (1 Alta, 5 Medias, 4 Bajas, 2 Informativas), todos corregidos | 39 (0 Altas, 15 Medios, 18 Bajos, 6 Informativos) |
 | La Alta | La API REST de GLPI respondía desde internet a través del WAF | No reaparece: el WAF sigue bloqueándola y se probó |
 | Método | Lectura del código y pruebas manuales | Plan escrito, evidencia reproducible, control positivo y neutralización |
 | Puntaje | Severidad | DREAD, factor de posición y score global |
@@ -140,7 +140,7 @@ Cada resultado esperado se mide con un indicador, una meta y una evidencia que c
 | Se recupera de un desastre | Segundos de restauración | ≤ 14 400 | 19 | `disponibilidad/F7-05-RESPALDO-Y-RESTAURACION` |
 | Los ataques se ven | Segundos hasta ver un ataque clasificado | < 120 | 0 | `disponibilidad/CA-21-REPORTERIA-WAF` |
 | Se cumple el documento de tablas | Filas del Excel que cumplen / fallan | todas las aplicables / 0 | 139 de 147 aplicables / 0 | `anexos/anexo-a-matriz.csv` |
-| El riesgo residual es bajo | Hallazgos Críticos o Altos / *score* global | 0 / ≤ 20 | 0 / 1,3 | `anexos/score-global.md` |
+| El riesgo residual es bajo | Hallazgos Críticos o Altos / *score* global | 0 / ≤ 20 | 0 / 1,2 | `anexos/score-global.md` |
 | La entrega es íntegra | Hashes que cuadran / secretos | todos / 0 | todos / 0 | `manifiesto.sha256`, `gitleaks` |
 
 ## 3.4 Coherencia entre planteamiento, marco, objetivos, metodología, cronograma y resultados
@@ -155,7 +155,7 @@ El problema que el SRS plantea es que, en la pyme ficticia, **las solicitudes de
 | **Metodología** | Construir primero el núcleo, integrar con contratos, auditar en diez fases con evidencia reproducible | Produce las cifras de este capítulo |
 | **Cronograma** | 05/10 al 25/10/2026 (Gantt del capítulo II) | El orden núcleo → adaptadores → integración → evidencias → auditoría explica por qué cada medición pudo hacerse |
 | **Resultados esperados** | Sin duplicados, auditoría inalterable, campos restringidos protegidos, rastro de cuentas, sistema responsivo | Los indicadores de la tabla 3.3 |
-| **Resultados obtenidos** | 17 de 19 indicadores cumplen (no cumplen los tokens en claro y la meta de que todas las filas aplicables del Excel cumplan: 139 de 147); el *score* global es 1,3; sin hallazgos Críticos ni Altos | Cierran el ciclo y dejan los pendientes explícitos (3.5) |
+| **Resultados obtenidos** | 17 de 19 indicadores cumplen (no cumplen los tokens en claro y la meta de que todas las filas aplicables del Excel cumplan: 139 de 147); el *score* global es 1,2; sin hallazgos Críticos ni Altos | Cierran el ciclo y dejan los pendientes explícitos (3.5) |
 
 **Verificaciones de coherencia hechas:** (1) cada objetivo tiene un resultado y una evidencia; (2) cada resultado esperado tiene un indicador con meta; (3) cada indicador cita su evidencia; (4) la secuencia del cronograma es la que el método exige, sin pruebas antes de que exista lo que prueban; (5) los resultados que **no** cumplen se reportan, no se omiten.
 
@@ -171,12 +171,12 @@ El problema que el SRS plantea es que, en la pyme ficticia, **las solicitudes de
 | La clasificación de ASVS la hizo una sola persona | 147 verificados sin revisión cruzada | Revisión del 10 % por una segunda persona |
 | La CI de GitHub no corrió sobre estos cambios | G1b y G4 parciales; el `master` remoto conserva un fallo ya corregido en la rama | `git push` y una primera corrida del flujo nocturno |
 | Cobertura de la superficie de ZAP en 90,9 % | Por debajo del 95 % del plan | Dos rutas inalcanzables con una sesión inyectada |
-| Cuatro decisiones del equipo | B-06, B-26, B-36 y las propuestas de ADR siguen abiertas | Aceptarlas o rechazarlas con un ADR |
+| Tres decisiones del equipo | B-06, B-26 y las propuestas de ADR siguen abiertas (B-36 se resolvió con ADR-032) | Aceptarlas o rechazarlas con un ADR |
 
 ## 3.6 Conclusiones
 
 1. **El sistema cumple lo que prometió y lo demuestra.** Los diez puntos del alcance tienen una prueba que pasa; los 21 criterios de aceptación cumplen.
-2. **La seguridad se midió, no se supuso.** Sin inyecciones, sin servicios expuestos más allá del WAF, con la cadena de auditoría íntegra tras una restauración y 0 centinelas hacia GLPI en 31 240 tramas. La exposición ponderada es 1,3 de 100.
-3. **Las debilidades reales son de operación y de decisión, no de código.** Lo más importante que queda es que el limitador del WAF puede banear una hora a una persona que navega rápido (B-36), que la red entre el worker y GLPI no protege los tokens (B-32) y que la política de contraseña de Supabase depende de una acción humana (B-10).
+2. **La seguridad se midió, no se supuso.** Sin inyecciones, sin servicios expuestos más allá del WAF, con la cadena de auditoría íntegra tras una restauración y 0 centinelas hacia GLPI en 31 240 tramas. La exposición ponderada es 1,2 de 100.
+3. **Las debilidades reales son de operación y de decisión, no de código.** Lo más importante que queda es que la red entre el worker y GLPI no protege los tokens (B-32), que el proceso único de `gunicorn` pierde los desafíos del segundo factor al reiniciarse (B-06) y que la política de contraseña de Supabase depende de una acción humana (B-10).
 4. **El método sirvió.** El control positivo evitó creerle a escáneres ciegos; los defectos sembrados mostraron que la suite detecta lo que debe; la mutación pasó de 77,8 a 92,7 % al revisar qué no se estaba comprobando; y el verificador de la entrega atrapó errores de la propia redacción.
 5. **Lo que no se pudo medir está dicho.** La copia contra el disco externo real, el servicio real de Supabase Auth, la accesibilidad con lector de pantalla y la ejecución de la CI en GitHub quedan como trabajo explícito, con su guion.

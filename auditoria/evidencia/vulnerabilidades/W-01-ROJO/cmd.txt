@@ -1,0 +1,1 @@
+uv run pytest -q -p no:cacheprovider tests/adaptadores/test_infra.py -k "ADR_032 or B_39" 2>&1 | tail -3; bash auditoria/scripts/verificar-w01.sh

@@ -1,12 +1,12 @@
 # Puntajes DREAD y score global
 
-Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (38 hallazgos). Un residual solo baja si hay una prueba que se rompe al quitar el control (anclas: `dread-anclas.md`).
+Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (39 hallazgos). Un residual solo baja si hay una prueba que se rompe al quitar el control (anclas: `dread-anclas.md`).
 
 ## Hallazgos ordenados por prioridad (DREAD × factor)
 
 | ID | Severidad | Estado | DREAD inherente | Factor | Prioridad | DREAD residual |
 |---|---|---|---|---|---|---|
-| B-36 | Media | abierto — decisión del equipo (RS-08 fija 2 r/s; | 6,4 | ×1,0 | 6,4 | 6,4 |
+| B-36 | Media | corregido — el 429 ya no banea (ADR-032, P-12; e | 6,4 | ×1,0 | 6,4 | 3,0 |
 | B-06 | Media | abierto — decisión del equipo (ADR) en F8 | 6,0 | ×1,0 | 6,0 | n/a |
 | B-10 | Media | abierto — [PENDIENTE: acción humana en el Dashbo | 6,0 | ×1,0 | 6,0 | n/a |
 | B-15 | Media | verificado (rojo→verde, evidencia B-15-ROJO / B- | 6,0 | ×1,0 | 6,0 | 2,0 |
@@ -15,6 +15,7 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 | B-07 | Baja | abierto — pre-commit verificado (F2-10); protecc | 5,2 | ×1,0 | 5,2 | n/a |
 | B-05 | Baja | verificado (U-06 en F3 y sqlmap nivel 5 con `Hos | 5,0 | ×1,0 | 5,0 | n/a |
 | B-24 | Baja | verificado (rojo→verde, evidencia B-24-ROJO / B- | 5,0 | ×1,0 | 5,0 | 1,0 |
+| B-39 | Baja | verificado (rojo→verde, evidencia W-01-ROJO / W- | 5,0 | ×1,0 | 5,0 | 1,0 |
 | B-31 | Media | aceptado con exención escrita (`exenciones-trivy | 4,8 | ×1,0 | 4,8 | 3,0 |
 | B-34 | Baja | corregido — `--borde-campo` (3,74:1) y relleno d | 4,6 | ×1,0 | 4,6 | 0,0 |
 | B-37 | Baja | abierto — los guiones de la auditoría ya purgan  | 4,4 | ×1,0 | 4,4 | 4,4 |
@@ -47,9 +48,9 @@ Generado por `auditoria/scripts/score-global.py` desde `auditoria/hallazgos/` (3
 
 ## Score global
 
-- Hallazgos que siguen en pie (abiertos o aceptados): **18** (Crítica: 0, Alta: 0, Media: 5, Baja: 9; informativos 4 no suman).
-- Exposición ponderada: **19**.
+- Hallazgos que siguen en pie (abiertos o aceptados): **17** (Crítica: 0, Alta: 0, Media: 4, Baja: 9; informativos 4 no suman).
+- Exposición ponderada: **17**.
 - Controles verificados (ASVS L1/L2 en «verificado»): **147**.
-- **Score global = 19 / (147 × 10) × 100 = 1,3** → aceptable (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).
+- **Score global = 17 / (147 × 10) × 100 = 1,2** → aceptable (escala: 0–20 aceptable · 21–40 requiere mejoras · 41–60 deficiente · 61–80 crítica · 81–100 exposición crítica).
 
 Se reporta junto al número de controles verificados: con 147 probados el score tiene sentido; con 10 no lo tendría.

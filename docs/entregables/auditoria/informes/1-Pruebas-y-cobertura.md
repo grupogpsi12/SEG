@@ -2,7 +2,7 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · commit `82eaf49` · generado el 25/10/2026
+Auditoría del 24 al 25 de octubre de 2026 · rama `auditoria/entrega` · commit `0271b8e` · generado el 26/10/2026
 
 ## 1. Resumen
 
@@ -121,4 +121,4 @@ Seis defectos, de uno en uno, con restauración byte a byte: SQL por f-string (`
 
 - Pruebas contra el **Supabase real** de autenticación: solo existe un servidor simulado (Supabase en solo lectura de catálogo).
 - La copia de exportes y respaldos al disco externo real: verificada contra una carpeta que lo simula (L-01, ADR-031).
-- El recorrido Playwright es sensible al limitador del WAF (2 r/s): en dos de tres corridas el caso RET recibió un 429. No es un defecto del código probado sino del ritmo del navegador (B-36).
+- El recorrido Playwright es sensible al limitador del WAF (2 r/s): en dos de tres corridas el caso RET recibió un 429. No es un defecto del código probado sino del ritmo del navegador (B-36). Desde ADR-032 ese 429 ya no termina en baneo.

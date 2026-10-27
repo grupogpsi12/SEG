@@ -121,4 +121,4 @@ Seis defectos, de uno en uno, con restauración byte a byte: SQL por f-string (`
 
 - Pruebas contra el **Supabase real** de autenticación: solo existe un servidor simulado (Supabase en solo lectura de catálogo).
 - La copia de exportes y respaldos al disco externo real: verificada contra una carpeta que lo simula (L-01, ADR-031).
-- El recorrido Playwright es sensible al limitador del WAF (2 r/s): en dos de tres corridas el caso RET recibió un 429. No es un defecto del código probado sino del ritmo del navegador (B-36).
+- El recorrido Playwright es sensible al limitador del WAF (2 r/s): en dos de tres corridas el caso RET recibió un 429. No es un defecto del código probado sino del ritmo del navegador (B-36). Desde ADR-032 ese 429 ya no termina en baneo.
