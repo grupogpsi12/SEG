@@ -284,3 +284,13 @@ def test_B_39_exclusion_puntual_de_953100_para_el_catalogo_de_traducciones_de_gl
     assert len(reglas) == 1
     assert '"@streq /front/locale.php"' in reglas[0]
     assert re.findall(r"ruleRemoveById=(\d+)", reglas[0]) == ["953100"]
+
+
+def test_ADR_033_las_peticiones_ajax_de_glpi_tienen_su_propio_limite() -> None:
+    """El panel de GLPI pide todas sus tarjetas a la vez a /ajax/dashboard.php: con 2 r/s, 5 o 6 de
+    7 salian con error (W-02). /ajax/ exige sesion de GLPI; el ingreso (/front/login.php) y todo lo
+    demas siguen con el limite general."""
+    entorno = _entorno("bw-scheduler")
+    assert "glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/" in entorno
+    assert "glpi.localhost}_LIMIT_REQ_RATE_1=20r/s" in entorno
+    assert "LIMIT_REQ_RATE=2r/s" in entorno
