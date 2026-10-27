@@ -133,6 +133,10 @@ services:
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_REVERSE_PROXY=yes
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_URL=/
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_HOST=http://glpi:80
+      # ADR-033 (W-02): el panel de GLPI pide todas sus tarjetas a la vez a /ajax/; con 2 r/s salian con
+      # error. /ajax/ exige sesion de GLPI; el ingreso y el resto del sitio siguen con 2 r/s (RS-08).
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_RATE_1=20r/s
       # La API de GLPI (v1 y v2) es solo del worker, por la red interna: desde fuera no existe.
       # Su inicio de sesion no pide el doble factor de la interfaz (auditoria del 12/10/2026).
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_BLACKLIST=yes
