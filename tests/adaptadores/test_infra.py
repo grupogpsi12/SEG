@@ -252,3 +252,35 @@ def test_B_38_el_volumen_de_soportes_se_monta_sin_ejecucion() -> None:
     opciones = COMPOSE["volumes"]["soportes"]["driver_opts"]
     assert opciones["type"] == "tmpfs"
     assert {"noexec", "nosuid", "nodev"} <= set(opciones["o"].split(","))
+
+
+def test_ADR_032_el_limite_de_ritmo_no_banea_pero_los_errores_si() -> None:
+    """B-36 y P-12: el panel de GLPI dispara ~20 peticiones en paralelo y cada 429 contaba como «mal
+    comportamiento»: la IP del equipo (la de la puerta de enlace de Docker, compartida por todos)
+    quedaba baneada una hora. El 429 sigue frenando; el baneo queda para los errores de un ataque."""
+    entorno = _entorno("bw-scheduler")
+    assert "BAD_BEHAVIOR_STATUS_CODES=400 401 403 404 405 444" in entorno
+    assert "LIMIT_REQ_RATE=2r/s" in entorno
+
+
+def test_B_39_exclusion_puntual_de_953100_para_el_catalogo_de_traducciones_de_glpi() -> None:
+    """Invariante 14: una regla, una ruta, un sitio. /front/locale.php devuelve las cadenas de GLPI,
+    que incluyen frases como las de los errores de PHP; la 953100 las marcaba y la 959100 cortaba la
+    respuesta ya enviada (500 en el navegador). El resto del CRS de salida sigue activo ahi."""
+    archivo = (
+        RAIZ
+        / "infra"
+        / "bunkerweb"
+        / "configs"
+        / "modsec-crs"
+        / "glpi.localhost"
+        / "locale-953100.conf"
+    )
+    reglas = [
+        linea
+        for linea in archivo.read_text(encoding="utf-8").replace("\\n", " ").splitlines()
+        if linea.strip() and not linea.lstrip().startswith("#")
+    ]
+    assert len(reglas) == 1
+    assert '"@streq /front/locale.php"' in reglas[0]
+    assert re.findall(r"ruleRemoveById=(\d+)", reglas[0]) == ["953100"]
