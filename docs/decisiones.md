@@ -35,6 +35,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 029 | Secretos compartidos del equipo cifrados en el repositorio con SOPS + age | Aceptada | 24/10/2026 |
 | 030 | Lecturas paginadas de la auditoría y de las solicitudes de un usuario (RNF-06) | Aceptada | 24/10/2026 |
 | 031 | Despliegue local con Docker Desktop: PostgreSQL 17 en contenedor, Supabase solo para Auth, Docker secrets y copias en un medio externo | Aceptada | 25/10/2026 |
+| 032 | El límite de ritmo del WAF responde 429 sin banear (P-12) | Aceptada | 26/10/2026 |
 
 ---
 
@@ -480,3 +481,18 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 - Los elementos de la auditoría marcados «pendiente de Azure» pasan a «no aplica». La copia al disco externo se verificó contra una carpeta que lo simula (L-01).
 - Código (L-01, hecho el 25/10/2026): `copiar-exportes.sh` reemplaza a `subir-exportes.sh`; `respaldo.sh` solo tiene el modo local, con retención de 30 días; se retiró `compose.azure.yaml`. Al retirarlo se perdió el `noexec` del volumen de soportes (B-38): ahora es tmpfs con `noexec,nosuid,nodev`.
 - SRS v2.5.
+
+## ADR-032 — El límite de ritmo del WAF responde 429 sin banear (P-12)
+
+**Contexto.** RS-08 fija 2 peticiones por segundo por IP y un bloqueo de una hora por «mal comportamiento». En BunkerWeb 1.6.15, `BAD_BEHAVIOR_STATUS_CODES` trae por defecto `400 401 403 404 405 429 444`, así que cada 429 del límite contaba para el bloqueo. La auditoría lo midió en la aplicación (B-36: tres páginas seguidas dan 429 y varias banean). El 26/10/2026 se vio en GLPI: el panel de inicio dispara unas 20 `POST /ajax/central.php` en paralelo, salieron 19 respuestas 429 y la IP quedó baneada una hora. En el despliegue local (ADR-031) todo el tráfico del navegador llega con la IP de la puerta de enlace de Docker, de modo que un baneo bloquea a todas las personas del equipo.
+
+**Decisión.** `BAD_BEHAVIOR_STATUS_CODES=400 401 403 404 405 444`. El límite de 2 r/s y el de 5 por minuto en `/ingreso` no cambian: el 429 sigue frenando a un escáner y a quien adivina contraseñas, pero ya no banea. El baneo queda para las respuestas de error que deja un ataque o un escáner (403 del CRS, 404 de rutas inexistentes, 400, 401, 405, 444).
+
+**Alternativas descartadas.**
+- Subir el límite general: frena menos a un escáner en las rutas sin límite propio.
+- No cambiar nada y desbloquear a mano: el baneo de toda la oficina por abrir un panel no es aceptable, en particular durante una emergencia (T11).
+
+**Consecuencias.**
+- Verificado (`W-01-VERDE`): 26 respuestas 429 seguidas no banean; 25 respuestas 404 sí banean (control negativo); `infra/waf/pruebas.sh` sigue con los siete ataques en 403 en los dos sitios.
+- El 429 todavía puede dejar sin cargar un recurso a quien navega muy rápido (un widget del panel de GLPI, una página de la aplicación); se recupera recargando. Si molesta en uso real, el siguiente paso es un límite propio para `^/ajax/` en `glpi.localhost`, con su ADR.
+- SRS v2.6 (RS-08, T21). Cierra la propuesta P-12 y la parte de baneo de B-36.
