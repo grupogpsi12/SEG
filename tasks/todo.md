@@ -403,6 +403,9 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Causa medida:** el panel de GLPI dispara ~20 `POST /ajax/central.php` en paralelo; con 2 r/s salen 19 respuestas 429 y el bloqueo por mal comportamiento banea la IP una hora. Todo el tráfico local llega con la IP de la puerta de enlace de Docker, así que el baneo bloquea a todos. Aparte, la regla 953100 del CRS («PHP Information Leakage») marca el catálogo de traducciones que devuelve `/front/locale.php` (GLPI responde 200) y la 959100 corta la respuesta: el navegador recibe 500.
   - **Pasos:** prueba roja estática y dinámica; `BAD_BEHAVIOR_STATUS_CODES` sin 429 (ADR-032, SRS 2.6, RS-08); exclusión puntual de 953100 solo en `glpi.localhost` `/front/locale.php`; reaplicar BunkerWeb; verde.
   - **Criterio:** una ráfaga sobre el límite da 429 y **no** banea; un 404 repetido sí banea (control negativo); `locale.php` da 200 por el WAF; `infra/waf/pruebas.sh` sigue con los siete ataques en 403 en los dos sitios.
+- [x] **W-02 Las tarjetas del panel de GLPI reciben 429** (26/10/2026). Hecho: ADR-033, SRS v2.7; evidencia `W-02-ROJO` y `W-02-VERDE`. Tras ADR-032 ya no hay baneo, pero el panel pide todas sus tarjetas a la vez a `/ajax/dashboard.php` y, con 2 r/s, 5 o 6 de 7 salen con error.
+  - **Pasos:** prueba roja estática y dinámica (ráfaga paralela de 7 y de 20 a `/ajax/`); límite propio de 20 r/s para `^/ajax/` solo en `glpi.localhost` (ADR-033, SRS 2.7, RS-08); verde.
+  - **Criterio:** 0 respuestas 429 en ráfagas de 7 y de 20 a `/ajax/`; la raíz de GLPI sigue con 2 r/s (control: una ráfaga de 20 a `/` sí da 429); `pruebas.sh glpi.localhost` con los ataques en 403.
 
 ## Orden de recorte (SRS §14)
 

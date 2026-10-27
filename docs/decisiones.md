@@ -36,6 +36,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 030 | Lecturas paginadas de la auditoría y de las solicitudes de un usuario (RNF-06) | Aceptada | 24/10/2026 |
 | 031 | Despliegue local con Docker Desktop: PostgreSQL 17 en contenedor, Supabase solo para Auth, Docker secrets y copias en un medio externo | Aceptada | 25/10/2026 |
 | 032 | El límite de ritmo del WAF responde 429 sin banear (P-12) | Aceptada | 26/10/2026 |
+| 033 | Límite propio de 20 r/s para `/ajax/` de GLPI | Aceptada | 26/10/2026 |
 
 ---
 
@@ -494,5 +495,20 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 
 **Consecuencias.**
 - Verificado (`W-01-VERDE`): 26 respuestas 429 seguidas no banean; 25 respuestas 404 sí banean (control negativo); `infra/waf/pruebas.sh` sigue con los siete ataques en 403 en los dos sitios.
-- El 429 todavía puede dejar sin cargar un recurso a quien navega muy rápido (un widget del panel de GLPI, una página de la aplicación); se recupera recargando. Si molesta en uso real, el siguiente paso es un límite propio para `^/ajax/` en `glpi.localhost`, con su ADR.
+- El 429 todavía puede dejar sin cargar un recurso a quien navega muy rápido (un widget del panel de GLPI, una página de la aplicación); se recupera recargando. En uso real molestó en el panel de GLPI: se resolvió con ADR-033.
 - SRS v2.6 (RS-08, T21). Cierra la propuesta P-12 y la parte de baneo de B-36.
+
+## ADR-033 — Límite propio de 20 r/s para `/ajax/` de GLPI
+
+**Contexto.** Tras ADR-032 ya no hay baneos, pero el panel de GLPI pide todas sus tarjetas a la vez a `/ajax/dashboard.php` (7 en el panel de tickets, unas 20 en el central). Con el límite general de 2 r/s, 5 de 7 tarjetas salían con error (429) y se mostraban como un triángulo de advertencia (medido en W-02-ROJO: 5 de 7 y 18 de 20).
+
+**Decisión.** `glpi.localhost_LIMIT_REQ_URL_1=^/ajax/` con `LIMIT_REQ_RATE_1=20r/s`, igual que los estáticos de la aplicación tienen 10 r/s. El resto de GLPI, incluido su inicio de sesión (`/front/login.php`), sigue con 2 r/s.
+
+**Alternativas descartadas.**
+- Subir el límite general de GLPI: también subiría el del inicio de sesión y el de las páginas sin sesión.
+- Dejarlo: las tarjetas del panel quedan vacías cada vez que se abre.
+
+**Consecuencias.**
+- Las rutas `/ajax/` de GLPI exigen una sesión iniciada; un atacante sin sesión no gana nada con el límite mayor, y el CRS sigue revisando cada petición. Con una sesión robada, el límite deja 20 peticiones por segundo a esas rutas (riesgo aceptado: la sesión ya da acceso completo a GLPI).
+- Verificado (`W-02-VERDE`): 0 respuestas 429 en ráfagas paralelas de 7 y de 20 a `/ajax/`; 18 de 20 en la raíz de GLPI (el límite general sigue); `pruebas.sh` con los ataques en 403 en los dos sitios.
+- SRS v2.7 (RS-08).
