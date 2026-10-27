@@ -1,0 +1,13 @@
+FAILED tests/adaptadores/test_infra.py::test_ADR_033_las_peticiones_ajax_de_glpi_tienen_su_propio_limite
+1 failed, 24 deselected in 0.22s
+== rafaga de 7 a /ajax/dashboard.php (las tarjetas del panel de tickets)
+
+FALLA 0 respuestas 429 (5)
+== rafaga de 20 a /ajax/ (el panel central)
+
+FALLA 0 respuestas 429 (18)
+== control: rafaga de 20 a la raiz de GLPI (limite general de 2 r/s)
+
+OK    el limite general sigue frenando (18 respuestas 429)
+fallos: 2
+      2 302       5 429       2 302      18 429       2 200      18 429 

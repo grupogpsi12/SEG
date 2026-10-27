@@ -136,7 +136,7 @@ Aunque la propuesta se centra en las tres propiedades solicitadas, se incluyen l
 | Control | Descripción | Verificación |
 |---|---|---|
 | C-02 Cortafuegos de aplicaciones web | ModSecurity con el conjunto OWASP CRS 4 en modo de bloqueo, con una sola exclusión puntual (una regla de salida en una ruta de GLPI) | Tráfico normal 200 y siete ataques 403 en los dos dominios |
-| C-03 Límites de frecuencia y bloqueo | 2 peticiones por segundo y 5 por minuto en el inicio de sesión; bloqueo de una hora por mal comportamiento, en el que el código 429 del límite no cuenta | Ráfaga de 26 respuestas 429 sin bloqueo; 25 respuestas 404 sí bloquean (hallazgo B-36, corregido con ADR-032) |
+| C-03 Límites de frecuencia y bloqueo | 2 peticiones por segundo en general, 5 por minuto en el inicio de sesión y 20 por segundo en las peticiones internas de GLPI que exigen sesión; bloqueo de una hora por mal comportamiento, en el que el código 429 del límite no cuenta | Ráfaga de 26 respuestas 429 sin bloqueo; 25 respuestas 404 sí bloquean; las tarjetas del panel de GLPI cargan sin errores (hallazgo B-36, corregido con ADR-032 y ADR-033) |
 | C-13 Aislamiento de red | Solo el WAF publica puertos en el equipo; las redes de datos pg_net y db_net son internas y sin salida; la reportería escucha solo en 127.0.0.1 | Matriz de puertos: 28 comprobaciones sin diferencias |
 | Detección y recuperación | Comprobaciones de salud; respaldo con pg_dump y volcado de MariaDB; restauración en un contenedor PostgreSQL 17 limpio con la cadena íntegra | Detección en 63 s (GLPI) y 43 s (base); restauración en 19 s frente a un objetivo de 4 horas |
 | Rendimiento | Páginas con percentil 95 inferior a 800 ms y el panel inferior a 2 s | 466 a 649 ms por página; 786 ms el panel |
