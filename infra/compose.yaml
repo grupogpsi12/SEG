@@ -100,6 +100,10 @@ services:
       - LIMIT_REQ_RATE=2r/s
       - USE_BAD_BEHAVIOR=yes
       - BAD_BEHAVIOR_BAN_TIME=3600
+      # ADR-032 (B-36, P-12): el 429 del limite de ritmo ya frena y no cuenta para el baneo. El panel
+      # de GLPI dispara ~20 peticiones en paralelo y todo el trafico local llega con una sola IP (la
+      # puerta de enlace de Docker): con el 429 en la lista, abrir el panel baneaba a todos una hora.
+      - BAD_BEHAVIOR_STATUS_CODES=400 401 403 404 405 444
       # Cabeceras (RS-07): BunkerWeb pone HSTS, Referrer-Policy y nosniff, y quita Server
       - STRICT_TRANSPORT_SECURITY=max-age=31536000; includeSubDomains
       - REFERRER_POLICY=strict-origin-when-cross-origin
