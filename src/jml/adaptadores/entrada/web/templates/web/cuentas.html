@@ -21,7 +21,7 @@
   {% endfor %}
   </tbody>
 </table>
-<p>
+<p class="paginas">
   {% if pagina.pagina > 1 %}<a href="?{{ consulta }}&amp;pagina={{ pagina.pagina|add:'-1' }}">Anterior</a>{% endif %}
   {% if pagina.pagina < ultima %}<a href="?{{ consulta }}&amp;pagina={{ pagina.pagina|add:'1' }}">Siguiente</a>{% endif %}
 </p>

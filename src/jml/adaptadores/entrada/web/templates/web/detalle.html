@@ -6,7 +6,7 @@
 <table>
   <tbody>
     <tr><th>Colaborador</th><td>{{ d.fila.colaborador_nombre }}</td></tr>
-    <tr><th>Estado</th><td>{{ d.fila.estado|etiqueta }}{% if d.fila.para_revision %} <span class="aviso">(para revisión)</span>{% endif %}</td></tr>
+    <tr><th>Estado</th><td><span class="pildora {{ d.fila.estado|tono }}">{{ d.fila.estado|etiqueta }}</span>{% if d.fila.para_revision %} <span class="aviso">(para revisión)</span>{% endif %}</td></tr>
     <tr><th>Fecha efectiva</th><td>{{ d.fila.fecha_efectiva|date:"Y-m-d" }}</td></tr>
     <tr><th>Registrada</th><td>{{ d.fila.creada_en|date:"Y-m-d H:i" }}</td></tr>
     {% if d.subtipo %}<tr><th>Subtipo</th><td>{{ d.subtipo.value }}</td></tr>{% endif %}

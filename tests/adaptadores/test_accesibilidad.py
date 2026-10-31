@@ -62,8 +62,20 @@ def test_el_contraste_de_la_formula_coincide_con_valores_conocidos() -> None:
         (BLANCO, VARIABLES["acento"]),  # botón principal
         (VARIABLES["error"], BLANCO),  # mensajes de error
         (VARIABLES["ok"], BLANCO),
-        ("#52606d", VARIABLES["fondo"]),  # texto de aviso
-        (VARIABLES["texto"], "#e8eefb"),  # fila resaltada
+        (VARIABLES["aviso"], VARIABLES["fondo"]),  # texto de aviso
+        (VARIABLES["aviso"], VARIABLES["lavanda"]),  # encabezado de las tablas
+        (VARIABLES["texto"], VARIABLES["resaltado"]),  # fila resaltada
+        (VARIABLES["acento"], VARIABLES["lavanda"]),  # enlace en una fila bajo el cursor
+        (VARIABLES["acento"], VARIABLES["resaltado"]),  # enlace en una fila resaltada
+        (VARIABLES["noche-texto"], VARIABLES["noche"]),  # menu lateral
+        (BLANCO, VARIABLES["noche-suave"]),  # menu lateral bajo el cursor
+        (VARIABLES["noche"], BLANCO),  # opcion actual del menu y titulos
+        (VARIABLES["noche"], VARIABLES["fondo"]),
+        (VARIABLES["tinta-pendiente"], VARIABLES["pastel-pendiente"]),  # etiquetas de estado
+        (VARIABLES["tinta-curso"], VARIABLES["pastel-curso"]),
+        (VARIABLES["tinta-ok"], VARIABLES["pastel-ok"]),
+        (VARIABLES["tinta-error"], VARIABLES["pastel-error"]),
+        (VARIABLES["tinta-neutro"], VARIABLES["pastel-neutro"]),
     ],
 )
 def test_wcag_1_4_3_el_texto_tiene_al_menos_4_5_a_1(texto: str, fondo: str) -> None:
@@ -145,6 +157,8 @@ PAGINAS = [
     ("/bandeja", "u-rrhh"),
     ("/dashboard", "u-tec-ad"),
     ("/cuentas", "u-tec-ad"),
+    ("/tickets", "u-tec-ad"),
+    ("/tickets", "u-admin"),
     ("/auditoria", "u-aud"),
     ("/administracion/perfiles", "u-admin"),
     ("/administracion/usuarios", "u-admin"),

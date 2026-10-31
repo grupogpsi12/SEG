@@ -18,6 +18,21 @@ _ESTADOS = {
 }
 
 
+_TONOS = {
+    EstadoSolicitud.PENDIENTE_APROBACION: "pendiente",
+    EstadoSolicitud.APROBADA: "curso",
+    EstadoSolicitud.EN_EJECUCION: "curso",
+    EstadoSolicitud.ERROR: "error",
+    EstadoSolicitud.CERRADA: "ok",
+}
+
+
+@register.filter
+def tono(estado: EstadoSolicitud) -> str:
+    """Clase de la pildora. El color acompana al texto, nunca lo reemplaza (WCAG 1.4.1)."""
+    return _TONOS.get(estado, "neutro")
+
+
 @register.filter
 def etiqueta(valor: TipoEvento | EstadoSolicitud) -> str:
     if isinstance(valor, TipoEvento):

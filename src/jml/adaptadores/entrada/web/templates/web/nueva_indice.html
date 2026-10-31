@@ -3,7 +3,7 @@
 {% block contenido %}
 <h1>Nueva solicitud</h1>
 {% if tipos %}
-<ul>
+<ul class="opciones">
   {% for valor, nombre in tipos %}
   <li><a href="{% url 'nueva' valor %}">{{ nombre }}</a></li>
   {% endfor %}

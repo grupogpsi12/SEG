@@ -14,7 +14,7 @@
       <td>{{ f.tipo|etiqueta }}</td>
       <td>{{ f.colaborador_nombre }}</td>
       <td>{{ f.fecha_efectiva|date:"Y-m-d" }}</td>
-      <td>{{ f.estado|etiqueta }}{% if f.para_revision %} <span class="aviso">(para revisión)</span>{% endif %}</td>
+      <td><span class="pildora {{ f.estado|tono }}">{{ f.estado|etiqueta }}</span>{% if f.para_revision %} <span class="aviso">(para revisión)</span>{% endif %}</td>
       <td>
         {% if f.cancelable %}
         <form class="en-linea" method="post" action="{% url 'decidir' f.id 'cancelar' %}">
@@ -27,7 +27,7 @@
   </tbody>
 </table>
 {% if ultima > 1 %}
-<p>
+<p class="paginas">
   {% if p.pagina > 1 %}<a href="?pagina={{ p.pagina|add:'-1' }}">Más recientes</a>{% endif %}
   {% if p.pagina < ultima %}<a href="?pagina={{ p.pagina|add:'1' }}">Más antiguas</a>{% endif %}
 </p>
