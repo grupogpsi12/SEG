@@ -30,6 +30,7 @@ urlpatterns = [
         vistas.reintentar,
         name="reintentar",
     ),
+    path("tickets", tecnicos.tickets, name="tickets"),
     path("cuentas", tecnicos.cuentas, name="cuentas"),
     path("cuentas.csv", tecnicos.cuentas_csv, name="cuentas_csv"),
     path("colaboradores/<str:colaborador>", tecnicos.ficha, name="ficha"),

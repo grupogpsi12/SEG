@@ -9,8 +9,8 @@ lang: es-CO
 | Proyecto | Sistema integrado de eventos laborales con identidad, recursos humanos y accesos automatizados |
 | Documento | Especificación de Requisitos de Software (SRS) |
 | Norma de referencia | ISO/IEC/IEEE 29148:2018, adaptada al alcance académico |
-| Versión | 2.7 — Borrador para revisión |
-| Fecha | 26 de octubre de 2026 |
+| Versión | 2.8 — Borrador para revisión |
+| Fecha | 31 de octubre de 2026 |
 | Autores | Jhinnet Bravo, Carlos Ruiz, Luis Ceron, Jhon Leal y Cristian Caro |
 | Docente | José Eduardo Patiño Santafé |
 | Estado | Pendiente de aprobación por el equipo y el docente |
@@ -26,6 +26,7 @@ lang: es-CO
 | 2.5 | 25/10/2026 | Cambio de arquitectura alineado con el documento de la primera entrega de Desarrollo Seguro (ADR-031): todo el despliegue corre en la máquina local con Docker Desktop; la base de la aplicación es PostgreSQL 17 en contenedor y Supabase queda solo para la autenticación; los secretos son Docker secrets en `secrets/`; certificado autofirmado para `app.localhost` y `glpi.localhost`; la auditoría exportada y los respaldos se copian a un medio externo al equipo. Se descartan Azure (VM, Key Vault, Blob, NSG), Let's Encrypt, DuckDNS y Cloudflare Tunnel (ADR-024). Afecta RD-04, RD-06, RD-10, RD-12, RI-03, RI-05, RI-06, RS-01, RS-02, RS-06, RS-19, RS-20, RNF-01, RNF-02, RNF-04, RNF-05, RNF-08, RNF-09, RNF-15, RNF-16, T2, T6, T8, T12, T19, CA-11, CA-13, CA-21, SUP-01, SUP-02, R1 a R3 y R11. |
 | 2.6 | 26/10/2026 | El 429 del límite de ritmo del WAF deja de contar para el bloqueo por mal comportamiento (RS-08, T21, ADR-032): el panel de GLPI dispara unas 20 peticiones en paralelo y, como todo el tráfico local llega con la IP de la puerta de enlace de Docker, abrirlo baneaba a todos una hora (B-36). Sin cambios de alcance. |
 | 2.7 | 26/10/2026 | Las peticiones `/ajax/` de GLPI tienen su propio límite de 20 por segundo (RS-08, ADR-033): el panel de GLPI pide todas sus tarjetas a la vez y, con 2 por segundo, 5 de 7 salían con error. Sin cambios de alcance. |
+| 2.8 | 31/10/2026 | Se agrega RF-41: consulta de tickets de solo lectura para técnicos y Administrador. El CRUD de tickets y de usuarios no se adopta: GLPI sigue siendo la fuente de la verdad (ADR-001) y las cuentas se crean por comando (RF-06, RS-15). Sin cambios de arquitectura. |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -144,12 +145,12 @@ Los roles se gestionan como grupos de Django, que asigna el Administrador del si
 |---|---|---|---|
 | Solicitante | Cualquier colaborador activo con usuario | Registrar sus propias vacaciones y su renuncia. Si es jefe, registrar cambios de departamento o sucursal de sus subordinados directos. Consultar y cancelar sus solicitudes pendientes. | — |
 | RRHH | Una persona de Recursos Humanos (cuenta única) | Registrar y emitir cualquier tipo de evento. Aprobar o rechazar solicitudes. Ver campos restringidos. Consultar el estado de todas las solicitudes y los contratos próximos a vencer. Cancelar solicitudes aprobadas sin tickets creados. | Roles técnicos y Administrador |
-| Técnico AD | Cola AD | Dashboard, búsqueda de cuentas y fichas. Trabaja sus tickets en GLPI. | RRHH |
+| Técnico AD | Cola AD | Dashboard, búsqueda de cuentas, fichas y consulta de tickets. Trabaja sus tickets en GLPI. | RRHH |
 | Técnico Comunicaciones | Cola Comunicaciones | Igual que Técnico AD. | RRHH |
 | Técnico Licencias | Cola Licencias (M365) | Igual que Técnico AD. | RRHH |
 | Técnico Inventario | Cola Inventario | Igual que Técnico AD. | RRHH |
 | Auditor | Docente o revisor | Leer la auditoría y verificar su integridad. Leer solicitudes sin campos restringidos. | Todos los demás |
-| Administrador del sistema | Responsable técnico del proyecto | Mantener la matriz de perfiles, los catálogos y los roles. Reintentar la emisión de solicitudes en `error`. No aprueba solicitudes. | RRHH y técnicos |
+| Administrador del sistema | Responsable técnico del proyecto | Mantener la matriz de perfiles, los catálogos y los roles. Reintentar la emisión de solicitudes en `error`. Consultar los tickets. No aprueba solicitudes. | RRHH y técnicos |
 
 **Control de doble firma.** RRHH es una sola cuenta (ADR-005). Ningún cambio de acceso ocurre con una sola firma:
 
@@ -448,6 +449,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RF-32 | La búsqueda de cuentas debe filtrar por nombre, documento, usuario, departamento, sede, sistema y estado de la cuenta, con resultados paginados. | Debe |
 | RF-33 | La ficha del colaborador debe mostrar: datos laborales (sin campos restringidos); cuentas por sistema con su estado, el ticket de origen y la fecha; equipos asociados (número de serie, modelo, fecha de entrega y si tiene acta); licencias asignadas; e historial de solicitudes y tickets con enlace a GLPI. | Debe |
 | RF-34 | El listado de la búsqueda debería poder exportarse a CSV. | Debería |
+| RF-41 | Los roles técnicos y el Administrador del sistema deben poder consultar los tickets en la aplicación, filtrados por cola, estado y solicitud, con resultados paginados y un enlace a GLPI. Es solo lectura: crear, modificar y cerrar tickets se hace en GLPI, que es la fuente de la verdad (ADR-001). | Debe |
 
 ## Auditoría y administración
 

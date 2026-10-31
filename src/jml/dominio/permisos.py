@@ -114,6 +114,11 @@ def puede_ver_restringidos(roles: frozenset[Rol]) -> bool:
     return Rol.RRHH in roles
 
 
+def puede_consultar_tickets(roles: frozenset[Rol]) -> bool:
+    """RF-41: los tecnicos y el Administrador, que reintenta las emisiones en error."""
+    return Rol.ADMINISTRADOR in roles or puede_ver_dashboard(roles)
+
+
 def puede_ver_dashboard(roles: frozenset[Rol]) -> bool:
     """RF-29: solo roles tecnicos."""
     return bool(roles & ROLES_TECNICOS)

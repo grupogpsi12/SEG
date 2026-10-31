@@ -6,23 +6,32 @@
   <title>{% block titulo %}Eventos laborales{% endblock %} · Andina Servicios</title>
   <link rel="stylesheet" href="{% static 'web/estilo.css' %}">
 </head>
-<body>
-  <header>
-    {% if perfil %}
-    <a href="{% url 'solicitudes' %}">Mis solicitudes</a>
-    <a href="{% url 'nueva_indice' %}">Nueva solicitud</a>
-    {% if es_rrhh %}<a href="{% url 'bandeja' %}">Bandeja de RRHH</a>{% endif %}
-    {% if es_admin %}<a href="{% url 'en_error' %}">Solicitudes en error</a> <a href="{% url 'admin_perfiles' %}">Administración</a>{% endif %}
-    {% if es_auditor %}<a href="{% url 'auditoria' %}">Auditoría</a>{% endif %}
-    {% if es_tecnico %}<a href="{% url 'dashboard' %}">Dashboard</a> <a href="{% url 'cuentas' %}">Cuentas</a>{% endif %}
-    <form class="en-linea salir" method="post" action="{% url 'salir' %}">
+<body class="{% if perfil %}con-menu{% else %}acceso{% endif %}">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  {% if perfil %}
+  {% with actual=request.resolver_match.url_name %}
+  <header class="lateral">
+    <a class="marca" href="{% url 'solicitudes' %}"><strong>Andina Servicios</strong><span>Eventos laborales</span></a>
+    <nav aria-label="Principal">
+      <a href="{% url 'solicitudes' %}"{% if actual == 'solicitudes' %} aria-current="page"{% endif %}>Mis solicitudes</a>
+      <a href="{% url 'nueva_indice' %}"{% if actual == 'nueva_indice' %} aria-current="page"{% endif %}>Nueva solicitud</a>
+      {% if es_rrhh %}<a href="{% url 'bandeja' %}"{% if actual == 'bandeja' %} aria-current="page"{% endif %}>Bandeja de RRHH</a>{% endif %}
+      {% if es_tecnico %}<a href="{% url 'dashboard' %}"{% if actual == 'dashboard' %} aria-current="page"{% endif %}>Dashboard</a>{% endif %}
+      {% if ve_tickets %}<a href="{% url 'tickets' %}"{% if actual == 'tickets' %} aria-current="page"{% endif %}>Tickets</a>{% endif %}
+      {% if es_tecnico %}<a href="{% url 'cuentas' %}"{% if actual == 'cuentas' %} aria-current="page"{% endif %}>Cuentas</a>{% endif %}
+      {% if es_admin %}<a href="{% url 'en_error' %}"{% if actual == 'en_error' %} aria-current="page"{% endif %}>Solicitudes en error</a>
+      <a href="{% url 'admin_perfiles' %}"{% if actual == 'admin_perfiles' %} aria-current="page"{% endif %}>Administración</a>{% endif %}
+      {% if es_auditor %}<a href="{% url 'auditoria' %}"{% if actual == 'auditoria' %} aria-current="page"{% endif %}>Auditoría</a>{% endif %}
+    </nav>
+    <form method="post" action="{% url 'salir' %}">
       {% csrf_token %}<button class="secundario" type="submit">Salir</button>
     </form>
-    {% else %}
-    <strong>Andina Servicios · Eventos laborales</strong>
-    {% endif %}
   </header>
-  <main>
+  {% endwith %}
+  {% else %}
+  <header class="marca-acceso"><strong>Andina Servicios · Eventos laborales</strong></header>
+  {% endif %}
+  <main id="contenido">
     {% for m in messages %}
       <p class="mensaje{% if m.level_tag == 'error' %} error{% endif %}" role="status">{{ m }}</p>
     {% endfor %}

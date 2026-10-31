@@ -1,4 +1,4 @@
-"""Vistas para los roles tecnicos: dashboard, busqueda de cuentas, CSV y ficha (RF-29 a RF-34).
+"""Vistas para los roles tecnicos: dashboard, busqueda, CSV, ficha y tickets (RF-29 a RF-34, RF-41).
 
 Sin tiempo real (ADR-020, invariante 11): el boton «Actualizar» es un enlace que vuelve a pedir
 la pagina. Los permisos los verifica el caso de uso; aqui solo se traduce `NoAutorizado` a 403.
@@ -17,9 +17,9 @@ from django.views.decorators.http import require_GET
 from jml.adaptadores.entrada.web import composicion
 from jml.adaptadores.entrada.web.graficos import barras
 from jml.adaptadores.entrada.web.vistas import _contexto, con_sesion
-from jml.aplicacion.dtos import FiltroDeCuentas, PerfilDeUsuario
+from jml.aplicacion.dtos import FiltroDeCuentas, FiltroDeTickets, PerfilDeUsuario
 from jml.dominio.errores import DatoInvalido, NoAutorizado, NoEncontrado
-from jml.dominio.tipos import EstadoDeCuenta, SistemaDeCuenta
+from jml.dominio.tipos import Cola, EstadoDeCuenta, EstadoDeTicket, SistemaDeCuenta
 
 # Una celda que empieza con estos caracteres se ejecuta como formula en Excel o LibreOffice
 # (inyeccion CSV, OWASP): se antepone un apostrofo.
@@ -54,6 +54,44 @@ class FormularioDeBusqueda(forms.Form):
             estado_de_cuenta=EstadoDeCuenta(c["estado_de_cuenta"])
             if c["estado_de_cuenta"]
             else None,
+            pagina=c["pagina"] or 1,
+        )
+
+
+ESTADOS_DE_TICKET = {
+    EstadoDeTicket.NUEVO: "Nuevo",
+    EstadoDeTicket.EN_ESPERA: "En espera",
+    EstadoDeTicket.EN_CURSO: "En curso",
+    EstadoDeTicket.RESUELTO: "Resuelto",
+    EstadoDeTicket.CERRADO: "Cerrado",
+}
+
+
+def _tono_de_ticket(estado: EstadoDeTicket | None) -> str:
+    if estado is None:
+        return "neutro"
+    if estado >= EstadoDeTicket.RESUELTO:
+        return "ok"
+    return "pendiente" if estado is EstadoDeTicket.EN_ESPERA else "curso"
+
+
+class FormularioDeTickets(forms.Form):
+    cola = forms.ChoiceField(
+        required=False, choices=[("", "Todas"), *[(c.value, c.value) for c in Cola]]
+    )
+    estado = forms.ChoiceField(
+        required=False,
+        choices=[("", "Todos"), *[(str(int(e)), n) for e, n in ESTADOS_DE_TICKET.items()]],
+    )
+    solicitud = forms.CharField(required=False, max_length=20)
+    pagina = forms.IntegerField(required=False, min_value=1, widget=forms.HiddenInput)
+
+    def filtro(self) -> FiltroDeTickets:
+        c = self.cleaned_data
+        return FiltroDeTickets(
+            cola=Cola(c["cola"]) if c["cola"] else None,
+            estado=EstadoDeTicket(int(c["estado"])) if c["estado"] else None,
+            solicitud=c["solicitud"] or None,
             pagina=c["pagina"] or 1,
         )
 
@@ -160,6 +198,48 @@ def cuentas_csv(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
             )
             escritor.writerow([_celda(v) for v in base + extra])
     return respuesta
+
+
+@require_GET
+@con_sesion
+def tickets(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
+    formulario = FormularioDeTickets(request.GET or None)
+    if request.GET and not formulario.is_valid():
+        raise Http404  # parametros manipulados: no hay pagina que mostrar
+    filtro = formulario.filtro() if request.GET else FiltroDeTickets()
+    try:
+        pagina = composicion.casos().buscar_tickets.ejecutar(perfil.usuario_id, filtro)
+    except NoAutorizado:
+        raise PermissionDenied from None
+    parametros = request.GET.copy()
+    parametros.pop("pagina", None)
+    filas = [
+        {
+            "f": f,
+            "estado": "Sin crear"
+            if f.ticket.estado_glpi is None
+            else ESTADOS_DE_TICKET[f.ticket.estado_glpi],
+            "tono": _tono_de_ticket(f.ticket.estado_glpi),
+        }
+        for f in pagina.filas
+    ]
+    return render(
+        request,
+        "web/tickets.html",
+        _contexto(
+            perfil,
+            formulario=formulario,
+            pagina=pagina,
+            filas=filas,
+            ultima=max(1, -(-pagina.total // pagina.tamano)),
+            consulta=parametros.urlencode(),
+            # Con un filtro por cola, resaltar pintaria todas las filas por igual.
+            resaltada=None
+            if filtro.cola or pagina.cola_resaltada is None
+            else pagina.cola_resaltada.value,
+            glpi=settings.JML_GLPI_URL.rstrip("/"),
+        ),
+    )
 
 
 @require_GET

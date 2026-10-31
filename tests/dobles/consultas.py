@@ -13,6 +13,7 @@ from jml.aplicacion.dtos import (
     FichaDeColaborador,
     FilaCuentas,
     FilaDeColaborador,
+    FilaDeTicket,
     FilaExposicion,
     FilaIncompleto,
     FilaPendientes,
@@ -20,9 +21,11 @@ from jml.aplicacion.dtos import (
     FilaSolicitudesDelMes,
     FilaVencidos,
     FiltroDeCuentas,
+    FiltroDeTickets,
     IndicadorDeEquipos,
     Indicadores,
     PaginaDeCuentas,
+    PaginaDeTickets,
     ResumenDeCuenta,
     ResumenDeSolicitud,
     ResumenDeTicket,
@@ -264,6 +267,46 @@ def buscar_cuentas(a: "Almacen", f: FiltroDeCuentas) -> PaginaDeCuentas:
     return PaginaDeCuentas(filas, len(ordenados), f.pagina, f.tamano)
 
 
+def _resumen_de_ticket(a: "Almacen", t: TicketSeguido) -> ResumenDeTicket:
+    return ResumenDeTicket(
+        t.ticket.clave_de_idempotencia,
+        a.solicitudes[t.ticket.solicitud_id].id,
+        t.ticket.cola,
+        t.ticket.clase,
+        t.ticket.accion,
+        t.id_externo,
+        t.observacion.estado if t.observacion else None,
+        bool(t.observacion and t.observacion.tiene_solucion),
+        t.reabierto,
+        cierre_incompleto(t),
+    )
+
+
+def buscar_tickets(a: "Almacen", f: FiltroDeTickets) -> PaginaDeTickets:
+    def pasa(t: TicketSeguido) -> bool:
+        if f.cola is not None and t.ticket.cola is not f.cola:
+            return False
+        if f.estado is not None and (t.observacion is None or t.observacion.estado is not f.estado):
+            return False
+        return not f.solicitud or f.solicitud.lower() in t.ticket.solicitud_id.lower()
+
+    ordenados = sorted(
+        (t for t in a.tickets.values() if pasa(t)),
+        key=lambda t: (t.ticket.vence_en, t.ticket.clave_de_idempotencia),
+    )
+    desde = (f.pagina - 1) * f.tamano
+    filas = tuple(
+        FilaDeTicket(
+            _resumen_de_ticket(a, t),
+            t.ticket.prioridad,
+            t.ticket.vence_en,
+            a.solicitudes[t.ticket.solicitud_id].colaborador_id,
+        )
+        for t in ordenados[desde : desde + f.tamano]
+    )
+    return PaginaDeTickets(filas, len(ordenados), f.pagina, f.tamano)
+
+
 def ficha(a: "Almacen", colaborador_id: ColaboradorId) -> FichaDeColaborador | None:
     c = a.colaboradores.get(colaborador_id)
     if c is None:
@@ -297,19 +340,5 @@ def ficha(a: "Almacen", colaborador_id: ColaboradorId) -> FichaDeColaborador | N
             ResumenDeSolicitud(s.id, s.tipo, s.estado, s.fecha_efectiva, s.creada_en)
             for s in solicitudes
         ),
-        tickets=tuple(
-            ResumenDeTicket(
-                t.ticket.clave_de_idempotencia,
-                a.solicitudes[t.ticket.solicitud_id].id,
-                t.ticket.cola,
-                t.ticket.clase,
-                t.ticket.accion,
-                t.id_externo,
-                t.observacion.estado if t.observacion else None,
-                bool(t.observacion and t.observacion.tiene_solucion),
-                t.reabierto,
-                cierre_incompleto(t),
-            )
-            for t in tickets
-        ),
+        tickets=tuple(_resumen_de_ticket(a, t) for t in tickets),
     )

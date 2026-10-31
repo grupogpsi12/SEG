@@ -29,7 +29,7 @@ METODOS = {
     "bandeja": ["GET"], "dashboard": ["GET"], "auditoria": ["GET", "POST"],
     "en_error": ["GET"], "admin_perfiles": ["GET"], "admin_perfil": ["GET", "POST"],
     "admin_usuarios": ["GET"], "admin_roles": ["POST"], "reintentar": ["POST"],
-    "cuentas": ["GET"], "cuentas_csv": ["GET"], "ficha": ["GET"],
+    "cuentas": ["GET"], "cuentas_csv": ["GET"], "ficha": ["GET"], "tickets": ["GET"],
     "detalle": ["GET"], "decidir": ["POST"],
 }  # fmt: skip
 
@@ -42,6 +42,7 @@ ACCESO = {
     "bandeja": ({"rrhh"}, "SRS 3.3: RRHH aprueba o rechaza"),
     "dashboard": (TECNICOS, "RF-29: solo roles técnicos"),
     "cuentas": (TECNICOS, "RF-29: solo roles técnicos"),
+    "tickets": (TECNICOS | {"administrador"}, "RF-41: técnicos y Administrador, solo lectura"),
     "cuentas_csv": (TECNICOS, "RF-33, T10: solo roles técnicos"),
     "ficha": (TECNICOS, "RF-34, T10: solo roles técnicos"),
     "auditoria": ({"auditor"}, "RF-36: el Auditor consulta y verifica"),

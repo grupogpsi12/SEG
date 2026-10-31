@@ -67,3 +67,7 @@ El trabajo técnico se hace **en GLPI** (`https://glpi.<dominio>`). La aplicaci�
 | Mantener la matriz de perfiles (grupos, licencias, equipo y recursos compartidos por departamento y sede) | **Administración → Matriz de perfiles**. Los cambios aplican a los eventos futuros. |
 | Reintentar una solicitud cuya emisión a GLPI falló | **Solicitudes en error → Reintentar** (revise antes que GLPI esté disponible). |
 | Emitir un evento sobre una persona de RRHH | **Nueva solicitud**, con su documento y una justificación (emisión por excepción). |
+
+## Consultar tickets
+
+Los técnicos y el Administrador ven los tickets en **Tickets**, filtrados por cola, estado o solicitud y ordenados por vencimiento. La página es de solo lectura: cada fila enlaza al ticket en GLPI, donde se trabaja. Los cambios aparecen aquí con la sincronización, cada 5 minutos. Cada técnico ve resaltada su cola.

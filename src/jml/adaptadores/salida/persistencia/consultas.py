@@ -17,6 +17,7 @@ from jml.aplicacion.dtos import (
     FichaDeColaborador,
     FilaCuentas,
     FilaDeColaborador,
+    FilaDeTicket,
     FilaExposicion,
     FilaIncompleto,
     FilaPendientes,
@@ -24,9 +25,11 @@ from jml.aplicacion.dtos import (
     FilaSolicitudesDelMes,
     FilaVencidos,
     FiltroDeCuentas,
+    FiltroDeTickets,
     IndicadorDeEquipos,
     Indicadores,
     PaginaDeCuentas,
+    PaginaDeTickets,
     ResultadoDeSincronizacion,
     ResumenDeCuenta,
     ResumenDeSolicitud,
@@ -283,6 +286,48 @@ def buscar_cuentas(f: FiltroDeCuentas) -> PaginaDeCuentas:
     return PaginaDeCuentas(filas, len(ordenados), f.pagina, f.tamano)
 
 
+def _resumen_de_ticket(t: m.Ticket) -> ResumenDeTicket:
+    return ResumenDeTicket(
+        t.clave,
+        SolicitudId(t.solicitud_id),
+        Cola(t.cola),
+        ClaseTicket(t.clase),
+        AccionDeTicket(t.accion),
+        t.id_externo,
+        None if t.estado_glpi is None else EstadoDeTicket(t.estado_glpi),
+        t.tiene_solucion,
+        t.reabierto,
+        cierre_incompleto(mp.seguido_de_modelo(t)),
+    )
+
+
+def buscar_tickets(f: FiltroDeTickets) -> PaginaDeTickets:
+    """RF-41, por paginas en la base (ADR-030): del vencimiento mas proximo al mas lejano."""
+    q = m.Ticket.objects.all()
+    if f.cola is not None:
+        q = q.filter(cola=f.cola.value)
+    if f.estado is not None:
+        q = q.filter(estado_glpi=int(f.estado))
+    if f.solicitud:
+        q = q.filter(solicitud__id__icontains=f.solicitud)
+    desde = (f.pagina - 1) * f.tamano
+    filas = q.select_related("solicitud").order_by("vence_en", "clave")[desde : desde + f.tamano]
+    return PaginaDeTickets(
+        tuple(
+            FilaDeTicket(
+                _resumen_de_ticket(t),
+                Prioridad(t.prioridad),
+                t.vence_en,
+                t.solicitud.colaborador_id,
+            )
+            for t in filas
+        ),
+        q.count(),
+        f.pagina,
+        f.tamano,
+    )
+
+
 def ficha(colaborador_id: ColaboradorId) -> FichaDeColaborador | None:
     fila = m.Colaborador.objects.filter(pk=colaborador_id).first()
     if fila is None:
@@ -322,19 +367,5 @@ def ficha(colaborador_id: ColaboradorId) -> FichaDeColaborador | None:
             )
             for s in solicitudes
         ),
-        tickets=tuple(
-            ResumenDeTicket(
-                t.clave,
-                SolicitudId(t.solicitud_id),
-                Cola(t.cola),
-                ClaseTicket(t.clase),
-                AccionDeTicket(t.accion),
-                t.id_externo,
-                None if t.estado_glpi is None else EstadoDeTicket(t.estado_glpi),
-                t.tiene_solucion,
-                t.reabierto,
-                cierre_incompleto(mp.seguido_de_modelo(t)),
-            )
-            for t in tickets
-        ),
+        tickets=tuple(_resumen_de_ticket(t) for t in tickets),
     )

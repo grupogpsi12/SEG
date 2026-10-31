@@ -20,8 +20,10 @@ from jml.aplicacion.bandeja import EntradaDeBandeja, EstadoDeEntrada
 from jml.aplicacion.dtos import (
     FichaDeColaborador,
     FiltroDeCuentas,
+    FiltroDeTickets,
     Indicadores,
     PaginaDeCuentas,
+    PaginaDeTickets,
     ResultadoDeSincronizacion,
 )
 from jml.aplicacion.puertos import (
@@ -650,6 +652,9 @@ class RepositoriosDjango:
 
     def buscar_cuentas(self, filtro: FiltroDeCuentas) -> PaginaDeCuentas:
         return consultas.buscar_cuentas(filtro)
+
+    def buscar_tickets(self, filtro: FiltroDeTickets) -> PaginaDeTickets:
+        return consultas.buscar_tickets(filtro)
 
     def ficha(self, colaborador_id: ColaboradorId) -> FichaDeColaborador | None:
         return consultas.ficha(colaborador_id)

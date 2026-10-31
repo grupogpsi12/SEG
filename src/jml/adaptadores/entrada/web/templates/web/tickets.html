@@ -1,0 +1,34 @@
+{% extends "web/base.html" %}
+{% block titulo %}Tickets{% endblock %}
+{% block contenido %}
+<h1>Tickets</h1>
+<p class="aviso">Solo consulta, del vencimiento más próximo al más lejano. Los tickets se trabajan en GLPI, y los cambios llegan aquí con la sincronización de cada 5 minutos.</p>
+<form method="get" class="busqueda">
+  {{ formulario.as_p }}
+  <p><button type="submit">Filtrar</button></p>
+</form>
+<p class="aviso">{{ pagina.total }} ticket(s) · página {{ pagina.pagina }} de {{ ultima }}</p>
+<table>
+  <thead><tr><th>Solicitud</th><th>Cola</th><th>Acción</th><th>Prioridad</th><th>Vence</th><th>Estado en GLPI</th><th>Colaborador</th><th>GLPI</th></tr></thead>
+  <tbody>
+  {% for fila in filas %}{% with f=fila.f t=fila.f.ticket %}
+    <tr{% if t.cola.value == resaltada %} class="resaltada"{% endif %}>
+      <td><a href="{% url 'detalle' t.solicitud_id %}">{{ t.solicitud_id }}</a></td>
+      <td>{{ t.cola.value }}</td>
+      <td>{{ t.accion.value }}</td>
+      <td>{{ f.prioridad.value }}</td>
+      <td class="fecha">{{ f.vence_en|date:"Y-m-d H:i" }}</td>
+      <td><span class="pildora {{ fila.tono }}">{{ fila.estado }}</span>{% if t.reabierto %} <span class="pildora error">Reabierto</span>{% endif %}{% if t.cierre_incompleto %} <span class="pildora pendiente">Cierre incompleto</span>{% endif %}</td>
+      <td><a href="{% url 'ficha' f.colaborador_id %}">{{ f.colaborador_id }}</a></td>
+      <td>{% if t.id_externo %}<a href="{{ glpi }}/front/ticket.form.php?id={{ t.id_externo|urlencode }}" rel="noopener noreferrer">#{{ t.id_externo }}</a>{% else %}—{% endif %}</td>
+    </tr>
+  {% endwith %}{% empty %}
+    <tr><td colspan="8">Ningún ticket coincide con el filtro. Pruebe con menos criterios.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p class="paginas">
+  {% if pagina.pagina > 1 %}<a href="?{{ consulta }}&amp;pagina={{ pagina.pagina|add:'-1' }}">Anterior</a>{% endif %}
+  {% if pagina.pagina < ultima %}<a href="?{{ consulta }}&amp;pagina={{ pagina.pagina|add:'1' }}">Siguiente</a>{% endif %}
+</p>
+{% endblock %}

@@ -279,6 +279,41 @@ class ResumenDeTicket:
     cierre_incompleto: bool
 
 
+# --- lectura: consulta de tickets (RF-41) ---------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class FiltroDeTickets:
+    cola: Cola | None = None
+    estado: EstadoDeTicket | None = None
+    solicitud: str | None = None
+    pagina: int = 1
+    tamano: int = 20
+
+    def __post_init__(self) -> None:
+        if self.pagina < 1:
+            raise DatoInvalido("pagina", "empieza en 1")
+        if not 1 <= self.tamano <= TAMANO_MAXIMO_DE_PAGINA:
+            raise DatoInvalido("tamano", f"entre 1 y {TAMANO_MAXIMO_DE_PAGINA}")
+
+
+@dataclass(frozen=True, slots=True)
+class FilaDeTicket:
+    ticket: ResumenDeTicket
+    prioridad: Prioridad
+    vence_en: datetime
+    colaborador_id: ColaboradorId
+
+
+@dataclass(frozen=True, slots=True)
+class PaginaDeTickets:
+    filas: tuple[FilaDeTicket, ...]
+    total: int
+    pagina: int
+    tamano: int
+    cola_resaltada: Cola | None = None
+
+
 @dataclass(frozen=True, slots=True)
 class FichaDeColaborador:
     colaborador_id: ColaboradorId

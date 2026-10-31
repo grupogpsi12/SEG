@@ -27,6 +27,7 @@ from jml.aplicacion.casos.auditoria import ConsultarAuditoria, VerificarAuditori
 from jml.aplicacion.casos.bandeja import ReintentarEmision
 from jml.aplicacion.casos.consultas import (
     BuscarCuentas,
+    BuscarTickets,
     ConsultarDashboard,
     ConsultarFicha,
     ContratosPorVencer,
@@ -91,6 +92,7 @@ class Casos:
     contratos_por_vencer: ContratosPorVencer
     dashboard: ConsultarDashboard
     buscar_cuentas: BuscarCuentas
+    buscar_tickets: BuscarTickets
     exportar_cuentas: ExportarCuentas
     ficha: ConsultarFicha
     auditoria: ConsultarAuditoria
@@ -131,6 +133,7 @@ def casos() -> Casos:
         contratos_por_vencer=ContratosPorVencer(consulta),
         dashboard=ConsultarDashboard(consulta),
         buscar_cuentas=BuscarCuentas(consulta),
+        buscar_tickets=BuscarTickets(consulta),
         exportar_cuentas=ExportarCuentas(consulta),
         ficha=ConsultarFicha(consulta),
         auditoria=ConsultarAuditoria(repos),
