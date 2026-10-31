@@ -238,3 +238,10 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 - **Un 500 detrás del WAF no siempre es de la aplicación.** GLPI registró 200 en `/front/locale.php`; la regla de salida 953100 del CRS cortó la respuesta ya enviada («header already sent»). Primero se compara el registro del WAF con el del servidor.
 - **Con `MSYS_NO_PATHCONV=1`, el curl de Windows no entiende `/dev/null` ni `/tmp/...`** (código 23): las rutas de salida se pasan con `cygpath -w`.
 - **Los paneles con muchas tarjetas piden todo en paralelo.** El límite de ritmo de BunkerWeb no tiene ráfaga: con 2 r/s pasan 2 y el resto recibe 429. Una ruta de la interfaz que dispara en paralelo necesita su propio límite (como `/static/` y `/ajax/`), y se prueba con peticiones en paralelo, no en serie (`verificar-w02.sh`).
+
+## Apariencia y consulta de tickets (31/10/2026)
+
+- **Un pedido de «CRUD» se contrasta con los invariantes antes de escribir código.** Crear cuentas desde la web exigía `service_role` en `web` (invariante 8, RS-15) y editar tickets chocaba con GLPI como fuente de la verdad (ADR-001). Lo que el equipo necesitaba de tickets era verlos: RF-41 es de solo lectura.
+- **Una prueba que limpia datos debe comprobar de quién son.** `contrato-glpi.sh` exigía `JML_GLPI_DE_PRUEBAS=si`, pero esa variable solo declara una intención: corrió contra el stack en uso y purgó los 88 tickets de la aplicación. Ahora mide si la aplicación tiene tickets y se niega (código 3).
+- **Un parche por lotes no debe suponer el final de línea.** Algunos archivos están con CRLF en la copia de trabajo de Windows: el reemplazo falló a mitad de camino y dejó capas aplicadas y otras no. Se normaliza a LF al leer, y se comprueba cada reemplazo.
+- **Las letras (a) a (h) del dashboard son trazabilidad, no decoración:** CA-15 las exige para relacionar la página con RF-30.

@@ -19,6 +19,16 @@ if [ "${JML_GLPI_DE_PRUEBAS:-}" != "si" ]; then
   exit 2
 fi
 
+# La suite purga todo ticket SOL-: contra el GLPI que usa la aplicacion borra sus tickets de verdad y
+# la sincronizacion sigue en «ok» sin leer ninguno (31/10/2026). Sin stack ni tabla, cuenta 0 (CI).
+en_uso="$(docker exec jml-postgres-1 psql -U postgres -d postgres -Atc \
+  "select count(*) from app.ticket where id_externo is not null" 2>/dev/null || echo 0)"
+if [ "${en_uso:-0}" -gt 0 ]; then
+  echo "Este GLPI esta en uso: la aplicacion sigue $en_uso tickets y esta suite los borraria." >&2
+  echo "Corrala en un stack limpio (docs/probar-localmente.md, seccion 6)." >&2
+  exit 3
+fi
+
 RAIZ="$(cd "$(dirname "$0")/../.." && pwd)"
 RED="${JML_RED_APP:-jml_app}"
 SECRETOS="$RAIZ/secrets"

@@ -1,6 +1,6 @@
 # Estado del proyecto y traspaso
 
-**Última actualización:** 25/10/2026 · rama `auditoria/entrega`.
+**Última actualización:** 31/10/2026 · rama `auditoria/entrega`.
 
 Este documento existe para que otra persona, u otra sesión de Claude Code con otra cuenta, retome el trabajo sin el historial de la conversación. Todo lo que afirma está respaldado por commits, pruebas o documentos del repositorio. **Léase junto con:**
 - `CLAUDE.md` (reglas).
@@ -13,6 +13,8 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 - `docs/auditoria-2026-10-12.md` (auditoría de funcionalidad y seguridad: 12 hallazgos corregidos).
 
 ## 1. Resumen
+
+**31/10/2026: consulta de tickets y nueva apariencia (SRS v2.8).** RF-41 agrega la página **Tickets**, de solo lectura, para técnicos y Administrador. El CRUD pedido no se adoptó: GLPI sigue siendo la fuente de la verdad y las cuentas se crean por comando. La interfaz usa fuentes propias y contraste medido. `contrato-glpi.sh` se niega a correr si la aplicación ya tiene tickets (evidencia `V-01-VERDE`).
 
 **25/10/2026: arquitectura 100 % local (ADR-031, SRS v2.5).** Según el documento de la primera entrega de Desarrollo Seguro, el sistema corre en la máquina local con Docker Desktop: PostgreSQL 17 en contenedor (`compose.yaml` + `compose.local.yaml`), Supabase solo para Auth, Docker secrets en `secrets/`, certificado autofirmado y copias de auditoría y respaldos en un disco externo. Azure, Let's Encrypt, DuckDNS y Cloudflare quedan fuera. Lo que figuraba «pendiente de Azure» ya no aplica; los scripts de copia ya están adecuados (L-01).
 

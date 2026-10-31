@@ -406,6 +406,10 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
 - [x] **W-02 Las tarjetas del panel de GLPI reciben 429** (26/10/2026). Hecho: ADR-033, SRS v2.7; evidencia `W-02-ROJO` y `W-02-VERDE`. Tras ADR-032 ya no hay baneo, pero el panel pide todas sus tarjetas a la vez a `/ajax/dashboard.php` y, con 2 r/s, 5 o 6 de 7 salen con error.
   - **Pasos:** prueba roja estática y dinámica (ráfaga paralela de 7 y de 20 a `/ajax/`); límite propio de 20 r/s para `^/ajax/` solo en `glpi.localhost` (ADR-033, SRS 2.7, RS-08); verde.
   - **Criterio:** 0 respuestas 429 en ráfagas de 7 y de 20 a `/ajax/`; la raíz de GLPI sigue con 2 r/s (control: una ráfaga de 20 a `/` sí da 429); `pruebas.sh glpi.localhost` con los ataques en 403.
+- [x] **V-01 Consulta de tickets en la aplicación (RF-41) y nueva apariencia** (31/10/2026). Hecho y verificado por el WAF con la imagen reconstruida; evidencia `V-01-VERDE`. El equipo pidió CRUD de usuarios y tickets; tras la «Pausa» decidió: usuarios sin cambios (RF-06, invariante 8), tickets solo de consulta (GLPI sigue siendo la fuente de la verdad, ADR-001) y un estilo que mezcla las tres referencias.
+  - **Pasos:** pruebas rojas; `FiltroDeTickets`, `buscar_tickets` en `Repositorios` (doble como oráculo y SQL), caso `BuscarTickets`, vista `/tickets`; SRS v2.8. Después, hoja de estilos y plantillas, con fuentes propias (sin CDN).
+  - **Dependencia nueva (solo archivos, sin código):** DM Sans y Source Serif 4, licencia SIL OFL 1.1, subconjunto latino de `@fontsource-variable` 5.2.8 y 5.2.9 (septiembre de 2025), copiado en `static/web/fuentes/`. Resuelve la tipografía sin CDN, que RI-01 prohíbe; la biblioteca estándar no aporta fuentes.
+  - **Criterio:** la consulta SQL coincide con el oráculo; técnicos y Administrador entran, los demás reciben 403; ningún campo restringido; las pruebas de contraste y estructura (RI-01) siguen en verde con los colores nuevos; ningún recurso externo.
 
 ## Orden de recorte (SRS §14)
 
