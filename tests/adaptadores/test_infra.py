@@ -294,3 +294,13 @@ def test_ADR_033_las_peticiones_ajax_de_glpi_tienen_su_propio_limite() -> None:
     assert "glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/" in entorno
     assert "glpi.localhost}_LIMIT_REQ_RATE_1=20r/s" in entorno
     assert "LIMIT_REQ_RATE=2r/s" in entorno
+
+
+def test_RF_41_contrato_glpi_no_corre_contra_un_glpi_con_tickets_de_la_aplicacion() -> None:
+    """La suite purga todo ticket SOL- de GLPI: corrida contra el stack en uso borro los 88 tickets
+    de la aplicacion (31/10/2026). La sincronizacion siguio en «ok», sin leer ninguno."""
+    guion = (RAIZ / "infra/scripts/contrato-glpi.sh").read_text(encoding="utf-8")
+    assert "select count(*) from app.ticket where id_externo is not null" in guion
+    guarda = guion.index("id_externo is not null")
+    assert guarda < guion.index("docker run"), "la guarda va antes de tocar GLPI"
+    assert "exit 3" in guion

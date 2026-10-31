@@ -123,7 +123,7 @@ infra/waf/pruebas.sh glpi.localhost                 # además, la API de GLPI ce
 JML_GLPI_DE_PRUEBAS=si infra/scripts/contrato-glpi.sh   # 30 pruebas contra su GLPI (necesita uv)
 ```
 
-`contrato-glpi.sh` **borra los tickets cuya clave empieza con `SOL-`** en su GLPI: úselo solo en su equipo.
+`contrato-glpi.sh` **borra los tickets cuya clave empieza con `SOL-`** en GLPI. Por eso se niega a correr (código 3) si la aplicación ya tiene tickets creados: úselo en un stack recién levantado.
 
 **Otras pruebas reproducibles** (todas con Docker; las cuatro primeras en entornos desechables que no tocan su base):
 
