@@ -1,0 +1,1 @@
+uvx bandit==1.9.4 -r src tests -x '*/migrations/*' -q --severity-level medium; echo bandit_medio_o_superior=$?

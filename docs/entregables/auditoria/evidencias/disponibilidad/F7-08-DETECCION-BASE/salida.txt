@@ -1,0 +1,5 @@
+postgres detenido: web unhealthy a los 43 s (RNF-01 exige menos de 120)
+ Container jml-postgres-1 Stopping 
+ Container jml-postgres-1 Stopped 
+ Container jml-postgres-1 Starting 
+ Container jml-postgres-1 Started 

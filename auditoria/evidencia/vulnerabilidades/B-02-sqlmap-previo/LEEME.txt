@@ -1,0 +1,6 @@
+Corrida PRELIMINAR de sqlmap (antes de la auditoria del 24/10/2026), importada tal cual.
+No fue ejecutada por auditoria/herramientas/registrar.py: la procedencia (comando, version,
+commit, fecha) esta declarada a mano en los demas archivos de esta carpeta.
+Limite conocido: NO tiene control positivo (plan §10): no se demostro que sqlmap detecte una
+inyeccion sembrada, ni que los POST llegaran a la logica de las vistas. La corrida formal, con
+control positivo y nivel 5, es el item F6-04 y reemplaza a esta como evidencia de CA-12.

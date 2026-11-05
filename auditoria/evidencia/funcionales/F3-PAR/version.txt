@@ -1,0 +1,1 @@
+psycopg (imagen jml-app) solo lectura; PostgreSQL 17 local frente a Supabase

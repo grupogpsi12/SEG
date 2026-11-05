@@ -1,0 +1,36 @@
+PASA  CU-01 200 GET /ingreso [anonimo] Pagina de ingreso por HTTPS
+PASA  CU-01 302 GET /bandeja [anonimo] Ruta protegida sin sesion redirige al ingreso
+PASA  CU-01 200 POST /ingreso [anonimo] Formulario de ingreso invalido: error del formulario, sin llamar a Supabase
+PASA  CU-01 403 POST /ingreso [anonimo] POST sin token CSRF es rechazado
+PASA  CU-02 302 POST /solicitudes/nueva/VAC [sol] Solicitante registra vacaciones con fecha futura
+PASA  CU-03 200 POST /solicitudes/nueva/VAC [sol] Segunda VAC abierta del mismo colaborador es rechazada con el id existente
+PASA  CU-04 302 POST /solicitudes/nueva/CDP [jefe] Jefe registra CDP de su subordinado
+PASA  CU-05 200 GET /bandeja [rrhh] Bandeja de RRHH lista las pendientes
+PASA  CU-05 302 POST /solicitudes/SOL-2026-000001/aprobar [rrhh] RRHH aprueba la VAC
+PASA  CU-05 302 POST /solicitudes/SOL-2026-000002/rechazar [rrhh] RRHH rechaza el CDP con justificacion
+PASA  CU-05 302 POST /solicitudes/SOL-2026-000001/aprobar [sol] Solicitante no puede aprobar (control de rol)
+PASA  CU-06 200 POST /solicitudes/nueva/ING [rrhh] Ingreso con archivo no PDF renombrado .pdf es rechazado
+PASA  CU-06 302 POST /solicitudes/nueva/ING [rrhh] RRHH emite el ingreso con soporte PDF valido
+PASA  CU-07 302 POST /solicitudes/nueva/RET [rrhh] RRHH emite RET de un contratista con motivo restringido
+PASA  CU-07 200 GET /solicitudes/SOL-2026-000004 [rrhh] RRHH ve el motivo restringido en el detalle
+PASA  CU-08 302 POST /solicitudes/nueva/EMG [rrhh] RRHH emite EMG (fuga detectada)
+PASA  CU-09 200 GET /dashboard [tec_ad] Dashboard del tecnico
+PASA  CU-09 200 GET /cuentas?departamento=Finanzas [tec_ad] Busqueda de cuentas con filtro
+PASA  CU-09 200 GET /colaboradores/col-014 [tec_ad] Ficha del colaborador retirado sin el motivo
+PASA  CU-09 200 GET /cuentas.csv [tec_inv] Exportacion CSV auditada
+PASA  CU-09 404 GET /solicitudes/SOL-2026-000004 [tec_ad] Tecnico no ve el detalle restringido del RET
+PASA  CU-10 403 GET /bandeja [sol] sol no accede a /bandeja
+PASA  CU-10 403 GET /dashboard [sol] sol no accede a /dashboard
+PASA  CU-10 403 GET /auditoria [tec_ad] tec_ad no accede a /auditoria
+PASA  CU-10 403 GET /administracion/perfiles [rrhh] rrhh no accede a /administracion/perfiles
+PASA  CU-10 403 GET /bandeja [auditor] auditor no accede a /bandeja
+PASA  CU-10 403 GET /dashboard [admin] admin no accede a /dashboard
+PASA  CU-11 200 GET /auditoria [auditor] Auditor consulta la auditoria
+FALLA CU-11 429 POST /auditoria [auditor] Auditor verifica la cadena de hashes
+PASA  CU-12 200 GET /administracion/perfiles [admin] Matriz de perfiles
+PASA  CU-12 200 GET /administracion/usuarios [admin] Usuarios y roles
+PASA  CU-12 200 GET /errores [admin] Solicitudes en error (reintento)
+PASA  CU-13 302 POST /salir [jefe] Cerrar sesion
+PASA  CU-13 302 GET /solicitudes [jefe] La sesion cerrada ya no da acceso
+
+34 pasos, 1 fallas

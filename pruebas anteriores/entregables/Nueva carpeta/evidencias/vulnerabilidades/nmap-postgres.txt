@@ -1,0 +1,11 @@
+# Nmap 7.98 scan initiated Sat Oct 24 16:17:32 2026 as: /usr/bin/nmap -Pn -sV -p- --script "pgsql-brute or banner" --script-args brute.firstonly=true,unpwdb.timelimit=30s -oN /o/nmap-postgres.txt postgres
+Nmap scan report for postgres (172.18.0.2)
+Host is up (0.000010s latency).
+rDNS record for 172.18.0.2: jml-postgres-1.jml_pg_net
+Not shown: 65534 closed tcp ports (reset)
+PORT     STATE SERVICE    VERSION
+5432/tcp open  postgresql PostgreSQL DB 9.6.0 or later
+MAC Address: 02:42:AC:12:00:02 (Unknown)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 24 16:18:10 2026 -- 1 IP address (1 host up) scanned in 38.00 seconds

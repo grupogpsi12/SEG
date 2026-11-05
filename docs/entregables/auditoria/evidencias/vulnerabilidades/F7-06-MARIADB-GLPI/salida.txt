@@ -1,0 +1,29 @@
+## variables de MariaDB
+bind_address	
+have_ssl	YES
+local_infile	ON
+require_secure_transport	OFF
+secure_file_priv	
+skip_name_resolve	ON
+ssl_cert	
+version	11.4.13-MariaDB-ubu2404
+## privilegios del usuario glpi (FILE permitiria leer o escribir archivos del servidor)
+GRANT USAGE ON *.* TO `glpi`@`%` IDENTIFIED BY PASSWORD '<oculto>'
+GRANT ALL PRIVILEGES ON `glpi`.* TO `glpi`@`%`
+## la sesion actual de esta consulta (por socket local): cifrado en uso
+Ssl_cipher	TLS_AES_256_GCM_SHA384
+## como se conecta GLPI a la base (config_db.php; sin la clave)
+<?php
+class DB extends DBmysql {
+   public $dbhost = 'mariadb:3306';
+   public $dbuser = 'glpi';
+   public $<oculto>
+   public $dbdefault = 'glpi';
+   public $use_timezones = true;
+   public $use_utf8mb4 = true;
+   public $allow_datetime = false;
+   public $allow_signed_keys = false;
+}
+   (sin opciones de TLS: GLPI abre la conexion en claro hacia mariadb:3306 por la red interna db_net)
+## hosts desde los que MariaDB ve conexiones (el tramo viaja por la red interna db_net)
+localhost	1

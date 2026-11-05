@@ -1,0 +1,137 @@
+
+ Start 2026-10-24 16:30:12        -->> 192.168.65.254:443 (app.localhost) <<--
+
+ A record via:           supplied IP "192.168.65.254"
+ rDNS (192.168.65.254):  --
+ Service detected:       HTTP
+
+ Testing protocols via sockets except NPN+ALPN 
+
+ SSLv2      not offered (OK)
+ SSLv3      not offered (OK)
+ TLS 1      not offered
+ TLS 1.1    not offered
+ TLS 1.2    offered (OK)
+ TLS 1.3    offered (OK): final
+ NPN/SPDY   not offered
+ ALPN/HTTP2 h2, http/1.1 (offered)
+
+ Testing cipher categories 
+
+ NULL ciphers (no encryption)                      not offered (OK)
+ Anonymous NULL Ciphers (no authentication)        not offered (OK)
+ Export ciphers (w/o ADH+NULL)                     not offered (OK)
+ LOW: 64 Bit + DES, RC[2,4], MD5 (w/o export)      not offered (OK)
+ Triple DES Ciphers / IDEA                         not offered
+ Obsoleted CBC ciphers (AES, ARIA etc.)            not offered
+ Strong encryption (AEAD ciphers) with no FS       not offered
+ Forward Secrecy strong encryption (AEAD ciphers)  offered (OK)
+
+
+ Testing robust forward secrecy (FS) -- omitting Null Authentication/Encryption, 3DES, RC4 
+
+ FS is offered (OK)           TLS_AES_256_GCM_SHA384
+                              TLS_CHACHA20_POLY1305_SHA256
+                              ECDHE-ECDSA-AES256-GCM-SHA384
+                              ECDHE-ECDSA-CHACHA20-POLY1305
+                              TLS_AES_128_GCM_SHA256
+                              ECDHE-ECDSA-AES128-GCM-SHA256 
+ KEMs offered                 X25519MLKEM768 
+ Elliptic curves offered:     prime256v1 secp384r1 secp521r1 X25519 X448 
+ TLS 1.2 sig_algs offered:    ECDSA+SHA256 ECDSA+SHA384 ECDSA+SHA512 
+                              ECDSA+SHA224 
+ TLS 1.3 sig_algs offered:    ECDSA+SHA256 
+
+ Testing HTTP header response @ "/" 
+
+ HTTP Status Code             403 Forbidden
+ HTTP clock skew              0 sec from localtime
+ Strict Transport Security    365 days=31536000 s, includeSubDomains
+ Public Key Pinning           --
+ Server banner                (no "Server" line in header, interesting!)
+ Application banner           --
+ Cookie(s)                    (none issued at "/") -- HTTP status 403 signals you maybe missed the web application
+ Security headers             X-Content-Type-Options: nosniff
+                              Permissions-Policy: accelerometer=(),
+                                ambient-light-sensor=(), aria-notify=(),
+                                attribution-reporting=(), autoplay=(),
+                                bluetooth=(), browsing-topics=(), camera=(),
+                                captured-surface-control=(),
+                                ch-device-memory=(), ch-downlink=(), ch-dpr=(),
+                                ch-ect=(), ch-prefers-color-scheme=(),
+                                ch-prefers-reduced-motion=(),
+                                ch-prefers-reduced-transparency=(), ch-rtt=(),
+                                ch-save-data=(), ch-ua-arch=(),
+                                ch-ua-bitness=(), ch-ua-form-factors=(),
+                                ch-ua-full-version-list=(),
+                                ch-ua-full-version=(),
+                                ch-ua-high-entropy-values=(), ch-ua-mobile=(),
+                                ch-ua-model=(), ch-ua-platform-version=(),
+                                ch-ua-platform=(), ch-ua-wow64=(), ch-ua=(),
+                                ch-viewport-height=(), ch-viewport-width=(),
+                                ch-width=(), compute-pressure=(),
+                                cross-origin-isolated=(),
+                                deferred-fetch-minimal=(), deferred-fetch=(),
+                                device-attributes=(),
+                                digital-credentials-create=(),
+                                digital-credentials-get=(), display-capture=(),
+                                encrypted-media=(),
+                                execution-while-not-rendered=(),
+                                execution-while-out-of-viewport=(),
+                                focus-without-user-activation=(),
+                                fullscreen=(), gamepad=(), geolocation=(),
+                                gyroscope=(), haptics=(), hid=(),
+                                identity-credentials-get=(), idle-detection=(),
+                                interest-cohort=(), keyboard-map=(),
+                                language-detector=(), language-model=(),
+                                local-fonts=(), local-network-access=(),
+                                local-network=(), loopback-network=(),
+                                magnetometer=(), manual-text=(),
+                                media-playback-while-not-visible=(),
+                                microphone=(), midi=(),
+                                on-device-speech-recognition=(),
+                                otp-credentials=(), payment=(),
+                                picture-in-picture=(),
+                                private-state-token-issuance=(),
+                                private-state-token-redemption=(),
+                                proofreader=(),
+                                publickey-credentials-create=(),
+                                publickey-credentials-get=(), rewriter=(),
+                                screen-wake-lock=(), serial=(),
+                                shared-storage-select-url=(),
+                                shared-storage=(), speaker-selection=(),
+                                storage-access=(), summarizer=(), tools=(),
+                                translator=(), unload=(), usb=(),
+                                vertical-scroll=(), web-app-installation=(),
+                                web-share=(), webnn=(), window-management=(),
+                                writer=(), xr-spatial-tracking=()
+                              Referrer-Policy: strict-origin-when-cross-origin
+ Reverse Proxy banner         --
+
+
+ Testing vulnerabilities 
+
+ Heartbleed (CVE-2014-0160)                not vulnerable (OK), no heartbeat extension
+ CCS (CVE-2014-0224)                       not vulnerable (OK)
+ Ticketbleed (CVE-2016-9244), experiment.  not vulnerable (OK), no session ticket extension
+ ROBOT                                     Server does not support any cipher suites that use RSA key transport
+ Secure Renegotiation (RFC 5746)           supported (OK)
+ Secure Client-Initiated Renegotiation     not vulnerable (OK)
+ CRIME, TLS (CVE-2012-4929)                not vulnerable (OK)
+ BREACH (CVE-2013-3587)                    no gzip/deflate/compress/br HTTP compression (OK)  - only supplied "/" tested
+ POODLE, SSL (CVE-2014-3566)               not vulnerable (OK), no SSLv3 support
+ TLS_FALLBACK_SCSV (RFC 7507)              No fallback possible (OK), no protocol below TLS 1.2 offered
+ SWEET32 (CVE-2016-2183, CVE-2016-6329)    not vulnerable (OK)
+ FREAK (CVE-2015-0204)                     not vulnerable (OK)
+ DROWN (CVE-2016-0800, CVE-2016-0703)      not vulnerable on this host and port (OK)
+                                           no RSA certificate, thus certificate can't be used with SSLv2 elsewhere
+ LOGJAM (CVE-2015-4000), experimental      not vulnerable (OK): no DH EXPORT ciphers, no DH key detected with <= TLS 1.2
+ BEAST (CVE-2011-3389)                     not vulnerable (OK), no SSL3 or TLS1
+ LUCKY13 (CVE-2013-0169), experimental     not vulnerable (OK)
+ Winshock (CVE-2014-6321), experimental    not vulnerable (OK)
+ RC4 (CVE-2013-2566, CVE-2015-2808)        no RC4 ciphers detected (OK)
+
+
+ Done 2026-10-24 16:30:34 [  24s] -->> 192.168.65.254:443 (app.localhost) <<--
+
+

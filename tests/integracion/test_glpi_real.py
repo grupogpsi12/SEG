@@ -7,7 +7,7 @@ Sin las variables de entorno se omite, con el ID S-28 (credenciales externas).
 
 import os
 from dataclasses import replace
-from datetime import UTC
+from datetime import UTC, datetime
 
 import httpx
 import pytest
@@ -18,7 +18,11 @@ from jml.dominio.tickets import TicketDeCola, generar_tickets
 from jml.dominio.tipos import Cola, Prioridad, Subtipo, TipoEvento
 from jml.dominio.valores import CalendarioHabil
 from tests.dobles.glpi_real import TecnicoGlpiReal
-from tests.fabricas import AHORA, SENTINELA, caso
+from tests.fabricas import HOY, SENTINELA, caso
+
+# El reloj de GLPI es el real: con una fecha fija, el vencimiento queda antes de la apertura del
+# ticket y GLPI lo rechaza («Invalid dates. Update cancelled.»). B-17.
+AHORA = datetime.now(UTC)
 
 SIN_GLPI = "JML_GLPI_API_URL" not in os.environ
 pytestmark = pytest.mark.skipif(SIN_GLPI, reason="S-28: sin un GLPI real (variables JML_GLPI_*)")
@@ -40,7 +44,8 @@ def glpi() -> tuple[SistemaDeTicketsGlpi, TecnicoGlpiReal]:
 
 
 def tickets_de(tipo: TipoEvento, sub: Subtipo | None) -> list[TicketDeCola]:
-    c = caso(tipo, sub)
+    # La fecha efectiva (y con ella el vencimiento) se mide desde el dia real, no desde HOY.
+    c = caso(tipo, sub, dias=7 + (AHORA.date() - HOY).days)
     return list(
         generar_tickets(c.solicitud, c.actual, c.nuevo, c.colaborador, CalendarioHabil(), AHORA)
     )

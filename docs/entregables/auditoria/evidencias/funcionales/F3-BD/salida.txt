@@ -1,0 +1,22 @@
+.............F.                                                          [100%]
+================================== FAILURES ===================================
+___________ test_BD_todas_las_tablas_tienen_rls_y_ninguna_politica ____________
+
+    def test_BD_todas_las_tablas_tienen_rls_y_ninguna_politica() -> None:
+        with connection.cursor() as c:
+            c.execute(
+                "SELECT relname FROM pg_class k JOIN pg_namespace n ON n.oid = k.relnamespace "
+                "WHERE n.nspname = %s AND k.relkind = 'r' AND NOT k.relrowsecurity",
+                [ESQUEMA],
+            )
+>           assert c.fetchall() == [], "tablas sin RLS"
+E           AssertionError: tablas sin RLS
+E           assert [('auth_group..._user',), ...] == []
+E             
+E             Left contains 9 more items, first extra item: ('auth_group_permissions',)
+E             Use -v to get more diff
+
+tests\integracion\test_roles_bd.py:117: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/integracion/test_roles_bd.py::test_BD_todas_las_tablas_tienen_rls_y_ninguna_politica
+1 failed, 14 passed, 270 deselected in 1.00s

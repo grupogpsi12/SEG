@@ -13,13 +13,20 @@ from jml.aplicacion.dtos import (
     FichaDeColaborador,
     FilaDeColaborador,
     FiltroDeCuentas,
+    FiltroDeTickets,
     Indicadores,
     PaginaDeCuentas,
+    PaginaDeTickets,
 )
 from jml.aplicacion.puertos import Reloj, Repositorios
 from jml.dominio.auditoria import EventoDeAuditoria
 from jml.dominio.errores import NoAutorizado, NoEncontrado
-from jml.dominio.permisos import Actor, puede_ver_dashboard
+from jml.dominio.permisos import (
+    Actor,
+    puede_consultar_tickets,
+    puede_ver_dashboard,
+    puede_ver_solicitud,
+)
 from jml.dominio.tipos import Cola, EstadoColaborador, Rol, TipoEvento
 from jml.dominio.valores import hoy_en_bogota
 
@@ -102,6 +109,25 @@ class BuscarCuentas:
         actor = _actor(self._dep, usuario_id)
         _exigir_tecnico(actor, "buscar_cuentas")
         return self._dep.repos.buscar_cuentas(filtro)
+
+
+class BuscarTickets:
+    """RF-41: solo lectura. Los tickets se crean, trabajan y cierran en GLPI (ADR-001)."""
+
+    def __init__(self, dependencias: DependenciasDeConsulta) -> None:
+        self._dep = dependencias
+
+    def ejecutar(self, usuario_id: str, filtro: FiltroDeTickets) -> PaginaDeTickets:
+        actor = _actor(self._dep, usuario_id)
+        if not puede_consultar_tickets(actor.roles):
+            raise NoAutorizado("buscar_tickets", "solo tecnicos y Administrador los consultan")
+        propia = next((COLA_DE_ROL[r] for r in COLA_DE_ROL if r in actor.roles), None)
+        pagina = self._dep.repos.buscar_tickets(filtro)
+        filas = tuple(
+            replace(f, solicitud_visible=puede_ver_solicitud(actor, f.solicitante_id))
+            for f in pagina.filas
+        )
+        return replace(pagina, filas=filas, cola_resaltada=propia)
 
 
 class ConsultarFicha:

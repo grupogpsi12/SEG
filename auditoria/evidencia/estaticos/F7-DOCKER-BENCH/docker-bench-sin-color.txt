@@ -1,0 +1,175 @@
+# ------------------------------------------------------------------------------
+# Docker Bench for Security v1.3.4
+#
+# Docker, Inc. (c) 2015-
+#
+# Checks for dozens of common best-practices around deploying Docker containers in production.
+# Inspired by the CIS Docker Community Edition Benchmark v1.1.0.
+# ------------------------------------------------------------------------------
+
+Initializing Sun Oct 25 20:10:12 UTC 2026
+
+
+
+[INFO] 4 - Container Images and Build File
+[WARN] 4.1  - Ensure a user for the container has been created
+[WARN]      * Running as root: jml-mariadb-1
+[WARN]      * Running as root: jml-postgres-1
+[NOTE] 4.2  - Ensure that containers use trusted base images
+[NOTE] 4.3  - Ensure unnecessary packages are not installed in the container
+[NOTE] 4.4  - Ensure images are scanned and rebuilt to include security patches
+[WARN] 4.5  - Ensure Content trust for Docker is Enabled
+[WARN] 4.6  - Ensure HEALTHCHECK instructions have been added to the container image
+[WARN]      * No Healthcheck found: [jml-app:local]
+[WARN]      * No Healthcheck found: [drwetter/testssl.sh:3.2]
+[WARN]      * No Healthcheck found: [python:3.12-slim]
+[WARN]      * No Healthcheck found: [ghcr.io/grupogpsi12/jml-app:ultima]
+[WARN]      * No Healthcheck found: [grafana/grafana:13.2.4]
+[WARN]      * No Healthcheck found: [glpi/glpi@sha256:45572164994cbd12bedd99bf6dd954b7962076dd3b529f0fdc4a84131f30a32a]
+[WARN]      * No Healthcheck found: [python@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1]
+[WARN]      * No Healthcheck found: [postgres@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3]
+[WARN]      * No Healthcheck found: [ubuntu:24.04]
+[WARN]      * No Healthcheck found: [mariadb@sha256:1292844148b311e4ed4300022a996d39083f415a963e970cf47cad1b3b18e3a6]
+[WARN]      * No Healthcheck found: [fluent/fluent-bit:5.1.3]
+[WARN]      * No Healthcheck found: [grafana/grafana:13.2.3]
+[WARN]      * No Healthcheck found: [grafana/loki:3.7.8]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/playwright/python:v1.63.0-noble]
+[WARN]      * No Healthcheck found: [nicolaka/netshoot:latest]
+[WARN]      * No Healthcheck found: [ghcr.io/gitleaks/gitleaks:v8.30.1]
+[WARN]      * No Healthcheck found: [ghcr.io/sullo/nikto:latest]
+[WARN]      * No Healthcheck found: [instrumentisto/nmap:latest]
+[WARN]      * No Healthcheck found: [ghcr.io/gitleaks/gitleaks:v8.30.0]
+[WARN]      * No Healthcheck found: [aquasec/trivy:0.67.2]
+[WARN]      * No Healthcheck found: [fluent/fluent-bit:3.2 fluent/fluent-bit:3.2.10]
+[WARN]      * No Healthcheck found: [fluent/fluent-bit:3.2 fluent/fluent-bit:3.2.10]
+[WARN]      * No Healthcheck found: [grafana/grafana:11.5.2]
+[WARN]      * No Healthcheck found: [grafana/loki:3.4.2]
+[INFO] 4.7  - Ensure update instructions are not use alone in the Dockerfile
+[INFO]      * Update instruction found: [jml-app:local]
+[INFO]      * Update instruction found: [python:3.12-slim]
+[INFO]      * Update instruction found: [ghcr.io/grupogpsi12/jml-app:ultima]
+[INFO]      * Update instruction found: [glpi/glpi@sha256:45572164994cbd12bedd99bf6dd954b7962076dd3b529f0fdc4a84131f30a32a]
+[INFO]      * Update instruction found: [python@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1]
+[INFO]      * Update instruction found: [postgres@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3]
+[INFO]      * Update instruction found: [ghcr.io/sullo/nikto:latest]
+[NOTE] 4.8  - Ensure setuid and setgid permissions are removed in the images
+[INFO] 4.9  - Ensure COPY is used instead of ADD in Dockerfile
+[INFO]      * ADD in image history: [grafana/grafana:13.2.4]
+[INFO]      * ADD in image history: [ubuntu:24.04]
+[INFO]      * ADD in image history: [mariadb@sha256:1292844148b311e4ed4300022a996d39083f415a963e970cf47cad1b3b18e3a6]
+[INFO]      * ADD in image history: [grafana/grafana:13.2.3]
+[INFO]      * ADD in image history: [bunkerity/bunkerweb@sha256:1b96f672660cc32bfae93604ac297371222dc9039b2b09b8eee5e40ba9d35c35]
+[INFO]      * ADD in image history: [bunkerity/bunkerweb-scheduler@sha256:321867d8db44d3a4ca1edfa3ff2c5b50163d3ebd5c67ed0d107161319d5ee860]
+[INFO]      * ADD in image history: [mcr.microsoft.com/playwright/python:v1.63.0-noble]
+[INFO]      * ADD in image history: [nicolaka/netshoot:latest]
+[INFO]      * ADD in image history: [ghcr.io/gitleaks/gitleaks:v8.30.1]
+[INFO]      * ADD in image history: [ghcr.io/sullo/nikto:latest]
+[INFO]      * ADD in image history: [instrumentisto/nmap:latest]
+[INFO]      * ADD in image history: [ghcr.io/gitleaks/gitleaks:v8.30.0]
+[INFO]      * ADD in image history: [aquasec/trivy:0.67.2]
+[INFO]      * ADD in image history: [grafana/grafana:11.5.2]
+[INFO]      * ADD in image history: [docker/docker-bench-security:latest]
+[NOTE] 4.10  - Ensure secrets are not stored in Dockerfiles
+[NOTE] 4.11  - Ensure verified packages are only Installed
+
+
+[INFO] 5 - Container Runtime
+[WARN] 5.1  - Ensure AppArmor Profile is Enabled
+[WARN]      * No AppArmorProfile Found: jml-bw-scheduler-1
+[WARN]      * No AppArmorProfile Found: jml-bunkerweb-1
+[WARN]      * No AppArmorProfile Found: jml-worker-1
+[WARN]      * No AppArmorProfile Found: jml-glpi-1
+[WARN]      * No AppArmorProfile Found: jml-grafana-1
+[WARN]      * No AppArmorProfile Found: jml-mariadb-1
+[WARN]      * No AppArmorProfile Found: jml-fluent-bit-1
+[WARN]      * No AppArmorProfile Found: jml-loki-1
+[WARN]      * No AppArmorProfile Found: jml-web-1
+[WARN]      * No AppArmorProfile Found: jml-postgres-1
+[PASS] 5.2  - Ensure SELinux security options are set, if applicable
+[WARN] 5.3  - Ensure Linux Kernel Capabilities are restricted within containers
+[WARN]      * Capabilities added: CapAdd=[CAP_] to jml-glpi-1
+[PASS] 5.4  - Ensure privileged containers are not used
+[PASS] 5.5  - Ensure sensitive host system directories are not mounted on containers
+[PASS] 5.6  - Ensure ssh is not run within containers
+[WARN] 5.7  - Ensure privileged ports are not mapped within containers
+[WARN]      * Privileged Port in use: 80 in jml-bunkerweb-1
+[WARN]      * Privileged Port in use: 443 in jml-bunkerweb-1
+[NOTE] 5.8  - Ensure only needed ports are open on the container
+[PASS] 5.9  - Ensure the host's network namespace is not shared
+[PASS] 5.10  - Ensure memory usage for container is limited
+[WARN] 5.11  - Ensure CPU priority is set appropriately on the container
+[WARN]      * Container running without CPU restrictions: jml-bw-scheduler-1
+[WARN]      * Container running without CPU restrictions: jml-bunkerweb-1
+[WARN]      * Container running without CPU restrictions: jml-worker-1
+[WARN]      * Container running without CPU restrictions: jml-glpi-1
+[WARN]      * Container running without CPU restrictions: jml-grafana-1
+[WARN]      * Container running without CPU restrictions: jml-mariadb-1
+[WARN]      * Container running without CPU restrictions: jml-fluent-bit-1
+[WARN]      * Container running without CPU restrictions: jml-loki-1
+[WARN]      * Container running without CPU restrictions: jml-web-1
+[WARN]      * Container running without CPU restrictions: jml-postgres-1
+[WARN] 5.12  - Ensure the container's root filesystem is mounted as read only
+[WARN]      * Container running with root FS mounted R/W: jml-bw-scheduler-1
+[WARN]      * Container running with root FS mounted R/W: jml-bunkerweb-1
+[WARN]      * Container running with root FS mounted R/W: jml-glpi-1
+[WARN]      * Container running with root FS mounted R/W: jml-grafana-1
+[WARN]      * Container running with root FS mounted R/W: jml-mariadb-1
+[WARN]      * Container running with root FS mounted R/W: jml-loki-1
+[WARN]      * Container running with root FS mounted R/W: jml-postgres-1
+[WARN] 5.13  - Ensure incoming container traffic is binded to a specific host interface
+[WARN]      * Port being bound to wildcard IP: 0.0.0.0 in jml-bunkerweb-1
+[WARN]      * Port being bound to wildcard IP: 0.0.0.0 in jml-bunkerweb-1
+[WARN] 5.14  - Ensure 'on-failure' container restart policy is set to '5'
+[WARN]      * MaximumRetryCount is not set to 5: jml-bw-scheduler-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-bunkerweb-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-worker-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-glpi-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-grafana-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-mariadb-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-fluent-bit-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-loki-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-web-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-postgres-1
+[PASS] 5.15  - Ensure the host's process namespace is not shared
+[PASS] 5.16  - Ensure the host's IPC namespace is not shared
+[PASS] 5.17  - Ensure host devices are not directly exposed to containers
+[INFO] 5.18  - Ensure the default ulimit is overwritten at runtime, only if needed
+[INFO]      * Container no default ulimit override: jml-bw-scheduler-1
+[INFO]      * Container no default ulimit override: jml-bunkerweb-1
+[INFO]      * Container no default ulimit override: jml-worker-1
+[INFO]      * Container no default ulimit override: jml-glpi-1
+[INFO]      * Container no default ulimit override: jml-grafana-1
+[INFO]      * Container no default ulimit override: jml-mariadb-1
+[INFO]      * Container no default ulimit override: jml-fluent-bit-1
+[INFO]      * Container no default ulimit override: jml-loki-1
+[INFO]      * Container no default ulimit override: jml-web-1
+[INFO]      * Container no default ulimit override: jml-postgres-1
+[PASS] 5.19  - Ensure mount propagation mode is not set to shared
+[PASS] 5.20  - Ensure the host's UTS namespace is not shared
+[PASS] 5.21  - Ensure the default seccomp profile is not Disabled
+[NOTE] 5.22  - Ensure docker exec commands are not used with privileged option
+[NOTE] 5.23  - Ensure docker exec commands are not used with user option
+[PASS] 5.24  - Ensure cgroup usage is confirmed
+[PASS] 5.25  - Ensure the container is restricted from acquiring additional privileges
+[WARN] 5.26  - Ensure container health is checked at runtime
+[WARN]      * Health check not set: jml-grafana-1
+[WARN]      * Health check not set: jml-fluent-bit-1
+[WARN]      * Health check not set: jml-loki-1
+[INFO] 5.27  - Ensure docker commands always get the latest version of the image
+[WARN] 5.28  - Ensure PIDs cgroup limit is used
+[WARN]      * PIDs limit not set: jml-bw-scheduler-1
+[WARN]      * PIDs limit not set: jml-bunkerweb-1
+[WARN]      * PIDs limit not set: jml-worker-1
+[WARN]      * PIDs limit not set: jml-glpi-1
+[WARN]      * PIDs limit not set: jml-grafana-1
+[WARN]      * PIDs limit not set: jml-mariadb-1
+[WARN]      * PIDs limit not set: jml-fluent-bit-1
+[WARN]      * PIDs limit not set: jml-loki-1
+[WARN]      * PIDs limit not set: jml-web-1
+[WARN]      * PIDs limit not set: jml-postgres-1
+[PASS] 5.29  - Ensure Docker's default bridge docker0 is not used
+[PASS] 5.30  - Ensure the host's user namespaces is not shared
+[PASS] 5.31  - Ensure the Docker socket is not mounted inside any containers
+
+[INFO] Checks: 42
+[INFO] Score: 4

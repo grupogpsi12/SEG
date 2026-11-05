@@ -12,21 +12,29 @@ from pathlib import Path
 
 from django.conf import settings
 
+from jml.adaptadores.salida.identidad.cuentas import ClienteDeCuentas
 from jml.adaptadores.salida.identidad.supabase import ProveedorSupabase
 from jml.adaptadores.salida.persistencia.repositorios import RepositoriosDjango
 from jml.adaptadores.salida.reloj import RelojDelSistema
 from jml.adaptadores.salida.soportes import AlmacenDeSoportesEnDisco
 from jml.aplicacion.casos._alta import DependenciasDeAlta
 from jml.aplicacion.casos.administracion import (
+    CambiarColaborador,
     CambiarRoles,
     ConsultarMatriz,
     ConsultarUsuarios,
+    CrearUsuario,
+    DesactivarUsuario,
+    EliminarUsuario,
     GuardarPerfil,
+    ReactivarUsuario,
+    VincularUsuario,
 )
 from jml.aplicacion.casos.auditoria import ConsultarAuditoria, VerificarAuditoria
 from jml.aplicacion.casos.bandeja import ReintentarEmision
 from jml.aplicacion.casos.consultas import (
     BuscarCuentas,
+    BuscarTickets,
     ConsultarDashboard,
     ConsultarFicha,
     ContratosPorVencer,
@@ -56,7 +64,7 @@ from jml.aplicacion.casos.listados import (
     SubordinadosDe,
 )
 from jml.aplicacion.casos.registrar import RegistrarSolicitud
-from jml.aplicacion.puertos import ProveedorDeIdentidad, Reloj
+from jml.aplicacion.puertos import AdministradorDeCuentas, ProveedorDeIdentidad, Reloj
 from jml.dominio.valores import CalendarioHabil
 
 
@@ -66,6 +74,11 @@ def reloj() -> Reloj:
 
 def directorio_de_soportes() -> Path:
     return Path(settings.JML_SOPORTES_DIR)
+
+
+def administrador_de_cuentas() -> AdministradorDeCuentas:
+    """ADR-035: sin el token, cada operacion responde «no disponible»; lo demas sigue igual."""
+    return ClienteDeCuentas(settings.JML_SERVICIO_CUENTAS_URL, settings.JML_SERVICIO_CUENTAS_TOKEN)
 
 
 @cache
@@ -91,6 +104,7 @@ class Casos:
     contratos_por_vencer: ContratosPorVencer
     dashboard: ConsultarDashboard
     buscar_cuentas: BuscarCuentas
+    buscar_tickets: BuscarTickets
     exportar_cuentas: ExportarCuentas
     ficha: ConsultarFicha
     auditoria: ConsultarAuditoria
@@ -101,6 +115,12 @@ class Casos:
     guardar_perfil: GuardarPerfil
     usuarios: ConsultarUsuarios
     cambiar_roles: CambiarRoles
+    crear_usuario: CrearUsuario
+    vincular_usuario: VincularUsuario
+    cambiar_colaborador: CambiarColaborador
+    desactivar_usuario: DesactivarUsuario
+    reactivar_usuario: ReactivarUsuario
+    eliminar_usuario: EliminarUsuario
     iniciar_ingreso: IniciarIngreso
     inscribir_totp: InscribirTotp
     completar_ingreso: CompletarIngreso
@@ -114,6 +134,7 @@ def casos() -> Casos:
     alta = DependenciasDeAlta(repos, soportes, r, calendario, lambda: uuid.uuid4().hex)
     decision = DependenciasDeDecision(repos, r, calendario, soportes)
     identidad = proveedor_de_identidad()
+    cuentas = administrador_de_cuentas()
     consulta = DependenciasDeConsulta(repos, r)
     return Casos(
         registrar=RegistrarSolicitud(alta),
@@ -131,6 +152,7 @@ def casos() -> Casos:
         contratos_por_vencer=ContratosPorVencer(consulta),
         dashboard=ConsultarDashboard(consulta),
         buscar_cuentas=BuscarCuentas(consulta),
+        buscar_tickets=BuscarTickets(consulta),
         exportar_cuentas=ExportarCuentas(consulta),
         ficha=ConsultarFicha(consulta),
         auditoria=ConsultarAuditoria(repos),
@@ -139,7 +161,13 @@ def casos() -> Casos:
         reintentar=ReintentarEmision(repos, r),
         matriz=ConsultarMatriz(repos),
         guardar_perfil=GuardarPerfil(repos),
-        usuarios=ConsultarUsuarios(repos),
+        usuarios=ConsultarUsuarios(repos, cuentas),
+        crear_usuario=CrearUsuario(repos, cuentas),
+        vincular_usuario=VincularUsuario(repos),
+        cambiar_colaborador=CambiarColaborador(repos),
+        desactivar_usuario=DesactivarUsuario(repos, cuentas),
+        reactivar_usuario=ReactivarUsuario(repos, cuentas),
+        eliminar_usuario=EliminarUsuario(repos, cuentas),
         cambiar_roles=CambiarRoles(repos),
         iniciar_ingreso=IniciarIngreso(DependenciasDeIngreso(identidad, repos)),
         inscribir_totp=InscribirTotp(identidad),

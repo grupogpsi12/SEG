@@ -1,0 +1,4 @@
+control positivo: la misma operacion legitima da: 200
+ataque (inyeccion SQL en la URL, correlation_id lab-ca21-1792974455) -> 403
+la linea de ModSecurity aparece en Loki con tipo="waf" (3 flujos) a los 0 s del ataque (limite de CA-21: 120 s)
+CA-21 (parte local) CUMPLIDO

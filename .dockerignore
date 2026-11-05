@@ -13,3 +13,4 @@ staticfiles
 tests
 docs
 tasks
+**/*.code-workspace

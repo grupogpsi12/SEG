@@ -1,0 +1,51 @@
+............F.                                                           [100%]
+================================== FAILURES ===================================
+_ test_B_19_un_error_que_no_es_de_dominio_tampoco_detiene_la_sincronizacion_de_las_demas _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000174970D7E00>
+
+    def test_B_19_un_error_que_no_es_de_dominio_tampoco_detiene_la_sincronizacion_de_las_demas(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Un fallo de la base (p. ej. un disparador que rechaza) en UNA solicitud no puede frenar a
+        todas: el worker dejaria de escribir el latido y la sincronizacion quedaria detenida."""
+        from jml.aplicacion.casos.sincronizar import SincronizarTickets
+    
+        m = Mundo.nuevo()
+        a = emitir_vac(m)
+        b = m.emitir(ingreso()).solicitud_id
+        m.correr_bandeja_hasta_vaciar()
+        m.tecnico_resuelve_todo(b)
+        original = SincronizarTickets._solicitud
+    
+        def con_fallo(self: SincronizarTickets, sid: SolicitudId, obs: dict) -> None:  # type: ignore[type-arg]  # firma del metodo privado
+            if sid == a:
+                raise RuntimeError("fallo inesperado con datos que no deben llegar al registro")
+            original(self, sid, obs)
+    
+        monkeypatch.setattr(SincronizarTickets, "_solicitud", con_fallo)
+>       res = m.sincronizar()
+              ^^^^^^^^^^^^^^^
+
+tests\aplicacion\test_defensas.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\mundo.py:220: in sincronizar
+    return SincronizarTickets(self._sync).ejecutar()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\jml\aplicacion\casos\sincronizar.py:71: in ejecutar
+    self._solicitud(sid, observaciones)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <jml.aplicacion.casos.sincronizar.SincronizarTickets object at 0x00000174970D6750>
+sid = SolicitudId(valor='SOL-2026-000001')
+obs = {'G-00001': Observacion(estado=<EstadoDeTicket.NUEVO: 1>, tiene_solucion=False, documentos=0, observada_en=datetime.da..._solucion=False, documentos=0, observada_en=datetime.datetime(2026, 10, 12, 15, 0, tzinfo=datetime.timezone.utc)), ...}
+
+    def con_fallo(self: SincronizarTickets, sid: SolicitudId, obs: dict) -> None:  # type: ignore[type-arg]  # firma del metodo privado
+        if sid == a:
+>           raise RuntimeError("fallo inesperado con datos que no deben llegar al registro")
+E           RuntimeError: fallo inesperado con datos que no deben llegar al registro
+
+tests\aplicacion\test_defensas.py:240: RuntimeError
+=========================== short test summary info ===========================
+FAILED tests/aplicacion/test_defensas.py::test_B_19_un_error_que_no_es_de_dominio_tampoco_detiene_la_sincronizacion_de_las_demas
+1 failed, 13 passed in 0.23s

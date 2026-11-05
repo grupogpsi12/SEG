@@ -1,0 +1,45 @@
+
+===================================================================
+Protocol Hierarchy Statistics
+Filter: 
+
+frame                                    frames:6537 bytes:2010454
+  sll                                    frames:6537 bytes:2010454
+    ip                                   frames:6535 bytes:2010358
+      tcp                                frames:6535 bytes:2010358
+        pgsql                            frames:5650 bytes:1944294
+          pgsql                          frames:2623 bytes:1111151
+            pgsql                        frames:1438 bytes:1003393
+              pgsql                      frames:1208 bytes:921695
+                pgsql                    frames:264 bytes:442024
+                  pgsql                  frames:156 bytes:409582
+                    pgsql                frames:135 bytes:290896
+                      pgsql              frames:123 bytes:232269
+                        pgsql            frames:122 bytes:231946
+                          pgsql          frames:122 bytes:231946
+                            pgsql        frames:122 bytes:231946
+                              pgsql      frames:119 bytes:229495
+                                pgsql    frames:119 bytes:229495
+                                ...pgsql frames:119 bytes:229495
+                                ...pgsql frames:119 bytes:229495
+                                ...pgsql frames:111 bytes:208831
+                                ...pgsql frames:111 bytes:208831
+                                ...pgsql frames:107 bytes:190819
+                                ...pgsql frames:19 bytes:136514
+                                ...pgsql frames:19 bytes:136514
+                                ...pgsql frames:19 bytes:136514
+                                ...pgsql frames:18 bytes:132195
+                                ...pgsql frames:18 bytes:132195
+                                ...pgsql frames:18 bytes:132195
+                                ...pgsql frames:18 bytes:132195
+                                ...pgsql frames:18 bytes:132195
+                                ...pgsql frames:13 bytes:90875
+                                ...pgsql frames:13 bytes:90875
+                                ...pgsql frames:13 bytes:90875
+                                ...pgsql frames:9 bytes:61627
+                                ...pgsql frames:4 bytes:20307
+                                ...pgsql frames:4 bytes:20307
+                                ...pgsql frames:4 bytes:20307
+                                ...pgsql frames:2 bytes:11202
+    arp                                  frames:2 bytes:96
+===================================================================

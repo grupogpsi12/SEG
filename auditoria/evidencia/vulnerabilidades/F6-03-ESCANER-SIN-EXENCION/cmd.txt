@@ -1,0 +1,1 @@
+MINUTOS=3 bash auditoria/scripts/escaner-con-waf.sh sin_exencion

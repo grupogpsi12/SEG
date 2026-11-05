@@ -1,0 +1,1 @@
+uvx pip-audit==2.10.1 -r requirements.lock --no-deps --disable-pip; echo pip_audit=$?

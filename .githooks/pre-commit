@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# G0 (plan de auditoria, B-07): ningun commit con un secreto ni con errores de ruff.
+#   git config core.hooksPath .githooks        (una vez por clon; ver docs/probar-localmente.md)
+# Rechaza el commit si gitleaks encuentra un secreto en lo que se va a confirmar o si ruff
+# (con las reglas S de bandit) falla en los archivos Python preparados.
+set -u
+RAIZ="$(cd "$(git rev-parse --show-toplevel)" && pwd)"  # ruta POSIX: en Git Bash "C:/" rompe el PATH
+cd "$RAIZ" || exit 1
+PATH="$RAIZ/.venv/Scripts:$RAIZ/.venv/bin:$PATH"
+
+if ! command -v gitleaks > /dev/null 2>&1; then
+  echo "pre-commit: falta gitleaks (https://github.com/gitleaks/gitleaks); no se puede confirmar sin revisar secretos" >&2
+  exit 1
+fi
+if ! gitleaks git --pre-commit --staged --redact --no-banner > /dev/null 2>&1; then
+  echo "pre-commit: gitleaks encontro un posible secreto en lo preparado. Detalle:" >&2
+  gitleaks git --pre-commit --staged --redact --no-banner >&2
+  exit 1
+fi
+
+mapfile -t py < <(git diff --cached --name-only --diff-filter=ACM -- '*.py')
+if [ "${#py[@]}" -gt 0 ]; then
+  if ! command -v ruff > /dev/null 2>&1; then
+    echo "pre-commit: falta ruff (uv sync --frozen)" >&2
+    exit 1
+  fi
+  ruff check "${py[@]}" || exit 1
+fi

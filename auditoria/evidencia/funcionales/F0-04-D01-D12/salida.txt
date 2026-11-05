@@ -1,0 +1,12 @@
+D-01 | CONFIRMADO | marcador SQLMAP_RESULTADOS sin reemplazar en docs/evidencia/seguridad-2026-10-24.md:46; el documento declara «sqlmap nivel 3 sin hallazgos» (CA-12)
+D-02 | PENDIENTE(F6) | casos-de-uso.txt de la Entrega 3 NO esta en el repositorio: no verificable desde archivos; se reproduce la verificacion del Auditor por el WAF en F6-06
+D-03 | PENDIENTE(F6) | limite general 2r/s presente (1) y solo 2 excepciones por URL (/ingreso y /static/); /auditoria no tiene excepcion. Plausible; se mide a ritmo humano y de guion en F6-06
+D-04 | CONFIRMADO | infra/scripts/seguridad-dinamica.sh:10: solo el baseline pasa por el WAF; la postura con WAF de las pruebas activas no esta medida
+D-05 | CONFIRMADO | sqlmap --level=3 (Host solo entra en nivel 5). Sumideros: request.META fuera del middleware=0; SQL crudo/raw/extra/execute fuera de migraciones=0. Riesgo acotado; se sostiene con la prueba U-06 (F3) y sqlmap nivel 5 (F6)
+D-06 | CONFIRMADO | Dockerfile: gunicorn con "--workers", "1" y 8 hilos (S-29/ADR-017: el token AAL1 vive en memoria). Punto unico de falla; amenaza N-3
+D-07 | CONFIRMADO | hooks locales=0 (ninguno); GitHub: "protected": false; gitleaks solo corre en .github/workflows/verificar.yml (RS-12 pide cada commit)
+D-08 | CONFIRMADO | pyproject.toml [tool.ruff.lint] select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT"] : sin flake8-bandit (S). bandit cubre la CI; falta la deteccion temprana
+D-09 | CONFIRMADO | tasks/todo.md 5.10 pendiente=1; docs/spikes/mutacion.md mide solo src/jml/dominio (menciones: 1); aplicacion y modulos de seguridad sin medicion por mutacion
+D-10 | CONFIRMADO | docs/estado.md §4.A.1: el asesor de seguridad de Supabase y la contrasena minima de 12 los ejecuta una persona en el Dashboard; CA-12 incompleto hasta entonces [PENDIENTE: accion humana]
+D-11 | CONFIRMADO | src/config/urls.py tiene 22 patrones (24 si se cuenta cada accion de «decidir»: aprobar, rechazar y cancelar); pruebas que enumeran las rutas=0. Correccion al plan: 22 patrones, no 24
+D-12 | CONFIRMADO | SRS RNF-11 pide al menos 80 %; Makefile exige fail-under=95 fail-under=90  (dominio/aplicacion); real 99 %. Deriva documental informativa

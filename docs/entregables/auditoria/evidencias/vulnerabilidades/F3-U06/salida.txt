@@ -1,0 +1,19 @@
+control antes: 302
+User-Agent: ' OR 1=1-- -> 403
+User-Agent: ');DROP TABLE solicitud;-- -> 403
+User-Agent: <script>alert(1)</script> -> 403
+User-Agent: ${jndi:ldap://127.0.0.1/a} -> 403
+User-Agent: () { :; }; echo vulnerable -> 403
+Referer: https://app.localhost/' UNION SELECT password FROM auth.users -> 403
+Referer: javascript:alert(1) -> 403
+Accept-Language: es-CO'; WAITFOR DELAY '0:0:5'-- -> 302
+Accept-Language: ../../../../etc/passwd -> 403
+Cookie: sessionid=' OR '1'='1; csrftoken=***enmascarado*** src=x onerror=alert(1)> -> 403
+Cookie: sessionid=***enmascarado*** -> 400
+X-Forwarded-For: 127.0.0.1, 10.20.40.2 -> 403
+X-Forwarded-Proto: gopher -> 302
+Host: evil.example -> 200
+control despues: 302
+BASE INTEGRA: mismas filas y mismos objetos
+en el log del WAF: 13 lineas con el valor literal; en el log de la web: 0
+Host ajeno (evil.example) lo atiende la pagina por defecto de BunkerWeb, no Django: 1 coincidencia

@@ -1,0 +1,1177 @@
+{
+ "TablaI Matriz funcion": [
+  [
+   "TABLA I. MATRIZ DE FUNCIONALIDADES PRINCIPALES DEL SISTEMA",
+   "",
+   ""
+  ],
+  [
+   "Función",
+   "Descripción resumida",
+   ""
+  ],
+  [
+   "F1. Autenticación y roles",
+   "Inicio de sesión con Supabase Auth y TOTP obligatorio; permisos por rol.",
+   ""
+  ],
+  [
+   "F2. Gestión de solicitudes",
+   "Registro con fecha efectiva, consulta, cancelación y de duplicación.",
+   ""
+  ],
+  [
+   "F3. Emisión de tickets",
+   "Un ticket por cola involucrada, con lista de verificación, prioridad, SLA y, cuando aplica, fecha programada.",
+   ""
+  ],
+  [
+   "F4. Sincronización",
+   "Estado de los tickets, soluciones, actas y activos desde GLPI, cada 5 minutos.",
+   ""
+  ],
+  [
+   "F5. Registro de cuentas",
+   "Estado de las cuentas por sistema, derivado de los tickets resueltos.",
+   ""
+  ],
+  [
+   "F6. DashBoards",
+   "Búsqueda de cuentas y ficha del colaborador.",
+   ""
+  ],
+  [
+   "F7. Auditoría",
+   "Registro inalterable de cada decisión, emisión, cambio de estado y acceso a datos personales.",
+   ""
+  ],
+  [
+   "F8. Administración",
+   "Matriz de perfiles, catálogos y asignación de roles.",
+   ""
+  ],
+  [
+   "",
+   "",
+   ""
+  ]
+ ],
+ "TablaII ADR": [
+  [
+   "TABLA II. DECISIONES DE ARQUITECTURA (ADR)",
+   "",
+   ""
+  ],
+  [
+   "Código",
+   "Título",
+   "Estado"
+  ],
+  [
+   "ADR - 01",
+   "Aplicación propia + GLPI",
+   "Aceptada (precisada por ADR-016)"
+  ],
+  [
+   "ADR - 02",
+   "Docker Compose en una VM de Azure",
+   "Aceptada"
+  ],
+  [
+   "ADR - 03",
+   "Samba AD DC + Entra ID sin sincronización",
+   "Reemplazada por ADR-019"
+  ],
+  [
+   "ADR - 04",
+   "Automatización con autorización humana",
+   "Reemplazada por ADR-019"
+  ],
+  [
+   "ADR - 05",
+   "Cuenta única de RRHH (con disidencia)",
+   "Aceptada"
+  ],
+  [
+   "ADR - 06",
+   "Deduplicación con índice único parcial",
+   "Aceptada"
+  ],
+  [
+   "ADR - 07",
+   "Auditoría de solo inserción con cadena de hashes",
+   "Aceptada"
+  ],
+  [
+   "ADR - 08",
+   "OIDC con Entra ID y BFF",
+   "Reemplazada por ADR-017"
+  ],
+  [
+   "ADR - 09",
+   "Secretos en Key Vault como archivos en tmpfs",
+   "Aceptada"
+  ],
+  [
+   "ADR - 10",
+   "Licencias de M365 registradas en GLPI",
+   "Reemplazada por ADR-019"
+  ],
+  [
+   "ADR - 11",
+   "Sincronización con GLPI por consulta periódica",
+   "Aceptada"
+  ],
+  [
+   "ADR - 12",
+   "Stack FastAPI + React + PostgreSQL",
+   "Reemplazada por ADR-015 y ADR-018"
+  ],
+  [
+   "ADR - 13",
+   "Exclusión del monitoreo del DC",
+   "Aceptada"
+  ],
+  [
+   "ADR - 14",
+   "Autenticación de servicio contra la API de GLPI",
+   "Pendiente (sprint 0)"
+  ],
+  [
+   "ADR - 15",
+   "Supabase como base de datos de la aplicación",
+   "Aceptada"
+  ],
+  [
+   "ADR - 16",
+   "Arquitectura hexagonal con la solicitud y sus tickets como núcleo",
+   "Aceptada"
+  ],
+  [
+   "ADR - 17",
+   "Supabase Auth con TOTP mediado por el servidor",
+   "Aceptada"
+  ],
+  [
+   "ADR - 18",
+   "Django 5.2 LTS con interfaz generada en el servidor",
+   "Aceptada"
+  ],
+  [
+   "ADR - 19",
+   "Sin automatizaciones fuera de GLPI ni directorio montado",
+   "Aceptada"
+  ],
+  [
+   "ADR - 20",
+   "Dashboard sin tiempo real para técnicos",
+   "Aceptada"
+  ],
+  [
+   "ADR - 21",
+   "Soporte de vinculación adjunto a GLPI, sin almacenamiento permanente en la aplicación",
+   "Aceptada"
+  ],
+  [
+   "ADR - 22",
+   "Permisos sobre recursos compartidos dentro de los eventos laborales",
+   "Aceptada"
+  ],
+  [
+   "ADR - 23",
+   "BunkerWeb como WAF y proxy inverso (en lugar de nginx y de Application Gateway)",
+   "Aceptada"
+  ],
+  [
+   "ADR - 24",
+   "Cloudflare Tunnel + Access delante de BunkerWeb",
+   "Propuesta (pendiente del equipo)"
+  ],
+  [
+   "ADR - 25",
+   "Tres consultas de lectura nuevas en los repositorios para las vistas (2.7)",
+   "Aceptada"
+  ],
+  [
+   "ADR - 26",
+   "Consulta de solicitudes en error para el reintento del Administrador (2.12)",
+   "Aceptada"
+  ],
+  [
+   "ADR - 27",
+   "Matriz y usuarios completos para el área de administración (2.13)",
+   "Aceptada"
+  ],
+  [
+   "ADR - 28",
+   "Dueño del esquema separado de app_backend, disparador con transiciones y bloqueo al decidir",
+   "Aceptada"
+  ]
+ ],
+ "TablaIII Puertos": [
+  [
+   "TABLA III. MATRIZ DE PUERTOS, PROTOCOLOS Y FLUJOS DE RED DEL SISTEMA",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Origen",
+   "Destino",
+   "Puerto",
+   "Protocolo",
+   "Alcance",
+   "Uso"
+  ],
+  [
+   "Usuarios",
+   "bunkerweb",
+   "443",
+   "HTTPS",
+   "Público",
+   "Sitios app.* y glpi.*, TLS de Let's Encrypt"
+  ],
+  [
+   "Usuarios",
+   "bunkerweb",
+   "80",
+   "HTTP",
+   "Público",
+   "Reto ACME y redirección a 443"
+  ],
+  [
+   "Administrador",
+   "VM (sshd)",
+   "22",
+   "SSH",
+   "Restringido",
+   "Administración; NSG limitado a IPs del equipo"
+  ],
+  [
+   "bunkerweb",
+   "web",
+   "8000",
+   "HTTP",
+   "Interno",
+   "Proxy del sitio app.* hacia gunicorn"
+  ],
+  [
+   "bunkerweb",
+   "glpi",
+   "80",
+   "HTTP",
+   "Interno",
+   "Proxy del sitio glpi.*"
+  ],
+  [
+   "bw-scheduler",
+   "bunkerweb",
+   "5000",
+   "HTTP + API_TOKEN",
+   "Interno",
+   "Envío de configuración y certificados"
+  ],
+  [
+   "worker",
+   "glpi",
+   "80",
+   "HTTP REST",
+   "Interno",
+   "http://glpi/apirest.php: crear y sincronizar tickets"
+  ],
+  [
+   "glpi",
+   "mariadb",
+   "3306",
+   "MySQL",
+   "Interno",
+   "Base propia de GLPI, red internal: true"
+  ],
+  [
+   "web, worker, migrar",
+   "Supabase PostgreSQL",
+   "5432",
+   "PostgreSQL + TLS",
+   "Saliente",
+   "Session pooler (no el 6543: lección n.º 9)"
+  ],
+  [
+   "web",
+   "Supabase Auth",
+   "443",
+   "HTTPS",
+   "Saliente",
+   "Contraseña + TOTP (/auth/v1)"
+  ],
+  [
+   "admin-usuarios",
+   "Supabase Auth admin",
+   "443",
+   "HTTPS",
+   "Saliente (admin)",
+   "Alta y baja de usuarios, único uso de service_role"
+  ],
+  [
+   "Host de la VM",
+   "Azure Key Vault",
+   "443",
+   "HTTPS",
+   "Saliente",
+   "Bootstrap de secretos a /run/secrets"
+  ],
+  [
+   "Host de la VM",
+   "Azure Blob Storage",
+   "443",
+   "HTTPS",
+   "Saliente",
+   "Exportación de auditoría y respaldos"
+  ],
+  [
+   "bw-scheduler",
+   "Let's Encrypt",
+   "443",
+   "HTTPS",
+   "Saliente",
+   "Emisión y renovación de certificados"
+  ],
+  [
+   "fluent-bit",
+   "loki",
+   "3100",
+   "HTTP",
+   "Interno",
+   "Envío de logs del WAF"
+  ],
+  [
+   "grafana",
+   "loki",
+   "3100",
+   "HTTP",
+   "Interno",
+   "Consulta de logs para el tablero"
+  ],
+  [
+   "Administrador (túnel SSH)",
+   "grafana",
+   "3000",
+   "HTTP",
+   "Localhost",
+   "Tablero solo en 127.0.0.1"
+  ],
+  [
+   "loki",
+   "Azure Blob Storage",
+   "443",
+   "HTTPS",
+   "Saliente",
+   "Almacenamiento de logs con identidad administrada"
+  ],
+  [
+   "cloudflared",
+   "Cloudflare",
+   "7844",
+   "QUIC / HTTP2",
+   "Saliente",
+   "Si se acepta, el NSG cierra 80 y 443"
+  ],
+  [
+   "web, worker, migrar",
+   "postgres:17",
+   "5432",
+   "PostgreSQL",
+   "Interno",
+   "compose.local.yaml, pruebas del equipo"
+  ]
+ ],
+ "TablaIV Users-Roles": [
+  [
+   "TABLA IV. DEFINICIÓN DE ROLES DE USUARIO Y SEGREGACIÓN DE FUNCIONES",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Rol",
+   "Quién",
+   "Permisos en la aplicación",
+   "Incompatible con"
+  ],
+  [
+   "Solicitante",
+   "Cualquier colaborador activo con usuario",
+   "Generar correos electrónicos con los diferentes estados para la gestión de usuarios. Creación de cuentas. Cambios de departamento o sucursal. Solicitudes de vacaciones o Permisos. Modificación de entidades. Renuncias o Despidos. Eliminaciones de cuentas.",
+   "N/A"
+  ],
+  [
+   "RRHH",
+   "Una persona de Recursos Humanos (cuenta única)",
+   "Registrar y emitir cualquier tipo de evento. Aprobar o rechazar solicitudes. Ver campos restringidos. Consultar el estado de todas las solicitudes y los contratos próximos a vencer. Cancelar solicitudes aprobadas sin tickets creados.",
+   "Roles técnicos y Administrador"
+  ],
+  [
+   "Técnico AD",
+   "Cola AD",
+   "DashBoards, búsqueda de cuentas y fichas. Trabaja sus tickets en GLPI.",
+   "RRHH"
+  ],
+  [
+   "Técnico Comunicaciones",
+   "Cola Comunicaciones",
+   "Igual que Técnico AD.",
+   "RRHH"
+  ],
+  [
+   "Técnico Licencias",
+   "Cola Licencias (M365)",
+   "Igual que Técnico AD.",
+   "RRHH"
+  ],
+  [
+   "Técnico Inventario",
+   "Cola Inventario",
+   "Igual que Técnico AD.",
+   "RRHH"
+  ],
+  [
+   "Auditor",
+   "Docente o revisor",
+   "Leer la auditoría y verificar su integridad. Leer solicitudes sin campos restringidos.",
+   "Todos los demás"
+  ],
+  [
+   "Administrador del sistema",
+   "Responsable técnico del proyecto",
+   "Mantener la matriz de perfiles, los catálogos y los roles. Reintentar la emisión de solicitudes en error. No aprueba solicitudes.",
+   "RRHH y técnicos"
+  ]
+ ],
+ "TablaV Eventos SLAs": [
+  [
+   "TABLA V. MATRIZ DE REGISTRO DE EVENTOS, APROBACIONES Y SLA DE ATENCIÓN",
+   "",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Código",
+   "Evento",
+   "JML",
+   "Quién puede registrarlo",
+   "Aprobación",
+   "Prioridad en GLPI",
+   "SLA de atención en GLPI"
+  ],
+  [
+   "ING",
+   "Ingreso",
+   "Joiner",
+   "RRHH",
+   "Emitida por RRHH",
+   "Media",
+   "Resuelto antes de la fecha de ingreso"
+  ],
+  [
+   "VAC",
+   "Vacaciones",
+   "Mover (temporal)",
+   "El colaborador o RRHH",
+   "RRHH",
+   "Media",
+   "Suspensión resuelta el día de inicio; reactivación el día de regreso"
+  ],
+  [
+   "CDP",
+   "Cambio de departamento o cargo",
+   "Mover",
+   "El jefe del colaborador o RRHH",
+   "RRHH",
+   "Media",
+   "1 día hábil desde la fecha efectiva"
+  ],
+  [
+   "CSU",
+   "Cambio de sucursal",
+   "Mover",
+   "El jefe del colaborador o RRHH",
+   "RRHH",
+   "Media",
+   "1 día hábil desde la fecha efectiva"
+  ],
+  [
+   "RET",
+   "Retiro (subtipos: renuncia, fin de contrato)",
+   "Leaver",
+   "El colaborador (renuncia) o RRHH",
+   "RRHH",
+   "Alta",
+   "Resuelto al final del último día laborado"
+  ],
+  [
+   "EMG",
+   "Emergencia (subtipos: despido con justa causa, fuga detectada)",
+   "Leaver inmediato",
+   "Solo RRHH",
+   "Emitida por RRHH",
+   "Muy alta",
+   "1 hora desde la emisión, con escalamiento en GLPI"
+  ]
+ ],
+ "TablaVI Estados Solicitud": [
+  [
+   "TABLA VI. MATRIZ DE ESTADOS DE SOLICITUD",
+   "",
+   ""
+  ],
+  [
+   "Estado",
+   "Tipo",
+   "Significado"
+  ],
+  [
+   "pendiente_aprobacion",
+   "Abierto",
+   "Registrada por un solicitante; espera la decisión de RRHH."
+  ],
+  [
+   "aprobada",
+   "Abierto",
+   "Aprobada o emitida; los tickets están en la bandeja de salida hacia GLPI."
+  ],
+  [
+   "en_ejecucion",
+   "Abierto",
+   "Tickets creados en GLPI; las colas están trabajando."
+  ],
+  [
+   "error",
+   "Abierto",
+   "GLPI rechazó la creación de un ticket tras los reintentos. El Administrador revisa y reintenta."
+  ],
+  [
+   "cerrada",
+   "Final",
+   "Todos los tickets de cierre están resueltos con solución (y con acta en Inventario)."
+  ],
+  [
+   "rechazada",
+   "Final",
+   "RRHH la rechazó, con justificación."
+  ],
+  [
+   "cancelada",
+   "Final",
+   "La canceló el solicitante (antes de la aprobación) o RRHH (antes de que se creara algún ticket)."
+  ]
+ ],
+ "TablaVII Clases de Tickets": [
+  [
+   "TABLA VII. CLASIFICACIÓN DE TICKETS DE SOLICITUD",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Clase",
+   "Cuando se crea",
+   "Estado inicial GLPI",
+   "¿Bloquea el cierre de la solicitud?"
+  ],
+  [
+   "De cierre inmediato",
+   "En la emisión",
+   "Nuevo",
+   "Sí"
+  ],
+  [
+   "De cierre programado",
+   "En la emisión, con vencimiento en la fecha futura (p. ej., la reactivación tras vacaciones)",
+   "En espera, hasta la fecha",
+   "Sí"
+  ],
+  [
+   "Posterior",
+   "En la emisión de RET o EMG, con vencimiento a 90 días (eliminación de cuentas)",
+   "En espera, hasta la fecha",
+   "No"
+  ]
+ ],
+ "TablaVIII Acciones por Cola": [
+  [
+   "TABLA VIII. ACCIONES DE EVENTOS POR COLA DE ATENCIÓN",
+   "",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Evento",
+   "AD",
+   "Comunicaciones",
+   "Licencias (M365)",
+   "Inventario"
+  ],
+  [
+   "ING",
+   "Verificar el soporte de vinculación adjunto; crear la cuenta con el usuario sugerido; agregar los grupos del perfil; aplicar en cada recurso compartido del perfil su perfil (Consulta o Edición) mediante el grupo FS-*; para contratistas, fijar la fecha de expiración.",
+   "Agregar los grupos de red del perfil (NET-*).",
+   "Verificar el soporte de vinculación adjunto; crear la identidad en M365 o Entra ID; registrar las licencias del perfil en GLPI.",
+   "Asignar el equipo al usuario en GLPI y adjuntar el acta de entrega firmada."
+  ],
+  [
+   "VAC",
+   "Deshabilitar la cuenta al inicio. (P) Habilitarla en la fecha de regreso.",
+   "—",
+   "Bloquear el inicio de sesión y revocar sesiones al inicio. (P) Desbloquear al regreso.",
+   "—"
+  ],
+  [
+   "CDP",
+   "Quitar los grupos del perfil anterior y agregar los del nuevo. En recursos compartidos: aplicar el perfil de los recursos nuevos y «Retiro de accesos» en los que ya no corresponden (la diferencia la calcula la aplicación).",
+   "Diferencia de grupos NET-*, si cambia.",
+   "Diferencia de grupos y de licencias.",
+   "Cambiar el equipo, solo si el nuevo perfil lo exige."
+  ],
+  [
+   "CSU",
+   "Diferencia de los grupos de sede.",
+   "Quitar NET-VLAN-<sede anterior> y agregar NET-VLAN-<sede nueva>.",
+   "—",
+   "Trasladar el equipo, con acta."
+  ],
+  [
+   "RET",
+   "Deshabilitar la cuenta, cambiar la contraseña, quitar los grupos, «Retiro de accesos» en todos los recursos compartidos, mover a la OU Deshabilitados y dar al jefe perfil Consulta sobre la carpeta personal por 30 días. (Posterior) Eliminar la cuenta a los 90 días.",
+   "Quitar todos los grupos NET-*.",
+   "Bloquear el inicio de sesión, revocar sesiones, quitar grupos y liberar licencias en GLPI. (Posterior) Eliminar la identidad a los 90 días.",
+   "Recibir el equipo con acta y paz y salvo."
+  ],
+  [
+   "EMG",
+   "Las mismas acciones de RET, de inmediato. (Posterior) Eliminar a los 90 días.",
+   "Las mismas de RET, de inmediato.",
+   "Las mismas de RET, de inmediato. (Posterior) Eliminar a los 90 días.",
+   "Recuperar el equipo con acta."
+  ]
+ ],
+ "TablaIX Deshabilitación": [
+  [
+   "TABLA IX. CRITERIOS Y ACCIONES DE DESHABILITACIÓN DE CUENTAS",
+   "",
+   ""
+  ],
+  [
+   "Aspecto",
+   "Suspensión (VAC)",
+   "Deshabilitación (RET, EMG)"
+  ],
+  [
+   "Cuenta",
+   "Deshabilitada",
+   "Deshabilitada y movida a la OU Deshabilitados"
+  ],
+  [
+   "Contraseña",
+   "Sin cambios",
+   "Cambiada a un valor aleatorio que no se comunica a nadie"
+  ],
+  [
+   "Grupos",
+   "Se conservan",
+   "Se quitan; el técnico lista en la solución los grupos retirados"
+  ],
+  [
+   "Sesiones",
+   "Revocadas",
+   "Revocadas"
+  ],
+  [
+   "Reversión",
+   "Ticket programado de reactivación",
+   "No se revierte. Un reingreso es un evento ING nuevo"
+  ],
+  [
+   "Eliminación",
+   "No aplica",
+   "Ticket posterior a los 90 días"
+  ]
+ ],
+ "TablaX Plantillas Solución ": [
+  [
+   "TABLA X. PLANTILLAS DE SOLUCIÓN POR COLA",
+   ""
+  ],
+  [
+   "Cola",
+   "Campos de la plantilla"
+  ],
+  [
+   "AD",
+   "Acción realizada; usuario (sAMAccountName); soporte de vinculación verificado (sí/no, solo en ingresos); grupos agregados; grupos retirados; recursos compartidos (ruta – perfil aplicado o retirado); OU final; fecha y hora de ejecución; observaciones."
+  ],
+  [
+   "Comunicaciones",
+   "Acción realizada; grupos de red agregados; grupos de red retirados; fecha y hora; observaciones."
+  ],
+  [
+   "Licencias",
+   "Acción realizada; identidad (UPN); soporte de vinculación verificado (sí/no, solo en ingresos); grupos agregados o retirados; licencias asignadas o liberadas en GLPI; sesiones revocadas (sí/no); fecha y hora."
+  ],
+  [
+   "Inventario",
+   "Acción realizada; número de serie; modelo; entregado o recibido; acta adjunta (sí/no); paz y salvo (sí/no)."
+  ]
+ ],
+ "TablaXI Estados Cuentas": [
+  [
+   "TABLA XI. DERIVACIÓN DEL ESTADO DE LAS CUENTAS",
+   "",
+   ""
+  ],
+  [
+   "Ticket del sistema",
+   "Mientras está abierto",
+   "Al resolverse con solución"
+  ],
+  [
+   "ING",
+   "pendiente_alta",
+   "activa"
+  ],
+  [
+   "VAC, suspensión",
+   "pendiente_suspension",
+   "suspendida"
+  ],
+  [
+   "VAC, reactivación (programado)",
+   "suspendida",
+   "activa"
+  ],
+  [
+   "CDP o CSU",
+   "Conserva el estado actual y se marca «cambio pendiente»",
+   "activa, con el perfil nuevo"
+  ],
+  [
+   "RET o EMG",
+   "pendiente_baja (cuenta como exposición)",
+   "deshabilitada"
+  ],
+  [
+   "Eliminación (posterior)",
+   "deshabilitada",
+   "eliminada"
+  ]
+ ],
+ "TablaXII Campos Eventos": [
+  [
+   "TABLA XII. CATÁLOGO DE CAMPOS ESPECÍFICOS POR TIPO DE EVENTO",
+   ""
+  ],
+  [
+   "Tipo",
+   "Campos específicos"
+  ],
+  [
+   "ING",
+   "Nombres; apellidos; número de documento; tipo de vinculación (empleado, contratista(tercero), practicante o temporal); departamento; cargo; sede; jefe directo; fecha de ingreso; fecha de fin (obligatoria si no es empleado); requiere equipo (sí o no) y tipo de equipo; soporte de vinculación (PDF obligatorio, máximo 20 MB): acta de inicio firmada si es contratista, acto administrativo de nombramiento o contrato en los demás casos."
+  ],
+  [
+   "VAC",
+   "Fecha de inicio; fecha de regreso."
+  ],
+  [
+   "CDP",
+   "Departamento nuevo; cargo nuevo; jefe nuevo; fecha efectiva."
+  ],
+  [
+   "CSU",
+   "Sede nueva; fecha efectiva; ¿se traslada el equipo? (sí o no)."
+  ],
+  [
+   "RET",
+   "Subtipo; último día laborado; motivo (R)."
+  ],
+  [
+   "EMG",
+   "Subtipo; reportado por; descripción del hecho (R); hora del hecho."
+  ]
+ ],
+ "TablaXIII Perfiles Acceso": [
+  [
+   "TABLA XIII. MATRIZ DE PERFILES DE ACCESO INICIAL",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Departamento",
+   "Grupos de AD",
+   "Grupos de red",
+   "Grupos de M365",
+   "Licencias de software (GLPI)",
+   "Equipo"
+  ],
+  [
+   "Gerencia",
+   "GG-Gerencia, FS-Gerencia-RW, FS-Comun-RO",
+   "NET-VPN, NET-WIFI-CORP",
+   "M365-Gerencia",
+   "Suite ofimática, lector PDF",
+   "Portátil"
+  ],
+  [
+   "RRHH",
+   "GG-RRHH, FS-RRHH-RW, FS-Comun-RO",
+   "NET-WIFI-CORP",
+   "M365-RRHH",
+   "Suite ofimática",
+   "Portátil"
+  ],
+  [
+   "Finanzas",
+   "GG-Finanzas, FS-Finanzas-RW, FS-Presupuesto-RO, FS-Comun-RO",
+   "NET-WIFI-CORP",
+   "M365-Finanzas",
+   "Suite ofimática, software contable",
+   "Escritorio"
+  ],
+  [
+   "Comercial",
+   "GG-Comercial, FS-Comercial-RW, FS-Comun-RO",
+   "NET-VPN, NET-WIFI-CORP",
+   "M365-Comercial",
+   "Suite ofimática, CRM",
+   "Portátil"
+  ],
+  [
+   "TI",
+   "GG-TI, FS-TI-RW, FS-Comun-RW",
+   "NET-VPN, NET-WIFI-CORP, NET-ADMIN",
+   "M365-TI",
+   "Suite ofimática, herramientas de soporte",
+   "Portátil"
+  ],
+  [
+   "Operaciones",
+   "GG-Operaciones, FS-Operaciones-RW, FS-Comun-RO",
+   "NET-WIFI-CORP",
+   "M365-Operaciones",
+   "Suite ofimática",
+   "Escritorio"
+  ]
+ ],
+ "TablaXIV Recursos Compartidos": [
+  [
+   "TABLA XIV. RECURSOS COMPARTIDOS POR DEPARTAMENTO",
+   "",
+   "",
+   "",
+   ""
+  ],
+  [
+   "Departamento",
+   "Ruta completa del recurso",
+   "Recurso raíz",
+   "Perfil",
+   "Grupo"
+  ],
+  [
+   "Todos, salvo TI",
+   "\\\\fs01.ad.andina.test\\comun",
+   "Común",
+   "Consulta",
+   "FS-Comun-RO"
+  ],
+  [
+   "TI",
+   "\\\\fs01.ad.andina.test\\comun",
+   "Común",
+   "Edición",
+   "FS-Comun-RW"
+  ],
+  [
+   "Gerencia",
+   "\\\\fs01.ad.andina.test\\departamentos\\Gerencia",
+   "Gerencia",
+   "Edición",
+   "FS-Gerencia-RW"
+  ],
+  [
+   "RRHH",
+   "\\\\fs01.ad.andina.test\\departamentos\\RRHH\\Hojas de vida",
+   "Historias laborales",
+   "Edición",
+   "FS-RRHH-RW"
+  ],
+  [
+   "Finanzas",
+   "\\\\fs01.ad.andina.test\\departamentos\\Finanzas\\Contabilidad",
+   "Contabilidad",
+   "Edición",
+   "FS-Finanzas-RW"
+  ],
+  [
+   "Finanzas",
+   "\\\\fs01.ad.andina.test\\departamentos\\Gerencia\\Presupuesto",
+   "Presupuesto",
+   "Consulta",
+   "FS-Presupuesto-RO"
+  ],
+  [
+   "Comercial",
+   "\\\\fs01.ad.andina.test\\departamentos\\Comercial",
+   "Comercial",
+   "Edición",
+   "FS-Comercial-RW"
+  ],
+  [
+   "TI",
+   "\\\\fs01.ad.andina.test\\departamentos\\TI",
+   "TI",
+   "Edición",
+   "FS-TI-RW"
+  ],
+  [
+   "Operaciones",
+   "\\\\fs01.ad.andina.test\\departamentos\\Operaciones",
+   "Operaciones",
+   "Edición",
+   "FS-Operaciones-RW"
+  ]
+ ],
+ "TablaXV RF Autenticación": [
+  [
+   "TABLA XV. REQUISITOS FUNCIONALES - AUTENTICACIÓN Y AUTORIZACIÓN",
+   "",
+   ""
+  ],
+  [
+   "ID",
+   "Requisito",
+   "Prioridad"
+  ],
+  [
+   "RF-01",
+   "El sistema debe autenticar con Supabase Auth (correo y contraseña) desde el servidor. Solo debe crear la sesión de Django después de verificar un código TOTP (nivel AAL2). Los tokens de Supabase no se guardan en el navegador ni en la sesión.",
+   "Debe"
+  ],
+  [
+   "RF-02",
+   "En el primer ingreso, el sistema debe exigir la inscripción de un factor TOTP antes de permitir cualquier otra acción.",
+   "Debe"
+  ],
+  [
+   "RF-03",
+   "El sistema debe aplicar los permisos de la sección 3.3 en cada vista del servidor, según los grupos de Django del usuario.",
+   "Debe"
+  ],
+  [
+   "RF-04",
+   "El sistema debe cerrar la sesión tras 30 minutos de inactividad o 8 horas de duración total, y rotar el identificador de sesión al iniciarla.",
+   "Debe"
+  ],
+  [
+   "RF-05",
+   "El sistema debe negar el acceso y registrar el evento en auditoría si un usuario tiene roles incompatibles.",
+   "Debe"
+  ],
+  [
+   "RF-06",
+   "El registro abierto debe estar deshabilitado. Las cuentas de usuario solo se crean y desactivan con un comando de administración que ejecuta el Administrador del sistema.",
+   "Debe"
+  ]
+ ],
+ "TablaXVI RF Solicitudes": [
+  [
+   "TABLA XVI. REQUISITOS FUNCIONALES - GESTIÓN DE SOLICITUDES",
+   "",
+   ""
+  ],
+  [
+   "ID",
+   "Requisito",
+   "Prioridad"
+  ],
+  [
+   "RF-07",
+   "El sistema debe permitir registrar solicitudes de los tipos de la sección 4.1, con los campos del catálogo (sección 4.8) y validación en el servidor.",
+   "Debe"
+  ],
+  [
+   "RF-08",
+   "El sistema debe aceptar una fecha efectiva futura.",
+   "Debe"
+  ],
+  [
+   "RF-09",
+   "El sistema debe rechazar una solicitud nueva cuando exista otra abierta para el mismo colaborador y el mismo tipo. La respuesta debe incluir el identificador de la solicitud existente. La regla la garantiza la base de datos (RD-01).",
+   "Debe"
+  ],
+  [
+   "RF-10",
+   "Las solicitudes EMG deben aceptarse, aunque existan otras abiertas de otros tipos para el mismo colaborador. Al emitirse, esas otras se marcan para que RRHH las revise.",
+   "Debe"
+  ],
+  [
+   "RF-11",
+   "El solicitante debe poder cancelar su solicitud mientras esté pendiente de aprobación. RRHH debe poder cancelar una solicitud aprobada mientras no se haya creado ningún ticket.",
+   "Debe"
+  ],
+  [
+   "RF-39",
+   "El registro de un ingreso debe exigir el soporte de vinculación. El sistema lo acepta solo si es PDF (extensión y firma %PDF- del contenido) y pesa como máximo 20 MB. Lo guarda con un nombre aleatorio fuera de la base de datos y registra su nombre original saneado, tamaño y hash SHA-256. La aplicación nunca abre, procesa ni sirve el archivo.",
+   "Debe"
+  ]
+ ],
+ "TablaXVII RF Tickets": [
+  [
+   "TABLA XVII. REQUISITOS FUNCIONALES - APROBACIÓN, EMISIÓN Y TICKETS",
+   "",
+   ""
+  ],
+  [
+   "ID",
+   "Requisito",
+   "Prioridad"
+  ],
+  [
+   "RF-12",
+   "RRHH debe poder aprobar o rechazar solicitudes pendientes. Rechazar exige justificación.",
+   "Debe"
+  ],
+  [
+   "RF-13",
+   "RRHH debe poder registrar y emitir cualquier tipo de evento en un solo paso, con justificación obligatoria.",
+   "Debe"
+  ],
+  [
+   "RF-14",
+   "Una vez aprobada, el contenido de la solicitud no debe poder modificarse; la base de datos lo impone con un disparador. Para corregirla, RRHH la cancela y registra una nueva vinculada a la anterior.",
+   "Debe"
+  ],
+  [
+   "RF-15",
+   "El sistema debe impedir que RRHH apruebe o emita solicitudes cuyo sujeto sea la propia persona de RRHH.",
+   "Debe"
+  ],
+  [
+   "RF-16",
+   "Al emitirse una solicitud, el dominio debe generar un ticket por cola según la matriz evento × cola (sección 4.4). Cada ticket lleva la lista de verificación calculada desde la matriz de perfiles (incluidos los recursos compartidos con ruta, serie, perfil y grupo), la prioridad y el vencimiento según el SLA.",
+   "Debe"
+  ],
+  [
+   "RF-17",
+   "Los tickets con fecha futura (reactivación de vacaciones y eliminación a los 90 días) deben crearse en la emisión, en estado «En espera» y con vencimiento en esa fecha. La aplicación no crea tickets después de la emisión.",
+   "Debe"
+  ],
+  [
+   "RF-18",
+   "La creación de tickets en GLPI debe hacerse mediante una bandeja de salida (outbox) con reintentos e idempotencia, de modo que una caída de GLPI no pierda ni duplique tickets. Tras 10 intentos fallidos, la solicitud pasa a error.",
+   "Debe"
+  ],
+  [
+   "RF-19",
+   "Cada ticket se crea con su categoría ITIL. Una regla de negocio de GLPI asigna el grupo técnico según la categoría, y los tickets sin categoría reconocida van a «Revisión manual».",
+   "Debe"
+  ],
+  [
+   "RF-20",
+   "El contenido del ticket debe limitarse a los datos técnicos necesarios: colaborador, usuario sugerido, perfil, fecha efectiva, lista de verificación y referencia a la solicitud. Nunca debe incluir campos restringidos ni contraseñas.",
+   "Debe"
+  ],
+  [
+   "RF-40",
+   "Al crear los tickets de un ingreso, el worker debe subir el soporte de vinculación a GLPI una sola vez y vincularlo a los tickets de AD y de Licencias. Después de confirmar la subida y el hash, debe borrar la copia temporal. Si la solicitud se cancela, la copia se borra sin subirse.",
+   "Debe"
+  ],
+  [
+   "RF-21",
+   "El sistema debe crear o actualizar en GLPI el usuario del colaborador, sin credenciales de inicio de sesión, para poder asignarle activos y licencias.",
+   "Debe"
+  ],
+  [
+   "RF-22",
+   "El worker debe sincronizar cada 5 minutos el estado, la solución y los documentos adjuntos de los tickets creados por la aplicación. Los tickets que GLPI gestione por su cuenta se ignoran.",
+   "Debe"
+  ],
+  [
+   "RF-23",
+   "El worker debe sincronizar cada 5 minutos los activos y las licencias asignados en GLPI a cada colaborador con usuario de GLPI.",
+   "Debe"
+  ],
+  [
+   "RF-24",
+   "Un ticket solo cuenta como resuelto si su estado en GLPI es «Resuelto» o «Cerrado» y tiene una solución registrada. Los tickets de Inventario además necesitan al menos un documento adjunto. Si no se cumple, el ticket se marca «cierre incompleto».",
+   "Debe"
+  ],
+  [
+   "RF-25",
+   "Si un ticket se reabre en GLPI, la sincronización debe reflejarlo en el ticket, en la cuenta derivada y en el dashboard, y registrarlo en auditoría.",
+   "Debe"
+  ],
+  [
+   "RF-26",
+   "La solicitud debe pasar a cerrada cuando todos sus tickets de cierre cuenten como resueltos según RF-24.",
+   "Debe"
+  ]
+ ],
+ "TablaXVIII RI Interfaces": [
+  [
+   "TABLA XVIII. REQUISITOS DE INTERFACES EXTERNAS (RI)",
+   "",
+   "",
+   ""
+  ],
+  [
+   "ID",
+   "Interfaz",
+   "Requisito",
+   "Prioridad"
+  ],
+  [
+   "RI-01",
+   "Usuario (web)",
+   "Páginas generadas en el servidor, en español y adaptables a distintos tamaños de pantalla: inicio de sesión y MFA, nueva solicitud por tipo, mis solicitudes, bandeja de RRHH, dashboard, búsqueda y ficha de colaborador, auditoría y administración. Sin JavaScript de terceros; los gráficos del dashboard se generan como SVG en el servidor. Cumplimiento de WCAG 2.1 nivel AA en contraste y navegación por teclado.",
+   "Debe"
+  ],
+  [
+   "RI-02",
+   "GLPI 11 (API REST)",
+   "Crear tickets con categoría, prioridad, estado, vencimiento y contenido; subir un documento y vincularlo a varios tickets; leer estado, solución y documentos de un ticket; crear y actualizar usuarios; leer activos y licencias por usuario. El único cliente es el worker, con una cuenta de servicio cuyo perfil de GLPI se limita a esas operaciones.",
+   "Debe"
+  ],
+  [
+   "RI-03",
+   "Supabase PostgreSQL",
+   "Conexión desde web y worker por el session pooler (puerto 5432), con TLS y verificación del certificado. El rol app_backend tiene solo los permisos de RD-02. Nunca se usan postgres ni service_role en ejecución normal.",
+   "Debe"
+  ],
+  [
+   "RI-04",
+   "Supabase Auth",
+   "Desde el servidor: inicio de sesión con contraseña e inscripción, desafío y verificación de TOTP. La API de administración (creación y desactivación de usuarios) usa la clave service_role, disponible solo para el comando de administración, nunca en los contenedores web ni worker.",
+   "Debe"
+  ],
+  [
+   "RI-05",
+   "Azure Key Vault",
+   "La VM lee los secretos con su identidad administrada al arrancar y los entrega a los contenedores como archivos en un sistema de archivos en memoria (tmpfs).",
+   "Debe"
+  ],
+  [
+   "RI-06",
+   "Azure Blob Storage",
+   "Escritura con identidad administrada en dos contenedores: auditoria (inmutable) y respaldos.",
+   "Debe"
+  ]
+ ]
+}

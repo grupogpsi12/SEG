@@ -1,0 +1,12 @@
+== flujos reales de RET y EMG contra GLPI 11 (con el centinela en el campo restringido)
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: '/req/req.txt'
+== análisis
+tramas capturadas: 86
+peticiones HTTP hacia GLPI (método y ruta): 
+T7  tramas con el centinela «SENTINELA-RESTRINGIDA-9f3a» (esperado 0): 0
+N-1 peticiones con App-Token en claro: 0
+N-1 peticiones con Session-Token en claro: 0
+N-1 peticiones con el user_token en la cabecera Authorization: 0
+V-04 tramas GLPI↔MariaDB (puerto 3306): 86 · con TLS: 0
+V-04 consultas SQL legibles en claro (protocolo mysql): 35
+ASERCION T7 CUMPLIDA: 0 tramas con el centinela

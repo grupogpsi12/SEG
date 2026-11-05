@@ -191,6 +191,31 @@ def test_un_error_programa_el_reintento_con_espera_de_30_segundos() -> None:
     assert m.solicitud(r.solicitud_id).estado is S.EN_EJECUCION
 
 
+def test_B_20_una_respuesta_inesperada_de_glpi_es_un_fallo_de_esa_entrada_y_no_frena_la_bandeja(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un `KeyError` al leer la respuesta de GLPI no es un `ErrorDeSistemaDeTickets`. Sin captura,
+    la entrada quedaba primera en la cola sin sumar intentos y bloqueaba a todas las demas."""
+    m = Mundo.nuevo()
+    r = emitir_vac(m)
+    original = m.glpi.crear_ticket
+    llamadas: list[str] = []
+
+    def roto(ticket):  # type: ignore[no-untyped-def]  # doble de prueba
+        if not llamadas:
+            llamadas.append(ticket.clave_de_idempotencia)
+            raise KeyError("id")
+        return original(ticket)
+
+    monkeypatch.setattr(m.glpi, "crear_ticket", roto)
+    res = m.bandeja()
+    assert res.reintentos_programados == 1
+    assert res.creadas == len(entradas(m, r.solicitud_id)) - 1  # las demas siguieron
+    fallida = next(e for e in entradas(m, r.solicitud_id) if e.intentos == 1)
+    assert fallida.clave == llamadas[0]
+    assert fallida.ultimo_error == "error_inesperado"
+
+
 def test_CA_07_tras_10_fallos_la_solicitud_pasa_a_error_con_las_esperas_de_S_13() -> None:
     m = Mundo.nuevo()
     r = emitir_vac(m)

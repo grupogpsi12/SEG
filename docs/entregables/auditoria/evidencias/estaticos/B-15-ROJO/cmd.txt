@@ -1,0 +1,1 @@
+uvx pip-audit==2.10.1 -r .contrato-tmp/lock-rojo.txt --no-deps --disable-pip

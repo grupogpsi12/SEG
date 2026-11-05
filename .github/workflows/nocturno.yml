@@ -1,0 +1,43 @@
+# G4 nocturno (auditoria 25/10/2026, plan §9.1): lo que tarda demasiado para cada push. Mutacion de `aplicacion` y de los
+# modulos de seguridad (mutmut 3.8.0 en un contenedor Linux), y Trivy de las cinco imagenes con prioridad por KEV y EPSS.
+# Definido y probado en local con los mismos guiones; la primera ejecucion en GitHub llega con el `git push`.
+# Acciones fijadas por SHA, como en verificar.yml (RS-18).
+name: nocturno
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutacion:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        objetivo: [aplicacion, seguridad]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - run: bash auditoria/scripts/mutacion-linux.sh ${{ matrix.objetivo }}   # falla bajo el 85 %
+
+  imagenes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e  # v6.8.0
+        with:
+          python-version: "3.12"
+      - name: Imagen propia y catalogo KEV de CISA
+        env:
+          JML_SUPABASE_URL: https://ci.invalid
+          JML_SUPABASE_CLAVE_PUBLICA: sb_publishable_ci
+        run: |
+          docker build -t jml-app:local .
+          mkdir -p .contrato-tmp
+          curl -fsSL -o .contrato-tmp/kev.json https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
+      - run: python3 auditoria/scripts/trivy-imagenes.py   # sale con 1 si una vulnerabilidad esta en KEV

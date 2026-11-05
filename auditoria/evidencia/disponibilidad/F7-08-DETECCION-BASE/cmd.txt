@@ -1,0 +1,1 @@
+bash infra/scripts/deteccion.sh base

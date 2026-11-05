@@ -1,0 +1,98 @@
+........................                                                 [100%]
+24 passed in 0.09s
+== 1. /front/locale.php completo por el WAF (B-39: la regla 953100 cortaba el catalogo de traducciones)
+   en_GB: 200 404324 (codigo de curl 0)
+OK    locale.php (en_GB) llega completo
+   es_419: 200 264044 (codigo de curl 0)
+OK    locale.php (es_419) llega completo
+== 2. rafaga sobre el limite (P-12): 429 sin baneo
+   codigos: 200 200 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 200 200 429 429 429 429 429 429
+OK    la rafaga produce 429 (26)
+OK    sin baneo tras 26 respuestas 429
+OK    la siguiente pagina responde (200)
+== 3. control negativo: 404 repetidos SI banean
+OK    baneo tras 25 respuestas 404
+fallos: 0
+Objetivo: https://app.localhost (IP 127.0.0.1)
+
+Trafico normal
+  [32m200 [0m Salud                                          (esperado 200)
+  [32m200 [0m Pagina de ingreso                              (esperado 200)
+  [32m302 [0m Sin sesion redirige al ingreso                 (esperado 302)
+  [32m200 [0m Estatico servido por WhiteNoise                (esperado 200)
+  [32m301 [0m HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  [32m403 [0m Inyeccion SQL (GET)                            (esperado 403)
+  [32m403 [0m Inyeccion SQL (POST)                           (esperado 403)
+  [32m403 [0m XSS                                            (esperado 403)
+  [32m403 [0m Recorrido de rutas                             (esperado 403)
+  [32m403 [0m Inyeccion de comandos                          (esperado 403)
+  [32m403 [0m Log4Shell en cabecera                          (esperado 403)
+  [32m403 [0m Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  [32mOK[0m   puerto 8000 cerrado
+  [32mOK[0m   puerto 3306 cerrado
+  [32mOK[0m   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  [32mOK[0m   sin token: ***enmascarado*** · token malo: cerrada · token correcto: 200
+
+[32mTodo segun lo esperado.[0m
+Objetivo: https://glpi.localhost (IP 127.0.0.1)
+
+Trafico normal
+  [32m200 [0m Pagina principal de GLPI                       (esperado 200|302)
+  [32m403 [0m API v1 de GLPI cerrada desde fuera             (esperado 403)
+  [32m403 [0m API v2 de GLPI cerrada desde fuera             (esperado 403)
+  [32m301 [0m HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  [32m403 [0m Inyeccion SQL (GET)                            (esperado 403)
+  [32m403 [0m Inyeccion SQL (POST)                           (esperado 403)
+  [32m403 [0m XSS                                            (esperado 403)
+  [32m403 [0m Recorrido de rutas                             (esperado 403)
+  [32m403 [0m Inyeccion de comandos                          (esperado 403)
+  [32m403 [0m Log4Shell en cabecera                          (esperado 403)
+  [32m403 [0m Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  [32mOK[0m   puerto 8000 cerrado
+  [32mOK[0m   puerto 3306 cerrado
+  [32mOK[0m   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  [32mOK[0m   sin token: ***enmascarado*** · token malo: cerrada · token correcto: 200
+
+[32mTodo segun lo esperado.[0m
+[2026-10-26 20:07:19 -0500] [CLI] [233] [ℹ️ ] - Getting variables from database
+[2026-10-26 20:07:19 -0500] [CLI] [233] [ℹ️ ] - ✅ Database connection established
+[2026-10-26 20:07:19 -0500] [API.CALLER] [233] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/unban
+[2026-10-26 20:07:19 -0500] [CLI] [233] [ℹ️ ] - CLI command status : ✔️ (success)
+
+[42m[37m[1m ✅ SUCCESS [0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+[32m• [0m🔓 IP [1m[37m10.20.40.128[0m has been unbanned [32mglobally[0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+
+[2026-10-26 20:07:41 -0500] [CLI] [259] [ℹ️ ] - Getting variables from database
+[2026-10-26 20:07:41 -0500] [CLI] [259] [ℹ️ ] - ✅ Database connection established
+[2026-10-26 20:07:41 -0500] [API.CALLER] [259] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/unban
+[2026-10-26 20:07:41 -0500] [CLI] [259] [ℹ️ ] - CLI command status : ✔️ (success)
+
+[42m[37m[1m ✅ SUCCESS [0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+[32m• [0m🔓 IP [1m[37m10.20.40.128[0m has been unbanned [32mglobally[0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+
+[2026-10-26 20:08:02 -0500] [CLI] [285] [ℹ️ ] - Getting variables from database
+[2026-10-26 20:08:02 -0500] [CLI] [285] [ℹ️ ] - ✅ Database connection established
+[2026-10-26 20:08:02 -0500] [API.CALLER] [285] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/unban
+[2026-10-26 20:08:02 -0500] [CLI] [285] [ℹ️ ] - CLI command status : ✔️ (success)
+
+[42m[37m[1m ✅ SUCCESS [0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+[32m• [0m🔓 IP [1m[37m10.20.40.128[0m has been unbanned [32mglobally[0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+

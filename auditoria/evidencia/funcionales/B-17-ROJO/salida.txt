@@ -1,0 +1,18 @@
+.F.............                                                          [100%]
+================================== FAILURES ===================================
+_ test_B_17_si_glpi_rechaza_el_vencimiento_con_200_el_adaptador_no_lo_da_por_hecho _
+
+    def test_B_17_si_glpi_rechaza_el_vencimiento_con_200_el_adaptador_no_lo_da_por_hecho() -> None:
+        """GLPI 11 responde 200 con `[{"<id>": false, "message": "Invalid dates. Update cancelled."}]`
+        cuando `time_to_resolve` es anterior a la apertura. Antes se ignoraba y el ticket quedaba sin
+        vencimiento sin que nadie lo supiera."""
+        glpi = GlpiSimulado()
+        glpi.rechaza_actualizaciones = True
+>       with pytest.raises(GlpiRechazo, match="fijar vencimiento"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GlpiRechazo
+
+tests\adaptadores\test_glpi_cliente.py:59: Failed
+=========================== short test summary info ===========================
+FAILED tests/adaptadores/test_glpi_cliente.py::test_B_17_si_glpi_rechaza_el_vencimiento_con_200_el_adaptador_no_lo_da_por_hecho
+1 failed, 14 passed in 0.33s

@@ -26,6 +26,9 @@ dev = [
     "pyyaml>=6,<7",
     "types-pyyaml>=6.0.12.20260906",
     "playwright==1.63.0",
+    "pytest-bdd==9.0.0",
+    "reportlab==5.0.1",
+    "pillow==12.3.0",
 ]
 
 [build-system]
@@ -47,6 +50,9 @@ norecursedirs = ["integracion", ".*", "*.egg-info"]
 pythonpath = ["src", "."]
 addopts = "-ra --strict-markers --strict-config"
 xfail_strict = true
+markers = [
+    "seguridad: pruebas de la auditoria de seguridad (docs/PLAN_AUDITORIA.md §5), con la etiqueta de amenaza en el nombre",
+]
 DJANGO_SETTINGS_MODULE = "tests.adaptadores.ajustes"
 
 [tool.coverage.run]
@@ -61,9 +67,12 @@ skip_covered = true
 line-length = 100
 target-version = "py312"
 src = ["src", "tests"]
+# Copias generadas de scripts (la entrega) y material ajeno: el original ya se revisa en su carpeta.
+force-exclude = true
+extend-exclude = ["docs/entregables", "pruebas anteriores", ".contrato-tmp"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT"]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PT", "S"]  # S: bandit en ruff (D-08)
 ignore = ["RUF001", "RUF002", "RUF003", "UP040", "UP047"]  # UP040/UP047: mutmut 2 no entiende PEP 695
 
 [tool.mypy]
@@ -102,6 +111,8 @@ type = "layers"
 layers = ["config", "jml.adaptadores", "jml.aplicacion", "jml.dominio"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["E501"]
+"tests/**" = ["E501", "S101", "S105", "S106", "S603", "S607", "S608"]  # aserciones, claves de prueba y comandos fijos
+# Guiones e informes de la auditoria (docs/PLAN_AUDITORIA.md): lineas largas con rutas y comandos.
+"auditoria/**" = ["E501", "S101", "S603", "S607"]  # herramientas locales: ejecutan comandos propios
 # Modelos y migraciones de Django: atributos de clase mutables y lineas generadas son el idioma.
 "src/jml/adaptadores/salida/persistencia/**" = ["RUF012", "E501"]

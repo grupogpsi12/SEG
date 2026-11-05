@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe -m pytest -q tests/seguridad/test_filtro_de_logs.py -p no:cacheprovider

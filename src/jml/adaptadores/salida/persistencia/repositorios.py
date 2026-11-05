@@ -4,7 +4,7 @@ La base de datos garantiza las reglas (RD-01, RD-09); el codigo solo traduce el
 `IntegrityError` al error del puerto, dentro de un savepoint para que la transaccion siga viva.
 """
 
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import datetime
 from types import TracebackType
 from typing import Self
@@ -18,10 +18,13 @@ from jml.adaptadores.salida.persistencia import mapeo as mp
 from jml.adaptadores.salida.persistencia import models as m
 from jml.aplicacion.bandeja import EntradaDeBandeja, EstadoDeEntrada
 from jml.aplicacion.dtos import (
+    AvanceDeSolicitud,
     FichaDeColaborador,
     FiltroDeCuentas,
+    FiltroDeTickets,
     Indicadores,
     PaginaDeCuentas,
+    PaginaDeTickets,
     ResultadoDeSincronizacion,
 )
 from jml.aplicacion.puertos import (
@@ -650,6 +653,12 @@ class RepositoriosDjango:
 
     def buscar_cuentas(self, filtro: FiltroDeCuentas) -> PaginaDeCuentas:
         return consultas.buscar_cuentas(filtro)
+
+    def buscar_tickets(self, filtro: FiltroDeTickets) -> PaginaDeTickets:
+        return consultas.buscar_tickets(filtro)
+
+    def avances(self, ids: Sequence[SolicitudId]) -> Mapping[SolicitudId, AvanceDeSolicitud]:
+        return consultas.avances(ids)
 
     def ficha(self, colaborador_id: ColaboradorId) -> FichaDeColaborador | None:
         return consultas.ficha(colaborador_id)

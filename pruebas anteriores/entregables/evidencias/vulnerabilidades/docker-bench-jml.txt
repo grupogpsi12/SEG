@@ -1,0 +1,60 @@
+[WARN]      * Running as root: jml-postgres-1
+[WARN]      * Running as root: jml-mariadb-1
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/azure-storage/azurite:3.35.0]
+[WARN]      * No Healthcheck found: [grafana/grafana:11.5.2]
+[WARN]      * No Healthcheck found: [ghcr.io/grupogpsi12/jml-app:ultima]
+[INFO]      * Update instruction found: [ghcr.io/grupogpsi12/jml-app:ultima]
+[INFO]      * ADD in image history: [mcr.microsoft.com/azure-storage/azurite:3.35.0]
+[INFO]      * ADD in image history: [grafana/grafana:11.5.2]
+[WARN] 5.1  - Ensure AppArmor Profile is Enabled
+[WARN]      * No AppArmorProfile Found: jml-bw-scheduler-1
+[WARN]      * No AppArmorProfile Found: jml-bunkerweb-1
+[WARN]      * No AppArmorProfile Found: jml-grafana-1
+[WARN]      * No AppArmorProfile Found: jml-fluent-bit-1
+[WARN]      * No AppArmorProfile Found: jml-loki-1
+[WARN]      * No AppArmorProfile Found: jml-worker-1
+[WARN]      * No AppArmorProfile Found: jml-web-1
+[WARN]      * No AppArmorProfile Found: jml-glpi-1
+[WARN]      * No AppArmorProfile Found: jml-postgres-1
+[WARN]      * No AppArmorProfile Found: jml-mariadb-1
+[WARN] 5.2  - Ensure SELinux security options are set, if applicable
+[PASS] 5.3  - Ensure Linux Kernel Capabilities are restricted within containers
+[PASS] 5.4  - Ensure privileged containers are not used
+[PASS] 5.5  - Ensure sensitive host system directories are not mounted on containers
+[PASS] 5.6  - Ensure ssh is not run within containers
+[WARN] 5.7  - Ensure privileged ports are not mapped within containers
+[WARN]      * Privileged Port in use: 80 in jml-bunkerweb-1
+[WARN]      * Privileged Port in use: 443 in jml-bunkerweb-1
+[NOTE] 5.8  - Ensure only needed ports are open on the container
+[PASS] 5.9  - Ensure the host's network namespace is not shared
+[WARN] 5.10  - Ensure memory usage for container is limited
+[WARN] 5.11  - Ensure CPU priority is set appropriately on the container
+[WARN]      * Container running without CPU restrictions: jml-bw-scheduler-1
+[WARN]      * Container running without CPU restrictions: jml-bunkerweb-1
+[WARN]      * Container running without CPU restrictions: jml-grafana-1
+[WARN]      * Container running without CPU restrictions: jml-fluent-bit-1
+[WARN]      * Container running without CPU restrictions: jml-loki-1
+[WARN]      * Container running without CPU restrictions: jml-worker-1
+[WARN]      * Container running without CPU restrictions: jml-web-1
+[WARN]      * Container running without CPU restrictions: jml-glpi-1
+[WARN]      * Container running without CPU restrictions: jml-postgres-1
+[WARN]      * Container running without CPU restrictions: jml-mariadb-1
+[WARN] 5.12  - Ensure the container's root filesystem is mounted as read only
+[WARN]      * Container running with root FS mounted R/W: jml-bw-scheduler-1
+[WARN]      * Container running with root FS mounted R/W: jml-bunkerweb-1
+[WARN]      * Container running with root FS mounted R/W: jml-grafana-1
+[WARN]      * Container running with root FS mounted R/W: jml-loki-1
+[WARN]      * Container running with root FS mounted R/W: jml-glpi-1
+[WARN]      * Container running with root FS mounted R/W: jml-postgres-1
+[WARN]      * Container running with root FS mounted R/W: jml-mariadb-1
+[WARN] 5.13  - Ensure incoming container traffic is binded to a specific host interface
+[WARN]      * Port being bound to wildcard IP: 0.0.0.0 in jml-bunkerweb-1
+[WARN]      * Port being bound to wildcard IP: 0.0.0.0 in jml-bunkerweb-1
+[WARN] 5.14  - Ensure 'on-failure' container restart policy is set to '5'
+[WARN]      * MaximumRetryCount is not set to 5: jml-bw-scheduler-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-bunkerweb-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-grafana-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-fluent-bit-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-loki-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-worker-1
+[WARN]      * MaximumRetryCount is not set to 5: jml-web-1

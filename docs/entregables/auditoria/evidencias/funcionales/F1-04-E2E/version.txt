@@ -1,0 +1,1 @@
+Playwright 1.63.0 (imagen por digest) sobre BunkerWeb 1.6.15

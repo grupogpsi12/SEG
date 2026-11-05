@@ -1,0 +1,25 @@
+        reason="S-40 (B-34): el borde de los campos de formulario mide 1,4:1 y WCAG 1.4.11 pide 3:1",
+    )
+    def test_wcag_1_4_11_el_borde_de_los_campos_tiene_al_menos_3_a_1() -> None:
+>       assert contraste(VARIABLES["borde"], BLANCO) >= 3.0
+E       AssertionError: assert 1.3934004648291334 >= 3.0
+E        +  where 1.3934004648291334 = contraste('#d5dbe3', '#ffffff')
+
+tests\adaptadores\test_accesibilidad.py:78: AssertionError
+________ test_wcag_1_4_11_las_barras_del_grafico_tienen_al_menos_3_a_1 ________
+
+    @pytest.mark.xfail(  # S-40
+        strict=True,
+        reason="S-40 (B-34): las barras del gráfico miden 2,1:1 y WCAG 1.4.11 pide 3:1",
+    )
+    def test_wcag_1_4_11_las_barras_del_grafico_tienen_al_menos_3_a_1() -> None:
+        barra = re.search(r"\.grafico \.barra \{ fill: (#[0-9a-fA-F]{6})", CSS)
+        assert barra is not None
+>       assert contraste(barra.group(1), BLANCO) >= 3.0
+E       AssertionError: assert 2.065441875332073 >= 3.0
+E        +  where 2.065441875332073 = contraste('#9fb6d9', '#ffffff')
+E        +    where '#9fb6d9' = <built-in method group of re.Match object at 0x00000182363C51B0>(1)
+E        +      where <built-in method group of re.Match object at 0x00000182363C51B0> = <re.Match object; span=(1898, 1929), match='.grafico .barra { fill: #9fb6d9'>.group
+
+tests\adaptadores\test_accesibilidad.py:88: AssertionError
+2 failed, 48 passed in 2.73s

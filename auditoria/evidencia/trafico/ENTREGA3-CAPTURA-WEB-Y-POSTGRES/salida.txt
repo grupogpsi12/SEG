@@ -1,0 +1,35 @@
+filas antes (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== Playwright por el WAF (ING con PDF, VAC, RET y EMG)
+=========================== short test summary info ============================
+ERROR tests/e2e/test_interfaz.py::test_RET_emitido_por_RRHH_llega_a_glpi_sin_el_motivo
+FAILED tests/e2e/test_interfaz.py::test_RET_emitido_por_RRHH_llega_a_glpi_sin_el_motivo
+1 failed, 3 passed, 1 error in 33.01s
+== analisis del lado de BunkerWeb
+tramas: 821
+TLS: ClientHello con TLS 1.3 ofrecido: 10
+TLS: suites elegidas por el servidor:      10 0x1302;
+TLS: versiones en el ServerHello:      10 0x0304;
+puerto 80 (8080 interno): redirecciones 301 hacia HTTPS: 0
+tramo externo cifrado (8443): tramas con el centinela en claro (esperado 0): 0
+tramo interno WAF->web (8000): peticiones HTTP: 18
+tramo interno WAF->web (8000): tramas con el centinela (esperado >0: el WAF termina el TLS): 2
+tramo interno WAF->glpi (80): tramas con el centinela (esperado 0): 0
+cookies de respuesta de la aplicacion (atributos):
+      3 csrftoken=***enmascarado***; expires=Sun, 24 Oct 2027 23:49:46 GMT; HttpOnly; Max-Age=31449600; Path=/; SameSite=Lax; Secure,sessionid=***enmascarado***; HttpOnly; Path=/; SameSite=Lax; Secure
+      3 csrftoken=***enmascarado***; expires=Sun, 24 Oct 2027 23:49:46 GMT; HttpOnly; Max-Age=31449600; Path=/; SameSite=Lax; Secure,messages=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/; SameSite=Lax,sessionid=<o
+      1 messages=W1siX19qc29uX21lc3NhZ2UiLDAsMjUsIlNvbGljaXR1ZCBTT0wtMjAyNi0wMDAwMjUgZW1pdGlkYTogc2UgZW52aWFyb24gNiB0aWNrZXRzIGEgbGEgY29sYS4iLCIiXV0:1xL7yj:iJxaugelg4mHUiayhpL8AkYTpr4KxCBqwjR4YgHoAmc; HttpOnly; Path=/; S
+      1 messages=W1siX19qc29uX21lc3NhZ2UiLDAsMjUsIlNvbGljaXR1ZCBTT0wtMjAyNi0wMDAwMjQgZW1pdGlkYTogc2UgZW52aWFyb24gNiB0aWNrZXRzIGEgbGEgY29sYS4iLCIiXV0:1xL7yF:_vIXdeZ9oD3hMsjNSKBfLvUcGrZ8u5Pro97gvF4hQHg; HttpOnly; Path=/; S
+cabeceras de seguridad que salen del upstream (CSP, X-Frame-Options, X-Request-ID): 19
+== analisis del lado de PostgreSQL
+tramas: 3150
+SSLRequest enviados por la aplicacion: 0 · conexiones con TLS: 0  (PostgreSQL local sin TLS; Supabase usa verify-full)
+mensajes Parse (consulta con parametros): 0 · Bind: 0
+consultas simples (texto sin parametros): 1332
+BEGIN: 127 · COMMIT: 127
+tramas con el centinela hacia PostgreSQL (esperado >0, solo en solicitud_restringida): 36
+autenticacion: metodo SCRAM visto: 21 · contrasena en claro (authtype 3): 0
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+web: healthy · worker: running
+ASERCIONES CUMPLIDAS: 0 centinelas fuera del host, 0 hacia GLPI, 0 contrasenas en claro

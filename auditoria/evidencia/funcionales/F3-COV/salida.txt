@@ -1,0 +1,16 @@
+..................................                                       [100%]
+1690 passed in 58.77s
+grupo                                      ramas  ramas %        líneas  comb. %
+dominio                                  303/310    97.74     1451/1454    99.43
+aplicacion                               218/232    93.97     1315/1326     98.4
+adaptadores                              372/398    93.47     2275/2323    97.28
+TOTAL                                    893/940     95.0     5041/5103     98.2
+seguridad:ingreso                          58/58    100.0       282/282    100.0
+seguridad:permisos                         32/32    100.0       103/103    100.0
+seguridad:auditoria                        30/30    100.0       138/138    100.0
+seguridad:soportes                         16/16    100.0         73/73    100.0
+seguridad:filtro-de-logs                   14/14    100.0         39/39    100.0
+seguridad:csv-y-vistas-tecnicas              8/8    100.0         92/92    100.0
+seguridad:middleware                         4/4    100.0         41/41    100.0
+
+Por debajo de la meta: ninguno

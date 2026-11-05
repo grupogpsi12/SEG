@@ -29,7 +29,7 @@ infra/scripts/seguridad-dinamica.sh     # informes HTML y JSON en .contrato-tmp/
 | Activo y autenticado como RRHH, directo | 68 | 0 | 1 | 5 | 6 |
 | Activo y autenticado como técnico, directo | 50 | 1 (falso positivo) | 1 | 5 | 6 |
 
-- **CA-12 se cumple: el *baseline* no tiene alertas altas, y a través del WAF no tiene ni medias ni bajas.**
+- **El criterio de ZAP *baseline* se cumple:** sin alertas altas, y a través del WAF sin medias ni bajas. El escaneo activo solo se hizo directo, sin WAF. [PENDIENTE: auditoría F6, con y sin exención de baneo]
 - **Escaneo activo autenticado.** Una cookie de sesión y una CSRF válida, inyectadas con un *hook*, le permitieron recorrer la bandeja, los formularios de las seis solicitudes, el dashboard, la búsqueda y las fichas. No hubo inyección SQL, XSS, inyección de comandos ni inclusión de archivos.
 - **«Path Traversal», alta con confianza baja.** ZAP la levantó con `documento=cuentas` (el nombre de la propia página) y sin evidencia en la respuesta. Se comprobó a mano que es un falso positivo: con `../../../../etc/passwd`, `/etc/passwd` y su versión codificada, la respuesta es la misma búsqueda vacía de 1097 bytes, sin contenido del sistema. `documento` solo se compara con un campo de la base, y la aplicación no abre ningún archivo salvo los soportes, con nombre validado.
 - **«HTTP Only Site», media.** Es propio de atacar `web` directo: HTTPS y HSTS los pone el WAF (RS-01).
@@ -43,7 +43,21 @@ Commit `89112ea`.
 
 ## 2. sqlmap (nivel 3, riesgo 1)
 
-SQLMAP_RESULTADOS
+Corrida **preliminar**, directa (sin WAF), sobre la imagen ya corregida de gunicorn. Evidencia cruda:
+`auditoria/evidencia/vulnerabilidades/B-02-sqlmap-previo/` (comando, versión, commit, fecha y sha256).
+
+| Objetivo | Rol | Resultado |
+|---|---|---|
+| `GET /cuentas` (8 parámetros) | técnico | ningún parámetro inyectable |
+| `/colaboradores/<id>` (ruta) | técnico | ningún parámetro inyectable |
+| `GET /solicitudes?pagina` | RRHH | ningún parámetro inyectable |
+| `/solicitudes/<id>` (ruta) | RRHH | ningún parámetro inyectable |
+| `GET /auditoria?pagina` | Auditor | ningún parámetro inyectable |
+| `POST /ingreso` | sin sesión | ningún parámetro inyectable |
+| `POST /solicitudes/nueva/RET` | RRHH | ningún parámetro inyectable |
+
+- 7 de 7 objetivos sin hallazgos y **cero cortes de conexión** (la corrida anterior, con `--max-requests`, tuvo 26).
+- **Límite de esta corrida.** No tiene control positivo (plan de auditoría, §10): no se demostró que sqlmap detecte una inyección sembrada ni que los POST llegaran a la lógica de las vistas. Hasta entonces es evidencia preliminar de CA-12. [PENDIENTE: auditoría F6-04, con control positivo, nivel 5 y `Host`]
 
 **Corregido por estas pruebas.** gunicorn reiniciaba su único proceso cada ~2000 peticiones (`--max-requests`): la aplicación quedaba unos segundos sin servicio («Broken pipe») y se perdían los desafíos TOTP en curso (S-29). Se quitó; commit `64b4847`.
 

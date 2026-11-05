@@ -1,0 +1,123 @@
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+........................................................................ [ 57%]
+........................................................................ [ 65%]
+........................................................................ [ 73%]
+........................................................................ [ 81%]
+........................................................................ [ 89%]
+........................................................................ [ 97%]
+..................                                                       [100%]
+882 passed in 42.30s
+== rafaga de 26 a /ajax/dashboard.php de GLPI
+
+OK    0 respuestas 429 (0)
+== rafaga de 40 a /ajax/dashboard.php de GLPI
+
+OK    0 respuestas 429 (0)
+== rafaga de 6 a /front/locale.php
+
+OK    0 respuestas 429 (0)
+== rafaga de 8 a /tickets (sin sesion: redirige al ingreso)
+
+OK    0 respuestas 429 (0)
+== control: rafaga de 20 a la raiz de GLPI (2 r/s)
+
+OK    el limite general sigue frenando (18)
+== control: rafaga de 8 a /colaboradores (2 r/s, T10)
+
+OK    el limite de las fichas sigue frenando (6)
+== control: rafaga de 10 a /ingreso (5 por minuto, T1)
+
+OK    el limite del ingreso sigue frenando (5)
+fallos: 0
+Objetivo: https://app.localhost (IP 127.0.0.1)
+
+Trafico normal
+  [32m200 [0m Salud                                          (esperado 200)
+  [32m200 [0m Pagina de ingreso                              (esperado 200)
+  [32m302 [0m Sin sesion redirige al ingreso                 (esperado 302)
+  [32m200 [0m Estatico servido por WhiteNoise                (esperado 200)
+  [32m301 [0m HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  [32m403 [0m Inyeccion SQL (GET)                            (esperado 403)
+  [32m403 [0m Inyeccion SQL (POST)                           (esperado 403)
+  [32m403 [0m XSS                                            (esperado 403)
+  [32m403 [0m Recorrido de rutas                             (esperado 403)
+  [32m403 [0m Inyeccion de comandos                          (esperado 403)
+  [32m403 [0m Log4Shell en cabecera                          (esperado 403)
+  [32m403 [0m Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  [32mOK[0m   puerto 8000 cerrado
+  [32mOK[0m   puerto 3306 cerrado
+  [32mOK[0m   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  [32mOK[0m   sin token: ***enmascarado*** · token malo: cerrada · token correcto: 200
+
+[32mTodo segun lo esperado.[0m
+Objetivo: https://glpi.localhost (IP 127.0.0.1)
+
+Trafico normal
+  [32m200 [0m Pagina principal de GLPI                       (esperado 200|302)
+  [32m403 [0m API v1 de GLPI cerrada desde fuera             (esperado 403)
+  [32m403 [0m API v2 de GLPI cerrada desde fuera             (esperado 403)
+  [32m301 [0m HTTP redirige a HTTPS                          (esperado 301|302|308)
+
+Ataques (deben ser bloqueados)
+  [32m403 [0m Inyeccion SQL (GET)                            (esperado 403)
+  [32m403 [0m Inyeccion SQL (POST)                           (esperado 403)
+  [32m403 [0m XSS                                            (esperado 403)
+  [32m403 [0m Recorrido de rutas                             (esperado 403)
+  [32m403 [0m Inyeccion de comandos                          (esperado 403)
+  [32m403 [0m Log4Shell en cabecera                          (esperado 403)
+  [32m403 [0m Escaner (User-Agent sqlmap)                    (esperado 403)
+
+Nada responde por fuera de BunkerWeb (RS-02, T19)
+  [32mOK[0m   puerto 8000 cerrado
+  [32mOK[0m   puerto 3306 cerrado
+  [32mOK[0m   puerto 5000 cerrado
+
+API interna de BunkerWeb (RS-19): rechaza sin token y acepta con el token
+  [32mOK[0m   sin token: ***enmascarado*** · token malo: cerrada · token correcto: 200
+
+[32mTodo segun lo esperado.[0m
+== datos y sesiones de prueba
+== Playwright por el WAF
+....                                                                     [100%]
+4 passed in 113.48s (0:01:53)
+     26 302      40 302       6 200       8 302       2 200      18 429       2 302       6 429       5 200       5 429 [2026-11-04 19:59:38 -0500] [CLI] [837] [ℹ️ ] - Getting variables from database
+[2026-11-04 19:59:38 -0500] [CLI] [837] [ℹ️ ] - ✅ Database connection established
+[2026-11-04 19:59:38 -0500] [API.CALLER] [837] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/unban
+[2026-11-04 19:59:38 -0500] [CLI] [837] [ℹ️ ] - CLI command status : ✔️ (success)
+
+[42m[37m[1m ✅ SUCCESS [0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+[32m• [0m🔓 IP [1m[37m10.20.40.128[0m has been unbanned [32mglobally[0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+
+[2026-11-04 20:00:00 -0500] [CLI] [863] [ℹ️ ] - Getting variables from database
+[2026-11-04 20:00:00 -0500] [CLI] [863] [ℹ️ ] - ✅ Database connection established
+[2026-11-04 20:00:00 -0500] [API.CALLER] [863] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/unban
+[2026-11-04 20:00:00 -0500] [CLI] [863] [ℹ️ ] - CLI command status : ✔️ (success)
+
+[42m[37m[1m ✅ SUCCESS [0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+[32m• [0m🔓 IP [1m[37m10.20.40.128[0m has been unbanned [32mglobally[0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+
+[2026-11-04 20:00:21 -0500] [CLI] [889] [ℹ️ ] - Getting variables from database
+[2026-11-04 20:00:21 -0500] [CLI] [889] [ℹ️ ] - ✅ Database connection established
+[2026-11-04 20:00:21 -0500] [API.CALLER] [889] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/unban
+[2026-11-04 20:00:21 -0500] [CLI] [889] [ℹ️ ] - CLI command status : ✔️ (success)
+
+[42m[37m[1m ✅ SUCCESS [0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+[32m• [0m🔓 IP [1m[37m10.20.40.128[0m has been unbanned [32mglobally[0m
+[32m───────────────────────────────────────────────────────────────────────────[0m
+

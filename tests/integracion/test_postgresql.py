@@ -98,7 +98,8 @@ def test_RD_02_app_backend_no_puede_modificar_las_tablas_de_solo_insercion(tabla
     repos = RepositoriosDjango(RelojSimulado())
     with repos.unidad_de_trabajo() as u:
         u.auditoria.registrar("u", EventoDeAuditoria("a", "o", {}))
-    for sql in (f"UPDATE {tabla} SET id = id", f"DELETE FROM {tabla}", f"TRUNCATE {tabla}"):
+    # `tabla` sale de la lista fija de parametrize, no de una entrada (falso positivo de bandit)
+    for sql in (f"UPDATE {tabla} SET id = id", f"DELETE FROM {tabla}", f"TRUNCATE {tabla}"):  # nosec B608
         with (
             pytest.raises(DatabaseError, match="permission denied"),
             transaction.atomic(),
@@ -112,8 +113,7 @@ def test_RD_10_todas_las_tablas_tienen_RLS_activo() -> None:
     with connection.cursor() as cursor:
         cursor.execute(
             "SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
-            "WHERE n.nspname = current_schema() AND c.relkind = 'r' AND NOT c.relrowsecurity "
-            "AND relname NOT LIKE 'django_%%' AND relname NOT LIKE 'auth_%%'"
+            "WHERE n.nspname = current_schema() AND c.relkind = 'r' AND NOT c.relrowsecurity"
         )
         sin_rls = [fila[0] for fila in cursor.fetchall()]
     assert sin_rls == []

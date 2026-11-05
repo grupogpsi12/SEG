@@ -1,0 +1,46 @@
+== modo: sin_exencion · correlation_id de laboratorio: lab-f6-sin-exencion
+filas antes (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+== sin exencion: configuracion real del proyecto (2 r/s, ban de 1 hora por mal comportamiento)
+   esperando a que BunkerWeb recargue la configuracion...
+== controles antes de escanear
+   peticion legitima: 302 (esperado 302) · ataque SQL por User-Agent: 403 (esperado 403: CRS en bloqueo)
+== sesiones de laboratorio
+== ZAP activo por el WAF, autenticado como rrhh (hasta 3 minutos)
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 12 
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 1	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 142
+== ZAP activo por el WAF, autenticado como tecnico (hasta 3 minutos)
+WARN-NEW: Content Security Policy (CSP) Header Not Set [10038] x 4 
+WARN-NEW: Proxy Disclosure [40025] x 3 
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 2	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 141
+== sqlmap nivel 3 por el WAF
+### GET /cuentas (tecnico)
+      1 [17:01:46] [WARNING] heuristic (basic) test shows that GET parameter 'nombre' might not be SQL injectable
+      1 [17:01:30] [INFO] checking if the target is protected by some kind of WAF/IPS
+### ruta /colaboradores/<id> (tecnico)
+      1 [17:11:46] [WARNING] heuristic (basic) test shows that URI parameter '#1*' might not be SQL injectable
+      1 [17:11:30] [INFO] checking if the target is protected by some kind of WAF/IPS
+### ruta /solicitudes/<id> (rrhh)
+      1 [17:21:46] [WARNING] heuristic (basic) test shows that URI parameter '#1*' might not be SQL injectable
+      1 [17:21:30] [INFO] checking if the target is protected by some kind of WAF/IPS
+### GET /auditoria?pagina (auditor)
+      1 [17:31:46] [WARNING] heuristic (basic) test shows that GET parameter 'pagina' might not be SQL injectable
+      1 [17:31:30] [INFO] checking if the target is protected by some kind of WAF/IPS
+== controles despues de escanear
+   IPs baneadas al terminar: 0
+== resumen de alertas de ZAP (riesgo: cantidad)
+   activo-rrhh.json:       5 Informational       1 Medium 
+   activo-tecnico.json:       3 Informational       1 Low       2 Medium 
+== trafico visto por el WAF durante la corrida (codigos HTTP de app.localhost)
+   3583 /auditoria?pagina=1
+   1206 /solicitudes/nueva/ING
+    518 /solicitudes/nueva/CDP
+    517 /solicitudes/nueva/EMG
+    433 /solicitudes/nueva/RET
+    433 /solicitudes/nueva/CSU
+    347 /solicitudes/nueva/VAC
+    159 /
+== neutralizar al terminar
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+web: healthy · worker: running

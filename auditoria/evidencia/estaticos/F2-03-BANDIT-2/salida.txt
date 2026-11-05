@@ -1,0 +1,4 @@
+bandit_medio_o_superior=0
+[tester]	WARNING	nosec encountered (B108), but no failed test on file src\config\settings.py:104
+[tester]	WARNING	nosec encountered (B608), but no failed test on file tests\integracion\test_postgresql.py:102
+[tester]	WARNING	nosec encountered (B608), but no failed test on file tests\integracion\test_postgresql.py:102

@@ -1,0 +1,1 @@
+PATH="$PWD/.venv/Scripts:$PATH:/c/Program Files/Docker/Docker/resources/bin" python -m pytest -q -p no:cacheprovider -rs tests/dominio tests/aplicacion tests/contratos tests/escenarios tests/adaptadores tests/seguridad tests/bdd

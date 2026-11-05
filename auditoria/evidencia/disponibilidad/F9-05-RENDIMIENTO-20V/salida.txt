@@ -1,0 +1,7 @@
+== migraciones como app_owner (ADR-028)
+== semilla: 300 colaboradores con su historia
+{"colaboradores_nuevos": 300, "eventos_posteriores": 96, "registros_de_auditoria": 6586, "cadena_valida": true, "colaborador_de_ejemplo": "col-n2", "solicitud_de_ejemplo": "SOL-2026-000301", "segundos": 41.1}
+
+== web con la configuracion de produccion (gunicorn 1 x 8 hilos)
+== medicion: 20 usuarios concurrentes x 20 vueltas
+{"usuarios_concurrentes": 20, "peticiones": 1440, "segundos": 40.8, "paginas": {"auditoria": {"peticiones": 80, "p50_ms": 475, "p95_ms": 649, "max_ms": 730, "umbral_ms": 800, "cumple": true}, "bandeja": {"peticiones": 120, "p50_ms": 443, "p95_ms": 641, "max_ms": 687, "umbral_ms": 800, "cumple": true}, "cuentas": {"peticiones": 200, "p50_ms": 416, "p95_ms": 636, "max_ms": 722, "umbral_ms": 800, "cumple": true}, "cuentas filtradas": {"peticiones": 200, "p50_ms": 379, "p95_ms": 510, "max_ms": 552, "umbral_ms": 800, "cumple": true}, "cuentas pagina 3": {"peticiones": 200, "p50_ms": 352, "p95_ms": 490, "max_ms": 558, "umbral_ms": 800, "cumple": true}, "dashboard": {"peticiones": 200, "p50_ms": 532, "p95_ms": 786, "max_ms": 973, "umbral_ms": 2000, "cumple": true}, "detalle": {"peticiones": 120, "p50_ms": 404, "p95_ms": 620, "max_ms": 697, "umbral_ms": 800, "cumple": true}, "ficha": {"peticiones": 200, "p50_ms": 340, "p95_ms": 466, "max_ms": 517, "umbral_ms": 800, "cumple": true}, "solicitudes": {"peticiones": 120, "p50_ms": 384, "p95_ms": 627, "max_ms": 754, "umbral_ms": 800, "cumple": true}}, "errores": {}}

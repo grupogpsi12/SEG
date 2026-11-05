@@ -1,0 +1,164 @@
+== control positivo: lo sembrado DEBE aparecer
+trivy config sobre Dockerfile.vulnerable: 1 reglas (se espera >= 1)
+trivy fs sobre requirements-vulnerable.txt: 8 CVE (se espera >= 1)
+== trivy config (infra/ y Dockerfile)
+
+Report Summary
+
+┌──────────────────────────────────────┬────────────┬───────────────────┐
+│                Target                │    Type    │ Misconfigurations │
+├──────────────────────────────────────┼────────────┼───────────────────┤
+│ .cp-trivy-3hNJ/Dockerfile.vulnerable │ dockerfile │         1         │
+├──────────────────────────────────────┼────────────┼───────────────────┤
+│ Dockerfile                           │ dockerfile │         0         │
+└──────────────────────────────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+.cp-trivy-3hNJ/Dockerfile.vulnerable (dockerfile)
+=================================================
+Tests: 20 (SUCCESSES: 19, FAILURES: 1)
+Failures: 1 (HIGH: 1, CRITICAL: 0)
+
+AVD-DS-0002 (HIGH): Specify at least 1 USER command in Dockerfile with non-root user as argument
+════════════════════════════════════════
+Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+
+See https://avd.aquasec.com/misconfig/ds002
+────────────────────────────────────────
+
+
+config=0
+== trivy fs (dependencias, secretos y configuracion) del repositorio
+
+Report Summary
+
+┌──────────────────────────────────────┬────────────┬─────────────────┬─────────┬───────────────────┐
+│                Target                │    Type    │ Vulnerabilities │ Secrets │ Misconfigurations │
+├──────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ .cp-trivy-3hNJ/dep/requirements.txt  │    pip     │        8        │    -    │         -         │
+├──────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ uv.lock                              │     uv     │        1        │    -    │         -         │
+├──────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ .cp-trivy-3hNJ/Dockerfile.vulnerable │ dockerfile │        -        │    -    │         1         │
+├──────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ Dockerfile                           │ dockerfile │        -        │    -    │         0         │
+├──────────────────────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ .cp-trivy-3hNJ/vulnerable.py         │    text    │        -        │    1    │         -         │
+└──────────────────────────────────────┴────────────┴─────────────────┴─────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+.cp-trivy-3hNJ/dep/requirements.txt (pip)
+=========================================
+Total: 8 (HIGH: 8, CRITICAL: 0)
+
+┌──────────┬────────────────┬──────────┬────────┬───────────────────┬────────────────┬──────────────────────────────────────────────────────────────┐
+│ Library  │ Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version  │                            Title                             │
+├──────────┼────────────────┼──────────┼────────┼───────────────────┼────────────────┼──────────────────────────────────────────────────────────────┤
+│ requests │ CVE-2018-18074 │ HIGH     │ fixed  │ 2.19.0            │ 2.20.0         │ python-requests: Redirect from HTTPS to HTTP does not remove │
+│          │                │          │        │                   │                │ Authorization header                                         │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2018-18074                   │
+├──────────┼────────────────┤          │        ├───────────────────┼────────────────┼──────────────────────────────────────────────────────────────┤
+│ urllib3  │ CVE-2019-11324 │          │        │ 1.24.1            │ 1.24.2         │ python-urllib3: Certification mishandle when error should be │
+│          │                │          │        │                   │                │ thrown                                                       │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2019-11324                   │
+│          ├────────────────┤          │        │                   ├────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2023-43804 │          │        │                   │ 2.0.6, 1.26.17 │ python-urllib3: Cookie request header isn't stripped during  │
+│          │                │          │        │                   │                │ cross-origin redirects                                       │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2023-43804                   │
+│          ├────────────────┤          │        │                   ├────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-66418 │          │        │                   │ 2.6.0          │ urllib3: urllib3: Unbounded decompression chain leads to     │
+│          │                │          │        │                   │                │ resource exhaustion                                          │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2025-66418                   │
+│          ├────────────────┤          │        │                   │                ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-66471 │          │        │                   │                │ urllib3: urllib3 Streaming API improperly handles highly     │
+│          │                │          │        │                   │                │ compressed data                                              │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2025-66471                   │
+│          ├────────────────┤          │        │                   ├────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-21441 │          │        │                   │ 2.6.3          │ urllib3: urllib3 vulnerable to decompression-bomb safeguard  │
+│          │                │          │        │                   │                │ bypass when following HTTP redirects (streaming...           │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2026-21441                   │
+│          ├────────────────┤          │        │                   ├────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-44431 │          │        │                   │ 2.7.0          │ urllib3: urllib3: Information disclosure via cross-origin    │
+│          │                │          │        │                   │                │ redirects forwarding sensitive headers                       │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2026-44431                   │
+│          ├────────────────┤          │        │                   ├────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-97689 │          │        │                   │ 2.8.0          │ urllib3: urllib3: Denial of Service via unbounded memory     │
+│          │                │          │        │                   │                │ allocation in chunk parser...                                │
+│          │                │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2026-97689                   │
+└──────────┴────────────────┴──────────┴────────┴───────────────────┴────────────────┴──────────────────────────────────────────────────────────────┘
+
+uv.lock (uv)
+============
+Total: 1 (HIGH: 0, CRITICAL: 1)
+
+┌─────────┬─────────────────────┬──────────┬────────┬───────────────────┬───────────────┬───────────────────────────────────────────────────┐
+│ Library │    Vulnerability    │ Severity │ Status │ Installed Version │ Fixed Version │                       Title                       │
+├─────────┼─────────────────────┼──────────┼────────┼───────────────────┼───────────────┼───────────────────────────────────────────────────┤
+│ certifi │ GHSA-6q48-6c7w-9gw2 │ CRITICAL │ fixed  │ 2026.7.22         │ 2026.10.19    │ certifi bundles emSign root CAs with compromised  │
+│         │                     │          │        │                   │               │ intermediate CA keys                              │
+│         │                     │          │        │                   │               │ https://github.com/advisories/GHSA-6q48-6c7w-9gw2 │
+└─────────┴─────────────────────┴──────────┴────────┴───────────────────┴───────────────┴───────────────────────────────────────────────────┘
+
+.cp-trivy-3hNJ/Dockerfile.vulnerable (dockerfile)
+=================================================
+Tests: 20 (SUCCESSES: 19, FAILURES: 1)
+Failures: 1 (HIGH: 1, CRITICAL: 0)
+
+AVD-DS-0002 (HIGH): Specify at least 1 USER command in Dockerfile with non-root user as argument
+════════════════════════════════════════
+Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+
+See https://avd.aquasec.com/misconfig/ds002
+────────────────────────────────────────
+
+
+
+.cp-trivy-3hNJ/vulnerable.py (secrets)
+======================================
+Total: 1 (HIGH: 0, CRITICAL: 1)
+
+CRITICAL: GitHub (github-pat)
+════════════════════════════════════════
+GitHub Personal Access Token
+────────────────────────────────────────
+ .cp-trivy-3hNJ/vulnerable.py:9 (offset: 278 bytes)
+────────────────────────────────────────
+   7   
+   8   # 5. secreto embebido (forma de un token personal de GitHub)
+   9 [ TOKEN_DE_SERVICIO = "****************************************"
+  10   
+────────────────────────────────────────
+
+
+fs=0
+2026-10-25T02:30:01Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-25T02:31:10Z	INFO	Detected config files	num=2
+
+📣 [34mNotices:[0m
+  - Version 0.76.1 of Trivy is now available, current version is 0.67.2
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+
+2026-10-25T02:31:10Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-25T02:31:10Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-25T02:31:11Z	INFO	[secret] Secret scanning is enabled
+2026-10-25T02:31:11Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln,misconfig' to disable secret scanning
+2026-10-25T02:31:11Z	INFO	[secret] Please see https://trivy.dev/v0.67/docs/scanner/secret#recommendation for faster secret detection
+2026-10-25T02:32:44Z	WARN	[pip] Unable to find python `site-packages` directory. License detection is skipped.	err="unable to find path to Python executable"
+2026-10-25T02:32:44Z	INFO	Suppressing dependencies for development and testing. To display them, try the '--include-dev-deps' flag.
+2026-10-25T02:32:44Z	INFO	Number of language-specific files	num=2
+2026-10-25T02:32:44Z	INFO	[pip] Detecting vulnerabilities...
+2026-10-25T02:32:44Z	INFO	[uv] Detecting vulnerabilities...
+2026-10-25T02:32:44Z	INFO	Detected config files	num=2
+
+📣 [34mNotices:[0m
+  - Version 0.76.1 of Trivy is now available, current version is 0.67.2
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+

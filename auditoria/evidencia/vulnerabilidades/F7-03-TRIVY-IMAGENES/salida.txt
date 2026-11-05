@@ -1,0 +1,17 @@
+KEV: 1756 CVE explotadas activamente en el catálogo de CISA · CVE distintas en las imágenes: 139
+
+aplicacion    jml-app:local                              CRITICAL   1 · HIGH  44 · con parche   1 · en KEV 0 · EPSS ≥ 10%: 0
+     [CRITICAL con parche] GHSA-6q48-6c7w-9gw2 certifi → 2026.10.19
+bunkerweb     bunkerity/bunkerweb:1.6.15                 CRITICAL   1 · HIGH  24 · con parche  25 · en KEV 0 · EPSS ≥ 10%: 2
+     [EPSS] CVE-2026-111497 brotli HIGH EPSS=0.328 parche=1.2.1-r0
+     [EPSS] CVE-2026-111497 brotli-libs HIGH EPSS=0.328 parche=1.2.1-r0
+     [CRITICAL con parche] GHSA-6q48-6c7w-9gw2 certifi → 2026.10.19
+planificador  bunkerity/bunkerweb-scheduler:1.6.15       CRITICAL   2 · HIGH   7 · con parche   9 · en KEV 0 · EPSS ≥ 10%: 1
+     [EPSS] CVE-2026-111497 brotli-libs HIGH EPSS=0.328 parche=1.2.1-r0
+     [CRITICAL con parche] GHSA-6q48-6c7w-9gw2 certifi → 2026.10.19
+     [CRITICAL con parche] GHSA-6q48-6c7w-9gw2 certifi → 2026.10.19
+glpi          glpi/glpi:11.0.11                          CRITICAL  13 · HIGH 203 · con parche   1 · en KEV 0 · EPSS ≥ 10%: 0
+mariadb       mariadb:11.4                               CRITICAL   1 · HIGH  25 · con parche  26 · en KEV 0 · EPSS ≥ 10%: 0
+     [CRITICAL con parche] CVE-2025-68121 stdlib → 1.24.13, 1.25.7, 1.26.0-rc.3
+
+VEREDICTO: ninguna vulnerabilidad en KEV; lo demás se prioriza por EPSS y parche disponible

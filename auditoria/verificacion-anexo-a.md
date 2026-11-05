@@ -1,0 +1,20 @@
+# Verificación del Anexo A, Tabla I (matriz de funcionalidades principales)
+
+Comando: `python auditoria/scripts/verificar-anexo-a.py` (evidencia: `auditoria/evidencia/funcionales/ANEXO-A-TABLA-I`). Ejecuta las pruebas de cada función y comprueba por lectura del código los puntos de su descripción que una prueba no cubre. Resultado: **las 8 funciones se cumplen**.
+
+| Función del anexo | Qué dice | Dónde se cumple | Pruebas que la ejercitan | Veredicto |
+|---|---|---|---|---|
+| F1. Autenticación y roles | Inicio de sesión con Supabase Auth y TOTP obligatorio; permisos por rol | `web/ingreso.py`, `casos/ingreso.py` (solo AAL2 abre sesión), `dominio/permisos.py` | 602: ingreso web, adaptador de Supabase, segundo uso del desafío (F3-U01), matriz de 440 celdas | **Cumple.** Límite: que Supabase rechace el *mismo código* TOTP dos veces lo impone Supabase y no se prueba sin un secreto real. |
+| F2. Gestión de solicitudes | Registro con fecha efectiva, consulta, cancelación y deduplicación | `casos/registrar.py`, `casos/decidir.py` (`CancelarSolicitud`), `UniqueConstraint` parcial en la base | 197 en memoria; carrera real con dos conexiones y decisiones simultáneas en PostgreSQL (F3-U05) | **Cumple.** |
+| F3. Emisión de tickets | Un ticket por cola, con lista de verificación, prioridad, SLA y, cuando aplica, fecha programada | `dominio/tickets.py` (`lista_de_verificacion`, `prioridad`, `vence_en`, `activo_desde`) | 94: matriz evento × cola celda por celda, golden de tickets, vencimientos S-01…S-03; los programados nacen «en espera» (RF-17) | **Cumple.** |
+| F4. Sincronización | Estado de los tickets, soluciones, actas y activos desde GLPI, cada 5 minutos | `worker/ciclo.py` (`INTERVALO_SINCRONIZACION_S = 300`), `casos/sincronizar.py` (tickets y `SincronizarActivos`) | 267 más 30 contra GLPI 11 real (F1-03) | **Cumple.** Tras B-17 el adaptador falla en alto si GLPI rechaza un vencimiento, y tras B-19/B-20 una solicitud o una entrada problemática ya no detiene a las demás. |
+| F5. Registro de cuentas | Estado de las cuentas por sistema, derivado de los tickets resueltos | `dominio/cuentas.py`; solo `sincronizar.py` escribe cuentas (comprobado por lectura) | 71: resuelto sin solución no cambia la cuenta, el acta de Inventario, reabiertos | **Cumple** (invariante 6: ninguna vista ni comando edita una cuenta). |
+| F6. DashBoards | Búsqueda de cuentas y ficha del colaborador | `casos/consultas.py` (`BuscarCuentas`, `ConsultarFicha`, dashboard), `web/tecnicos.py` | 58: roles técnicos, paginación, CSV sin inyección de fórmulas | **Cumple.** Solo los roles técnicos acceden (matriz) y cada ficha consultada queda auditada. |
+| F7. Auditoría | Registro inalterable de cada decisión, emisión, cambio de estado y acceso a datos personales | Cadena SHA-256 (`dominio/auditoria.py`); eventos `solicitud.*` y decisión, `ticket.creado`, `ticket.estado_sincronizado`, `ficha.consultada`, `restringido.consultado` | 46 más PostgreSQL real: `UPDATE`/`DELETE`/`TRUNCATE` rechazados y disparador (F3-BD, tres defectos sembrados detectados) | **Cumple.** Pendiente de despliegue: la copia diaria inmutable en Azure Blob (RD-04) `[PENDIENTE: ventana de despliegue]`. Las denegaciones por rol quedan en el log estructurado, no en la cadena (B-25 y decisión abierta). |
+| F8. Administración | Matriz de perfiles, catálogos y asignación de roles | `web/administracion.py`; «catálogos» = la propia matriz (S-32) | 21: solo el Administrador; nadie cambia sus propios roles; roles incompatibles | **Cumple**, con la interpretación S-32 de «catálogos», que el SRS no define. |
+
+## Lo que la verificación no cubre y conviene saber
+
+- **El nombre de F6.** El anexo la llama «DashBoards» pero describe búsqueda y ficha. Ambas existen; el *dashboard* de indicadores (RF-29/30) también.
+- **Una función del SRS que no está en la tabla y sí falta:** el Auditor no puede leer solicitudes (B-26), aunque el SRS lo dice. No afecta a las ocho funciones del anexo.
+- **Lo que depende de otros entornos:** TOTP real contra Supabase, la copia en Azure Blob y la Data API con la clave pública quedan marcados como pendientes, no como verificados.

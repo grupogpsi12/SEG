@@ -1,0 +1,2 @@
+Comandos manuales del 25/10/2026, 21:33 (-05:00), antes y despues de aplicar la migracion 0006 con `docker compose -f infra/compose.yaml -f infra/compose.local.yaml run --rm migrar`.
+La verificacion reproducible es auditoria/scripts/ca-13-postgres-local.sh (evidencia ADR-031-CA-13-POSTGRES-LOCAL).

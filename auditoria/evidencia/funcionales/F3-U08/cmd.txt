@@ -1,0 +1,1 @@
+docker exec jml-web-1 python manage.py check --deploy; echo codigo=$?; docker exec jml-web-1 python manage.py check --deploy --fail-level WARNING --silence-checks 2>/dev/null; true

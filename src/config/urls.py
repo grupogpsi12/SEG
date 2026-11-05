@@ -20,6 +20,22 @@ urlpatterns = [
     path("administracion/perfiles", administracion.perfiles, name="admin_perfiles"),
     path("administracion/perfil", administracion.editar_perfil, name="admin_perfil"),
     path("administracion/usuarios", administracion.usuarios, name="admin_usuarios"),
+    path("administracion/usuarios/crear", administracion.crear_usuario, name="admin_usuario_crear"),
+    path(
+        "administracion/usuarios/vincular",
+        administracion.vincular_usuario,
+        name="admin_usuario_vincular",
+    ),
+    path(
+        "administracion/usuarios/<str:usuario>/colaborador",
+        administracion.cambiar_colaborador,
+        name="admin_usuario_colaborador",
+    ),
+    re_path(
+        r"^administracion/usuarios/(?P<usuario>[^/]+)/(?P<accion>desactivar|reactivar|eliminar)$",
+        administracion.cambiar_acceso,
+        name="admin_usuario_acceso",
+    ),
     path(
         "administracion/usuarios/<str:usuario>/roles",
         administracion.cambiar_roles,
@@ -30,6 +46,7 @@ urlpatterns = [
         vistas.reintentar,
         name="reintentar",
     ),
+    path("tickets", tecnicos.tickets, name="tickets"),
     path("cuentas", tecnicos.cuentas, name="cuentas"),
     path("cuentas.csv", tecnicos.cuentas_csv, name="cuentas_csv"),
     path("colaboradores/<str:colaborador>", tecnicos.ficha, name="ficha"),

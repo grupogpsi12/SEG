@@ -1,0 +1,1 @@
+JML_MODO=local JML_RESPALDO_DESTINO=.contrato-tmp/respaldos bash infra/scripts/respaldo.sh && bash infra/scripts/restaurar-prueba.sh .contrato-tmp/respaldos

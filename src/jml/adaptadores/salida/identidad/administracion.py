@@ -1,7 +1,7 @@
 """Alta y baja de cuentas en Supabase Auth con la clave `service_role` (RF-06, invariante 8).
 
-Solo la usa el comando `admin_usuarios`, que corre en el contenedor `admin-usuarios`: es el
-unico que monta el secreto `supabase_service_role`. La web y el worker nunca lo importan.
+Solo la usa el contenedor `admin-usuarios`, con su comando y su servicio interno (ADR-035): es el
+unico que monta el secreto `supabase_service_role`. La web y el worker nunca lo instancian.
 """
 
 from typing import Any
@@ -11,6 +11,7 @@ import httpx
 from jml.aplicacion.puertos import IdentidadNoDisponible
 
 BANEO_INDEFINIDO = "876000h"  # ~100 anios: Supabase no tiene "desactivar", solo banear
+_MAXIMO_DE_PAGINAS = 50
 
 
 class ErrorDeAdministracion(Exception):
@@ -50,6 +51,19 @@ class AdministradorSupabase:
     def desactivar(self, usuario_id: str) -> None:
         self._pedir("PUT", f"/{usuario_id}", {"ban_duration": BANEO_INDEFINIDO})
 
+    def reactivar(self, usuario_id: str) -> None:
+        self._pedir("PUT", f"/{usuario_id}", {"ban_duration": "none"})
+
     def eliminar(self, usuario_id: str) -> None:
-        """Compensacion: si la base falla tras crear la cuenta, no queda una cuenta huerfana."""
+        """Tambien es la compensacion: si la base falla tras crear, no queda una cuenta huerfana."""
         self._pedir("DELETE", f"/{usuario_id}")
+
+    def correos(self) -> dict[str, str]:
+        """Id -> correo de todas las cuentas, por paginas."""
+        correos: dict[str, str] = {}
+        for pagina in range(1, _MAXIMO_DE_PAGINAS + 1):
+            usuarios = self._pedir("GET", f"?page={pagina}&per_page=200").get("users", [])
+            if not usuarios:
+                break
+            correos.update({str(u["id"]): str(u.get("email", "")) for u in usuarios})
+        return correos

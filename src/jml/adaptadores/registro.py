@@ -6,6 +6,7 @@ dentro de diccionarios anidados. Un `CampoRestringido` ya se imprime como `<ocul
 
 import json
 import logging
+import unicodedata
 from contextvars import ContextVar
 from datetime import UTC, datetime
 
@@ -19,8 +20,11 @@ _ESTANDAR = set(vars(logging.LogRecord("", 0, "", 0, "", None, None))) | {"messa
 
 
 def _prohibida(clave: str) -> bool:
-    minuscula = clave.lower()
-    return any(p in minuscula for p in PALABRAS_PROHIBIDAS)
+    # Sin acentos: `contraseña` y `descripción` tambien se filtran (B-21).
+    sin_acentos = "".join(
+        c for c in unicodedata.normalize("NFKD", clave.lower()) if not unicodedata.combining(c)
+    )
+    return any(p in sin_acentos for p in PALABRAS_PROHIBIDAS)
 
 
 def _limpiar(valor: object) -> object:

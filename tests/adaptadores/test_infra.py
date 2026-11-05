@@ -36,7 +36,7 @@ def test_RS_03_la_red_de_la_base_de_glpi_es_interna() -> None:
 def test_invariante_8_service_role_solo_en_admin_usuarios() -> None:
     con_clave = {n for n, s in SERVICIOS.items() if "supabase_service_role" in s.get("secrets", [])}
     assert con_clave == {"admin-usuarios"}
-    assert SERVICIOS["admin-usuarios"]["profiles"] == ["admin"]  # no arranca con `up`
+    assert "ports" not in SERVICIOS["admin-usuarios"]  # ADR-035: servicio solo por admin_net
 
 
 def test_RS_18_imagenes_de_terceros_fijadas_por_digest() -> None:
@@ -224,3 +224,85 @@ def test_S_29_el_unico_proceso_de_gunicorn_no_se_reinicia_cada_n_peticiones() ->
     cmd = next(x for x in (RAIZ / "Dockerfile").read_text().splitlines() if x.startswith("CMD"))
     assert '"--workers", "1"' in cmd
     assert '"--max-requests"' not in (RAIZ / "Dockerfile").read_text()  # como argumento del CMD
+
+
+def test_B_01_la_ip_de_confianza_de_bunkerweb_esta_reservada_fuera_del_rango_dinamico() -> None:
+    """Auditoria 24/10/2026, B-01 (T20, RS-05). Django confia en `X-Forwarded-*` solo desde la IP
+    fija de bunkerweb. Si esa IP cae en el rango que Docker reparte a los demas contenedores, tras
+    un reinicio cualquiera de ellos puede tomarla primero: bunkerweb no arranca («Address already
+    in use») y la aplicacion queda sin borde. Reproducido con
+    auditoria/scripts/reproducir-ip-confianza.sh."""
+    import ipaddress
+
+    ip_fija = ipaddress.ip_address(SERVICIOS["bunkerweb"]["networks"]["app"]["ipv4_address"])
+    de_confianza = SERVICIOS["web"]["environment"]["JML_PROXIES_CONFIABLES"]
+    assert str(ip_fija) == de_confianza  # la fija ES la de confianza
+    config = COMPOSE["networks"]["app"]["ipam"]["config"][0]
+    subred = ipaddress.IPv4Network(config["subnet"])
+    assert ip_fija in subred
+    rango_dinamico = ipaddress.IPv4Network(config["ip_range"])  # falla si no se declaro
+    assert rango_dinamico.subnet_of(subred)
+    assert ip_fija not in rango_dinamico
+
+
+def test_B_38_el_volumen_de_soportes_se_monta_sin_ejecucion() -> None:
+    """Invariante 12 y RS-17: el soporte de vinculacion vive en un volumen `noexec`. Lo daba
+    `compose.azure.yaml` (un directorio del host con noexec); con ADR-031 no hay VM, y el volumen
+    con nombre de compose.yaml se montaba `ext4 rw` en web y worker (medido en /proc/mounts)."""
+    opciones = COMPOSE["volumes"]["soportes"]["driver_opts"]
+    assert opciones["type"] == "tmpfs"
+    assert {"noexec", "nosuid", "nodev"} <= set(opciones["o"].split(","))
+
+
+def test_ADR_032_el_limite_de_ritmo_no_banea_pero_los_errores_si() -> None:
+    """B-36 y P-12: el panel de GLPI dispara ~20 peticiones en paralelo y cada 429 contaba como «mal
+    comportamiento»: la IP del equipo (la de la puerta de enlace de Docker, compartida por todos)
+    quedaba baneada una hora. El 429 sigue frenando; el baneo queda para los errores de un ataque."""
+    entorno = _entorno("bw-scheduler")
+    assert "BAD_BEHAVIOR_STATUS_CODES=400 401 403 404 405 444" in entorno
+    assert "LIMIT_REQ_RATE=2r/s" in entorno
+
+
+def test_B_39_exclusion_puntual_de_953100_para_el_catalogo_de_traducciones_de_glpi() -> None:
+    """Invariante 14: una regla, una ruta, un sitio. /front/locale.php devuelve las cadenas de GLPI,
+    que incluyen frases como las de los errores de PHP; la 953100 las marcaba y la 959100 cortaba la
+    respuesta ya enviada (500 en el navegador). El resto del CRS de salida sigue activo ahi."""
+    archivo = (
+        RAIZ
+        / "infra"
+        / "bunkerweb"
+        / "configs"
+        / "modsec-crs"
+        / "glpi.localhost"
+        / "locale-953100.conf"
+    )
+    reglas = [
+        linea
+        for linea in archivo.read_text(encoding="utf-8").replace("\\n", " ").splitlines()
+        if linea.strip() and not linea.lstrip().startswith("#")
+    ]
+    assert len(reglas) == 1
+    assert '"@streq /front/locale.php"' in reglas[0]
+    assert re.findall(r"ruleRemoveById=(\d+)", reglas[0]) == ["953100"]
+
+
+def test_ADR_033_las_peticiones_ajax_de_glpi_tienen_su_propio_limite() -> None:
+    """El panel de GLPI pide todas sus tarjetas a la vez a /ajax/dashboard.php: con 2 r/s, 5 o 6 de
+    7 salian con error (W-02). /ajax/ exige sesion de GLPI; el ingreso (/front/login.php) y todo lo
+    demas siguen con el limite general."""
+    entorno = _entorno("bw-scheduler")
+    assert "glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/" in entorno
+    assert "glpi.localhost}_LIMIT_REQ_RATE_1=60r/s" in entorno  # ADR-036: el central pide 26
+    assert "glpi.localhost}_LIMIT_REQ_URL_2=^/front/locale" in entorno
+    assert "glpi.localhost}_LIMIT_REQ_RATE_2=10r/s" in entorno
+    assert "LIMIT_REQ_RATE=2r/s" in entorno
+
+
+def test_RF_41_contrato_glpi_no_corre_contra_un_glpi_con_tickets_de_la_aplicacion() -> None:
+    """La suite purga todo ticket SOL- de GLPI: corrida contra el stack en uso borro los 88 tickets
+    de la aplicacion (31/10/2026). La sincronizacion siguio en «ok», sin leer ninguno."""
+    guion = (RAIZ / "infra/scripts/contrato-glpi.sh").read_text(encoding="utf-8")
+    assert "select count(*) from app.ticket where id_externo is not null" in guion
+    guarda = guion.index("id_externo is not null")
+    assert guarda < guion.index("docker run"), "la guarda va antes de tocar GLPI"
+    assert "exit 3" in guion

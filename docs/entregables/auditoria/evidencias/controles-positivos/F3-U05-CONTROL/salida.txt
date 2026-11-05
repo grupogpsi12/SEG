@@ -1,0 +1,6 @@
+[U05-sin-bloqueo] sin defecto:
+    1 passed, 269 deselected in 1.90s
+[U05-sin-bloqueo] con el defecto sembrado en src/jml/adaptadores/salida/persistencia/repositorios.py:
+    1 failed, 269 deselected in 2.01s
+[U05-sin-bloqueo] archivo restaurado: True
+[U05-sin-bloqueo] DETECTADO: verde sin defecto, rojo con él

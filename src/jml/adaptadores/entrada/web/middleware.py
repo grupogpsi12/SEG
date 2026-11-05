@@ -2,6 +2,7 @@
 
 import contextlib
 import ipaddress
+import logging
 import re
 import uuid
 from collections.abc import Callable
@@ -64,6 +65,39 @@ def politica_de_contenido(siguiente: Vista) -> Vista:
     def middleware(request: HttpRequest) -> HttpResponse:
         respuesta = siguiente(request)
         respuesta["Content-Security-Policy"] = settings.POLITICA_DE_CONTENIDO
+        return respuesta
+
+    return middleware
+
+
+seguridad = logging.getLogger("jml.seguridad")
+
+
+def registrar_denegacion(request: HttpRequest) -> None:
+    """RF-35, A09: cada acceso denegado por rol deja un evento con quien, donde y como.
+
+    Es un log estructurado, no una fila de la cadena de auditoria: un usuario que repitiera una
+    URL prohibida inflaria la cadena (que se escribe con un candado global) y el WAF ya limita el
+    ritmo, pero la cadena es para decisiones, no para ruido.
+    """
+    coincidencia = request.resolver_match
+    seguridad.warning(
+        "acceso.denegado",
+        extra={
+            "usuario": request.session.get("usuario_id"),
+            "ruta": coincidencia.url_name if coincidencia else None,
+            "metodo": request.method,
+        },
+    )
+
+
+def denegaciones(siguiente: Vista) -> Vista:
+    """Registra toda respuesta 403 (rol, CSRF); los avisos con redireccion, las vistas."""
+
+    def middleware(request: HttpRequest) -> HttpResponse:
+        respuesta = siguiente(request)
+        if respuesta.status_code == 403:
+            registrar_denegacion(request)
         return respuesta
 
     return middleware

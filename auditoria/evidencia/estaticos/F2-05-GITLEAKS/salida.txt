@@ -1,0 +1,12 @@
+historial=0
+arbol=1
+[90m9:28PM[0m [32mINF[0m [1m115 commits scanned.[0m
+[90m9:28PM[0m [32mINF[0m [1mscanned ~4450221 bytes (4.45 MB) in 742ms[0m
+[90m9:28PM[0m [32mINF[0m [1mno leaks found[0m
+[90m9:28PM[0m [33mWRN[0m [1mskipping file: too large max_size=5MB, size=20MB[0m [36mpath=[0m".venv\\Lib\\site-packages\\6ec57f84c680d3a3778b__mypyc.cp312-win_amd64.pyd"
+[90m9:28PM[0m [33mWRN[0m [1mskipping file: too large max_size=5MB, size=93MB[0m [36mpath=[0m".venv\\Lib\\site-packages\\playwright\\driver\\node.exe"
+[90m9:28PM[0m [33mWRN[0m [1mskipping file: too large max_size=5MB, size=5MB[0m [36mpath=[0m".venv\\Lib\\site-packages\\psycopg_binary\\_psycopg.c"
+[90m9:28PM[0m [33mWRN[0m [1mskipping file: too large max_size=5MB, size=5MB[0m [36mpath=[0m".venv\\Lib\\site-packages\\psycopg_binary.libs\\libcrypto-3-x64-be130c995d77647726840da339a25e7c.dll"
+[90m9:28PM[0m [33mWRN[0m [1mskipping file: too large max_size=5MB, size=26MB[0m [36mpath=[0m".venv\\Scripts\\ruff.exe"
+[90m9:28PM[0m [32mINF[0m [1mscanned ~103408933 bytes (103.41 MB) in 8.48s[0m
+[90m9:28PM[0m [33mWRN[0m [1mleaks found: 5[0m

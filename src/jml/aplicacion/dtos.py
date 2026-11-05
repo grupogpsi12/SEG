@@ -97,6 +97,15 @@ class ContratoPorVencer:
 
 
 @dataclass(frozen=True, slots=True)
+class AvanceDeSolicitud:
+    """RF-11: tickets de cierre resueltos segun la ultima sincronizacion (no cuenta posteriores)."""
+
+    resueltos: int
+    total: int
+    actualizada_en: datetime | None
+
+
+@dataclass(frozen=True, slots=True)
 class FilaDeSolicitud:
     """Una fila de las listas de las vistas (ADR-025). Sin campos restringidos (RD-05)."""
 
@@ -109,6 +118,7 @@ class FilaDeSolicitud:
     colaborador_nombre: str
     para_revision: bool
     cancelable: bool  # el solicitante puede cancelarla: sigue pendiente (RF-11)
+    avance: AvanceDeSolicitud | None = None  # solo en Mis solicitudes y en el detalle
 
 
 @dataclass(frozen=True, slots=True)
@@ -279,6 +289,44 @@ class ResumenDeTicket:
     cierre_incompleto: bool
 
 
+# --- lectura: consulta de tickets (RF-41) ---------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class FiltroDeTickets:
+    cola: Cola | None = None
+    estado: EstadoDeTicket | None = None
+    solicitud: str | None = None
+    pagina: int = 1
+    tamano: int = 20
+
+    def __post_init__(self) -> None:
+        if self.pagina < 1:
+            raise DatoInvalido("pagina", "empieza en 1")
+        if not 1 <= self.tamano <= TAMANO_MAXIMO_DE_PAGINA:
+            raise DatoInvalido("tamano", f"entre 1 y {TAMANO_MAXIMO_DE_PAGINA}")
+
+
+@dataclass(frozen=True, slots=True)
+class FilaDeTicket:
+    ticket: ResumenDeTicket
+    prioridad: Prioridad
+    vence_en: datetime
+    colaborador_id: ColaboradorId
+    colaborador_nombre: str
+    solicitante_id: UsuarioId
+    solicitud_visible: bool = False  # la fija el caso de uso, segun quien consulta
+
+
+@dataclass(frozen=True, slots=True)
+class PaginaDeTickets:
+    filas: tuple[FilaDeTicket, ...]
+    total: int
+    pagina: int
+    tamano: int
+    cola_resaltada: Cola | None = None
+
+
 @dataclass(frozen=True, slots=True)
 class FichaDeColaborador:
     colaborador_id: ColaboradorId
@@ -301,6 +349,15 @@ class FichaDeColaborador:
 
 
 @dataclass(frozen=True, slots=True)
+class EstadoDeTicketDeSolicitud:
+    cola: Cola
+    accion: AccionDeTicket
+    estado: EstadoDeTicket | None
+    resuelto: bool
+    bloquea_el_cierre: bool
+
+
+@dataclass(frozen=True, slots=True)
 class DetalleDeSolicitud:
     """Detalle para la vista (2.8). `restringido` solo viene lleno para RRHH (RD-05, CA-10)."""
 
@@ -308,6 +365,7 @@ class DetalleDeSolicitud:
     subtipo: Subtipo | None
     datos: tuple[tuple[str, str], ...]  # (campo, valor) de los datos del evento
     restringido: str | None
+    tickets: tuple[EstadoDeTicketDeSolicitud, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -338,3 +396,5 @@ class FilaDeUsuario:
     colaborador_nombre: str | None
     roles: tuple[Rol, ...]
     activo: bool
+    colaborador_id: ColaboradorId | None = None
+    correo: str | None = None  # None si el servicio de cuentas no responde (ADR-035)

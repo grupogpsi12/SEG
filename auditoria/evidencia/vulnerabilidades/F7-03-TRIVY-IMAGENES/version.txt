@@ -1,0 +1,1 @@
+Trivy 0.67.2 + CISA KEV + EPSS (api.first.org) del 25/10/2026

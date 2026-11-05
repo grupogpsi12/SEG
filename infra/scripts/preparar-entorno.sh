@@ -32,6 +32,7 @@ asegurar() {  # nombre longitud
 
 asegurar django_secret_key 50
 asegurar bw_api_token 32
+asegurar admin_servicio_token 36  # ADR-035: web -> admin-usuarios
 asegurar glpi_db_password 32
 asegurar grafana_admin_password 24  # infra/compose.reporteria.yaml (RS-20)
 
@@ -50,6 +51,10 @@ fi
 # una variable de entorno, si se define, tiene prioridad.
 [ -n "${JML_SUPABASE_URL:-}" ] || JML_SUPABASE_URL="$(cat "$SECRETOS/supabase_url" 2> /dev/null || true)"
 [ -n "${JML_SUPABASE_CLAVE_PUBLICA:-}" ]   || JML_SUPABASE_CLAVE_PUBLICA="$(cat "$SECRETOS/supabase_clave_publica" 2> /dev/null || true)"
+# Sin `secretos.sh descifrar`, se conservan los valores del .env anterior.
+_del_env() { sed -n "s/^$1=//p" "$ENV_SALIDA" 2> /dev/null | head -n 1; }
+[ -n "${JML_SUPABASE_URL:-}" ] || JML_SUPABASE_URL="$(_del_env JML_SUPABASE_URL)"
+[ -n "${JML_SUPABASE_CLAVE_PUBLICA:-}" ] || JML_SUPABASE_CLAVE_PUBLICA="$(_del_env JML_SUPABASE_CLAVE_PUBLICA)"
 
 for requerido in db_password supabase_ca_crt; do
   if [ ! -e "$SECRETOS/$requerido" ]; then
@@ -78,6 +83,7 @@ done
   echo "JML_DB_USUARIO_DUENIO=${JML_DB_USUARIO_DUENIO:-app_owner.${JML_DB_USUARIO#*.}}"
   echo "JML_SUPABASE_URL=${JML_SUPABASE_URL:?defina JML_SUPABASE_URL o corra secretos.sh descifrar}"
   echo "JML_SUPABASE_CLAVE_PUBLICA=${JML_SUPABASE_CLAVE_PUBLICA:?defina JML_SUPABASE_CLAVE_PUBLICA o corra secretos.sh descifrar}"
-} > "$ENV_SALIDA"
-chmod 600 "$ENV_SALIDA"
+} > "$ENV_SALIDA.tmp"  # si falta un valor, el .env anterior queda intacto (04/11/2026)
+chmod 600 "$ENV_SALIDA.tmp"
+mv "$ENV_SALIDA.tmp" "$ENV_SALIDA"
 echo "escrito: $ENV_SALIDA"

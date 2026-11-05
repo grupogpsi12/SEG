@@ -1,0 +1,4 @@
+10.20.40.1	GET	/		
+10.20.40.2		/	301	https://app.localhost/
+10.20.40.1	GET	/		
+10.20.40.2		/	301	https://glpi.localhost/

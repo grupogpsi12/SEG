@@ -2,19 +2,31 @@
 {% block titulo %}Usuarios y roles{% endblock %}
 {% block contenido %}
 <h1>Usuarios y roles</h1>
-<p class="aviso">Las cuentas se crean y desactivan con el comando <code>admin_usuarios</code> (RF-06). Aquí solo se cambian los roles; las combinaciones incompatibles se rechazan (RF-05) y cada cambio queda en la auditoría.</p>
+<p><a class="boton" href="{% url 'admin_usuario_crear' %}">Crear usuario</a> <a href="{% url 'admin_usuario_vincular' %}">Vincular una cuenta existente</a></p>
+<p class="aviso">Las combinaciones de roles incompatibles se rechazan (RF-05) y cada cambio queda en la auditoría. El Supabase es compartido: desactivar o eliminar una cuenta afecta a todo el equipo.</p>
+{% if sin_servicio %}<p class="mensaje error" role="status">El servicio de cuentas no está disponible: no se ven los correos y no se pueden crear, desactivar ni eliminar cuentas.</p>{% endif %}
 <table>
-  <thead><tr><th>Usuario</th><th>Colaborador</th><th>Estado</th><th>Roles</th></tr></thead>
+  <thead><tr><th>Cuenta</th><th>Colaborador</th><th>Estado</th><th>Roles</th><th>Acciones</th></tr></thead>
   <tbody>
   {% for f in filas %}
     <tr>
-      <td class="aviso">{{ f.usuario_id }}</td>
+      <td>{{ f.correo|default:"—" }}<br><span class="aviso">{{ f.usuario_id }}</span></td>
+      {% if f.usuario_id == perfil.usuario_id %}
       <td>{{ f.colaborador_nombre|default:"—" }}</td>
-      <td>{{ f.activo|yesno:"activo,inactivo" }}</td>
+      <td><span class="pildora ok">Activo</span></td>
+      <td>{% for r in f.roles %}{{ r.value }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+      <td class="aviso">Es su cuenta (usted)</td>
+      {% else %}
       <td>
-        {% if f.usuario_id == perfil.usuario_id %}
-          {% for r in f.roles %}{{ r.value }}{% if not forloop.last %}, {% endif %}{% endfor %} <span class="aviso">(usted)</span>
-        {% else %}
+        <form method="post" action="{% url 'admin_usuario_colaborador' f.usuario_id %}">
+          {% csrf_token %}
+          <label for="c-{{ forloop.counter }}" class="aviso">{{ f.colaborador_nombre|default:"Sin colaborador" }}</label>
+          <input type="text" id="c-{{ forloop.counter }}" name="colaborador" maxlength="64" value="{{ f.colaborador_id|default:'' }}">
+          <button class="secundario" type="submit">Guardar</button>
+        </form>
+      </td>
+      <td><span class="pildora {% if f.activo %}ok{% else %}neutro{% endif %}">{{ f.activo|yesno:"Activo,Inactivo" }}</span></td>
+      <td>
         <form method="post" action="{% url 'admin_roles' f.usuario_id %}" class="roles">
           {% csrf_token %}
           {% for r in todos %}
@@ -22,11 +34,27 @@
           {% endfor %}
           <button class="secundario" type="submit">Guardar roles</button>
         </form>
+      </td>
+      <td>
+        {% if f.activo %}
+        <form method="post" action="{% url 'admin_usuario_acceso' f.usuario_id 'desactivar' %}">
+          {% csrf_token %}<button class="secundario" type="submit">Desactivar</button>
+        </form>
+        {% else %}
+        <form method="post" action="{% url 'admin_usuario_acceso' f.usuario_id 'reactivar' %}">
+          {% csrf_token %}<button class="secundario" type="submit">Reactivar</button>
+        </form>
+        <form method="post" action="{% url 'admin_usuario_acceso' f.usuario_id 'eliminar' %}">
+          {% csrf_token %}
+          <label class="en-linea"><input type="checkbox" name="confirmar" value="si" required> Confirmo</label>
+          <button class="secundario" type="submit">Eliminar</button>
+        </form>
         {% endif %}
       </td>
+      {% endif %}
     </tr>
   {% empty %}
-    <tr><td colspan="4">No hay usuarios.</td></tr>
+    <tr><td colspan="5">No hay usuarios.</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -1,0 +1,1 @@
+export PATH="$PWD/.venv/Scripts:$PATH"; python -m pytest -q -p no:cacheprovider --cov=jml --cov-branch --cov-report= tests/dominio tests/aplicacion tests/contratos tests/escenarios tests/adaptadores tests/seguridad | tail -2; python auditoria/scripts/cobertura-por-capa.py

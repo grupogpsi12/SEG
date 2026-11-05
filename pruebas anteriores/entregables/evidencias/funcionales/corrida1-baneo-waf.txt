@@ -1,0 +1,53 @@
+PASA  CU-01 200 GET /ingreso [anonimo] Pagina de ingreso por HTTPS
+PASA  CU-01 302 GET /bandeja [anonimo] Ruta protegida sin sesion redirige al ingreso
+FALLA CU-01 403 POST /ingreso [anonimo] Formulario de ingreso invalido: error del formulario, sin llamar a Supabase
+PASA  CU-01 403 POST /ingreso [anonimo] POST sin token CSRF es rechazado
+FALLA CU-02 403 POST /solicitudes/nueva/VAC [sol] Solicitante registra vacaciones con fecha futura
+FALLA CU-03 403 POST /solicitudes/nueva/VAC [sol] Segunda VAC abierta del mismo colaborador es rechazada con el id existente
+FALLA CU-04 403 POST /solicitudes/nueva/CDP [jefe] Jefe registra CDP de su subordinado
+PASA  CU-05 200 GET /bandeja [rrhh] Bandeja de RRHH lista las pendientes
+FALLA CU-05 404 POST /solicitudes//aprobar [rrhh] RRHH aprueba la VAC
+FALLA CU-05 404 POST /solicitudes//rechazar [rrhh] RRHH rechaza el CDP con justificacion
+FALLA CU-05 404 POST /solicitudes//aprobar [sol] Solicitante no puede aprobar (control de rol)
+FALLA CU-06 403 POST /solicitudes/nueva/ING [rrhh] Ingreso con archivo no PDF renombrado .pdf es rechazado
+FALLA CU-06 403 POST /solicitudes/nueva/ING [rrhh] RRHH emite el ingreso con soporte PDF valido
+FALLA CU-07 403 POST /solicitudes/nueva/RET [rrhh] RRHH emite RET de un contratista con motivo restringido
+FALLA CU-07 404 GET /solicitudes/ [rrhh] RRHH ve el motivo restringido en el detalle
+FALLA CU-08 403 POST /solicitudes/nueva/EMG [rrhh] RRHH emite EMG (fuga detectada)
+FALLA CU-09 403 GET /dashboard [tec_ad] Dashboard del tecnico
+FALLA CU-09 403 GET /cuentas?departamento=Finanzas [tec_ad] Busqueda de cuentas con filtro
+FALLA CU-09 403 GET /colaboradores/col-014 [tec_ad] Ficha del colaborador retirado sin el motivo
+FALLA CU-09 403 GET /cuentas.csv [tec_inv] Exportacion CSV auditada
+PASA  CU-09 403 GET /solicitudes/ [tec_ad] Tecnico no ve el detalle restringido del RET
+PASA  CU-10 403 GET /bandeja [sol] sol no accede a /bandeja
+PASA  CU-10 403 GET /dashboard [sol] sol no accede a /dashboard
+PASA  CU-10 403 GET /auditoria [tec_ad] tec_ad no accede a /auditoria
+PASA  CU-10 403 GET /administracion/perfiles [rrhh] rrhh no accede a /administracion/perfiles
+PASA  CU-10 403 GET /bandeja [auditor] auditor no accede a /bandeja
+PASA  CU-10 403 GET /dashboard [admin] admin no accede a /dashboard
+FALLA CU-11 403 GET /auditoria [auditor] Auditor consulta la auditoria
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\Demo GLPI V2\jml\docs\entregables\scripts\casos_de_uso.py", line 235, in <module>
+    pasos = ejecutar(sesiones)
+            ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\Demo GLPI V2\jml\docs\entregables\scripts\casos_de_uso.py", line 214, in ejecutar
+    tok = t.csrf("auditor", "/auditoria")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\Demo GLPI V2\jml\docs\entregables\scripts\casos_de_uso.py", line 62, in csrf
+    raise RuntimeError(f"sin token CSRF en {ruta} ({r.status_code})")
+RuntimeError: sin token CSRF en /auditoria (403)
+[2026-10-24 10:51:26 -0500] [CLI] [305] [ℹ️ ] - Getting variables from database
+[2026-10-24 10:51:26 -0500] [CLI] [305] [ℹ️ ] - ✅ Database connection established
+[2026-10-24 10:51:26 -0500] [API.CALLER] [305] [ℹ️ ] - Successfully sent API request to http://bunkerweb:5000/bans
+[2026-10-24 10:51:26 -0500] [CLI] [305] [ℹ️ ] - CLI command status : ✔️ (success)
+
+ BunkerWeb Ban List 
+
+▓▓▓ bunkerweb Bans  ▓▓▓
+───────────────────────────────────────────────────────────────────────────
+🖧 Service-Specific Bans:
+  🔒 10.20.40.1 [local] - Service: app.localhost
+     ⏱ Banned on 2026-10-24 at 10:50:54 for 59 minutes and 27 seconds
+     ℹ️ Reason: bad behavior
+───────────────────────────────────────────────────────────────────────────
+

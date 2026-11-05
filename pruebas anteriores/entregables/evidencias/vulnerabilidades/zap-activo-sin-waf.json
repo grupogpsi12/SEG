@@ -1,0 +1,461 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Sat, 24 Oct 2026 19:07:36",
+	"created": "2026-10-24T19:07:36.806055140Z",
+	"insights":[
+		{
+			"level": "Medium",
+			"reason": "Exceeded High",
+			"site": "http://app.localhost:8000",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "50"
+		},
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.error",
+			"description": "ZAP errors logged - see the zap.log file for details",
+			"statistic": "18"
+		},
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "26"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "",
+			"key": "insight.network.failure",
+			"description": "Percentage of network failures",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "50"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.code.3xx",
+			"description": "Percentage of responses with status code 3xx",
+			"statistic": "8"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.endpoint.ctype.text/css",
+			"description": "Percentage of endpoints with content type text/css",
+			"statistic": "4"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.endpoint.ctype.text/html",
+			"description": "Percentage of endpoints with content type text/html",
+			"statistic": "95"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "69"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "30"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "23"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://app.localhost:8000",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "3"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://app.localhost:8000",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://app.localhost:8000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "1"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "https://app.localhost:8000",
+			"@host": "app.localhost",
+			"@port": "8000",
+			"@ssl": "true",
+			"alerts": [ 
+			]
+		},
+		{
+			"@name": "http://app.localhost:8000",
+			"@host": "app.localhost",
+			"@port": "8000",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "10098",
+					"alertRef": "10098",
+					"alert": "Cross-Domain Misconfiguration",
+					"name": "Cross-Domain Misconfiguration",
+					"riskcode": "2",
+					"confidence": "2",
+					"riskdesc": "Medium (Medium)",
+					"desc": "<p>Web browser data loading may be possible, due to a Cross Origin Resource Sharing (CORS) misconfiguration on the web server.</p>",
+					"instances":[ 
+						{
+							"id": "4",
+							"uri": "http://app.localhost:8000/static/web/estilo.39f3d64597e4.css",
+							"nodeName": "http:\/\/app.localhost:8000\/static\/web\/estilo.39f3d64597e4.css",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "Access-Control-Allow-Origin: *",
+							"otherinfo": "The CORS misconfiguration on the web server permits cross-domain read requests from arbitrary third party domains, using unauthenticated APIs on this domain. Web browser implementations do not permit arbitrary third parties to read the response from authenticated APIs, however. This reduces the risk somewhat. This misconfiguration could be used by an attacker to access data that is available in an unauthenticated manner, but which uses some other form of security, such as IP address white-listing."
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>Ensure that sensitive data is not available in an unauthenticated manner (using IP address white-listing, for instance).</p><p>Configure the \"Access-Control-Allow-Origin\" HTTP header to a more restrictive set of domains, or remove all CORS headers entirely, to allow the web browser to enforce the Same Origin Policy (SOP) in a more restrictive manner.</p>",
+					"otherinfo": "<p>The CORS misconfiguration on the web server permits cross-domain read requests from arbitrary third party domains, using unauthenticated APIs on this domain. Web browser implementations do not permit arbitrary third parties to read the response from authenticated APIs, however. This reduces the risk somewhat. This misconfiguration could be used by an attacker to access data that is available in an unauthenticated manner, but which uses some other form of security, such as IP address white-listing.</p>",
+					"reference": "<p>https://vulncat.fortify.com/en/detail?category=HTML5&subcategory=Overly%20Permissive%20CORS%20Policy</p>",
+					"cweid": "264",
+					"wascid": "14",
+					"sourceid": "18"
+				},
+				{
+					"pluginid": "10106",
+					"alertRef": "10106",
+					"alert": "HTTP Only Site",
+					"name": "HTTP Only Site",
+					"riskcode": "2",
+					"confidence": "2",
+					"riskdesc": "Medium (Medium)",
+					"desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+					"instances":[ 
+						{
+							"id": "26",
+							"uri": "http://app.localhost:8000/",
+							"nodeName": "https:\/\/app.localhost:8000\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "Failed to connect.\nZAP attempted to connect via: https://app.localhost:8000/"
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>Configure your web or application server to use SSL (https).</p>",
+					"otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://app.localhost:8000/</p>",
+					"reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+					"cweid": "311",
+					"wascid": "4",
+					"sourceid": "15086"
+				},
+				{
+					"pluginid": "10021",
+					"alertRef": "10021",
+					"alert": "X-Content-Type-Options Header Missing",
+					"name": "X-Content-Type-Options Header Missing",
+					"riskcode": "1",
+					"confidence": "2",
+					"riskdesc": "Low (Medium)",
+					"desc": "<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</p>",
+					"instances":[ 
+						{
+							"id": "2",
+							"uri": "http://app.localhost:8000/solicitudes",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						},
+						{
+							"id": "17",
+							"uri": "http://app.localhost:8000/solicitudes/SOL-2026-000004",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/SOL-2026-000004",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						},
+						{
+							"id": "18",
+							"uri": "http://app.localhost:8000/solicitudes/nueva",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/nueva",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						},
+						{
+							"id": "15",
+							"uri": "http://app.localhost:8000/solicitudes/nueva/EMG",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/nueva\/EMG",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						},
+						{
+							"id": "8",
+							"uri": "http://app.localhost:8000/static/web/estilo.39f3d64597e4.css",
+							"nodeName": "http:\/\/app.localhost:8000\/static\/web\/estilo.39f3d64597e4.css",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.</p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.</p>",
+					"otherinfo": "<p>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.</p><p>At \"High\" threshold this scan rule will not alert on client or server error responses.</p>",
+					"reference": "<p>https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/gg622941(v=vs.85)</p><p>https://owasp.org/www-community/Security_Headers</p>",
+					"cweid": "693",
+					"wascid": "15",
+					"sourceid": "3"
+				},
+				{
+					"pluginid": "10112",
+					"alertRef": "10112",
+					"alert": "Session Management Response Identified",
+					"name": "Session Management Response Identified",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The given response has been identified as containing a session management token. The 'Other Info' field contains a set of header tokens that can be used in the Header Based Session Management Method. If the request is in a context which has a Session Management Method set to \"Auto-Detect\" then this rule will change the session management to use the tokens identified.</p>",
+					"instances":[ 
+						{
+							"id": "0",
+							"uri": "http://app.localhost:8000/",
+							"nodeName": "http:\/\/app.localhost:8000\/",
+							"method": "GET",
+							"param": "sessionid",
+							"attack": "",
+							"evidence": "sessionid",
+							"otherinfo": "cookie:sessionid"
+						},
+						{
+							"id": "16",
+							"uri": "http://app.localhost:8000/bandeja",
+							"nodeName": "http:\/\/app.localhost:8000\/bandeja",
+							"method": "GET",
+							"param": "csrftoken",
+							"attack": "",
+							"evidence": "csrftoken",
+							"otherinfo": "cookie:csrftoken\ncookie:sessionid"
+						},
+						{
+							"id": "5",
+							"uri": "http://app.localhost:8000/robots.txt",
+							"nodeName": "http:\/\/app.localhost:8000\/robots.txt",
+							"method": "GET",
+							"param": "sessionid",
+							"attack": "",
+							"evidence": "sessionid",
+							"otherinfo": "cookie:sessionid"
+						},
+						{
+							"id": "3",
+							"uri": "http://app.localhost:8000/sitemap.xml",
+							"nodeName": "http:\/\/app.localhost:8000\/sitemap.xml",
+							"method": "GET",
+							"param": "sessionid",
+							"attack": "",
+							"evidence": "sessionid",
+							"otherinfo": "cookie:sessionid"
+						},
+						{
+							"id": "1",
+							"uri": "http://app.localhost:8000/solicitudes",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes",
+							"method": "GET",
+							"param": "csrftoken",
+							"attack": "",
+							"evidence": "csrftoken",
+							"otherinfo": "cookie:csrftoken\ncookie:sessionid"
+						},
+						{
+							"id": "12",
+							"uri": "http://app.localhost:8000/solicitudes/SOL-2026-000003",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/SOL-2026-000003",
+							"method": "GET",
+							"param": "csrftoken",
+							"attack": "",
+							"evidence": "csrftoken",
+							"otherinfo": "cookie:csrftoken\ncookie:sessionid"
+						},
+						{
+							"id": "13",
+							"uri": "http://app.localhost:8000/solicitudes/SOL-2026-000004",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/SOL-2026-000004",
+							"method": "GET",
+							"param": "csrftoken",
+							"attack": "",
+							"evidence": "csrftoken",
+							"otherinfo": "cookie:csrftoken\ncookie:sessionid"
+						},
+						{
+							"id": "14",
+							"uri": "http://app.localhost:8000/solicitudes/nueva",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/nueva",
+							"method": "GET",
+							"param": "csrftoken",
+							"attack": "",
+							"evidence": "csrftoken",
+							"otherinfo": "cookie:csrftoken\ncookie:sessionid"
+						},
+						{
+							"id": "10",
+							"uri": "http://app.localhost:8000/solicitudes/nueva/EMG",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/nueva\/EMG",
+							"method": "GET",
+							"param": "csrftoken",
+							"attack": "",
+							"evidence": "csrftoken",
+							"otherinfo": "cookie:csrftoken\ncookie:sessionid"
+						},
+						{
+							"id": "9",
+							"uri": "http://app.localhost:8000/salir",
+							"nodeName": "http:\/\/app.localhost:8000\/salir ()(csrfmiddlewaretoken)",
+							"method": "POST",
+							"param": "sessionid",
+							"attack": "",
+							"evidence": "sessionid",
+							"otherinfo": "cookie:sessionid"
+						}
+					],
+					"count": "10",
+					"systemic": false,
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>cookie:sessionid</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/session-mgmt-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "1"
+				},
+				{
+					"pluginid": "10104",
+					"alertRef": "10104",
+					"alert": "User Agent Fuzzer",
+					"name": "User Agent Fuzzer",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>Check for differences in response based on fuzzed User Agent (eg. mobile sites, access as a Search Engine Crawler). Compares the response statuscode and the hashcode of the response body with the original response.</p>",
+					"instances":[ 
+						{
+							"id": "27",
+							"uri": "http://app.localhost:8000/",
+							"nodeName": "http:\/\/app.localhost:8000\/",
+							"method": "GET",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://app.localhost:8000/solicitudes",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes",
+							"method": "GET",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "29",
+							"uri": "http://app.localhost:8000/solicitudes/SOL-2026-000003",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/SOL-2026-000003",
+							"method": "GET",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://app.localhost:8000/solicitudes/SOL-2026-000004",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/SOL-2026-000004",
+							"method": "GET",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "30",
+							"uri": "http://app.localhost:8000/solicitudes/nueva",
+							"nodeName": "http:\/\/app.localhost:8000\/solicitudes\/nueva",
+							"method": "GET",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "<p>https://owasp.org/www-project-web-security-testing-guide/</p>",
+					"cweid": "0",
+					"wascid": "0",
+					"sourceid": "16230"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

@@ -209,3 +209,50 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
     - `MSYS_NO_PATHCONV` evita que se traduzcan las rutas de los contenedores, pero rompe las de `docker compose -f`. Usar rutas relativas para compose y `cygpath -w` para los montajes.
     - `python` es el Python del sistema: mutmut necesita el del entorno virtual delante en el `PATH`.
     - Las barras invertidas dentro de un heredoc de Python siguen fallando (lección 29): escribir el archivo entero con la herramienta de archivos.
+
+
+## Auditoría (24/10/2026)
+
+- **Una exención de límites se comprueba, no se supone.** Tras relajar BunkerWeb, 20 peticiones seguidas sin 429 son la prueba; el límite de *conexiones* por IP (`v1ips`, 10) sobrevive a la recarga cuando quedan conexiones colgadas de un escaneo anterior, y solo reiniciar el contenedor `bunkerweb` las libera. Los 429 cuentan como mal comportamiento y terminan en baneo.
+- **En Git Bash, un `$VAR` con espacios sin comillas puede borrar o crear donde no debe** (la ruta del proyecto tiene un espacio). Siempre entre comillas, y rutas de Windows (`pwd -W`) para Python nativo y Docker.
+- **`docker logs --since` con una hora ISO falló** por la zona horaria; se delimita la corrida con peticiones marca (`?marca=INICIO-x`) dentro del propio log.
+- **Si el planificador de BunkerWeb no aplica un cambio, mirar su log antes de reiniciar cosas.** El overlay del laboratorio fallaba en silencio: nginx rechaza `limit_conn` de 65536 o más (`config check failed`), el planificador vuelve a la última configuración buena y todo parece funcionar con los límites de siempre. `docker logs jml-bw-scheduler-1 | grep -i error` lo muestra.
+
+## Auditoría (25/10/2026)
+
+- **Una fila de un documento sin una prueba que la mida está sin verificar, aunque «parezca» cumplida.** RI-01 decía «WCAG 2.1 AA en contraste y navegación por teclado» y nadie había calculado un solo contraste: al hacerlo, el borde de los campos medía 1,39:1 y las barras del gráfico 2,07:1 (B-34). Un requisito se vuelve una prueba con un número.
+- **El Excel del Anexo A puede ir detrás del SRS.** Antes de comprobar el sistema contra una tabla, se compara la tabla con la fuente de la verdad (`anexo-a-tablas-vs-srs.py`): en este caso el Excel traía un rol Solicitante que promete crear y eliminar cuentas y mandar correos, cosa que ADR-019 prohíbe. Se informa como error del documento, no del sistema.
+- **La mutación se mide con TODOS los directorios de pruebas que ejercitan el código**, no solo con los de la capa. `aplicacion` dio 77,8 % con `tests/aplicacion` y `tests/escenarios`, y 83,2 % al sumar `adaptadores`, `contratos` y `bdd` (las pruebas de los casos de uso de auditoría estaban en `tests/adaptadores`). Con las pruebas nuevas, 92,7 %.
+- **Los supervivientes más numerosos eran la acción y el motivo de una denegación y las claves de la cadena de auditoría.** Las pruebas miraban el *tipo* de la excepción y la *acción* de la cadena, no su *contenido*. Cuando un contenido alimenta un registro (B-25, RF-35), se compara exacto. Los mutantes que cambian la caja de un método o de una cabecera con `httpx` o Django (insensibles a mayúsculas) son equivalentes: no se persiguen.
+- **El host puede tener sus propios servicios.** El `mysqld.exe` de Windows escucha en el 3306 y una sonda TCP «a localhost» creyó que MariaDB estaba publicada. La publicación de puertos se mide con `docker inspect` / `docker ps`, no con el host.
+- **`subprocess.run(text=True)` en Windows decodifica con cp1252** y devuelve `None` en `stdout` si la salida trae bytes que no mapea: dos escenarios del borde fallaron por eso, sin relación con el WAF. Se fija `encoding="utf-8", errors="replace"`.
+- **Un `xfail` es una decisión registrada, no un parche**: el guardián exige un `S-nn` en la línea, el supuesto debe nombrar la prueba y el contador de supuestos de `test_supuestos.py` se sube a mano (S-39 por B-26, S-40 por B-34).
+- **`| tail` esconde el código de salida.** Registré «verde» una evidencia con una prueba fallando; el registrador devolvió 0 porque el último comando era el `tail`. La evidencia de un verde se registra sin tuberías y se lee `codigo.txt`.
+- **Un POST con `curl` dentro de la red de Docker necesita el `Referer` del origen de confianza, sin el puerto interno.** `CSRF_TRUSTED_ORIGINS` es `https://app.localhost`; con `Referer: https://app.localhost:8443/` Django respondió 403 y la verificación de la cadena (CU-06) parecía fallar. Un 403 en una captura se explica antes de reportarlo.
+- **Un script que limpia su carpeta de trabajo al empezar borra la corrida anterior.** Repetir un solo caso de `captura-por-caso-de-uso.sh` eliminó los `.pcap` de los demás: para un informe se hace una corrida completa y coherente (`JML_CASOS` es solo para depurar).
+- **Un cambio de arquitectura se propaga por números, no solo por palabras.** ADR-031 (todo local) movió los conteos de ASVS (144 → 147 verificados), del Excel (10 «no verificables» → «no aplica») y CA-13 (de parcial a cumple, tras medirlo en la base local, donde además faltaba la migración 0006). Se recalcula con los scripts (`generar-asvs-l2.py`, `anexo-a-matriz.py`, `score-global.py`) y después se buscan las cifras viejas en todos los documentos.
+- **Retirar una pieza de despliegue exige revisar qué invariante sostenía.** `compose.azure.yaml` era lo único que montaba los soportes con `noexec` (invariante 12); al pasar a todo local, el volumen quedó `ext4 rw` sin que ninguna prueba lo notara (B-38). Ahora `test_infra.py` lo exige y se mide en `/proc/mounts`.
+- **`TZ=America/Bogota` no funciona en Git Bash de Windows** (no trae zoneinfo) y cae en UTC: los respaldos de la noche salían con la fecha del día siguiente. Colombia no tiene horario de verano: se usa `TZ='<-05>5'`.
+- **tcpdump pierde segmentos en ráfagas grandes** (un PDF de 1,5 MB): tshark marca «ACKed unseen segment» y no reconoce la petición HTTP. Se confirma por la conversación TCP y por los efectos, no se reporta como «no hubo petición».
+- **En el despliegue local todos los navegadores comparten una IP ante el WAF** (la puerta de enlace de Docker, 10.20.40.128): un baneo bloquea a todo el equipo, y una prueba que banea a propósito también saca de GLPI a quien lo está usando. Avisar antes de correr `verificar-w01.sh` o `pruebas.sh`.
+- **Un 500 detrás del WAF no siempre es de la aplicación.** GLPI registró 200 en `/front/locale.php`; la regla de salida 953100 del CRS cortó la respuesta ya enviada («header already sent»). Primero se compara el registro del WAF con el del servidor.
+- **Con `MSYS_NO_PATHCONV=1`, el curl de Windows no entiende `/dev/null` ni `/tmp/...`** (código 23): las rutas de salida se pasan con `cygpath -w`.
+- **Los paneles con muchas tarjetas piden todo en paralelo.** El límite de ritmo de BunkerWeb no tiene ráfaga: con 2 r/s pasan 2 y el resto recibe 429. Una ruta de la interfaz que dispara en paralelo necesita su propio límite (como `/static/` y `/ajax/`), y se prueba con peticiones en paralelo, no en serie (`verificar-w02.sh`).
+
+## Apariencia y consulta de tickets (31/10/2026)
+
+- **Un pedido de «CRUD» se contrasta con los invariantes antes de escribir código.** Crear cuentas desde la web exigía `service_role` en `web` (invariante 8, RS-15) y editar tickets chocaba con GLPI como fuente de la verdad (ADR-001). Lo que el equipo necesitaba de tickets era verlos: RF-41 es de solo lectura.
+- **Una prueba que limpia datos debe comprobar de quién son.** `contrato-glpi.sh` exigía `JML_GLPI_DE_PRUEBAS=si`, pero esa variable solo declara una intención: corrió contra el stack en uso y purgó los 88 tickets de la aplicación. Ahora mide si la aplicación tiene tickets y se niega (código 3).
+- **Un parche por lotes no debe suponer el final de línea.** Algunos archivos están con CRLF en la copia de trabajo de Windows: el reemplazo falló a mitad de camino y dejó capas aplicadas y otras no. Se normaliza a LF al leer, y se comprueba cada reemplazo.
+- **Las letras (a) a (h) del dashboard son trazabilidad, no decoración:** CA-15 las exige para relacionar la página con RF-30.
+
+## Auditoría funcional (04/11/2026)
+
+- **«No funciona» se reproduce al ritmo de una persona.** Los filtros pasaban con pausas y fallaban a menos de 0,7 s entre clics: el 429 del WAF, no el código. Se prueba con el navegador real y por el WAF, y también sin pausas.
+- **El historial del WAF dice lo que vio el usuario.** Loki mostró el panel central con 26 tarjetas en un segundo, cuando ADR-033 se había probado con 20. Una prueba de carga se dimensiona con lo medido, no con una suposición.
+- **Enlazar es prometer permiso.** Agregar un enlace a una página obliga a comprobar quién puede abrirla: dos columnas de Tickets daban 404 y 403.
+- **Una función nueva se mide con la carga.** El avance por fila pasó las 2800 pruebas e incumplió RNF-06 (1058 ms). Solo `carga.sh` lo mostró, y sale con código 0 aunque una página no cumpla: hay que leer `cumple`.
+- **Un filtro de salida esconde el dato que importa.** `lint-imports | tail -1` imprimió una línea vacía y un contrato roto llegó a un commit. Se filtra por `Contracts:` y se lee.
+- **Un script que prepara el entorno no se corre sin leerlo.** `preparar-entorno.sh` truncaba `infra/.env` antes de validar. Se escribe a un temporal y se renombra.
+- **Una prueba puede gastar el límite de la siguiente.** El control de `/ingreso` agotó los 5 intentos y `pruebas.sh` falló a continuación.
+

@@ -10,8 +10,10 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from jml.adaptadores.entrada.web import composicion
 from jml.adaptadores.entrada.web.mensajes import texto_del_error
+from jml.adaptadores.entrada.web.middleware import registrar_denegacion
 from jml.adaptadores.entrada.web.vistas import _contexto, con_sesion
 from jml.aplicacion.dtos import PerfilDeUsuario
+from jml.aplicacion.puertos import CuentaCreada, CuentaRechazada, IdentidadNoDisponible
 from jml.dominio.errores import ErrorDeDominio, NoAutorizado
 from jml.dominio.perfiles import PerfilDeAcceso, RecursoCompartido
 from jml.dominio.tipos import PerfilDeRecurso, Rol, TipoDeEquipo
@@ -154,8 +156,182 @@ def usuarios(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
     except NoAutorizado:
         raise PermissionDenied from None
     return render(
-        request, "web/admin_usuarios.html", _contexto(perfil, filas=filas, todos=list(Rol))
+        request,
+        "web/admin_usuarios.html",
+        _contexto(
+            perfil,
+            filas=filas,
+            todos=list(Rol),
+            sin_servicio=bool(filas) and all(f.correo is None for f in filas),
+        ),
     )
+
+
+_ID_DE_SUPABASE = r"^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$"
+_ROLES = [(r.value, r.value.replace("_", " ")) for r in Rol]
+_NO_DISPONIBLE = (
+    "El servicio de cuentas no está disponible. Revise el contenedor admin-usuarios y la clave de "
+    "Supabase, e intente de nuevo."
+)
+_RECHAZOS = {
+    "email_exists": "Ya existe una cuenta con ese correo.",
+    "user_not_found": "Esa cuenta ya no existe en Supabase.",
+    "correo_invalido": "El correo no es válido.",
+}
+
+
+def _texto_de_rechazo(e: CuentaRechazada) -> str:
+    return _RECHAZOS.get(e.codigo, "Supabase rechazó la operación.")
+
+
+class _FormularioDeAlta(forms.Form):
+    roles = forms.MultipleChoiceField(choices=_ROLES, widget=forms.CheckboxSelectMultiple)
+    colaborador = forms.CharField(
+        required=False,
+        max_length=64,
+        label="Colaborador (opcional)",
+        help_text="Su identificador, por ejemplo col-006. Obligatorio para quien hace solicitudes.",
+    )
+
+    def datos(self) -> tuple[frozenset[Rol], str | None]:
+        c = self.cleaned_data
+        return frozenset(Rol(r) for r in c["roles"]), c["colaborador"].strip() or None
+
+
+class FormularioDeCuenta(_FormularioDeAlta):
+    field_order = ("correo", "roles", "colaborador")
+    correo = forms.EmailField(max_length=254)
+
+
+class FormularioDeVinculo(_FormularioDeAlta):
+    field_order = ("usuario", "roles", "colaborador")
+    usuario = forms.RegexField(
+        _ID_DE_SUPABASE,
+        label="Id de Supabase",
+        error_messages={"invalid": "Debe ser el UUID de la cuenta, en minúsculas."},
+    )
+
+
+def _alta(request: HttpRequest, formulario: forms.Form, error: Exception) -> str:
+    if isinstance(error, NoAutorizado):
+        raise PermissionDenied from None
+    if isinstance(error, ErrorDeDominio):
+        return texto_del_error(error)
+    return (
+        _NO_DISPONIBLE
+        if isinstance(error, IdentidadNoDisponible)
+        else _texto_de_rechazo(
+            error  # type: ignore[arg-type]
+        )
+    )
+
+
+@require_http_methods(["GET", "POST"])
+@con_sesion
+def crear_usuario(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
+    if Rol.ADMINISTRADOR not in perfil.roles:
+        raise PermissionDenied
+    formulario = FormularioDeCuenta(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and formulario.is_valid():
+        roles, colaborador = formulario.datos()
+        try:
+            creada: CuentaCreada = composicion.casos().crear_usuario.ejecutar(
+                perfil.usuario_id, formulario.cleaned_data["correo"], roles, colaborador
+            )
+        except (ErrorDeDominio, IdentidadNoDisponible, CuentaRechazada) as e:
+            formulario.add_error(None, _alta(request, formulario, e))
+        else:
+            # Se responde aqui, sin redirigir: la contrasena no pasa por sesiones ni mensajes.
+            respuesta = render(
+                request, "web/admin_usuario_creado.html", _contexto(perfil, creada=creada)
+            )
+            respuesta["Cache-Control"] = "no-store"
+            return respuesta
+    return render(
+        request,
+        "web/admin_usuario_form.html",
+        _contexto(perfil, formulario=formulario, titulo="Crear usuario", boton="Crear cuenta"),
+    )
+
+
+@require_http_methods(["GET", "POST"])
+@con_sesion
+def vincular_usuario(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
+    if Rol.ADMINISTRADOR not in perfil.roles:
+        raise PermissionDenied
+    formulario = FormularioDeVinculo(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and formulario.is_valid():
+        roles, colaborador = formulario.datos()
+        try:
+            composicion.casos().vincular_usuario.ejecutar(
+                perfil.usuario_id, formulario.cleaned_data["usuario"], roles, colaborador
+            )
+        except ErrorDeDominio as e:
+            formulario.add_error(None, _alta(request, formulario, e))
+        else:
+            messages.success(request, "Cuenta vinculada.")
+            return redirect("admin_usuarios")
+    return render(
+        request,
+        "web/admin_usuario_form.html",
+        _contexto(
+            perfil,
+            formulario=formulario,
+            titulo="Vincular una cuenta existente",
+            boton="Vincular",
+        ),
+    )
+
+
+def _volver(perfil: PerfilDeUsuario) -> HttpResponse:
+    # lecciones n.30: quien no es Administrador no vuelve a una pagina que tambien le niega
+    return redirect("admin_usuarios" if Rol.ADMINISTRADOR in perfil.roles else "solicitudes")
+
+
+@require_POST
+@con_sesion
+def cambiar_colaborador(
+    request: HttpRequest, perfil: PerfilDeUsuario, usuario: str
+) -> HttpResponse:
+    colaborador = request.POST.get("colaborador", "").strip()[:64] or None
+    try:
+        composicion.casos().cambiar_colaborador.ejecutar(perfil.usuario_id, usuario, colaborador)
+    except ErrorDeDominio as e:
+        if isinstance(e, NoAutorizado):
+            registrar_denegacion(request)
+        messages.error(request, texto_del_error(e))
+    else:
+        messages.success(request, "Colaborador actualizado.")
+    return _volver(perfil)
+
+
+@require_POST
+@con_sesion
+def cambiar_acceso(
+    request: HttpRequest, perfil: PerfilDeUsuario, usuario: str, accion: str
+) -> HttpResponse:
+    casos = composicion.casos()
+    try:
+        if accion == "desactivar":
+            casos.desactivar_usuario.ejecutar(perfil.usuario_id, usuario)
+            messages.success(request, "Cuenta desactivada.")
+        elif accion == "reactivar":
+            casos.reactivar_usuario.ejecutar(perfil.usuario_id, usuario)
+            messages.success(request, "Cuenta reactivada.")
+        elif request.POST.get("confirmar") != "si":
+            messages.error(request, "Marque la casilla para confirmar la eliminación.")
+        else:
+            casos.eliminar_usuario.ejecutar(perfil.usuario_id, usuario)
+            messages.success(request, "Cuenta eliminada de Supabase. Su historial se conserva.")
+    except ErrorDeDominio as e:
+        if isinstance(e, NoAutorizado):
+            registrar_denegacion(request)
+        messages.error(request, texto_del_error(e))
+    except IdentidadNoDisponible:
+        messages.error(request, _NO_DISPONIBLE)
+    except CuentaRechazada as e:
+        messages.error(request, _texto_de_rechazo(e))
+    return _volver(perfil)
 
 
 @require_POST
@@ -169,8 +345,9 @@ def cambiar_roles(request: HttpRequest, perfil: PerfilDeUsuario, usuario: str) -
         try:
             composicion.casos().cambiar_roles.ejecutar(perfil.usuario_id, usuario, roles)
         except ErrorDeDominio as e:
+            if isinstance(e, NoAutorizado):
+                registrar_denegacion(request)
             messages.error(request, texto_del_error(e))
         else:
             messages.success(request, "Roles actualizados.")
-    # lecciones n.30: quien no es Administrador no vuelve a una pagina que tambien le niega
-    return redirect("admin_usuarios" if Rol.ADMINISTRADOR in perfil.roles else "solicitudes")
+    return _volver(perfil)

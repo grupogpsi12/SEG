@@ -1,0 +1,6 @@
+[U01-segundo-uso] sin defecto:
+    5 passed in 0.48s
+[U01-segundo-uso] con el defecto sembrado en src/jml/adaptadores/salida/identidad/supabase.py:
+    1 failed, 3 passed in 0.56s
+[U01-segundo-uso] archivo restaurado: True
+[U01-segundo-uso] DETECTADO: verde sin defecto, rojo con él

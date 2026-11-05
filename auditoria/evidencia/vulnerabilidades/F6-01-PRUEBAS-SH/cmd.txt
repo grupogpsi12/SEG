@@ -1,0 +1,1 @@
+U() { for ip in 10.20.40.128 127.0.0.1; do docker compose -f infra/compose.yaml exec -T bw-scheduler bwcli unban $ip >/dev/null 2>&1; done; }; U; echo '### app.localhost'; bash infra/waf/pruebas.sh app.localhost; echo codigo_app=$?; U; echo '### glpi.localhost'; bash infra/waf/pruebas.sh glpi.localhost; echo codigo_glpi=$?; U

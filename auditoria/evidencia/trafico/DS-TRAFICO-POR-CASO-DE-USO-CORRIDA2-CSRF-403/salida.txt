@@ -1,0 +1,128 @@
+filas antes (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+worker detenido: los POST del escaner no crean tickets en GLPI
+correlation_id de laboratorio: usar el prefijo lab-f6- en X-Request-ID
+limpieza previa de GLPI: tickets purgados (solicitud >= SOL-2026-000022): 0
+################ CU-01 a CU-04: recorrido por el navegador, una prueba por captura
+=============== CU-01-ingreso
+prueba de navegador: == Playwright por el WAF .                                                                        [100%] 1 passed, 3 deselected in 26.41s 
+--- resultado del caso CU-01-ingreso
+tramas: bunkerweb 507 · postgres 938 · glpi 5316
+TLS: saludos del cliente con TLS 1.3: 2 · suites elegidas:       2 0x1302;
+peticiones del WAF a la aplicacion (metodo ruta, sin parametros):
+         1 GET	/static/web/estilo.1ff5347696d8.css
+         1 GET	/solicitudes/nueva/ING
+         1 GET	/solicitudes
+respuestas de la aplicacion por codigo:       3 200;      1 302;
+centinela: tramo externo cifrado 0 · WAF a aplicacion 0 · base de datos 0 · hacia GLPI 0
+base de datos: BEGIN 28 · COMMIT 28 · contrasena en claro 0
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 3 · documentos subidos (POST /apirest.php/Document): 2
+escrituras del worker hacia GLPI (metodo ruta, agrupadas):
+         4 PUT	/apirest.php/Ticket/<id>
+         3 POST	/apirest.php/Ticket
+         2 POST	/apirest.php/Document_Item
+         1 POST	/apirest.php/User
+consultas del worker a GLPI (cantidad de peticiones GET): 43
+GLPI a MariaDB: tramas 4627 · con TLS 0
+=============== CU-02-vacaciones
+prueba de navegador: == Playwright por el WAF .                                                                        [100%] 1 passed, 3 deselected in 16.39s 
+--- resultado del caso CU-02-vacaciones
+tramas: bunkerweb 198 · postgres 1654 · glpi 11317
+TLS: saludos del cliente con TLS 1.3: 4 · suites elegidas:       4 0x1302;
+peticiones del WAF a la aplicacion (metodo ruta, sin parametros):
+         2 GET	/static/web/estilo.1ff5347696d8.css
+         2 GET	/bandeja
+         1 POST	/solicitudes/nueva/VAC
+         1 POST	/solicitudes/SOL-<id>/aprobar
+         1 GET	/solicitudes/nueva/VAC
+         1 GET	/solicitudes
+respuestas de la aplicacion por codigo:       6 200;      2 302;
+centinela: tramo externo cifrado 0 · WAF a aplicacion 0 · base de datos 8 · hacia GLPI 0
+base de datos: BEGIN 81 · COMMIT 81 · contrasena en claro 0
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 4 · documentos subidos (POST /apirest.php/Document): 0
+escrituras del worker hacia GLPI (metodo ruta, agrupadas):
+         4 PUT	/apirest.php/Ticket/<id>
+         4 POST	/apirest.php/Ticket
+         1 POST	/apirest.php/User
+consultas del worker a GLPI (cantidad de peticiones GET): 174
+GLPI a MariaDB: tramas 10696 · con TLS 0
+=============== CU-03-retiro
+prueba de navegador: == Playwright por el WAF .                                                                        [100%] 1 passed, 3 deselected in 16.22s 
+--- resultado del caso CU-03-retiro
+tramas: bunkerweb 96 · postgres 1822 · glpi 14169
+TLS: saludos del cliente con TLS 1.3: 2 · suites elegidas:       2 0x1302;
+peticiones del WAF a la aplicacion (metodo ruta, sin parametros):
+         1 POST	/solicitudes/nueva/RET
+         1 GET	/static/web/estilo.1ff5347696d8.css
+         1 GET	/solicitudes/nueva/RET
+         1 GET	/solicitudes
+respuestas de la aplicacion por codigo:       3 200;      1 302;
+centinela: tramo externo cifrado 0 · WAF a aplicacion 1 · base de datos 35 · hacia GLPI 0
+base de datos: BEGIN 78 · COMMIT 78 · contrasena en claro 0
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 6 · documentos subidos (POST /apirest.php/Document): 0
+escrituras del worker hacia GLPI (metodo ruta, agrupadas):
+         6 PUT	/apirest.php/Ticket/<id>
+         6 POST	/apirest.php/Ticket
+         1 POST	/apirest.php/User
+consultas del worker a GLPI (cantidad de peticiones GET): 209
+GLPI a MariaDB: tramas 13421 · con TLS 0
+=============== CU-04-emergencia
+prueba de navegador: == Playwright por el WAF .                                                                        [100%] 1 passed, 3 deselected in 16.22s 
+--- resultado del caso CU-04-emergencia
+tramas: bunkerweb 96 · postgres 1073 · glpi 5200
+TLS: saludos del cliente con TLS 1.3: 2 · suites elegidas:       2 0x1302;
+peticiones del WAF a la aplicacion (metodo ruta, sin parametros):
+         1 POST	/solicitudes/nueva/EMG
+         1 GET	/static/web/estilo.1ff5347696d8.css
+         1 GET	/solicitudes/nueva/EMG
+         1 GET	/solicitudes
+respuestas de la aplicacion por codigo:       3 200;      1 302;
+centinela: tramo externo cifrado 0 · WAF a aplicacion 1 · base de datos 27 · hacia GLPI 0
+base de datos: BEGIN 33 · COMMIT 33 · contrasena en claro 0
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 6 · documentos subidos (POST /apirest.php/Document): 0
+escrituras del worker hacia GLPI (metodo ruta, agrupadas):
+         6 POST	/apirest.php/Ticket
+         2 PUT	/apirest.php/Ticket/<id>
+         1 POST	/apirest.php/User
+consultas del worker a GLPI (cantidad de peticiones GET): 42
+GLPI a MariaDB: tramas 4854 · con TLS 0
+################ CU-05 y CU-06: lecturas con la sesion de un tecnico y de un auditor
+=============== CU-05-consulta-tecnica
+GET /dashboard -> 200
+GET /cuentas -> 200
+GET /colaboradores/<id> -> 200
+--- resultado del caso CU-05-consulta-tecnica
+tramas: bunkerweb 111 · postgres 215 · glpi 0
+TLS: saludos del cliente con TLS 1.3: 3 · suites elegidas:       3 0x1302;
+peticiones del WAF a la aplicacion (metodo ruta, sin parametros):
+         1 GET	/dashboard
+         1 GET	/cuentas
+         1 GET	/colaboradores/<id>
+respuestas de la aplicacion por codigo:       3 200;
+centinela: tramo externo cifrado 0 · WAF a aplicacion 0 · base de datos 0 · hacia GLPI 0
+base de datos: BEGIN 11 · COMMIT 11 · contrasena en claro 0
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 0 · documentos subidos (POST /apirest.php/Document): 0
+escrituras del worker hacia GLPI (metodo ruta, agrupadas):
+consultas del worker a GLPI (cantidad de peticiones GET): 0
+GLPI a MariaDB: tramas 0 · con TLS 0
+=============== CU-06-auditoria
+GET /auditoria -> 200
+POST /auditoria (verificar la cadena) -> 403
+la respuesta confirma que la cadena esta integra: 0
+--- resultado del caso CU-06-auditoria
+tramas: bunkerweb 122 · postgres 166 · glpi 0
+TLS: saludos del cliente con TLS 1.3: 3 · suites elegidas:       3 0x1302;
+peticiones del WAF a la aplicacion (metodo ruta, sin parametros):
+         2 GET	/auditoria
+         1 POST	/auditoria
+respuestas de la aplicacion por codigo:       2 200;      1 403;
+centinela: tramo externo cifrado 0 · WAF a aplicacion 0 · base de datos 0 · hacia GLPI 0
+base de datos: BEGIN 10 · COMMIT 10 · contrasena en claro 0
+tickets creados por el worker en GLPI (POST /apirest.php/Ticket): 0 · documentos subidos (POST /apirest.php/Document): 0
+escrituras del worker hacia GLPI (metodo ruta, agrupadas):
+consultas del worker a GLPI (cantidad de peticiones GET): 0
+GLPI a MariaDB: tramas 0 · con TLS 0
+################ restauracion
+filas despues (auditoria/solicitud/ticket/colaborador): 414/21/88/75
+web: healthy · worker: running
+limpieza final de GLPI: tickets purgados (solicitud >= SOL-2026-000022): 20
+FIN DE LA CAPTURA POR CASO DE USO

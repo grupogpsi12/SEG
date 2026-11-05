@@ -1,0 +1,1 @@
+.venv/Scripts/python.exe -m ruff check . ; echo ruff=$?; .venv/Scripts/python.exe -m ruff format --check . ; echo format=$?; .venv/Scripts/python.exe -m mypy src; echo mypy=$?; .venv/Scripts/lint-imports; echo imports=$?

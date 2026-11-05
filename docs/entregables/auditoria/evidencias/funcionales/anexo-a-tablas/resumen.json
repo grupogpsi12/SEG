@@ -1,0 +1,72 @@
+{
+ "filas": 157,
+ "resultados": {
+  "CUMPLE": 139,
+  "NO APLICA (ADR-031)": 10,
+  "PARCIAL": 6,
+  "NO VERIFICABLE EN LOCAL": 2
+ },
+ "por_tabla": {
+  "I": {
+   "CUMPLE": 8
+  },
+  "II": {
+   "CUMPLE": 26,
+   "NO APLICA (ADR-031)": 1,
+   "PARCIAL": 1
+  },
+  "III": {
+   "CUMPLE": 11,
+   "NO APLICA (ADR-031)": 7,
+   "NO VERIFICABLE EN LOCAL": 2
+  },
+  "IV": {
+   "PARCIAL": 2,
+   "CUMPLE": 6
+  },
+  "V": {
+   "CUMPLE": 6
+  },
+  "VI": {
+   "CUMPLE": 7
+  },
+  "VII": {
+   "CUMPLE": 3
+  },
+  "VIII": {
+   "CUMPLE": 6
+  },
+  "IX": {
+   "CUMPLE": 6
+  },
+  "X": {
+   "CUMPLE": 4
+  },
+  "XI": {
+   "CUMPLE": 6
+  },
+  "XII": {
+   "CUMPLE": 6
+  },
+  "XIII": {
+   "CUMPLE": 6
+  },
+  "XIV": {
+   "CUMPLE": 9
+  },
+  "XV": {
+   "CUMPLE": 6
+  },
+  "XVI": {
+   "CUMPLE": 6
+  },
+  "XVII": {
+   "CUMPLE": 16
+  },
+  "XVIII": {
+   "PARCIAL": 3,
+   "CUMPLE": 1,
+   "NO APLICA (ADR-031)": 2
+  }
+ }
+}

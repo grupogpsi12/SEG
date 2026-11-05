@@ -1,0 +1,8 @@
+/ping sin token: 000
+conexion cerrada
+/ping token falso: 000
+conexion cerrada
+/instances sin token: 000
+conexion cerrada
+/instances token falso: 000
+conexion cerrada

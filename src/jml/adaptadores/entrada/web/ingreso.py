@@ -98,6 +98,7 @@ def segundo_factor(request: HttpRequest) -> HttpResponse:
     casos = composicion.casos()
     formulario = FormularioDeCodigo(request.POST or None)
     secreto = None
+    aviso = None
     if request.method == "POST" and formulario.is_valid():
         try:
             usuario_id = casos.completar_ingreso.ejecutar(
@@ -133,7 +134,8 @@ def segundo_factor(request: HttpRequest) -> HttpResponse:
             return redirect("ingreso")
         except IdentidadNoDisponible:
             registro.exception("Supabase Auth no respondio al inscribir el TOTP")
-            formulario.add_error(None, ERROR_SERVICIO)
+            # Un formulario sin enlazar no admite `add_error` (daba un 500, B-24): va como mensaje.
+            aviso = ERROR_SERVICIO
     return render(
         request,
         "web/segundo_factor.html",
@@ -141,6 +143,7 @@ def segundo_factor(request: HttpRequest) -> HttpResponse:
             "formulario": formulario,
             "secreto": secreto,
             "inscribir": bool(request.session.get(SESION_INSCRIBIR)),
+            "aviso": aviso,
         },
     )
 

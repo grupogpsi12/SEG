@@ -1,0 +1,12 @@
+OK    privilegios de anon y authenticated sobre tablas de app: 0
+OK    uso del esquema app por anon y authenticated: false false
+OK    tablas de app sin RLS (B-23): 0
+OK    politicas de RLS en app (RLS sin politicas): 0
+OK    app_backend con UPDATE, DELETE o TRUNCATE en auditoria, decision o cuenta_historial: 0
+OK    control positivo: app_backend tiene 98 privilegios en app
+OK    puertos publicados por postgres: 
+OK    redes de postgres: jml_pg_net
+OK    pg_net es internal: true
+OK    service_role en jml-web-1 (secretos y entorno): 0
+OK    service_role en jml-worker-1 (secretos y entorno): 0
+fallos: 0

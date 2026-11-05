@@ -8,7 +8,7 @@
 # Reglas que este archivo cumple (CLAUDE.md, SRS):
 # - Solo `bunkerweb` publica puertos (RS-02, invariante 14). Ningun otro servicio tiene `ports`.
 # - `db_net` es interna (RS-03). `bw-universe` solo une bunkerweb y su scheduler (RS-19).
-# - `service_role` solo se monta en admin-usuarios (invariante 8).
+# - `service_role` solo se monta en admin-usuarios (invariante 8); web le pide por admin_net (ADR-035).
 # - Secretos como archivos en /run/secrets (ADR-009); infra/.env solo trae lo que una imagen de
 #   terceros exige como variable (API_TOKEN de BunkerWeb y la clave de MariaDB para GLPI).
 # - Imagenes por digest (RS-18).
@@ -81,7 +81,7 @@ services:
       # Sin interfaz ni MariaDB propia: el scheduler usa SQLite (ADR-023, RS-19).
       - MULTISITE=yes
       - SERVER_NAME=${APP_DOMINIO:-app.localhost} ${GLPI_DOMINIO:-glpi.localhost}
-      # HTTPS: autofirmado en local; Let's Encrypt en Azure (compose.azure.yaml, RS-01)
+      # HTTPS con certificado autofirmado: no hay exposicion publica (RS-01, ADR-031)
       - GENERATE_SELF_SIGNED_SSL=${GENERATE_SELF_SIGNED_SSL:-yes}
       - AUTO_LETS_ENCRYPT=${AUTO_LETS_ENCRYPT:-no}
       - EMAIL_LETS_ENCRYPT=${EMAIL_LETS_ENCRYPT:-}
@@ -100,6 +100,10 @@ services:
       - LIMIT_REQ_RATE=2r/s
       - USE_BAD_BEHAVIOR=yes
       - BAD_BEHAVIOR_BAN_TIME=3600
+      # ADR-032 (B-36, P-12): el 429 del limite de ritmo ya frena y no cuenta para el baneo. El panel
+      # de GLPI dispara ~20 peticiones en paralelo y todo el trafico local llega con una sola IP (la
+      # puerta de enlace de Docker): con el 429 en la lista, abrir el panel baneaba a todos una hora.
+      - BAD_BEHAVIOR_STATUS_CODES=400 401 403 404 405 444
       # Cabeceras (RS-07): BunkerWeb pone HSTS, Referrer-Policy y nosniff, y quita Server
       - STRICT_TRANSPORT_SECURITY=max-age=31536000; includeSubDomains
       - REFERRER_POLICY=strict-origin-when-cross-origin
@@ -125,10 +129,22 @@ services:
       # redireccion y la pagina salia sin estilos (prueba de interfaz del 24/10/2026, RS-08).
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_2=^/static/
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_2=10r/s
+      # ADR-034: filtrar o paginar dos veces en menos de 0,7 s daba 429 y la pagina desaparecia. Solo
+      # paginas con sesion; el ingreso y las fichas (T1, T10) siguen con sus limites.
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_3=^/(solicitudes|tickets|cuentas|dashboard|bandeja|auditoria|errores|administracion)
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_3=10r/s
       # --- glpi.*: GLPI (CSP por defecto de BunkerWeb, RS-07) ---
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_REVERSE_PROXY=yes
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_URL=/
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_HOST=http://glpi:80
+      # ADR-033 (W-02): el panel de GLPI pide todas sus tarjetas a la vez a /ajax/; con 2 r/s salian con
+      # error. /ajax/ exige sesion de GLPI; el ingreso y el resto del sitio siguen con 2 r/s (RS-08).
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/
+      # ADR-036: 20 r/s no alcanzaba: el panel central pide 26 tarjetas en un segundo (medido).
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_RATE_1=60r/s
+      # ADR-036: cada pagina pide el catalogo de traducciones; con 2 r/s salia 429.
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_URL_2=^/front/locale
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_RATE_2=10r/s
       # La API de GLPI (v1 y v2) es solo del worker, por la red interna: desde fuera no existe.
       # Su inicio de sesion no pide el doble factor de la interfaz (auditoria del 12/10/2026).
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_BLACKLIST=yes
@@ -146,6 +162,8 @@ services:
   # --- Aplicacion ----------------------------------------------------------------------------
   web:
     <<: *app
+    networks: [app, admin_net]
+    secrets: [django_secret_key, db_password, supabase_ca_crt, admin_servicio_token]
     healthcheck:  # RNF-01: /salud verifica tambien Supabase
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/salud', headers={'Host': '${APP_DOMINIO:-app.localhost}'}), timeout=5)"]
       # RNF-01: Supabase caido se detecta en menos de 2 minutos (2 fallos x 30 s; medido 24/10/2026)
@@ -170,7 +188,7 @@ services:
       JML_EXPORTES_DIR: /var/lib/jml/exportes
     volumes:
       - soportes:/var/lib/jml/soportes
-      - exportes:/var/lib/jml/exportes  # RD-04: lo sube a Blob infra/scripts/subir-exportes.sh
+      - exportes:/var/lib/jml/exportes  # RD-04: lo copia al disco externo infra/scripts/copiar-exportes.sh
     healthcheck:  # RNF-01: ultima sincronizacion exitosa y GLPI que responde (menos de 2 minutos)
       test: ["CMD", "python", "manage.py", "worker", "--salud"]
       interval: 30s
@@ -179,13 +197,22 @@ services:
       start_period: 120s
     mem_limit: 384m
 
-  admin-usuarios:  # RF-06: unico uso de service_role (invariante 8)
+  admin-usuarios:  # RF-06, ADR-035: unico uso de service_role (invariante 8). Servicio para web
     <<: *app
-    profiles: [admin]
-    restart: "no"
     entrypoint: ["python", "manage.py", "admin_usuarios"]
-    secrets: [django_secret_key, db_password, supabase_ca_crt, supabase_service_role]
+    command: ["servir"]  # `run --rm admin-usuarios crear ...` sigue funcionando
+    secrets: [django_secret_key, db_password, supabase_ca_crt, supabase_service_role, admin_servicio_token]
     volumes: []
+    networks:
+      app: {}  # solo para salir a Supabase: el servicio escucha unicamente en admin_net
+      admin_net: { aliases: [servicio-cuentas] }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket,urllib.request as u; s=socket.socket(2,2); s.connect(('10.20.70.1',9)); u.urlopen('http://%s:8090/salud' % s.getsockname()[0], timeout=5)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 20s
+    mem_limit: 256m
 
   migrar:  # ADR-028: unico uso de app_owner, duenio del esquema (revision externa H1)
     <<: *app
@@ -275,11 +302,20 @@ secrets:
   glpi_app_token: { file: ../secrets/glpi_app_token }
   glpi_user_token: { file: ../secrets/glpi_user_token }
   glpi_admin_user_token: { file: ../secrets/glpi_admin_user_token }
+  admin_servicio_token: { file: ../secrets/admin_servicio_token }
 
 volumes:
   bw-storage:
-  exportes:  # auditoria diaria + ancla (RD-04); en Azure, un directorio del host
-  soportes:  # en Azure, compose.azure.yaml lo monta desde un sistema de archivos noexec (RS-17)
+  exportes:  # auditoria diaria + ancla (RD-04); copia diaria al disco externo (ADR-031)
+  soportes:
+    # Invariante 12 y RS-17 (B-38): sin ejecucion. tmpfs porque Docker no monta un volumen con nombre
+    # con noexec; si Docker se reinicia, un soporte en transito se pierde y RD-12 lo cubre (la
+    # solicitud pasa a error y RRHH registra de nuevo). uid 10001 = usuario jml de la imagen.
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=256m,mode=0700,uid=10001,gid=10001,noexec,nosuid,nodev
   glpi-datos:
   mariadb-datos:
 
@@ -287,6 +323,12 @@ networks:
   bw-universe:
     ipam: { config: [{ subnet: 10.20.30.0/24 }] }
   app:
-    ipam: { config: [{ subnet: 10.20.40.0/24 }] }
+    # ip_range: Docker reparte a los demas contenedores solo la mitad alta (.128 a .255). La IP fija
+    # de bunkerweb (.2), la unica en la que Django confia (RS-05), queda reservada: sin esto, tras un
+    # reinicio otro contenedor la tomaba primero y bunkerweb no arrancaba (B-01, auditoria 24/10/2026).
+    ipam: { config: [{ subnet: 10.20.40.0/24, ip_range: 10.20.40.128/25 }] }
+  admin_net:
+    internal: true  # ADR-035: solo web llega al servicio de cuentas
+    ipam: { config: [{ subnet: 10.20.70.0/24 }] }
   db_net:
     internal: true  # RS-03

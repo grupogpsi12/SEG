@@ -1,0 +1,1 @@
+VUELTAS=20 env -u MSYS_NO_PATHCONV bash infra/scripts/carga.sh

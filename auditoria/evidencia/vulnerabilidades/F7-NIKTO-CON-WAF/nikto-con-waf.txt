@@ -1,0 +1,20 @@
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          192.168.65.254
++ Target Hostname:    app.localhost
++ Target Port:        443
+---------------------------------------------------------------------------
++ SSL Info:           Subject:  /CN=www.example.com
+                      Ciphers:  TLS_AES_256_GCM_SHA384
+                      Issuer:   /CN=www.example.com
++ Start Time:         2026-10-25 20:05:05 (GMT0)
+---------------------------------------------------------------------------
++ Server: No banner retrieved
++ All CGI directories 'found', use '-C none' to test none
++ Hostname 'app.localhost' does not match certificate's names: www.example.com. See: https://cwe.mitre.org/data/definitions/297.html
++ /: Suggested security header missing: content-security-policy. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
++ ERROR: Host maximum execution time of 240 seconds reached
++ Scan terminated: 0 error(s) and 2 item(s) reported on remote host
++ End Time:           2026-10-25 20:09:07 (GMT0) (242 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested

@@ -5,12 +5,14 @@ una vista que olvide el chequeo no abre la informacion (RF-03).
 """
 
 from collections.abc import Sequence
-from dataclasses import fields
+from dataclasses import fields, replace
 from datetime import datetime
 from enum import Enum
 
 from jml.aplicacion.dtos import (
+    AvanceDeSolicitud,
     DetalleDeSolicitud,
+    EstadoDeTicketDeSolicitud,
     FilaDeSolicitud,
     OpcionDeColaborador,
     PaginaDeSolicitudes,
@@ -19,8 +21,15 @@ from jml.aplicacion.dtos import (
 from jml.aplicacion.puertos import Repositorios, UnidadDeTrabajo
 from jml.dominio.auditoria import EventoDeAuditoria
 from jml.dominio.errores import DatoInvalido, NoAutorizado, NoEncontrado
-from jml.dominio.permisos import Actor, puede_reintentar_emision, puede_ver_restringidos
+from jml.dominio.permisos import (
+    Actor,
+    puede_reintentar_emision,
+    puede_ver_restringidos,
+    puede_ver_solicitud,
+)
+from jml.dominio.resolucion import ticket_resuelto
 from jml.dominio.solicitud import Solicitud
+from jml.dominio.tickets import TicketSeguido
 from jml.dominio.tipos import EstadoSolicitud, Rol
 from jml.dominio.valores import BOGOTA, Documento, SolicitudId
 
@@ -50,6 +59,18 @@ def _fila(uow: UnidadDeTrabajo, s: Solicitud, usuario_id: str) -> FilaDeSolicitu
     )
 
 
+_SIN_AVANCE = AvanceDeSolicitud(0, 0, None)
+
+
+def _avance(tickets: Sequence[TicketSeguido]) -> AvanceDeSolicitud:
+    """RF-11: lo mismo que decide el cierre (RF-26). Solo cambia con la sincronizacion."""
+    de_cierre = [t for t in tickets if t.ticket.bloquea_el_cierre]
+    vistos = [t.observacion.observada_en for t in tickets if t.observacion is not None]
+    return AvanceDeSolicitud(
+        sum(ticket_resuelto(t) for t in de_cierre), len(de_cierre), max(vistos, default=None)
+    )
+
+
 class MisSolicitudes:
     """RF-11: el solicitante consulta las que registro, de la mas reciente a la mas antigua.
 
@@ -69,7 +90,11 @@ class MisSolicitudes:
             tramo = uow.solicitudes.del_solicitante(
                 usuario_id, max(hasta - self._tamano, 0), max(hasta, 0)
             )
-            filas = tuple(_fila(uow, s, usuario_id) for s in reversed(tramo))
+            avances = self._repos.avances([s.id for s in tramo])
+            filas = tuple(
+                replace(_fila(uow, s, usuario_id), avance=avances.get(s.id, _SIN_AVANCE))
+                for s in reversed(tramo)
+            )
             return PaginaDeSolicitudes(filas, total, pagina, self._tamano)
 
 
@@ -168,7 +193,7 @@ class ConsultarSolicitud:
             actor = _actor(uow, usuario_id)
             s = uow.solicitudes.obtener(solicitud_id)
             es_rrhh = puede_ver_restringidos(actor.roles)
-            if s is None or not (es_rrhh or s.solicitante_id == usuario_id):
+            if s is None or not puede_ver_solicitud(actor, s.solicitante_id):
                 raise NoEncontrado("solicitud", solicitud_id.valor)
             restringido = s.restringido.revelar() if es_rrhh and s.restringido else None
             if restringido is not None:
@@ -176,7 +201,25 @@ class ConsultarSolicitud:
                     usuario_id, EventoDeAuditoria("restringido.consultado", s.id.valor, {})
                 )
             datos = tuple((f.name, _como_texto(getattr(s.datos, f.name))) for f in fields(s.datos))
-            return DetalleDeSolicitud(_fila(uow, s, usuario_id), s.subtipo, datos, restringido)
+            seguidos = sorted(
+                uow.tickets.de_solicitud(s.id), key=lambda t: t.ticket.clave_de_idempotencia
+            )
+            return DetalleDeSolicitud(
+                replace(_fila(uow, s, usuario_id), avance=_avance(seguidos)),
+                s.subtipo,
+                datos,
+                restringido,
+                tuple(
+                    EstadoDeTicketDeSolicitud(
+                        t.ticket.cola,
+                        t.ticket.accion,
+                        None if t.observacion is None else t.observacion.estado,
+                        ticket_resuelto(t),
+                        t.ticket.bloquea_el_cierre,
+                    )
+                    for t in seguidos
+                ),
+            )
 
 
 class SolicitudesEnError:

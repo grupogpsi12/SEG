@@ -1,0 +1,6 @@
+[BD-sin-rls] sin defecto:
+    16 passed, 4 skipped, 265 deselected in 0.89s
+[BD-sin-rls] con el defecto sembrado en src/jml/adaptadores/salida/persistencia/migrations/0006_rls_en_las_tablas_del_framework.py:
+    1 failed, 265 deselected in 0.68s
+[BD-sin-rls] archivo restaurado: True
+[BD-sin-rls] DETECTADO: verde sin defecto, rojo con él

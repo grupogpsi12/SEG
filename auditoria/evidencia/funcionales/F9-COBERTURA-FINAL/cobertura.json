@@ -1,0 +1,90 @@
+{
+  "dominio": {
+    "ramas_total": 310,
+    "ramas_cubiertas": 303,
+    "ramas_pct": 97.74,
+    "lineas_total": 1454,
+    "lineas_cubiertas": 1451,
+    "combinado_pct": 99.43
+  },
+  "aplicacion": {
+    "ramas_total": 232,
+    "ramas_cubiertas": 220,
+    "ramas_pct": 94.83,
+    "lineas_total": 1326,
+    "lineas_cubiertas": 1317,
+    "combinado_pct": 98.65
+  },
+  "adaptadores": {
+    "ramas_total": 406,
+    "ramas_cubiertas": 380,
+    "ramas_pct": 93.6,
+    "lineas_total": 2343,
+    "lineas_cubiertas": 2295,
+    "combinado_pct": 97.31
+  },
+  "TOTAL": {
+    "ramas_total": 948,
+    "ramas_cubiertas": 903,
+    "ramas_pct": 95.25,
+    "lineas_total": 5123,
+    "lineas_cubiertas": 5063,
+    "combinado_pct": 98.27
+  },
+  "seguridad:ingreso": {
+    "ramas_total": 58,
+    "ramas_cubiertas": 58,
+    "ramas_pct": 100.0,
+    "lineas_total": 282,
+    "lineas_cubiertas": 282,
+    "combinado_pct": 100.0
+  },
+  "seguridad:permisos": {
+    "ramas_total": 32,
+    "ramas_cubiertas": 32,
+    "ramas_pct": 100.0,
+    "lineas_total": 103,
+    "lineas_cubiertas": 103,
+    "combinado_pct": 100.0
+  },
+  "seguridad:auditoria": {
+    "ramas_total": 30,
+    "ramas_cubiertas": 30,
+    "ramas_pct": 100.0,
+    "lineas_total": 138,
+    "lineas_cubiertas": 138,
+    "combinado_pct": 100.0
+  },
+  "seguridad:soportes": {
+    "ramas_total": 16,
+    "ramas_cubiertas": 16,
+    "ramas_pct": 100.0,
+    "lineas_total": 73,
+    "lineas_cubiertas": 73,
+    "combinado_pct": 100.0
+  },
+  "seguridad:filtro-de-logs": {
+    "ramas_total": 14,
+    "ramas_cubiertas": 14,
+    "ramas_pct": 100.0,
+    "lineas_total": 39,
+    "lineas_cubiertas": 39,
+    "combinado_pct": 100.0
+  },
+  "seguridad:csv-y-vistas-tecnicas": {
+    "ramas_total": 8,
+    "ramas_cubiertas": 8,
+    "ramas_pct": 100.0,
+    "lineas_total": 92,
+    "lineas_cubiertas": 92,
+    "combinado_pct": 100.0
+  },
+  "seguridad:middleware": {
+    "ramas_total": 6,
+    "ramas_cubiertas": 6,
+    "ramas_pct": 100.0,
+    "lineas_total": 53,
+    "lineas_cubiertas": 53,
+    "combinado_pct": 100.0
+  }
+}

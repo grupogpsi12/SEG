@@ -1,0 +1,18 @@
+/dev/sdd /var/lib/jml/soportes ext4 rw,relatime 0 0
+/dev/sdd /var/lib/jml/soportes ext4 rw,relatime 0 0
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_B_38_el_volumen_de_soportes_se_monta_sin_ejecucion ___________
+
+    def test_B_38_el_volumen_de_soportes_se_monta_sin_ejecucion() -> None:
+        """Invariante 12 y RS-17: el soporte de vinculacion vive en un volumen `noexec`. Lo daba
+        `compose.azure.yaml` (un directorio del host con noexec); con ADR-031 no hay VM, y el volumen
+        con nombre de compose.yaml se montaba `ext4 rw` en web y worker (medido en /proc/mounts)."""
+>       opciones = COMPOSE["volumes"]["soportes"]["driver_opts"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests\adaptadores\test_infra.py:252: TypeError
+=========================== short test summary info ===========================
+FAILED tests/adaptadores/test_infra.py::test_B_38_el_volumen_de_soportes_se_monta_sin_ejecucion
+1 failed, 21 deselected in 0.18s

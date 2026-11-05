@@ -1,0 +1,34 @@
+# CA-13 en la arquitectura local (ADR-031) - 2026-10-25 21:33 -0500
+## permisos de anon y authenticated sobre tablas del esquema app (esperado: 0)
+0
+## uso del esquema app por anon y authenticated (esperado: f f)
+f|f
+## tablas de app sin RLS (esperado: vacio)
+django_migrations
+auth_user_user_permissions
+django_content_type
+auth_user
+auth_user_groups
+auth_permission
+auth_group
+auth_group_permissions
+django_session
+## control positivo: app_backend si tiene permisos (esperado: > 0)
+98
+## app_backend sin UPDATE/DELETE/TRUNCATE en auditoria, decision, cuenta_historial (esperado: 0)
+0
+## puertos publicados por postgres (esperado: vacio)
+{"5432/tcp":null}
+## redes de postgres
+jml_pg_net 
+## red pg_net internal (esperado: true)
+true
+## service_role en web y worker (esperado: vacio)
+FIN
+
+## tras aplicar la migracion 0006 (B-23) con el rol app_owner: tablas de app sin RLS (esperado: vacio)
+## la aplicacion sigue sana (app_backend con BYPASSRLS)
+urllib.error.HTTPError: HTTP Error 400: Bad Request
+healthy
+FIN-2
+(el 400 de la sonda interna es ALLOWED_HOSTS para 127.0.0.1; el chequeo de salud del contenedor sigue en healthy)

@@ -1,0 +1,60 @@
+## jml.adaptadores.registro.xǁFormatoJSONǁformat__mutmut_39
+-    return json.dumps(salida, ensure_ascii=False, default=str)
++    return json.dumps(salida, ensure_ascii=None, default=str)
+## jml.adaptadores.entrada.web.middleware.x_proxy_confiable__mutmut_11
+-        reenviado = meta.pop("HTTP_X_FORWARDED_FOR", "")
++        reenviado = meta.pop("HTTP_X_FORWARDED_FOR", "XXXX")
+## jml.adaptadores.entrada.web.middleware.x_proxy_confiable__mutmut_14
+-        esquema = meta.pop("HTTP_X_FORWARDED_PROTO", "")
++        esquema = meta.pop("HTTP_X_FORWARDED_PROTO", None)
+## jml.adaptadores.entrada.web.middleware.x_proxy_confiable__mutmut_19
+-        esquema = meta.pop("HTTP_X_FORWARDED_PROTO", "")
++        esquema = meta.pop("HTTP_X_FORWARDED_PROTO", "XXXX")
+## jml.adaptadores.entrada.web.middleware.x_correlacion__mutmut_7
+-        recibido = request.headers.get("X-Request-ID", "")
++        recibido = request.headers.get("x-request-id", "")
+## jml.adaptadores.entrada.web.middleware.x_correlacion__mutmut_8
+-        recibido = request.headers.get("X-Request-ID", "")
++        recibido = request.headers.get("X-REQUEST-ID", "")
+## jml.adaptadores.entrada.web.middleware.x_correlacion__mutmut_9
+-        recibido = request.headers.get("X-Request-ID", "")
++        recibido = request.headers.get("X-Request-ID", "XXXX")
+## jml.adaptadores.salida.identidad.supabase.x__claims__mutmut_12
+-        datos = json.loads(base64.urlsafe_b64decode(cuerpo + "=" * (-len(cuerpo) % 4)))
++        datos = json.loads(base64.urlsafe_b64decode(cuerpo + "=" * (+len(cuerpo) % 4)))
+## jml.adaptadores.salida.identidad.supabase.x__claims__mutmut_13
+-        datos = json.loads(base64.urlsafe_b64decode(cuerpo + "=" * (-len(cuerpo) % 4)))
++        datos = json.loads(base64.urlsafe_b64decode(cuerpo + "=" * (-len(cuerpo) % 5)))
+## jml.adaptadores.salida.identidad.supabase.x__claims__mutmut_19
+-        raise IdentidadNoDisponible("token ilegible")
++        raise IdentidadNoDisponible("XXtoken ilegibleXX")
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁ__init____mutmut_5
+-    self._base = url.rstrip("/") + "/auth/v1"
++    self._base = url.rstrip("XX/XX") + "/auth/v1"
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁ_guardar__mutmut_2
+-    desafio = secrets.token_urlsafe(32)
++    desafio = secrets.token_urlsafe(None)
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁautenticar__mutmut_9
+-        "POST",
++        "post",
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁinscribir_totp__mutmut_14
+-        "POST", "/factors", p.token_aal1, {"factor_type": "totp", "issuer": _EMISOR}
++        "post", "/factors", p.token_aal1, {"factor_type": "totp", "issuer": _EMISOR}
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁ_borrar_no_verificados__mutmut_8
+-    r = self._pedir("GET", "/user", token)
++    r = self._pedir("XXGETXX", "/user", token)
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁ_borrar_no_verificados__mutmut_9
+-    r = self._pedir("GET", "/user", token)
++    r = self._pedir("get", "/user", token)
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁ_borrar_no_verificados__mutmut_32
+-            self._pedir("DELETE", f"/factors/{f['id']}", token)
++            self._pedir("delete", f"/factors/{f['id']}", token)
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁverificar_totp__mutmut_15
+-    reto = self._pedir("POST", f"/factors/{p.factor_id}/challenge", p.token_aal1)
++    reto = self._pedir("post", f"/factors/{p.factor_id}/challenge", p.token_aal1)
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁverificar_totp__mutmut_29
+-        "POST",
++        "post",
+## jml.adaptadores.salida.identidad.supabase.xǁProveedorSupabaseǁverificar_totp__mutmut_77
+-        self._pedir("POST", "/logout?scope=local", token_aal2)
++        self._pedir("post", "/logout?scope=local", token_aal2)

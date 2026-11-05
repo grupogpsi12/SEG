@@ -1,0 +1,1 @@
+set -e; for d in docs/entregables/auditoria 'docs/Desarrollo Seguro' docs/entregables/capitulos; do echo "== $d"; MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd -W)/$d:/src:ro" ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f detect --no-git --source /src --redact --no-banner --no-color; done
