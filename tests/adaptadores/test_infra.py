@@ -292,7 +292,9 @@ def test_ADR_033_las_peticiones_ajax_de_glpi_tienen_su_propio_limite() -> None:
     demas siguen con el limite general."""
     entorno = _entorno("bw-scheduler")
     assert "glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/" in entorno
-    assert "glpi.localhost}_LIMIT_REQ_RATE_1=20r/s" in entorno
+    assert "glpi.localhost}_LIMIT_REQ_RATE_1=60r/s" in entorno  # ADR-036: el central pide 26
+    assert "glpi.localhost}_LIMIT_REQ_URL_2=^/front/locale" in entorno
+    assert "glpi.localhost}_LIMIT_REQ_RATE_2=10r/s" in entorno
     assert "LIMIT_REQ_RATE=2r/s" in entorno
 
 

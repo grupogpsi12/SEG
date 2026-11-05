@@ -39,6 +39,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 033 | Límite propio de 20 r/s para `/ajax/` de GLPI | Aceptada | 26/10/2026 |
 | 034 | Límite propio de 10 r/s para las páginas con sesión de la aplicación | Aceptada | 04/11/2026 |
 | 035 | CRUD de usuarios en la web mediante un servicio interno de cuentas | Aceptada | 04/11/2026 |
+| 036 | `/ajax/` de GLPI a 60 r/s y límite propio para `/front/locale.php` | Aceptada | 04/11/2026 |
 
 ---
 
@@ -548,3 +549,11 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 - El Supabase es compartido por el equipo: desactivar o eliminar afecta a todas las bases.
 - Sin la clave (ADR-029) el servicio responde 503 y el resto de la aplicación sigue funcionando.
 - SRS v2.10 (RF-06, RS-15, RI-04).
+
+## ADR-036 — `/ajax/` de GLPI a 60 r/s y límite propio para `/front/locale.php`
+
+**Contexto.** ADR-033 fijó 20 r/s para `/ajax/` y se verificó con ráfagas de 7 y de 20. El registro del WAF del 27/10/2026 04:08:58 muestra el panel central real: 26 peticiones `get_card` en un segundo, 17 con 200 y 9 con 429. El catálogo `/front/locale.php` también recibió 429 con el límite general. La verificación era menor que el caso real.
+
+**Decisión.** `/ajax/` de `glpi.localhost` a 60 r/s (más del doble del caso medido, para varias pestañas o personas tras la IP compartida). `^/front/locale` a 10 r/s. El ingreso de GLPI y lo demás siguen con 2 r/s. Actualiza el valor de ADR-033, que sigue vigente en lo demás.
+
+**Consecuencias.** `/ajax/` exige sesión de GLPI. La prueba es ahora con ráfagas de 26 y de 40 (`auditoria/scripts/verificar-v02.sh`).

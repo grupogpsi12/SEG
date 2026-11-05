@@ -140,7 +140,11 @@ services:
       # ADR-033 (W-02): el panel de GLPI pide todas sus tarjetas a la vez a /ajax/; con 2 r/s salian con
       # error. /ajax/ exige sesion de GLPI; el ingreso y el resto del sitio siguen con 2 r/s (RS-08).
       - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_URL_1=^/ajax/
-      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_RATE_1=20r/s
+      # ADR-036: 20 r/s no alcanzaba: el panel central pide 26 tarjetas en un segundo (medido).
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_RATE_1=60r/s
+      # ADR-036: cada pagina pide el catalogo de traducciones; con 2 r/s salia 429.
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_URL_2=^/front/locale
+      - ${GLPI_DOMINIO:-glpi.localhost}_LIMIT_REQ_RATE_2=10r/s
       # La API de GLPI (v1 y v2) es solo del worker, por la red interna: desde fuera no existe.
       # Su inicio de sesion no pide el doble factor de la interfaz (auditoria del 12/10/2026).
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_BLACKLIST=yes
