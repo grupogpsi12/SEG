@@ -9,7 +9,7 @@ lang: es-CO
 | Proyecto | Sistema integrado de eventos laborales con identidad, recursos humanos y accesos automatizados |
 | Documento | Especificación de Requisitos de Software (SRS) |
 | Norma de referencia | ISO/IEC/IEEE 29148:2018, adaptada al alcance académico |
-| Versión | 2.9 — Borrador para revisión |
+| Versión | 2.10 — Borrador para revisión |
 | Fecha | 4 de noviembre de 2026 |
 | Autores | Jhinnet Bravo, Carlos Ruiz, Luis Ceron, Jhon Leal y Cristian Caro |
 | Docente | José Eduardo Patiño Santafé |
@@ -28,6 +28,7 @@ lang: es-CO
 | 2.7 | 26/10/2026 | Las peticiones `/ajax/` de GLPI tienen su propio límite de 20 por segundo (RS-08, ADR-033): el panel de GLPI pide todas sus tarjetas a la vez y, con 2 por segundo, 5 de 7 salían con error. Sin cambios de alcance. |
 | 2.8 | 31/10/2026 | Se agrega RF-41: consulta de tickets de solo lectura para técnicos y Administrador. El CRUD de tickets y de usuarios no se adopta: GLPI sigue siendo la fuente de la verdad (ADR-001) y las cuentas se crean por comando (RF-06, RS-15). Sin cambios de arquitectura. |
 | 2.9 | 04/11/2026 | Correcciones del equipo. Avance visible en Mis solicitudes (RF-11). Tickets con el nombre del colaborador y enlaces solo para quien puede abrirlos (RF-41). Límite propio de 10 r/s para las páginas con sesión (RS-08, ADR-034): filtrar dos veces seguidas daba 429. |
+| 2.10 | 04/11/2026 | El Administrador gestiona las cuentas desde la web (RF-06, RF-37, RS-15, RI-04, ADR-035): `admin-usuarios` pasa a ser un servicio interno, alcanzable solo desde `web` y con su propio token. `service_role` sigue únicamente en ese contenedor. Acceso directo «Crear usuario» para RRHH, que abre el ingreso. |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -394,7 +395,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RF-03 | El sistema debe aplicar los permisos de la sección 3.3 en cada vista del servidor, según los grupos de Django del usuario. | Debe |
 | RF-04 | El sistema debe cerrar la sesión tras 30 minutos de inactividad o 8 horas de duración total, y rotar el identificador de sesión al iniciarla. | Debe |
 | RF-05 | El sistema debe negar el acceso y registrar el evento en auditoría si un usuario tiene roles incompatibles. | Debe |
-| RF-06 | El registro abierto debe estar deshabilitado. Las cuentas de usuario solo se crean y desactivan con un comando de administración que ejecuta el Administrador del sistema. Una cuenta que ya existe en Supabase se registra en otra base de la aplicación con el mismo comando (`vincular`), sin la clave `service_role`; sin el TOTP de esa cuenta no da acceso. | Debe |
+| RF-06 | El registro abierto debe estar deshabilitado. El Administrador del sistema crea, vincula, desactiva, reactiva y elimina cuentas desde el área de administración, o con el comando de administración (ADR-035). Eliminar exige haber desactivado antes y conserva la fila local inactiva, porque la auditoría y las decisiones apuntan a ese id. Una cuenta que ya existe en Supabase se registra en otra base con `vincular`, sin la clave `service_role`; sin el TOTP de esa cuenta no da acceso. | Debe |
 
 ## Gestión de solicitudes
 
@@ -508,7 +509,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RI-01 | Usuario (web) | Páginas generadas en el servidor, en español y adaptables a distintos tamaños de pantalla: inicio de sesión y MFA, nueva solicitud por tipo, mis solicitudes, bandeja de RRHH, dashboard, búsqueda y ficha de colaborador, auditoría y administración. Sin JavaScript de terceros; los gráficos del dashboard se generan como SVG en el servidor. Cumplimiento de WCAG 2.1 nivel AA en contraste y navegación por teclado. | Debe |
 | RI-02 | GLPI 11 (API REST) | Crear tickets con categoría, prioridad, estado, vencimiento y contenido; subir un documento y vincularlo a varios tickets; leer estado, solución y documentos de un ticket; crear y actualizar usuarios; leer activos y licencias por usuario. El único cliente es el worker, con una cuenta de servicio cuyo perfil de GLPI se limita a esas operaciones. | Debe |
 | RI-03 | PostgreSQL 17 local | Conexión desde web y worker al contenedor `postgres` por la red interna `pg_net` (puerto 5432, sin publicar en el host). El rol `app_backend` no es dueño de ningún objeto: tiene solo `SELECT`, `INSERT`, `UPDATE` y `DELETE`, sin modificar ni borrar en las tablas de RD-02, y `BYPASSRLS` porque RLS no tiene políticas. Las migraciones las corre `app_owner`, dueño del esquema, solo desde un contenedor de una sola vez (ADR-028). Nunca se usan `postgres` ni `service_role` en ejecución normal. | Debe |
-| RI-04 | Supabase Auth | Desde el servidor: inicio de sesión con contraseña e inscripción, desafío y verificación de TOTP. La API de administración (creación y desactivación de usuarios) usa la clave `service_role`, disponible solo para el comando de administración, nunca en los contenedores web ni worker. | Debe |
+| RI-04 | Supabase Auth | Desde el servidor: inicio de sesión con contraseña e inscripción, desafío y verificación de TOTP. La API de administración (creación y desactivación de usuarios) usa la clave `service_role`, disponible solo en el contenedor `admin-usuarios` (comando y servicio interno, ADR-035), nunca en los contenedores web ni worker. | Debe |
 | RI-05 | Docker secrets (directorio `secrets/`) | Los secretos se generan con `infra/scripts/preparar-entorno.sh` en el directorio `secrets/` del equipo, que no se versiona, y Docker Compose los monta como archivos en `/run/secrets` solo en los contenedores que los necesitan. | Debe |
 | RI-06 | Almacenamiento local de exportes y respaldos | El worker escribe la auditoría diaria y su ancla en el volumen `exportes`; los respaldos se generan en el host. Ambos se copian a un medio externo al equipo. | Debe |
 
@@ -532,7 +533,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RS-12 | Escaneo de secretos (gitleaks) en cada commit y en la integración continua. | Debe |
 | RS-13 | Antes de la entrega se ejecutan OWASP ZAP baseline y sqlmap con `--level` 3 o superior, incluidas las cabeceras, dos veces: contra la aplicación sin WAF (en local) para medir el código, y a través de BunkerWeb para medir la defensa completa. | Debe |
 | RS-14 | Los contenedores se ejecutan sin privilegios, con sistema de archivos de solo lectura donde aplique, imágenes fijadas por digest y límites de memoria. | Debe |
-| RS-15 | La clave `service_role` de Supabase solo se monta al ejecutar el comando de administración de usuarios. Su presencia en las variables o archivos de los contenedores web o worker se considera un defecto crítico. | Debe |
+| RS-15 | La clave `service_role` de Supabase solo se monta en el contenedor `admin-usuarios`. Su servicio interno escucha solo en la red interna `admin_net`, que comparte únicamente con `web`, y exige un token propio (ADR-035). Su presencia en las variables o archivos de los contenedores web o worker se considera un defecto crítico. | Debe |
 | RS-16 | En Supabase Auth: registro abierto deshabilitado, contraseña de al menos 12 caracteres y MFA TOTP habilitado. Revisar sin hallazgos el asesor de seguridad de Supabase antes de la entrega. | Debe |
 | RS-17 | Carga del soporte: solo el rol RRHH puede subirlo. Límite de 21 MB en BunkerWeb (`MAX_CLIENT_SIZE`, cuyo valor por defecto es 10 MB) y de 20 MB en Django; la carga debe pasar por ModSecurity en modo bloqueo sin falsos positivos. Validación de extensión y firma de contenido, nombre aleatorio en disco y volumen montado con `noexec`. El contenido nunca se interpreta en el servidor. | Debe |
 | RS-18 | BunkerWeb 1.6.15 o superior (las versiones anteriores a 1.6.13 tienen avisos de seguridad altos en su API interna y su interfaz), con imagen fijada por digest, ModSecurity con OWASP CRS 4 en `SECURITY_MODE=block` en ambos sitios. Las exclusiones de reglas por falsos positivos se versionan como archivos de configuración, con la ruta y la regla exactas, nunca desactivando el CRS completo. | Debe |

@@ -113,7 +113,15 @@ def es_denegacion_por_rol(c: Celda) -> bool:
     if c.rol == "anonimo" or c.esperado == "405":
         return False
     return c.esperado == "403" or (
-        c.ruta in ("admin_roles", "reintentar", "decidir") and c.esperado == "302:/solicitudes"
+        c.ruta
+        in (
+            "admin_roles",
+            "admin_usuario_colaborador",
+            "admin_usuario_acceso",
+            "reintentar",
+            "decidir",
+        )
+        and c.esperado == "302:/solicitudes"
     )
 
 

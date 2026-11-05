@@ -121,6 +121,12 @@ class GoTrueSimulado:
             return httpx.Response(401, json={"msg": "no autorizado"})
         cuerpo = json.loads(peticion.content) if peticion.content else {}
         resto = ruta.removeprefix("/auth/v1/admin/users").strip("/")
+        if peticion.method == "GET" and not resto:
+            pagina = peticion.url.params.get("page", "1")
+            lista = list(self.usuarios.values()) if pagina == "1" else []
+            return httpx.Response(
+                200, json={"users": [{"id": u.id, "email": u.correo} for u in lista]}
+            )
         if peticion.method == "POST" and not resto:
             if cuerpo["email"] in self.usuarios:
                 return httpx.Response(422, json={"error_code": "email_exists"})

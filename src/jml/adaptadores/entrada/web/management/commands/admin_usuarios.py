@@ -1,4 +1,4 @@
-"""`python manage.py admin_usuarios crear|desactivar`: el UNICO alta y baja de usuarios (RF-06).
+"""`manage.py admin_usuarios crear|vincular|desactivar|servir`: alta y baja de cuentas (RF-06).
 
 Corre en el contenedor `admin-usuarios`, el unico que monta el secreto `supabase_service_role`
 (invariante 8). No hay registro abierto: la cuenta nace aqui en Supabase Auth y, con el mismo
@@ -22,6 +22,7 @@ from typing import Any
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 
+from jml.adaptadores.entrada.web.servicio_cuentas import PUERTO, crear_servidor, ip_en_la_red
 from jml.adaptadores.salida.identidad.administracion import (
     AdministradorSupabase,
     ErrorDeAdministracion,
@@ -76,8 +77,12 @@ class Command(BaseCommand):
         vincular.add_argument("--colaborador", help="Id del colaborador al que corresponde")
         desactivar = sub.add_parser("desactivar", help="Banea la cuenta y la desactiva")
         desactivar.add_argument("--usuario", required=True, help="Id de Supabase del usuario")
+        sub.add_parser("servir", help="Servicio interno de cuentas para web (ADR-035)")
 
     def handle(self, *args: Any, **o: Any) -> None:
+        if o["accion"] == "servir":
+            self._servir()
+            return
         try:
             if o["accion"] == "crear":
                 self._crear(o["correo"], frozenset(Rol(r) for r in o["roles"]), o["colaborador"])
@@ -88,6 +93,18 @@ class Command(BaseCommand):
                 self._desactivar(o["usuario"])
         except (ErrorDeAdministracion, IdentidadNoDisponible) as e:
             raise CommandError(f"Supabase rechazo la operacion: {e}") from None
+
+    def _servir(self) -> None:
+        try:
+            admin = administrador()
+        except CommandError:
+            admin = None  # sin la clave (ADR-029): responde 503 y el resto de la app sigue
+            self.stderr.write("servicio de cuentas sin supabase_service_role")
+        token = settings.JML_SERVICIO_CUENTAS_TOKEN
+        if not token:
+            raise CommandError("falta el secreto admin_servicio_token (ADR-035)")
+        host = ip_en_la_red(os.environ.get("JML_SERVICIO_CUENTAS_PUERTA", "10.20.70.1"))
+        crear_servidor(host, PUERTO, admin, token).serve_forever()
 
     @staticmethod
     def _validar(repos: Repositorios, roles: frozenset[Rol], colaborador: str | None) -> None:

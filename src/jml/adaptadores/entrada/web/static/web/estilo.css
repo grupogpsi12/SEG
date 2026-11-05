@@ -98,6 +98,8 @@ form.en-linea { display: inline; }
 form.busqueda { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0 1rem; align-items: end; padding: 0.5rem 1.25rem; margin-bottom: 1rem; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); }
 .roles { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; align-items: center; }
 .roles label { margin: 0; font-weight: 400; }
+td form + form { margin-top: 0.5rem; }
+td input[type=text] { min-width: 8rem; }
 
 .mensaje { padding: 0.65rem 1rem; border-radius: 10px; margin: 0 0 1rem; background: var(--pastel-ok); color: var(--tinta-ok); max-width: 75ch; }
 .mensaje.error { background: var(--pastel-error); color: var(--tinta-error); }

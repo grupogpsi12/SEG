@@ -38,6 +38,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 032 | El límite de ritmo del WAF responde 429 sin banear (P-12) | Aceptada | 26/10/2026 |
 | 033 | Límite propio de 20 r/s para `/ajax/` de GLPI | Aceptada | 26/10/2026 |
 | 034 | Límite propio de 10 r/s para las páginas con sesión de la aplicación | Aceptada | 04/11/2026 |
+| 035 | CRUD de usuarios en la web mediante un servicio interno de cuentas | Aceptada | 04/11/2026 |
 
 ---
 
@@ -525,3 +526,25 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 - Pedir paciencia a las personas: el error parece un fallo de la aplicación.
 
 **Consecuencias.** Un escáner con sesión válida puede pedir 10 r/s en esas rutas: exigen sesión y los errores siguen contando para el baneo (ADR-032). SRS v2.9 (RS-08).
+
+## ADR-035 — CRUD de usuarios en la web mediante un servicio interno de cuentas
+
+**Contexto.** El equipo pidió que el Administrador gestione usuarios desde la web. Crear, banear o borrar en Supabase exige `service_role`, que el invariante 8 y RS-15 limitan al contenedor `admin-usuarios`, antes de un solo uso por comando. Montar la clave en `web` es un defecto crítico. El equipo eligió esta opción entre tres (decisión del 04/11/2026).
+
+**Decisión.**
+- `admin-usuarios` queda encendido con `admin_usuarios servir`, un servidor HTTP de biblioteca estándar. `run --rm admin-usuarios crear ...` sigue funcionando.
+- Escucha solo en su IP de `admin_net` (interna, `10.20.70.0/24`), que comparte únicamente con `web`, y exige el token `admin_servicio_token`. Solo habla con Supabase; no decide permisos ni escribe en la base.
+- Nuevo puerto `AdministradorDeCuentas`, con dos implementaciones (cliente real y doble en memoria) y una suite de contrato.
+- `web` valida permisos y roles, escribe la base y audita. La contraseña inicial se muestra una vez en la respuesta del POST: sin sesión, sin mensajes, sin auditoría y con `Cache-Control: no-store`.
+- «Eliminar» exige desactivar antes y conserva la fila local inactiva (invariantes 3 y 4). Nadie opera sobre su propia cuenta.
+
+**Alternativas descartadas.**
+- Web sin `service_role` y alta por comando: era la recomendada; más segura, pero no da el CRUD completo pedido.
+- Clave en `web`: rompe el invariante 8.
+
+**Consecuencias y riesgo aceptado.**
+- Quien comprometa `web` puede pedir crear, desactivar o borrar cuentas, aunque no obtiene la clave. No puede cambiar lo que Supabase exige para entrar: una cuenta nueva sin rol en la base no da acceso y todo ingreso pide TOTP.
+- La clave deja de estar montada solo por momentos: ahora está siempre en un contenedor encendido.
+- El Supabase es compartido por el equipo: desactivar o eliminar afecta a todas las bases.
+- Sin la clave (ADR-029) el servicio responde 503 y el resto de la aplicación sigue funcionando.
+- SRS v2.10 (RF-06, RS-15, RI-04).

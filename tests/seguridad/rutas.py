@@ -11,6 +11,7 @@ EJEMPLOS = {
     "usuario": "u-ana",
     "colaborador": "col-1",
 }
+POR_RUTA = {"admin_usuario_acceso": {"accion": "desactivar"}}
 
 
 def rutas() -> dict[str, str]:
@@ -22,5 +23,6 @@ def rutas() -> dict[str, str]:
         )
         assert p.name is not None, "toda ruta debe tener nombre"
         parametros = set(p.pattern.regex.groupindex) | set(getattr(p.pattern, "converters", {}))
-        salida[p.name] = reverse(p.name, kwargs={k: EJEMPLOS[k] for k in sorted(parametros)})
+        ejemplos = {**EJEMPLOS, **POR_RUTA.get(p.name, {})}
+        salida[p.name] = reverse(p.name, kwargs={k: ejemplos[k] for k in sorted(parametros)})
     return salida

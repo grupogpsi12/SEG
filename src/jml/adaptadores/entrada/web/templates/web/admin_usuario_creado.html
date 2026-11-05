@@ -1,0 +1,13 @@
+{% extends "web/base.html" %}
+{% block titulo %}Usuario creado{% endblock %}
+{% block contenido %}
+<h1>Usuario creado</h1>
+<p>Entregue estos datos a la persona por un canal privado. <strong>La contraseña no se volverá a mostrar.</strong> En su primer ingreso deberá inscribir el código TOTP.</p>
+<table>
+  <tbody>
+    <tr><th>Id de la cuenta</th><td>{{ creada.id }}</td></tr>
+    <tr><th>Contraseña inicial</th><td class="clave">{{ creada.contrasena_inicial }}</td></tr>
+  </tbody>
+</table>
+<p><a href="{% url 'admin_usuarios' %}">Volver a usuarios</a></p>
+{% endblock %}

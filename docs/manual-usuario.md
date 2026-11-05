@@ -68,6 +68,14 @@ El trabajo técnico se hace **en GLPI** (`https://glpi.<dominio>`). La aplicaci�
 | Reintentar una solicitud cuya emisión a GLPI falló | **Solicitudes en error → Reintentar** (revise antes que GLPI esté disponible). |
 | Emitir un evento sobre una persona de RRHH | **Nueva solicitud**, con su documento y una justificación (emisión por excepción). |
 
+## Administrar usuarios
+
+El Administrador entra por **Administración → Usuarios y roles**. Puede crear una cuenta (la contraseña inicial se muestra una sola vez), vincular una cuenta que ya existe, cambiar roles y colaborador, y desactivar, reactivar o eliminar. Para eliminar debe desactivar antes. El Supabase es compartido: esas dos acciones afectan a todo el equipo. Nadie puede modificar su propia cuenta.
+
+## Crear usuario para una persona nueva
+
+RRHH usa **Crear usuario** en el menú o en su bandeja. Abre el formulario de ingreso, que pide el soporte PDF. Al emitirlo se crean los tickets de cuenta, red, licencias y equipo.
+
 ## Consultar tickets
 
 Los técnicos y el Administrador ven los tickets en **Tickets**, filtrados por cola, estado o solicitud y ordenados por vencimiento. La página es de solo lectura: cada fila enlaza al ticket en GLPI, donde se trabaja. Los cambios aparecen aquí con la sincronización, cada 5 minutos. Cada técnico ve resaltada su cola.

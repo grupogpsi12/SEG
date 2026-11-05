@@ -3,6 +3,8 @@
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 from config.secretos import leer_secreto, lista_de_entorno, ruta_de_secreto
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -109,6 +111,12 @@ JML_EXPORTES_DIR = os.environ.get("JML_EXPORTES_DIR", "/var/lib/jml/exportes")
 JML_GLPI_URL = os.environ.get("JML_GLPI_URL", "https://glpi.localhost")
 # Solo el worker: API v1 de GLPI por la red interna, sin pasar por el WAF (item 3.2).
 JML_GLPI_API_URL = os.environ.get("JML_GLPI_API_URL", "http://glpi/apirest.php")
+JML_SERVICIO_CUENTAS_URL = "http://servicio-cuentas:8090"  # ADR-035: red interna admin_net
+# Solo web y admin-usuarios lo montan. Vacio, el cliente responde «no disponible» sin llamar.
+try:
+    JML_SERVICIO_CUENTAS_TOKEN = leer_secreto("admin_servicio_token")
+except ImproperlyConfigured:
+    JML_SERVICIO_CUENTAS_TOKEN = ""
 JML_SUPABASE_CLAVE_PUBLICA = os.environ.get("JML_SUPABASE_CLAVE_PUBLICA", "")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

@@ -10,7 +10,7 @@ Para quién: el Administrador del sistema y quien despliegue u opere la platafor
 | `web` | Aplicación Django (gunicorn: 1 proceso × 8 hilos, S-29) | `django_secret_key`, `db_password` |
 | `worker` | Bandeja de salida a GLPI, sincronización cada 5 minutos, exportación diaria de auditoría | lo anterior + `glpi_app_token`, `glpi_user_token` |
 | `migrar` (una sola vez) | `migrate` como `app_owner` (ADR-028) | `db_owner_password` (como `db_password`) |
-| `admin-usuarios` (una sola vez) | Crear, vincular o desactivar cuentas (RF-06) | lo de `web` + `supabase_service_role` |
+| `admin-usuarios` (servicio, ADR-035) | Atiende a `web` por `admin_net`; también `run --rm` para crear, vincular o desactivar por comando (RF-06) | lo de `web` + `supabase_service_role` |
 | `configurar-glpi` (una sola vez) | GLPI como código (3.1) | `glpi_app_token`, `glpi_admin_user_token` |
 | `glpi` + `mariadb` | Mesa de servicio | `glpi_db_password` |
 

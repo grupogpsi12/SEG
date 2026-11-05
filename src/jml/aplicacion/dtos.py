@@ -396,3 +396,5 @@ class FilaDeUsuario:
     colaborador_nombre: str | None
     roles: tuple[Rol, ...]
     activo: bool
+    colaborador_id: ColaboradorId | None = None
+    correo: str | None = None  # None si el servicio de cuentas no responde (ADR-035)

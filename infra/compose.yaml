@@ -8,7 +8,7 @@
 # Reglas que este archivo cumple (CLAUDE.md, SRS):
 # - Solo `bunkerweb` publica puertos (RS-02, invariante 14). Ningun otro servicio tiene `ports`.
 # - `db_net` es interna (RS-03). `bw-universe` solo une bunkerweb y su scheduler (RS-19).
-# - `service_role` solo se monta en admin-usuarios (invariante 8).
+# - `service_role` solo se monta en admin-usuarios (invariante 8); web le pide por admin_net (ADR-035).
 # - Secretos como archivos en /run/secrets (ADR-009); infra/.env solo trae lo que una imagen de
 #   terceros exige como variable (API_TOKEN de BunkerWeb y la clave de MariaDB para GLPI).
 # - Imagenes por digest (RS-18).
@@ -158,6 +158,8 @@ services:
   # --- Aplicacion ----------------------------------------------------------------------------
   web:
     <<: *app
+    networks: [app, admin_net]
+    secrets: [django_secret_key, db_password, supabase_ca_crt, admin_servicio_token]
     healthcheck:  # RNF-01: /salud verifica tambien Supabase
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/salud', headers={'Host': '${APP_DOMINIO:-app.localhost}'}), timeout=5)"]
       # RNF-01: Supabase caido se detecta en menos de 2 minutos (2 fallos x 30 s; medido 24/10/2026)
@@ -191,13 +193,22 @@ services:
       start_period: 120s
     mem_limit: 384m
 
-  admin-usuarios:  # RF-06: unico uso de service_role (invariante 8)
+  admin-usuarios:  # RF-06, ADR-035: unico uso de service_role (invariante 8). Servicio para web
     <<: *app
-    profiles: [admin]
-    restart: "no"
     entrypoint: ["python", "manage.py", "admin_usuarios"]
-    secrets: [django_secret_key, db_password, supabase_ca_crt, supabase_service_role]
+    command: ["servir"]  # `run --rm admin-usuarios crear ...` sigue funcionando
+    secrets: [django_secret_key, db_password, supabase_ca_crt, supabase_service_role, admin_servicio_token]
     volumes: []
+    networks:
+      app: {}  # solo para salir a Supabase: el servicio escucha unicamente en admin_net
+      admin_net: { aliases: [servicio-cuentas] }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket,urllib.request as u; s=socket.socket(2,2); s.connect(('10.20.70.1',9)); u.urlopen('http://%s:8090/salud' % s.getsockname()[0], timeout=5)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 20s
+    mem_limit: 256m
 
   migrar:  # ADR-028: unico uso de app_owner, duenio del esquema (revision externa H1)
     <<: *app
@@ -287,6 +298,7 @@ secrets:
   glpi_app_token: { file: ../secrets/glpi_app_token }
   glpi_user_token: { file: ../secrets/glpi_user_token }
   glpi_admin_user_token: { file: ../secrets/glpi_admin_user_token }
+  admin_servicio_token: { file: ../secrets/admin_servicio_token }
 
 volumes:
   bw-storage:
@@ -311,5 +323,8 @@ networks:
     # de bunkerweb (.2), la unica en la que Django confia (RS-05), queda reservada: sin esto, tras un
     # reinicio otro contenedor la tomaba primero y bunkerweb no arrancaba (B-01, auditoria 24/10/2026).
     ipam: { config: [{ subnet: 10.20.40.0/24, ip_range: 10.20.40.128/25 }] }
+  admin_net:
+    internal: true  # ADR-035: solo web llega al servicio de cuentas
+    ipam: { config: [{ subnet: 10.20.70.0/24 }] }
   db_net:
     internal: true  # RS-03

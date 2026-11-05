@@ -36,7 +36,7 @@ def test_RS_03_la_red_de_la_base_de_glpi_es_interna() -> None:
 def test_invariante_8_service_role_solo_en_admin_usuarios() -> None:
     con_clave = {n for n, s in SERVICIOS.items() if "supabase_service_role" in s.get("secrets", [])}
     assert con_clave == {"admin-usuarios"}
-    assert SERVICIOS["admin-usuarios"]["profiles"] == ["admin"]  # no arranca con `up`
+    assert "ports" not in SERVICIOS["admin-usuarios"]  # ADR-035: servicio solo por admin_net
 
 
 def test_RS_18_imagenes_de_terceros_fijadas_por_digest() -> None:

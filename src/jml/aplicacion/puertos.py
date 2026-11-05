@@ -6,7 +6,7 @@ implementacion y un ADR (CLAUDE.md).
 """
 
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from types import TracebackType
 from typing import Protocol, Self
@@ -100,6 +100,14 @@ class IdentidadNoDisponible(ErrorDePuerto):
     """El proveedor de identidad no respondio o respondio algo inesperado (red, 5xx)."""
 
 
+class CuentaRechazada(ErrorDePuerto):
+    """El servicio de cuentas la rechazo; `codigo` no lleva datos (p. ej. email_exists)."""
+
+    def __init__(self, codigo: str) -> None:
+        super().__init__(codigo)
+        self.codigo = codigo
+
+
 # --- Reloj ------------------------------------------------------------------------------------
 
 
@@ -184,6 +192,27 @@ class ProveedorDeIdentidad(Protocol):
     def verificar_totp(self, desafio_id: str, codigo: str) -> IdentidadVerificada:
         """Solo con un codigo valido se alcanza AAL2; si no, `CredencialesInvalidas`."""
         ...
+
+
+@dataclass(frozen=True, slots=True)
+class CuentaCreada:
+    id: UsuarioId
+    contrasena_inicial: str = field(repr=False)  # se muestra una vez; nunca se guarda ni se audita
+
+
+class AdministradorDeCuentas(Protocol):
+    """ADR-035: alta y baja de cuentas. La implementacion real le pide al contenedor
+    `admin-usuarios`, el unico con `service_role` (invariante 8, RS-15)."""
+
+    def crear(self, correo: str) -> CuentaCreada: ...
+
+    def desactivar(self, usuario_id: UsuarioId) -> None: ...
+
+    def reactivar(self, usuario_id: UsuarioId) -> None: ...
+
+    def eliminar(self, usuario_id: UsuarioId) -> None: ...
+
+    def correos(self) -> Mapping[UsuarioId, str]: ...
 
 
 # --- SistemaDeTickets (GLPI) ------------------------------------------------------------------
