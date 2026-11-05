@@ -21,7 +21,12 @@ from jml.aplicacion.dtos import (
 from jml.aplicacion.puertos import Reloj, Repositorios
 from jml.dominio.auditoria import EventoDeAuditoria
 from jml.dominio.errores import NoAutorizado, NoEncontrado
-from jml.dominio.permisos import Actor, puede_consultar_tickets, puede_ver_dashboard
+from jml.dominio.permisos import (
+    Actor,
+    puede_consultar_tickets,
+    puede_ver_dashboard,
+    puede_ver_solicitud,
+)
 from jml.dominio.tipos import Cola, EstadoColaborador, Rol, TipoEvento
 from jml.dominio.valores import hoy_en_bogota
 
@@ -117,7 +122,12 @@ class BuscarTickets:
         if not puede_consultar_tickets(actor.roles):
             raise NoAutorizado("buscar_tickets", "solo tecnicos y Administrador los consultan")
         propia = next((COLA_DE_ROL[r] for r in COLA_DE_ROL if r in actor.roles), None)
-        return replace(self._dep.repos.buscar_tickets(filtro), cola_resaltada=propia)
+        pagina = self._dep.repos.buscar_tickets(filtro)
+        filas = tuple(
+            replace(f, solicitud_visible=puede_ver_solicitud(actor, f.solicitante_id))
+            for f in pagina.filas
+        )
+        return replace(pagina, filas=filas, cola_resaltada=propia)
 
 
 class ConsultarFicha:

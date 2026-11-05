@@ -15,7 +15,8 @@
     <nav aria-label="Principal">
       <a href="{% url 'solicitudes' %}"{% if actual == 'solicitudes' %} aria-current="page"{% endif %}>Mis solicitudes</a>
       <a href="{% url 'nueva_indice' %}"{% if actual == 'nueva_indice' %} aria-current="page"{% endif %}>Nueva solicitud</a>
-      {% if es_rrhh %}<a href="{% url 'bandeja' %}"{% if actual == 'bandeja' %} aria-current="page"{% endif %}>Bandeja de RRHH</a>{% endif %}
+      {% if es_rrhh %}<a href="{% url 'nueva' 'ING' %}">Crear usuario</a>
+      <a href="{% url 'bandeja' %}"{% if actual == 'bandeja' %} aria-current="page"{% endif %}>Bandeja de RRHH</a>{% endif %}
       {% if es_tecnico %}<a href="{% url 'dashboard' %}"{% if actual == 'dashboard' %} aria-current="page"{% endif %}>Dashboard</a>{% endif %}
       {% if ve_tickets %}<a href="{% url 'tickets' %}"{% if actual == 'tickets' %} aria-current="page"{% endif %}>Tickets</a>{% endif %}
       {% if es_tecnico %}<a href="{% url 'cuentas' %}"{% if actual == 'cuentas' %} aria-current="page"{% endif %}>Cuentas</a>{% endif %}

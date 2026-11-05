@@ -3,6 +3,8 @@
 {% block titulo %}Bandeja de RRHH{% endblock %}
 {% block contenido %}
 <h1>Pendientes de aprobación</h1>
+<p><a class="boton" href="{% url 'nueva' 'ING' %}">Crear usuario</a></p>
+<p class="aviso">Registra un ingreso con su soporte PDF. Al emitirlo se crean los tickets de cuenta, red, licencias y equipo.</p>
 {% if filas %}
 <table>
   <thead><tr><th>Solicitud</th><th>Evento</th><th>Colaborador</th><th>Fecha efectiva</th><th>Decisión</th></tr></thead>

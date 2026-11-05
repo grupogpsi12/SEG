@@ -15,6 +15,18 @@
     {% endfor %}
   </tbody>
 </table>
+{% if d.tickets %}
+<h2>Avance: {{ d.fila.avance.resueltos }} de {{ d.fila.avance.total }} tickets</h2>
+<p class="aviso">Última actualización: {{ d.fila.avance.actualizada_en|date:"Y-m-d H:i"|default:"todavía sin sincronizar" }}. Se actualiza cada 5 minutos con lo que TI resuelve en GLPI.</p>
+<table>
+  <thead><tr><th>Cola</th><th>Acción</th><th>Estado</th></tr></thead>
+  <tbody>
+  {% for t in d.tickets %}
+    <tr><td>{{ t.cola.value }}</td><td>{{ t.accion.value }}{% if not t.bloquea_el_cierre %} <span class="aviso">(posterior)</span>{% endif %}</td><td><span class="pildora {{ t|tono_de_ticket }}">{{ t|estado_de_ticket }}</span></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
 {% if d.restringido %}
 <h2>Información restringida (solo RRHH)</h2>
 <p class="restringido">{{ d.restringido|linebreaksbr }}</p>

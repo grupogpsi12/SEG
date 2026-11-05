@@ -311,7 +311,14 @@ def buscar_tickets(f: FiltroDeTickets) -> PaginaDeTickets:
     if f.solicitud:
         q = q.filter(solicitud__id__icontains=f.solicitud)
     desde = (f.pagina - 1) * f.tamano
-    filas = q.select_related("solicitud").order_by("vence_en", "clave")[desde : desde + f.tamano]
+    filas = list(
+        q.select_related("solicitud").order_by("vence_en", "clave")[desde : desde + f.tamano]
+    )
+    ids = {t.solicitud.colaborador_id for t in filas}
+    nombres = {
+        c.id: mp.colaborador_de_modelo(c).nombre_completo
+        for c in m.Colaborador.objects.filter(pk__in=ids)
+    }
     return PaginaDeTickets(
         tuple(
             FilaDeTicket(
@@ -319,6 +326,8 @@ def buscar_tickets(f: FiltroDeTickets) -> PaginaDeTickets:
                 Prioridad(t.prioridad),
                 t.vence_en,
                 t.solicitud.colaborador_id,
+                nombres.get(t.solicitud.colaborador_id, t.solicitud.colaborador_id),
+                t.solicitud.solicitante_id,
             )
             for t in filas
         ),

@@ -97,6 +97,15 @@ class ContratoPorVencer:
 
 
 @dataclass(frozen=True, slots=True)
+class AvanceDeSolicitud:
+    """RF-11: tickets de cierre resueltos segun la ultima sincronizacion (no cuenta posteriores)."""
+
+    resueltos: int
+    total: int
+    actualizada_en: datetime | None
+
+
+@dataclass(frozen=True, slots=True)
 class FilaDeSolicitud:
     """Una fila de las listas de las vistas (ADR-025). Sin campos restringidos (RD-05)."""
 
@@ -109,6 +118,7 @@ class FilaDeSolicitud:
     colaborador_nombre: str
     para_revision: bool
     cancelable: bool  # el solicitante puede cancelarla: sigue pendiente (RF-11)
+    avance: AvanceDeSolicitud | None = None  # solo en Mis solicitudes y en el detalle
 
 
 @dataclass(frozen=True, slots=True)
@@ -303,6 +313,9 @@ class FilaDeTicket:
     prioridad: Prioridad
     vence_en: datetime
     colaborador_id: ColaboradorId
+    colaborador_nombre: str
+    solicitante_id: UsuarioId
+    solicitud_visible: bool = False  # la fija el caso de uso, segun quien consulta
 
 
 @dataclass(frozen=True, slots=True)
@@ -336,6 +349,15 @@ class FichaDeColaborador:
 
 
 @dataclass(frozen=True, slots=True)
+class EstadoDeTicketDeSolicitud:
+    cola: Cola
+    accion: AccionDeTicket
+    estado: EstadoDeTicket | None
+    resuelto: bool
+    bloquea_el_cierre: bool
+
+
+@dataclass(frozen=True, slots=True)
 class DetalleDeSolicitud:
     """Detalle para la vista (2.8). `restringido` solo viene lleno para RRHH (RD-05, CA-10)."""
 
@@ -343,6 +365,7 @@ class DetalleDeSolicitud:
     subtipo: Subtipo | None
     datos: tuple[tuple[str, str], ...]  # (campo, valor) de los datos del evento
     restringido: str | None
+    tickets: tuple[EstadoDeTicketDeSolicitud, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

@@ -16,6 +16,10 @@ from django.views.decorators.http import require_GET
 
 from jml.adaptadores.entrada.web import composicion
 from jml.adaptadores.entrada.web.graficos import barras
+from jml.adaptadores.entrada.web.templatetags.web_extras import (
+    ESTADOS_DE_TICKET,
+    tono_de_estado,
+)
 from jml.adaptadores.entrada.web.vistas import _contexto, con_sesion
 from jml.aplicacion.dtos import FiltroDeCuentas, FiltroDeTickets, PerfilDeUsuario
 from jml.dominio.errores import DatoInvalido, NoAutorizado, NoEncontrado
@@ -56,23 +60,6 @@ class FormularioDeBusqueda(forms.Form):
             else None,
             pagina=c["pagina"] or 1,
         )
-
-
-ESTADOS_DE_TICKET = {
-    EstadoDeTicket.NUEVO: "Nuevo",
-    EstadoDeTicket.EN_ESPERA: "En espera",
-    EstadoDeTicket.EN_CURSO: "En curso",
-    EstadoDeTicket.RESUELTO: "Resuelto",
-    EstadoDeTicket.CERRADO: "Cerrado",
-}
-
-
-def _tono_de_ticket(estado: EstadoDeTicket | None) -> str:
-    if estado is None:
-        return "neutro"
-    if estado >= EstadoDeTicket.RESUELTO:
-        return "ok"
-    return "pendiente" if estado is EstadoDeTicket.EN_ESPERA else "curso"
 
 
 class FormularioDeTickets(forms.Form):
@@ -219,7 +206,7 @@ def tickets(request: HttpRequest, perfil: PerfilDeUsuario) -> HttpResponse:
             "estado": "Sin crear"
             if f.ticket.estado_glpi is None
             else ESTADOS_DE_TICKET[f.ticket.estado_glpi],
-            "tono": _tono_de_ticket(f.ticket.estado_glpi),
+            "tono": tono_de_estado(f.ticket.estado_glpi),
         }
         for f in pagina.filas
     ]

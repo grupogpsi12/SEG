@@ -9,8 +9,8 @@ lang: es-CO
 | Proyecto | Sistema integrado de eventos laborales con identidad, recursos humanos y accesos automatizados |
 | Documento | Especificación de Requisitos de Software (SRS) |
 | Norma de referencia | ISO/IEC/IEEE 29148:2018, adaptada al alcance académico |
-| Versión | 2.8 — Borrador para revisión |
-| Fecha | 31 de octubre de 2026 |
+| Versión | 2.9 — Borrador para revisión |
+| Fecha | 4 de noviembre de 2026 |
 | Autores | Jhinnet Bravo, Carlos Ruiz, Luis Ceron, Jhon Leal y Cristian Caro |
 | Docente | José Eduardo Patiño Santafé |
 | Estado | Pendiente de aprobación por el equipo y el docente |
@@ -27,6 +27,7 @@ lang: es-CO
 | 2.6 | 26/10/2026 | El 429 del límite de ritmo del WAF deja de contar para el bloqueo por mal comportamiento (RS-08, T21, ADR-032): el panel de GLPI dispara unas 20 peticiones en paralelo y, como todo el tráfico local llega con la IP de la puerta de enlace de Docker, abrirlo baneaba a todos una hora (B-36). Sin cambios de alcance. |
 | 2.7 | 26/10/2026 | Las peticiones `/ajax/` de GLPI tienen su propio límite de 20 por segundo (RS-08, ADR-033): el panel de GLPI pide todas sus tarjetas a la vez y, con 2 por segundo, 5 de 7 salían con error. Sin cambios de alcance. |
 | 2.8 | 31/10/2026 | Se agrega RF-41: consulta de tickets de solo lectura para técnicos y Administrador. El CRUD de tickets y de usuarios no se adopta: GLPI sigue siendo la fuente de la verdad (ADR-001) y las cuentas se crean por comando (RF-06, RS-15). Sin cambios de arquitectura. |
+| 2.9 | 04/11/2026 | Correcciones del equipo. Avance visible en Mis solicitudes (RF-11). Tickets con el nombre del colaborador y enlaces solo para quien puede abrirlos (RF-41). Límite propio de 10 r/s para las páginas con sesión (RS-08, ADR-034): filtrar dos veces seguidas daba 429. |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -403,7 +404,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RF-08 | El sistema debe aceptar una fecha efectiva futura. | Debe |
 | RF-09 | El sistema debe rechazar una solicitud nueva cuando exista otra abierta para el mismo colaborador y el mismo tipo. La respuesta debe incluir el identificador de la solicitud existente. La regla la garantiza la base de datos (RD-01). | Debe |
 | RF-10 | Las solicitudes EMG deben aceptarse aunque existan otras abiertas de otros tipos para el mismo colaborador. Al emitirse, esas otras se marcan para que RRHH las revise. | Debe |
-| RF-11 | El solicitante debe poder cancelar su solicitud mientras esté pendiente de aprobación. RRHH debe poder cancelar una solicitud aprobada mientras no se haya creado ningún ticket. | Debe |
+| RF-11 | El solicitante debe poder cancelar su solicitud mientras esté pendiente de aprobación. RRHH debe poder cancelar una solicitud aprobada mientras no se haya creado ningún ticket. La lista y el detalle deben mostrar el avance (tickets de cierre resueltos, estado por cola y última actualización), que cambia solo con la sincronización y se ve al recargar (invariante 11). | Debe |
 | RF-39 | El registro de un ingreso debe exigir el soporte de vinculación. El sistema lo acepta solo si es PDF (extensión y firma `%PDF-` del contenido) y pesa como máximo 20 MB. Lo guarda con un nombre aleatorio fuera de la base de datos y registra su nombre original saneado, tamaño y hash SHA-256. La aplicación nunca abre, procesa ni sirve el archivo. | Debe |
 
 ## Aprobación y emisión
@@ -449,7 +450,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RF-32 | La búsqueda de cuentas debe filtrar por nombre, documento, usuario, departamento, sede, sistema y estado de la cuenta, con resultados paginados. | Debe |
 | RF-33 | La ficha del colaborador debe mostrar: datos laborales (sin campos restringidos); cuentas por sistema con su estado, el ticket de origen y la fecha; equipos asociados (número de serie, modelo, fecha de entrega y si tiene acta); licencias asignadas; e historial de solicitudes y tickets con enlace a GLPI. | Debe |
 | RF-34 | El listado de la búsqueda debería poder exportarse a CSV. | Debería |
-| RF-41 | Los roles técnicos y el Administrador del sistema deben poder consultar los tickets en la aplicación, filtrados por cola, estado y solicitud, con resultados paginados y un enlace a GLPI. Es solo lectura: crear, modificar y cerrar tickets se hace en GLPI, que es la fuente de la verdad (ADR-001). | Debe |
+| RF-41 | Los roles técnicos y el Administrador del sistema deben poder consultar los tickets en la aplicación, filtrados por cola, estado y solicitud, con resultados paginados, el nombre del colaborador y un enlace a GLPI. Solo enlaza la solicitud y la ficha a quien puede abrirlas. Es solo lectura: crear, modificar y cerrar tickets se hace en GLPI, que es la fuente de la verdad (ADR-001). | Debe |
 
 ## Auditoría y administración
 
@@ -524,7 +525,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | RS-05 | Todo input externo, incluidas las cabeceras HTTP, se valida con formularios de Django o esquemas. Las consultas usan el ORM o SQL con parámetros, incluidas las escrituras de auditoría y logs. Django confía en `X-Forwarded-For` y `X-Forwarded-Proto` solo cuando vienen del contenedor de BunkerWeb. | Debe |
 | RS-06 | Los secretos viven en el directorio `secrets/` del equipo (excluido de Git), se montan como Docker secrets y se rotan cada 90 días: clave secreta de Django, contraseña de `app_backend`, token de GLPI y claves de Supabase. Los que el equipo comparte durante el desarrollo se versionan cifrados con SOPS + age, por persona, y se rotan al quitar a alguien (ADR-029). | Debe |
 | RS-07 | Cabeceras de seguridad con una sola fuente por cabecera. Django envía la CSP de la aplicación (`default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`) y `X-Frame-Options: DENY`; BunkerWeb las conserva (`KEEP_UPSTREAM_HEADERS`). BunkerWeb envía HSTS, `Referrer-Policy`, `X-Content-Type-Options` y `Permissions-Policy` en ambos sitios, `Cross-Origin-Resource-Policy` y `Cross-Origin-Embedder-Policy` de mismo origen en `app.*` y la CSP por defecto de GLPI, y elimina `Server` y `X-Powered-By`. Los estáticos no abren CORS. | Debe |
-| RS-08 | Límite de peticiones en BunkerWeb (`USE_LIMIT_REQ`): 5 por minuto por IP en inicio de sesión y verificación TOTP, y 2 por segundo por IP en general (valor por defecto de BunkerWeb), salvo los estáticos de la aplicación (`/static/`, inmutables), con 10 por segundo, y las peticiones `/ajax/` de GLPI, que exigen sesión de GLPI, con 20 por segundo (ADR-033), más bloqueo por mal comportamiento (`USE_BAD_BEHAVIOR`, 1 hora) solo por respuestas de error (400, 401, 403, 404, 405 y 444): el 429 del límite de ritmo frena, pero no cuenta para el bloqueo (ADR-032). Los errores de inicio de sesión deben ser genéricos (no revelan si el correo existe). | Debe |
+| RS-08 | Límite de peticiones en BunkerWeb (`USE_LIMIT_REQ`): 5 por minuto por IP en inicio de sesión y verificación TOTP, y 2 por segundo por IP en general, 10 por segundo en las páginas con sesión (`/solicitudes`, `/tickets`, `/cuentas`, `/dashboard`, `/bandeja`, `/auditoria`, `/errores`, `/administracion`; ADR-034) (valor por defecto de BunkerWeb), salvo los estáticos de la aplicación (`/static/`, inmutables), con 10 por segundo, y las peticiones `/ajax/` de GLPI, que exigen sesión de GLPI, con 20 por segundo (ADR-033), más bloqueo por mal comportamiento (`USE_BAD_BEHAVIOR`, 1 hora) solo por respuestas de error (400, 401, 403, 404, 405 y 444): el 429 del límite de ritmo frena, pero no cuenta para el bloqueo (ADR-032). Los errores de inicio de sesión deben ser genéricos (no revelan si el correo existe). | Debe |
 | RS-09 | Los logs son JSON con identificador de correlación y sin secretos, contraseñas, códigos TOTP, tokens ni campos restringidos. Los del WAF tampoco los guardan: el log de auditoría de ModSecurity no copia cabeceras ni cuerpo, y la reportería tapa el valor de los campos sensibles que disparan una regla. | Debe |
 | RS-10 | Los técnicos inician sesión en GLPI con cuentas nominales y el doble factor nativo de GLPI 11. La cuenta de servicio de la API no puede iniciar sesión en la interfaz. | Debe |
 | RS-11 | Las dependencias y las imágenes se escanean en cada integración continua (pip-audit, Trivy). Una vulnerabilidad crítica bloquea el despliegue. | Debe |

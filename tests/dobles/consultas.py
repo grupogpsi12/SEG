@@ -282,6 +282,11 @@ def _resumen_de_ticket(a: "Almacen", t: TicketSeguido) -> ResumenDeTicket:
     )
 
 
+def _nombre(a: "Almacen", colaborador_id: ColaboradorId) -> str:
+    c = a.colaboradores.get(colaborador_id)
+    return colaborador_id if c is None else c.nombre_completo
+
+
 def buscar_tickets(a: "Almacen", f: FiltroDeTickets) -> PaginaDeTickets:
     def pasa(t: TicketSeguido) -> bool:
         if f.cola is not None and t.ticket.cola is not f.cola:
@@ -301,6 +306,8 @@ def buscar_tickets(a: "Almacen", f: FiltroDeTickets) -> PaginaDeTickets:
             t.ticket.prioridad,
             t.ticket.vence_en,
             a.solicitudes[t.ticket.solicitud_id].colaborador_id,
+            _nombre(a, a.solicitudes[t.ticket.solicitud_id].colaborador_id),
+            a.solicitudes[t.ticket.solicitud_id].solicitante_id,
         )
         for t in ordenados[desde : desde + f.tamano]
     )

@@ -92,6 +92,8 @@ button:hover { background: var(--acento-hondo); border-color: var(--acento-hondo
 button:active { transform: translateY(1px); }
 button.secundario { background: var(--superficie); color: var(--acento); border-color: var(--borde-campo); }
 button.secundario:hover { background: var(--lavanda); border-color: var(--acento); color: var(--acento-hondo); }
+a.boton { display: inline-block; padding: 0.5rem 1.15rem; border-radius: var(--pildora); background: var(--acento); color: #ffffff; font: 600 0.9rem/1.4 var(--sans); text-decoration: none; }
+a.boton:hover { background: var(--acento-hondo); color: #ffffff; }
 form.en-linea { display: inline; }
 form.busqueda { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0 1rem; align-items: end; padding: 0.5rem 1.25rem; margin-bottom: 1rem; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); }
 .roles { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; align-items: center; }
