@@ -37,6 +37,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 031 | Despliegue local con Docker Desktop: PostgreSQL 17 en contenedor, Supabase solo para Auth, Docker secrets y copias en un medio externo | Aceptada | 25/10/2026 |
 | 032 | El límite de ritmo del WAF responde 429 sin banear (P-12) | Aceptada | 26/10/2026 |
 | 033 | Límite propio de 20 r/s para `/ajax/` de GLPI | Aceptada | 26/10/2026 |
+| 034 | Límite propio de 10 r/s para las páginas con sesión de la aplicación | Aceptada | 04/11/2026 |
 
 ---
 
@@ -512,3 +513,15 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 - Las rutas `/ajax/` de GLPI exigen una sesión iniciada; un atacante sin sesión no gana nada con el límite mayor, y el CRS sigue revisando cada petición. Con una sesión robada, el límite deja 20 peticiones por segundo a esas rutas (riesgo aceptado: la sesión ya da acceso completo a GLPI).
 - Verificado (`W-02-VERDE`): 0 respuestas 429 en ráfagas paralelas de 7 y de 20 a `/ajax/`; 18 de 20 en la raíz de GLPI (el límite general sigue); `pruebas.sh` con los ataques en 403 en los dos sitios.
 - SRS v2.7 (RS-08).
+
+## ADR-034 — Límite propio de 10 r/s para las páginas con sesión de la aplicación
+
+**Contexto.** RS-08 fija 2 r/s por IP y el límite de BunkerWeb no admite ráfagas. El 04/11/2026 el equipo informó que los filtros de tickets «no funcionan». Medido con un navegador real: filtrar dos veces con menos de 0,7 s entre clics devuelve 429 y la página de error reemplaza al formulario. Con 0,8 s funciona. En el despliegue local todos comparten la IP de la puerta de enlace de Docker, lo que lo empeora.
+
+**Decisión.** `app.localhost_LIMIT_REQ_URL_3=^/(solicitudes|tickets|cuentas|dashboard|bandeja|auditoria|errores|administracion)` con 10 r/s. No cambian `/ingreso` y `/ingreso/segundo-factor` (5 por minuto, T1), `/colaboradores` (2 r/s: consulta masiva de fichas, T10) ni el límite general.
+
+**Alternativas descartadas.**
+- Subir el límite general del sitio: también relaja lo que no tiene sesión.
+- Pedir paciencia a las personas: el error parece un fallo de la aplicación.
+
+**Consecuencias.** Un escáner con sesión válida puede pedir 10 r/s en esas rutas: exigen sesión y los errores siguen contando para el baneo (ADR-032). SRS v2.9 (RS-08).

@@ -129,6 +129,10 @@ services:
       # redireccion y la pagina salia sin estilos (prueba de interfaz del 24/10/2026, RS-08).
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_2=^/static/
       - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_2=10r/s
+      # ADR-034: filtrar o paginar dos veces en menos de 0,7 s daba 429 y la pagina desaparecia. Solo
+      # paginas con sesion; el ingreso y las fichas (T1, T10) siguen con sus limites.
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_URL_3=^/(solicitudes|tickets|cuentas|dashboard|bandeja|auditoria|errores|administracion)
+      - ${APP_DOMINIO:-app.localhost}_LIMIT_REQ_RATE_3=10r/s
       # --- glpi.*: GLPI (CSP por defecto de BunkerWeb, RS-07) ---
       - ${GLPI_DOMINIO:-glpi.localhost}_USE_REVERSE_PROXY=yes
       - ${GLPI_DOMINIO:-glpi.localhost}_REVERSE_PROXY_URL=/
