@@ -6,10 +6,12 @@ esta en el SQL. Ninguna consulta toca el motivo ni la descripcion (RD-05): sus D
 """
 
 from collections import Counter
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from jml.aplicacion.dtos import (
+    AvanceDeSolicitud,
     FichaDeColaborador,
     FilaCuentas,
     FilaDeColaborador,
@@ -280,6 +282,21 @@ def _resumen_de_ticket(a: "Almacen", t: TicketSeguido) -> ResumenDeTicket:
         t.reabierto,
         cierre_incompleto(t),
     )
+
+
+def avances(a: "Almacen", ids: Sequence[SolicitudId]) -> dict[SolicitudId, AvanceDeSolicitud]:
+    """El oraculo usa la regla del dominio: la consulta agregada debe dar lo mismo."""
+    salida: dict[SolicitudId, AvanceDeSolicitud] = {}
+    for sid in ids:
+        tickets = [t for t in a.tickets.values() if t.ticket.solicitud_id == sid.valor]
+        if not tickets:
+            continue
+        de_cierre = [t for t in tickets if t.ticket.bloquea_el_cierre]
+        vistos = [t.observacion.observada_en for t in tickets if t.observacion is not None]
+        salida[sid] = AvanceDeSolicitud(
+            sum(ticket_resuelto(t) for t in de_cierre), len(de_cierre), max(vistos, default=None)
+        )
+    return salida
 
 
 def _nombre(a: "Almacen", colaborador_id: ColaboradorId) -> str:

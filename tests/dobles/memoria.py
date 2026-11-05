@@ -6,7 +6,7 @@ no queda rastro de los anteriores (CA-02). La restriccion de duplicado abierto a
 la regla de RD-01 (mismo conjunto de estados abiertos) y la del documento unico, RD-09.
 """
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from types import TracebackType
@@ -14,6 +14,7 @@ from typing import Self
 
 from jml.aplicacion.bandeja import EntradaDeBandeja, EstadoDeEntrada
 from jml.aplicacion.dtos import (
+    AvanceDeSolicitud,
     FichaDeColaborador,
     FiltroDeCuentas,
     FiltroDeTickets,
@@ -475,6 +476,9 @@ class RepositoriosEnMemoria:
 
     def buscar_tickets(self, filtro: FiltroDeTickets) -> PaginaDeTickets:
         return consultas.buscar_tickets(self.almacen, filtro)
+
+    def avances(self, ids: Sequence[SolicitudId]) -> Mapping[SolicitudId, AvanceDeSolicitud]:
+        return consultas.avances(self.almacen, ids)
 
     def ficha(self, colaborador_id: ColaboradorId) -> FichaDeColaborador | None:
         return consultas.ficha(self.almacen, colaborador_id)

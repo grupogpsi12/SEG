@@ -177,3 +177,50 @@ def test_ADR_034_las_paginas_de_consulta_tienen_su_propio_limite() -> None:
     url_3 = next(x for x in entorno.splitlines() if "LIMIT_REQ_URL_3" in x)
     for fuera in ("ingreso", "segundo", "colaboradores"):
         assert fuera not in url_3  # T1 y T10: la verificacion y las fichas siguen con 2 r/s
+
+
+# --- auditoria funcional del 04/11/2026 ---------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_toda_pagina_declara_su_icono_y_no_pide_favicon_ico(mundo: Mundo) -> None:
+    """El navegador pedia /favicon.ico y recibia 404 en cada sesion nueva."""
+    assert 'rel="icon"' in texto(Client().get("/ingreso"))
+    assert Client().get("/static/web/icono.svg").status_code == 200
+
+
+def test_los_espacios_de_trabajo_del_editor_no_entran_a_la_imagen() -> None:
+    raiz = Path(__file__).resolve().parents[2]
+    assert "**/*.code-workspace" in (raiz / ".dockerignore").read_text(encoding="utf-8")
+
+
+@pytest.mark.django_db
+def test_RF_11_el_avance_sql_coincide_con_el_oraculo() -> None:
+    oraculo, ids = semilla()
+    real, _ = semilla(RepositoriosDjango)
+    todas = list(ids.values())
+    for m in (oraculo, real):
+        with m.puerto.unidad_de_trabajo() as u:
+            for sid, cuantos in zip(todas, (1, 2, 4, 0), strict=False):
+                seguidos = sorted(
+                    u.tickets.de_solicitud(sid), key=lambda x: x.ticket.clave_de_idempotencia
+                )
+                for s in seguidos[:cuantos]:
+                    u.tickets.guardar(
+                        s.observar(Observacion(EstadoDeTicket.RESUELTO, True, 1, AHORA))
+                    )
+    assert real.puerto.avances(todas) == oraculo.puerto.avances(todas)
+    assert real.puerto.avances([]) == {}
+
+
+@pytest.mark.django_db
+def test_RNF_06_mis_solicitudes_no_hace_una_consulta_de_tickets_por_fila() -> None:
+    """Con una consulta por fila, el p95 llego a 1058 ms con 300 colaboradores (meta: 800 ms)."""
+    m, _ = semilla(RepositoriosDjango)
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    with CaptureQueriesContext(connection) as consultas:
+        MisSolicitudes(m.puerto).ejecutar("u-rrhh")
+    de_tickets = [q for q in consultas if '"ticket"' in q["sql"]]
+    assert len(de_tickets) == 1, de_tickets

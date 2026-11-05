@@ -59,6 +59,9 @@ def _fila(uow: UnidadDeTrabajo, s: Solicitud, usuario_id: str) -> FilaDeSolicitu
     )
 
 
+_SIN_AVANCE = AvanceDeSolicitud(0, 0, None)
+
+
 def _avance(tickets: Sequence[TicketSeguido]) -> AvanceDeSolicitud:
     """RF-11: lo mismo que decide el cierre (RF-26). Solo cambia con la sincronizacion."""
     de_cierre = [t for t in tickets if t.ticket.bloquea_el_cierre]
@@ -87,8 +90,9 @@ class MisSolicitudes:
             tramo = uow.solicitudes.del_solicitante(
                 usuario_id, max(hasta - self._tamano, 0), max(hasta, 0)
             )
+            avances = self._repos.avances([s.id for s in tramo])
             filas = tuple(
-                replace(_fila(uow, s, usuario_id), avance=_avance(uow.tickets.de_solicitud(s.id)))
+                replace(_fila(uow, s, usuario_id), avance=avances.get(s.id, _SIN_AVANCE))
                 for s in reversed(tramo)
             )
             return PaginaDeSolicitudes(filas, total, pagina, self._tamano)

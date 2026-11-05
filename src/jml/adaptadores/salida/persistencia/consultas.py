@@ -9,11 +9,12 @@ from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, time, timedelta
 
-from django.db.models import Count, Min, Q
+from django.db.models import Count, Max, Min, Q
 
 from jml.adaptadores.salida.persistencia import mapeo as mp
 from jml.adaptadores.salida.persistencia import models as m
 from jml.aplicacion.dtos import (
+    AvanceDeSolicitud,
     FichaDeColaborador,
     FilaCuentas,
     FilaDeColaborador,
@@ -299,6 +300,24 @@ def _resumen_de_ticket(t: m.Ticket) -> ResumenDeTicket:
         t.reabierto,
         cierre_incompleto(mp.seguido_de_modelo(t)),
     )
+
+
+def avances(ids: Sequence[SolicitudId]) -> dict[SolicitudId, AvanceDeSolicitud]:
+    """RF-11: una consulta agregada para toda la pagina, sin cargar la definicion de los tickets."""
+    de_cierre = ~Q(clase=ClaseTicket.POSTERIOR.value)
+    filas = (
+        m.Ticket.objects.filter(solicitud_id__in=[i.valor for i in ids])
+        .values("solicitud_id")
+        .annotate(
+            total=Count("clave", filter=de_cierre),
+            resueltos=Count("clave", filter=de_cierre & _RESUELTO_DE_VERDAD),
+            ultima=Max("observado_en", filter=Q(estado_glpi__isnull=False)),
+        )
+    )
+    return {
+        SolicitudId(f["solicitud_id"]): AvanceDeSolicitud(f["resueltos"], f["total"], f["ultima"])
+        for f in filas
+    }
 
 
 def buscar_tickets(f: FiltroDeTickets) -> PaginaDeTickets:

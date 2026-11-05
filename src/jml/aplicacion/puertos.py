@@ -13,6 +13,7 @@ from typing import Protocol, Self
 
 from jml.aplicacion.bandeja import EntradaDeBandeja
 from jml.aplicacion.dtos import (
+    AvanceDeSolicitud,
     FichaDeColaborador,
     FiltroDeCuentas,
     FiltroDeTickets,
@@ -475,5 +476,9 @@ class Repositorios(Protocol):
     def buscar_cuentas(self, filtro: FiltroDeCuentas) -> PaginaDeCuentas: ...
 
     def buscar_tickets(self, filtro: FiltroDeTickets) -> PaginaDeTickets: ...
+
+    def avances(self, ids: Sequence[SolicitudId]) -> Mapping[SolicitudId, AvanceDeSolicitud]:
+        """RF-11: en una sola consulta: una por fila incumplia RNF-06 (p95 de 1058 ms)."""
+        ...
 
     def ficha(self, colaborador_id: ColaboradorId) -> FichaDeColaborador | None: ...
