@@ -245,3 +245,14 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 - **Una prueba que limpia datos debe comprobar de quién son.** `contrato-glpi.sh` exigía `JML_GLPI_DE_PRUEBAS=si`, pero esa variable solo declara una intención: corrió contra el stack en uso y purgó los 88 tickets de la aplicación. Ahora mide si la aplicación tiene tickets y se niega (código 3).
 - **Un parche por lotes no debe suponer el final de línea.** Algunos archivos están con CRLF en la copia de trabajo de Windows: el reemplazo falló a mitad de camino y dejó capas aplicadas y otras no. Se normaliza a LF al leer, y se comprueba cada reemplazo.
 - **Las letras (a) a (h) del dashboard son trazabilidad, no decoración:** CA-15 las exige para relacionar la página con RF-30.
+
+## Auditoría funcional (04/11/2026)
+
+- **«No funciona» se reproduce al ritmo de una persona.** Los filtros pasaban con pausas y fallaban a menos de 0,7 s entre clics: el 429 del WAF, no el código. Se prueba con el navegador real y por el WAF, y también sin pausas.
+- **El historial del WAF dice lo que vio el usuario.** Loki mostró el panel central con 26 tarjetas en un segundo, cuando ADR-033 se había probado con 20. Una prueba de carga se dimensiona con lo medido, no con una suposición.
+- **Enlazar es prometer permiso.** Agregar un enlace a una página obliga a comprobar quién puede abrirla: dos columnas de Tickets daban 404 y 403.
+- **Una función nueva se mide con la carga.** El avance por fila pasó las 2800 pruebas e incumplió RNF-06 (1058 ms). Solo `carga.sh` lo mostró, y sale con código 0 aunque una página no cumpla: hay que leer `cumple`.
+- **Un filtro de salida esconde el dato que importa.** `lint-imports | tail -1` imprimió una línea vacía y un contrato roto llegó a un commit. Se filtra por `Contracts:` y se lee.
+- **Un script que prepara el entorno no se corre sin leerlo.** `preparar-entorno.sh` truncaba `infra/.env` antes de validar. Se escribe a un temporal y se renombra.
+- **Una prueba puede gastar el límite de la siguiente.** El control de `/ingreso` agotó los 5 intentos y `pruebas.sh` falló a continuación.
+

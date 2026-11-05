@@ -28,7 +28,9 @@ METODOS = {
     "solicitudes": ["GET"], "nueva_indice": ["GET"], "nueva": ["GET", "POST"],
     "bandeja": ["GET"], "dashboard": ["GET"], "auditoria": ["GET", "POST"],
     "en_error": ["GET"], "admin_perfiles": ["GET"], "admin_perfil": ["GET", "POST"],
-    "admin_usuarios": ["GET"], "admin_roles": ["POST"], "reintentar": ["POST"],
+    "admin_usuarios": ["GET"], "admin_usuario_crear": ["GET", "POST"],
+    "admin_usuario_vincular": ["GET", "POST"], "admin_usuario_colaborador": ["POST"],
+    "admin_usuario_acceso": ["POST"], "admin_roles": ["POST"], "reintentar": ["POST"],
     "cuentas": ["GET"], "cuentas_csv": ["GET"], "ficha": ["GET"], "tickets": ["GET"],
     "detalle": ["GET"], "decidir": ["POST"],
 }  # fmt: skip
@@ -49,10 +51,14 @@ ACCESO = {
     "en_error": ({"administrador"}, "RF-38: el Administrador reintenta"),
     "admin_perfiles": ({"administrador"}, "RF-37"),
     "admin_perfil": ({"administrador"}, "RF-37"),
+    "admin_usuario_crear": ({"administrador"}, "ADR-035"),
+    "admin_usuario_vincular": ({"administrador"}, "ADR-035"),
     "admin_usuarios": ({"administrador"}, "RF-37"),
 }
 POST_PERMITIDO = {
     "admin_roles": ("administrador", "302:/administracion/usuarios", "RF-37"),
+    "admin_usuario_colaborador": ("administrador", "302:/administracion/usuarios", "ADR-035"),
+    "admin_usuario_acceso": ("administrador", "302:/administracion/usuarios", "ADR-035"),
     "reintentar": ("administrador", "302:/errores", "RF-38"),
     "decidir": ("rrhh", "302:/bandeja", "SRS 3.3: RRHH decide"),
 }

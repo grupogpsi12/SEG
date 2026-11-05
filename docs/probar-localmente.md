@@ -100,7 +100,7 @@ docker compose $C exec web python manage.py admin_usuarios vincular \
 
 **`--colaborador`** vincula la cuenta a una persona de las semillas. Es obligatorio para quien solicita, y `col-006` a `col-010` son de RRHH.
 
-Para probar varios roles, vincule varias cuentas. Cambiar los roles de una cuenta ya vinculada se hace en la aplicación: **Administración → Usuarios**, con una cuenta de Administrador.
+Para probar varios roles, vincule varias cuentas. Con una cuenta de Administrador, todo esto también se hace en la aplicación: **Administración → Usuarios y roles** (ADR-035).
 
 ## 5. Entrar
 

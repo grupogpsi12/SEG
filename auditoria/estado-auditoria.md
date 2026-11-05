@@ -138,6 +138,7 @@ Este archivo es la **única fuente de qué sigue** (prompt §17.1.4). El ítem a
 | X-11 | W-01: el WAF banea al abrir el panel de GLPI y corta `/front/locale.php` | 429 sin baneo, 404 con baneo, locale completo, siete ataques en 403 | ✔ ADR-032 (B-36 corregido) y exclusión puntual de 953100 (B-39): `W-01-ROJO` / `W-01-VERDE`; score global 1,2 |
 | X-12 | W-02: las tarjetas del panel de GLPI reciben 429 | 0 respuestas 429 en ráfagas de 7 y 20 a `/ajax/`; el resto con 2 r/s | ✔ ADR-033 (20 r/s solo en `/ajax/` de GLPI): `W-02-ROJO` / `W-02-VERDE` |
 | X-13 | V-01: consulta de tickets (RF-41), nueva apariencia y guarda de `contrato-glpi.sh` | SQL igual al oráculo; 403 a los demás roles; contraste AA; E2E y WAF en verde con la imagen nueva | ✔ SRS v2.8; `matriz-authz.csv` con `/tickets`; `V-01-VERDE` |
+| X-14 | V-02: correcciones del equipo y auditoría funcional | Cero 4xx en el recorrido por roles; `service_role` solo en `admin-usuarios`; RNF-06 cumplido | ✔ SRS v2.11; ADR-034 a ADR-036; `V-02-VERDE`, `V-02-INTEGRACION`, `V-02-RENDIMIENTO`; informe `docs/evidencia/auditoria-funcional-2026-11-04.md` |
 
 ## F9 — Empaquetado y informes
 

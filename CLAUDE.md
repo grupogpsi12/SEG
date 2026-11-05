@@ -4,7 +4,7 @@ Proyecto académico (Politécnico Grancolombiano, Gerencia de Proyectos en Segur
 
 ## Antes de cualquier trabajo
 
-1. Lee `docs/SRS.md` (v2.5) y `docs/estado.md` (estado y traspaso). Es la fuente de verdad. Si algo que te piden contradice el SRS, di **"Pausa —"**, explica la contradicción y espera una decisión.
+1. Lee `docs/SRS.md` (v2.11) y `docs/estado.md` (estado y traspaso). Es la fuente de verdad. Si algo que te piden contradice el SRS, di **"Pausa —"**, explica la contradicción y espera una decisión.
 2. Lee `tasks/todo.md` y trabaja solo sobre el ítem activo.
 3. Lee `tasks/lessons.md` y no repitas errores registrados.
 4. Las decisiones vigentes están en `docs/decisiones.md`. Los ADR marcados **REEMPLAZADA** no se aplican. Cambiar una decisión vigente exige un ADR nuevo.
@@ -109,7 +109,7 @@ Si un comando todavía no existe, créalo como parte del ítem de `todo.md` que 
 5. **Campos restringidos.** El motivo de retiro y la descripción de una emergencia viven solo en `solicitud_restringida`. Nunca van a GLPI, logs, dashboard ni fichas.
 6. **Cuentas derivadas.** El estado de una cuenta solo lo cambia la sincronización de tickets (SRS §4.7). No hay vista ni comando que lo edite.
 7. **Ticket resuelto = estado ≥ Resuelto + solución** (+ acta en Inventario). Sin eso no cierra la solicitud ni cambia la cuenta.
-8. **Supabase.** Nada de `GRANT` a `anon` ni a `authenticated`; esquema `app` no expuesto; RLS activo sin políticas. `service_role` solo en el contenedor `admin-usuarios`. Nunca uses el rol `postgres` desde la aplicación.
+8. **Supabase.** Nada de `GRANT` a `anon` ni a `authenticated`; esquema `app` no expuesto; RLS activo sin políticas. `service_role` solo en el contenedor `admin-usuarios`, cuyo servicio interno solo atiende a `web` por `admin_net` (ADR-035). Nunca uses el rol `postgres` desde la aplicación.
 9. **Autenticación.** La sesión de Django se crea solo después de verificar el TOTP (AAL2). Los tokens de Supabase no se guardan. Errores de inicio de sesión genéricos.
 10. **Secretos.** Se leen de `/run/secrets/*`. Nunca en el código, `.env` versionados, GLPI ni la base de datos. Ninguna plantilla de ticket o solución lleva contraseñas.
 11. **Sin tiempo real.** Nada de websockets, Supabase Realtime, recarga automática ni JavaScript de terceros.

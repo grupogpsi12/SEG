@@ -1,6 +1,6 @@
 # Estado del proyecto y traspaso
 
-**Última actualización:** 31/10/2026 · rama `auditoria/entrega`.
+**Última actualización:** 04/11/2026 · rama `auditoria/entrega`.
 
 Este documento existe para que otra persona, u otra sesión de Claude Code con otra cuenta, retome el trabajo sin el historial de la conversación. Todo lo que afirma está respaldado por commits, pruebas o documentos del repositorio. **Léase junto con:**
 - `CLAUDE.md` (reglas).
@@ -13,6 +13,8 @@ Este documento existe para que otra persona, u otra sesión de Claude Code con o
 - `docs/auditoria-2026-10-12.md` (auditoría de funcionalidad y seguridad: 12 hallazgos corregidos).
 
 ## 1. Resumen
+
+**04/11/2026: correcciones del equipo y auditoría funcional (SRS v2.11).** El Administrador gestiona usuarios desde la web mediante un servicio interno, `admin-usuarios`, el único con `service_role` (ADR-035). Mis solicitudes muestra el avance. Tickets muestra nombres y solo enlaza lo que cada rol puede abrir. Límites del WAF medidos con el uso real (ADR-034, ADR-036). Informe: `docs/evidencia/auditoria-funcional-2026-11-04.md`. Tras clonar, `preparar-entorno.sh` crea el secreto nuevo `admin_servicio_token`.
 
 **31/10/2026: consulta de tickets y nueva apariencia (SRS v2.8).** RF-41 agrega la página **Tickets**, de solo lectura, para técnicos y Administrador. El CRUD pedido no se adoptó: GLPI sigue siendo la fuente de la verdad y las cuentas se crean por comando. La interfaz usa fuentes propias y contraste medido. `contrato-glpi.sh` se niega a correr si la aplicación ya tiene tickets (evidencia `V-01-VERDE`).
 

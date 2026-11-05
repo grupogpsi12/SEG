@@ -411,6 +411,11 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Dependencia nueva (solo archivos, sin código):** DM Sans y Source Serif 4, licencia SIL OFL 1.1, subconjunto latino de `@fontsource-variable` 5.2.8 y 5.2.9 (septiembre de 2025), copiado en `static/web/fuentes/`. Resuelve la tipografía sin CDN, que RI-01 prohíbe; la biblioteca estándar no aporta fuentes.
   - **Criterio:** la consulta SQL coincide con el oráculo; técnicos y Administrador entran, los demás reciben 403; ningún campo restringido; las pruebas de contraste y estructura (RI-01) siguen en verde con los colores nuevos; ningún recurso externo.
 
+- [x] **V-02 Correcciones del equipo y auditoría funcional** (04/11/2026). Hecho: SRS v2.11, ADR-034 a ADR-036; informe `docs/evidencia/auditoria-funcional-2026-11-04.md`; evidencia `V-02-VERDE`, `V-02-INTEGRACION` y `V-02-RENDIMIENTO`.
+  - **Decisiones del equipo:** CRUD de usuarios con servicio interno; «crear ticket de usuario» como acceso directo al ingreso de RRHH; avance visible en Mis solicitudes; enlaces solo para quien puede abrirlos.
+  - **Criterio:** cero 4xx en el recorrido por roles; `service_role` solo en `admin-usuarios`; `import-linter` en verde; RNF-06 cumplido.
+  - **Pendiente humano:** probar una cuenta real en Supabase desde la web y abrir el panel central de GLPI con sesión.
+
 ## Orden de recorte (SRS §14)
 
 Reportería del WAF (RNF-16) → RF-34 (CSV) → RF-30 (g) → gráficos SVG, conservando las tablas. **Nunca se recortan:** RET, EMG, deduplicación, auditoría, MFA, derivación de cuentas, WAF en modo bloqueo e indicadores (a), (c) y (e). **El núcleo (Fase 1) no se recorta**: si falta tiempo, se recortan adaptadores y vistas, no reglas.

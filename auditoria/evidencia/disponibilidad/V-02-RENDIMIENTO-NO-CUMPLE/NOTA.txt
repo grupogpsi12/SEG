@@ -1,0 +1,1 @@
+Mis solicitudes con p95 de 1058 ms (meta: 800 ms), por una consulta de tickets por fila. Corregido con una consulta agregada: ver V-02-RENDIMIENTO, 682 ms.

@@ -1,0 +1,1 @@
+Corrida reemplazada por V-02-VERDE. verificar-v02.sh acababa de gastar los 5 intentos por minuto de /ingreso y pruebas.sh recibio 429: fue el orden de las pruebas, no un defecto. El guion ahora espera un minuto.
