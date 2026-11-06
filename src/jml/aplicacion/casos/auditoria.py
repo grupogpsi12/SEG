@@ -18,7 +18,7 @@ def _exigir_auditor(repos: Repositorios, usuario_id: str) -> None:
     with repos.unidad_de_trabajo() as uow:
         actor = uow.usuarios.actor_de(usuario_id)
     if actor is None or not puede_consultar_auditoria(actor.roles):
-        raise NoAutorizado("auditoria", "solo el Auditor consulta la auditoria")
+        raise NoAutorizado("auditoria", "solo el Auditor o el Administrador consulta la auditoria")
 
 
 class ConsultarAuditoria:

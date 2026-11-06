@@ -107,9 +107,7 @@ def _tipos_disponibles(perfil: PerfilDeUsuario, hay_subordinados: bool) -> list[
     if Rol.RRHH in perfil.roles:
         return list(TipoEvento)
     if Rol.ADMINISTRADOR in perfil.roles:
-        # Un ingreso nunca es excepcion del Administrador: la persona aun no existe, luego no es
-        # de RRHH (S-08). Tampoco sube el soporte, que es solo de RRHH (invariante 12).
-        return [t for t in TipoEvento if t is not TipoEvento.ING]
+        return list(TipoEvento)
     if Rol.SOLICITANTE not in perfil.roles:
         return []
     disponibles: list[TipoEvento] = []
@@ -213,7 +211,7 @@ def _enviar(
     caso: Callable[[NuevaSolicitud], SolicitudRegistrada]
     if not emision:
         caso = casos.registrar.ejecutar
-    elif Rol.RRHH in perfil.roles:
+    elif Rol.RRHH in perfil.roles or Rol.ADMINISTRADOR in perfil.roles:
         caso = casos.emitir.ejecutar
     else:
         caso = casos.emitir_por_excepcion.ejecutar

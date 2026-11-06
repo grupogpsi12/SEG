@@ -30,6 +30,7 @@ lang: es-CO
 | 2.9 | 04/11/2026 | Correcciones del equipo. Avance visible en Mis solicitudes (RF-11). Tickets con el nombre del colaborador y enlaces solo para quien puede abrirlos (RF-41). Límite propio de 10 r/s para las páginas con sesión (RS-08, ADR-034): filtrar dos veces seguidas daba 429. |
 | 2.10 | 04/11/2026 | El Administrador gestiona las cuentas desde la web (RF-06, RF-37, RS-15, RI-04, ADR-035): `admin-usuarios` pasa a ser un servicio interno, alcanzable solo desde `web` y con su propio token. `service_role` sigue únicamente en ese contenedor. Acceso directo «Crear usuario» para RRHH, que abre el ingreso. |
 | 2.11 | 04/11/2026 | Auditoría funcional: `/ajax/` de GLPI pasa a 60 r/s y `/front/locale.php` a 10 r/s (RS-08, ADR-036), porque el panel central pide 26 tarjetas en un segundo. |
+| 2.12 | 05/11/2026 | Alcance académico de demostración: el Administrador puede consultar todas las áreas de lectura y emitir todos los tipos de evento, incluido Ingreso; no puede aprobar solicitudes. ADR-037. |
 
 **Regla de mantenimiento.** La única fuente de este documento es `docs/SRS.md` en el repositorio. Desde la versión 2.2 no se genera en Word.
 
@@ -153,7 +154,7 @@ Los roles se gestionan como grupos de Django, que asigna el Administrador del si
 | Técnico Licencias | Cola Licencias (M365) | Igual que Técnico AD. | RRHH |
 | Técnico Inventario | Cola Inventario | Igual que Técnico AD. | RRHH |
 | Auditor | Docente o revisor | Leer la auditoría y verificar su integridad. Leer solicitudes sin campos restringidos. | Todos los demás |
-| Administrador del sistema | Responsable técnico del proyecto | Mantener la matriz de perfiles, los catálogos y los roles. Reintentar la emisión de solicitudes en `error`. Consultar los tickets. No aprueba solicitudes. | RRHH y técnicos |
+| Administrador del sistema | Responsable técnico del proyecto | Mantener la matriz de perfiles, los catálogos y los roles. Reintentar la emisión de solicitudes en `error`. Consultar todas las áreas de lectura y emitir cualquier tipo de evento, incluido Ingreso, para la demostración académica. No aprueba solicitudes. | RRHH y técnicos |
 
 **Control de doble firma.** RRHH es una sola cuenta (ADR-005). Ningún cambio de acceso ocurre con una sola firma:
 
@@ -414,7 +415,7 @@ La aplicación sugiere el usuario en el ticket de ingreso y garantiza que sea ú
 | ID | Requisito | Prioridad |
 |---|---|---|
 | RF-12 | RRHH debe poder aprobar o rechazar solicitudes pendientes. Rechazar exige justificación. | Debe |
-| RF-13 | RRHH debe poder registrar y emitir cualquier tipo de evento en un solo paso, con justificación obligatoria. | Debe |
+| RF-13 | RRHH y, para la demostración académica, el Administrador deben poder registrar y emitir cualquier tipo de evento en un solo paso, con justificación obligatoria. | Debe |
 | RF-14 | Una vez aprobada, el contenido de la solicitud no debe poder modificarse; la base de datos lo impone con un disparador. Para corregirla, RRHH la cancela y registra una nueva vinculada a la anterior. | Debe |
 | RF-15 | El sistema debe impedir que RRHH apruebe o emita solicitudes cuyo sujeto sea la propia persona de RRHH. | Debe |
 

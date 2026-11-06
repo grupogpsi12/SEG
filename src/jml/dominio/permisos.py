@@ -96,8 +96,8 @@ def puede_registrar_como_solicitante(
 
 
 def puede_emitir_directo(actor: Actor, relacion: Relacion) -> bool:
-    """RF-13 y RF-15: RRHH emite cualquier tipo, salvo sobre su propia persona."""
-    return actor.tiene(Rol.RRHH) and relacion is not Relacion.SI_MISMO
+    """RF-13 y la demostración académica: RRHH y Administrador emiten cualquier tipo."""
+    return bool(actor.roles & {Rol.RRHH, Rol.ADMINISTRADOR}) and relacion is not Relacion.SI_MISMO
 
 
 def puede_emitir_por_excepcion(actor: Actor, sujeto_es_rrhh: bool) -> bool:
@@ -110,8 +110,8 @@ def puede_decidir(actor: Actor) -> bool:
 
 
 def puede_ver_restringidos(roles: frozenset[Rol]) -> bool:
-    """RD-05: solo RRHH ve motivo y descripcion."""
-    return Rol.RRHH in roles
+    """RD-05: RRHH y Administrador los ven en la demostración académica."""
+    return bool(roles & {Rol.RRHH, Rol.ADMINISTRADOR})
 
 
 def puede_ver_solicitud(actor: Actor, solicitante_id: str) -> bool:
@@ -125,12 +125,12 @@ def puede_consultar_tickets(roles: frozenset[Rol]) -> bool:
 
 
 def puede_ver_dashboard(roles: frozenset[Rol]) -> bool:
-    """RF-29: solo roles tecnicos."""
-    return bool(roles & ROLES_TECNICOS)
+    """RF-29: roles técnicos; el Administrador ve todo en la demostración académica."""
+    return Rol.ADMINISTRADOR in roles or bool(roles & ROLES_TECNICOS)
 
 
 def puede_consultar_auditoria(roles: frozenset[Rol]) -> bool:
-    return Rol.AUDITOR in roles
+    return bool(roles & {Rol.AUDITOR, Rol.ADMINISTRADOR})
 
 
 def puede_reintentar_emision(roles: frozenset[Rol]) -> bool:

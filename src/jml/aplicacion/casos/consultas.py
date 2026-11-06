@@ -56,8 +56,10 @@ def _actor(dep: DependenciasDeConsulta, usuario_id: str) -> Actor:
 
 
 def _exigir_tecnico(actor: Actor, accion: str) -> None:
-    if not puede_ver_dashboard(actor.roles):
-        raise NoAutorizado(accion, "solo los roles tecnicos consultan esta informacion")
+    if Rol.ADMINISTRADOR not in actor.roles and not puede_ver_dashboard(actor.roles):
+        raise NoAutorizado(
+            accion, "solo los roles tecnicos o el Administrador consultan esta informacion"
+        )
 
 
 class ContratosPorVencer:
@@ -68,7 +70,7 @@ class ContratosPorVencer:
 
     def ejecutar(self, usuario_id: str) -> tuple[ContratoPorVencer, ...]:
         actor = _actor(self._dep, usuario_id)
-        if Rol.RRHH not in actor.roles:
+        if not actor.roles & {Rol.RRHH, Rol.ADMINISTRADOR}:
             raise NoAutorizado("contratos_por_vencer", "solo RRHH ve los contratos por vencer")
         hoy = hoy_en_bogota(self._dep.reloj.ahora())
         limite = hoy + timedelta(days=DIAS_DE_AVISO)

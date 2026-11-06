@@ -76,6 +76,11 @@ El Administrador entra por **Administración → Usuarios y roles**. Puede crear
 
 RRHH usa **Crear usuario** en el menú o en su bandeja. Abre el formulario de ingreso, que pide el soporte PDF. Al emitirlo se crean los tickets de cuenta, red, licencias y equipo.
 
+Para la demostración académica, el **Administrador** también puede abrir **Nueva solicitud →
+Ingreso** y emitir cualquier tipo de evento. Puede consultar todas las áreas de lectura, incluidos
+datos restringidos, auditoría, dashboard, cuentas, fichas y tickets, pero no puede aprobar
+solicitudes.
+
 ## Consultar tickets
 
 Los técnicos y el Administrador ven los tickets en **Tickets**, filtrados por cola, estado o solicitud y ordenados por vencimiento. La página es de solo lectura: cada fila enlaza al ticket en GLPI, donde se trabaja. Los cambios aparecen aquí con la sincronización, cada 5 minutos. Cada técnico ve resaltada su cola.

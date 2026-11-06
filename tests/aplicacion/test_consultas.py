@@ -98,9 +98,10 @@ def test_RF_29_solo_los_roles_tecnicos_ven_el_dashboard_y_RRHH_recibe_403() -> N
     m, _ = semilla()
     for usuario in ("u-tec-ad", "u-tec-com", "u-tec-lic", "u-tec-inv"):
         assert m.dashboard(usuario).generados_en == m.reloj.ahora()
-    for usuario in ("u-rrhh", "u-admin", "u-aud", "u-col", "fantasma"):
+    for usuario in ("u-rrhh", "u-aud", "u-col", "fantasma"):
         with pytest.raises(NoAutorizado):
             m.dashboard(usuario)
+    assert m.dashboard("u-admin").generados_en == m.reloj.ahora()
 
 
 def test_RF_31_cada_tecnico_ve_su_cola_resaltada() -> None:
@@ -347,11 +348,13 @@ def test_los_filtros_de_pagina_son_validos() -> None:
 
 def test_la_busqueda_y_la_ficha_son_solo_para_tecnicos() -> None:
     m, _ = semilla()
-    for usuario in ("u-rrhh", "u-admin", "u-aud", "u-col"):
+    for usuario in ("u-rrhh", "u-aud", "u-col"):
         with pytest.raises(NoAutorizado):
             m.buscar(usuario, FiltroDeCuentas())
         with pytest.raises(NoAutorizado):
             m.ficha(usuario, "col-1")
+    assert m.buscar("u-admin", FiltroDeCuentas()).total > 0
+    assert m.ficha("u-admin", "col-1").colaborador_id == "col-1"
 
 
 # --- RF-33: ficha -----------------------------------------------------------------------------

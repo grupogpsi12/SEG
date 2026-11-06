@@ -92,6 +92,10 @@ def test_web_y_worker_tienen_chequeo_de_salud_y_corren_sin_root_ni_escritura() -
     assert "USER jml" in (RAIZ / "Dockerfile").read_text()
 
 
+def test_web_espera_al_servicio_de_cuentas() -> None:
+    assert SERVICIOS["web"]["depends_on"]["admin-usuarios"]["condition"] == "service_healthy"
+
+
 def test_ningun_env_con_valores_esta_versionado() -> None:
     assert not (RAIZ / "infra" / ".env").exists() or ".env" in (RAIZ / ".gitignore").read_text()
     assert "infra/.env" in (RAIZ / ".gitignore").read_text()

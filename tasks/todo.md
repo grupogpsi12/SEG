@@ -4,6 +4,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
 Ítem activo: **2.2** (necesita Docker: instalación pendiente del equipo, ver `docs/estado.md`). Estado general y traspaso: **`docs/estado.md`**.
 
+Subítem completado de esta sesión: **corregir catálogo y permisos de demostración**.
+✔ Verificación: `Ingreso` aparece en Nueva solicitud; `admin` puede consultar todo y emitir
+cualquier tipo de solicitud; las rutas de administración de usuarios no muestran un error de
+servicio cuando `admin-usuarios` está disponible; pruebas web y de autorización en verde.
+
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
 ## Fase 0 — Aprobación y pruebas técnicas (spikes)

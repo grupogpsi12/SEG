@@ -40,6 +40,7 @@ Formato: contexto → decisión → alternativas descartadas → consecuencias. 
 | 034 | Límite propio de 10 r/s para las páginas con sesión de la aplicación | Aceptada | 04/11/2026 |
 | 035 | CRUD de usuarios en la web mediante un servicio interno de cuentas | Aceptada | 04/11/2026 |
 | 036 | `/ajax/` de GLPI a 60 r/s y límite propio para `/front/locale.php` | Aceptada | 04/11/2026 |
+| 037 | Alcance académico ampliado del Administrador | Aceptada | 05/11/2026 |
 
 ---
 
@@ -557,3 +558,17 @@ Las dos crecen cada día de uso, así que no es solo una cuestión de umbral: co
 **Decisión.** `/ajax/` de `glpi.localhost` a 60 r/s (más del doble del caso medido, para varias pestañas o personas tras la IP compartida). `^/front/locale` a 10 r/s. El ingreso de GLPI y lo demás siguen con 2 r/s. Actualiza el valor de ADR-033, que sigue vigente en lo demás.
 
 **Consecuencias.** `/ajax/` exige sesión de GLPI. La prueba es ahora con ráfagas de 26 y de 40 (`auditoria/scripts/verificar-v02.sh`).
+
+## ADR-037 — Alcance académico ampliado del Administrador
+
+**Contexto.** La demostración académica necesita una cuenta con visibilidad completa y capacidad de
+crear los flujos de eventos sin representar un modelo de segregación para producción.
+
+**Decisión.** El Administrador puede consultar todas las áreas de lectura, incluidos datos
+restringidos, auditoría, dashboard, cuentas, fichas y tickets, y puede emitir cualquier tipo de
+evento, incluido Ingreso. No puede aprobar solicitudes. Esta excepción es solo para la
+demostración y queda documentada en el SRS v2.12.
+
+**Consecuencias.** Las pruebas de autorización reflejan el alcance ampliado. Se conserva la
+prohibición de acciones sobre directorios o servicios de identidad: emitir un Ingreso solo crea la
+solicitud y sus tickets en GLPI.
