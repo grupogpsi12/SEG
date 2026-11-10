@@ -97,4 +97,11 @@ python docs/entregables/auditoria/verificar-entrega.py docs/entregables/auditori
 
 ## 8. Video(s) de demostración
 
-El video de demostración del funcionamiento de las pruebas, la implementación y la solución se entrega aparte (no se versiona en el repositorio por tamaño). El guion reproducible de la demostración —qué mostrar y con qué comando— es esta misma lista de tablas: cada fila es un paso verificable en vivo.
+El video de demostración está en `docs/Desarrollo Seguro/video/demostracion-ssgui.mp4` (57 s). Recorre, con fotogramas reales de la aplicación capturados a través del WAF y tarjetas de resultado: la implementación, el inicio de sesión, la creación de eventos, la consulta de tickets, el dashboard, la administración de usuarios y las dos pruebas de ataque (inyección SQL y hombre en el medio) con su veredicto. Se regenera con:
+
+```
+bash auditoria/scripts/mitm-interceptacion.sh   # (opcional) refrescar resultados de ataque
+uv run --with playwright --with pillow python auditoria/scripts/construir-video-demo.py <cookie> <salida>
+```
+
+El guion reproducible —qué mostrar y con qué comando— es además esta misma lista de tablas: cada fila es un paso verificable en vivo.
