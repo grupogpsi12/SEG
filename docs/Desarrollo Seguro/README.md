@@ -11,12 +11,13 @@ José Bedoya, Carlos Ruiz, Luis Cerón y Cristian Caro · Institución Universit
 | 2 | Resultados de pruebas de vulnerabilidades | Resultados obtenidos con escáneres: OWASP ZAP, sqlmap, Nikto, testssl.sh, Trivy (con KEV y EPSS) y Docker Bench, a través del WAF y directamente contra la aplicación | [PDF](2-Resultados-de-pruebas-de-vulnerabilidades.pdf) · [fuente](2-Resultados-de-pruebas-de-vulnerabilidades.md) |
 | 3 | Análisis de captura de tráfico de la aplicación web | Capturas para casos de uso: ingreso, vacaciones, retiro, emergencia, consulta técnica y verificación de la auditoría, en tres puntos de la red | [PDF](3-Analisis-de-captura-de-trafico.pdf) · [fuente](3-Analisis-de-captura-de-trafico.md) |
 | 4 | Propuesta de controles de seguridad de la información | Controles en términos de confidencialidad, autenticidad e integridad, con la descripción y los diagramas de la arquitectura de seguridad propuesta | [PDF](4-Propuesta-de-controles-de-seguridad.pdf) · [fuente](4-Propuesta-de-controles-de-seguridad.md) |
+| 5 | Pruebas de ataque: hombre en el medio e inyección SQL | Ataques MitM (interceptación con certificado falso, degradación de TLS, despojo de TLS, robo de cookie, captura del tramo externo) y SQL Injection (sqlmap nivel 5 y cargas manuales, con y sin WAF), con las tres propiedades de seguridad | [PDF](5-Pruebas-de-ataque-MitM-y-SQLi.pdf) · [md](5-Pruebas-de-ataque-MitM-y-SQLi.md) |
 
 Las figuras de los entregables están en [`figuras/`](figuras/).
 
 ## Arquitectura de referencia
 
-Los cuatro documentos corresponden a la arquitectura definida en la primera entrega (`DS_1eraEntrega_Local`): todo el sistema se ejecuta en la máquina local con Docker Desktop; la base de datos de la aplicación es PostgreSQL 17 en contenedor; GLPI 11 conserva su MariaDB; Supabase Auth es el único servicio externo; los secretos son Docker secrets fuera del repositorio; el borde usa un certificado autofirmado para `app.localhost` y `glpi.localhost`; y la auditoría exportada y los respaldos se copian a un disco externo. En el repositorio, esta decisión es el ADR-031 y la versión 2.5 del SRS.
+Los cinco documentos corresponden a la arquitectura definida en la primera entrega (`DS_1eraEntrega_Local`): todo el sistema se ejecuta en la máquina local con Docker Desktop; la base de datos de la aplicación es PostgreSQL 17 en contenedor; GLPI 11 conserva su MariaDB; Supabase Auth es el único servicio externo; los secretos son Docker secrets fuera del repositorio; el borde usa un certificado autofirmado para `app.localhost` y `glpi.localhost`; y la auditoría exportada y los respaldos se copian a un disco externo. En el repositorio, esta decisión es el ADR-031 y la versión 2.5 del SRS.
 
 ## Evidencia y reproducción
 

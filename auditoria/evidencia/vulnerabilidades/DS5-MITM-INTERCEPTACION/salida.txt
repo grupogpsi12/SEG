@@ -1,0 +1,21 @@
+== 1. El cliente que valida rechaza un certificado de interceptor (CN=app.localhost, firmado por un atacante)
+   cliente que valida -> 000·60 (curl 60 = certificado no confiable)
+OK    el interceptor es rechazado por el cliente que valida
+   cliente que NO valida (-k) -> 200 (acepta al interceptor: cliente comprometido)
+OK    solo un cliente que no valida acepta al interceptor
+== 2. No se puede forzar TLS 1.0/1.1 (anti-downgrade)
+   curl --tls-max 1.1 -> 000�35fallo·35 (debe fallar el handshake)
+OK    TLS 1.1 o anterior es rechazado
+== 3. SSL-strip: el puerto 80 redirige a 443 y el borde envía HSTS
+   http 80 -> 301 · Strict-Transport-Security: max-age=31536000; includeSubDomains
+OK    el puerto 80 redirige (301/302/308)
+OK    HSTS presente con un año de duración
+== 4. La cookie de sesión lleva Secure, HttpOnly y SameSite
+   Set-Cookie: csrftoken=***enmascarado***; expires=Tue, 09 Nov 2027 02:21:03 GMT; HttpOnly; Max-Age=31449600; Path=/; SameSite=Lax; Secure
+OK    la cookie tiene Secure
+OK    la cookie tiene HttpOnly
+OK    la cookie tiene SameSite
+== 5. Una contraseña centinela NO viaja en claro en el tramo navegador↔WAF (va dentro de TLS)
+   apariciones del centinela en el tramo TLS: 0
+OK    la contraseña no aparece en claro (va cifrada)
+fallos: 0

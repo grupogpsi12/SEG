@@ -16,6 +16,7 @@ ENTREGABLES = [
     "2-Resultados-de-pruebas-de-vulnerabilidades",
     "3-Analisis-de-captura-de-trafico",
     "4-Propuesta-de-controles-de-seguridad",
+    "5-Pruebas-de-ataque-MitM-y-SQLi",
 ]
 
 

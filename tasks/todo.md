@@ -421,6 +421,10 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Criterio:** cero 4xx en el recorrido por roles; `service_role` solo en `admin-usuarios`; `import-linter` en verde; RNF-06 cumplido.
   - **Pendiente humano:** probar una cuenta real en Supabase desde la web y abrir el panel central de GLPI con sesión.
 
+- [ ] **DS-5 Entrega de Desarrollo Seguro: pruebas de ataque MitM y SQL Injection** (09/11/2026). Actividad del curso: controles de confidencialidad, autenticidad e integridad, con pruebas mínimas de MitM (hombre en el medio) e inyección SQL. Entregable 5, con el formato de los cuatro anteriores.
+  - **Pasos:** (a) SQL Injection con sqlmap nivel 5 sobre el stack actual (8 objetivos, cabecera Host, segundo orden) más payloads manuales; control positivo contra la app sembrada. (b) MitM: inventario TLS del borde (testssl), redirección 80→443 + HSTS (anti-SSL-strip), atributos de la cookie de sesión, captura de los tres tramos (navegador↔WAF cifrado; worker↔GLPI interno; GLPI↔MariaDB), e intento activo de interceptación con un proxy que presenta un certificado falso (el cliente lo rechaza). (c) Registrar evidencia con el protocolo. (d) Escribir `docs/Desarrollo Seguro/5-Pruebas-de-ataque-MitM-y-SQLi.md` y su PDF. (e) Actualizar README, estado y entrega.
+  - **Criterio:** 0 parámetros inyectables; la cadena de auditoría íntegra tras sqlmap; el cliente que valida rechaza el certificado del interceptor; ningún secreto ni dato sensible viaja en claro fuera de la red interna; `verificar-entrega.py` en verde.
+
 ## Orden de recorte (SRS §14)
 
 Reportería del WAF (RNF-16) → RF-34 (CSV) → RF-30 (g) → gráficos SVG, conservando las tablas. **Nunca se recortan:** RET, EMG, deduplicación, auditoría, MFA, derivación de cuentas, WAF en modo bloqueo e indicadores (a), (c) y (e). **El núcleo (Fase 1) no se recorta**: si falta tiempo, se recortan adaptadores y vistas, no reglas.
