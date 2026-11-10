@@ -1,0 +1,6 @@
+Segundo orden interrumpido por tiempo (>30 min sin completar la comparacion de paginas).
+No se detecto ningun parametro inyectable en lo ejecutado. El veredicto completo del segundo
+orden (0 inyectables) ya esta en F6-04-SQLMAP-NIVEL5 (commit 4b68baf) y en los otros 7 objetivos
+de DS5-SQLI-NIVEL5 de este mismo stack. sqlmap es lento aqui por --second-url con contenido
+inestable (el formulario de Django valida y rechaza antes de cualquier consulta), no por una
+vulnerabilidad.
