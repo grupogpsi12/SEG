@@ -2,7 +2,7 @@
 
 **Sistema integrado de eventos laborales (JML) · Andina Servicios S.A.S. (empresa ficticia, datos ficticios)**
 Politécnico Grancolombiano · Gerencia de Proyectos en Seguridad de la Información · Grupo D01
-25 de octubre de 2026
+25 de octubre de 2026 · actualizado el 9 de noviembre de 2026
 
 > **Nota para el equipo.** Las cifras de este capítulo salen de las evidencias de `docs/entregables/auditoria/` (cada una con su comando, salida, versión, *commit* y fecha). La comparación con «otros trabajos previos» usa lo que existe en el repositorio: el estado documentado del proyecto, la auditoría interna del 12/10/2026 y la Entrega 3 del 24/10/2026, además de los marcos de referencia publicados (OWASP, CIS). **No se inventaron citas bibliográficas.** Si su marco conceptual incluye trabajos académicos o de la industria, añádalos como filas de la tabla de la sección 3.2.4 con sus referencias. La sección 3.4 usa como problema y objetivos lo que dice el SRS; ajústela a sus capítulos I y II de planteamiento y objetivos.
 
@@ -62,6 +62,25 @@ Cada prueba que el plan y el SRS definen se relaciona con lo que midió y con su
 2. **La exposición ponderada es pequeña.** El *score* global es 1,2 de 100 (la escala llama «aceptable» a 0 a 20), con **147 controles de ASVS verificados**. El número solo tiene sentido junto a esa cifra.
 3. **La mayor parte del valor de la auditoría vino de medir, no de leer.** Seis hallazgos se encontraron al medir algo que el proyecto daba por cumplido: la API de GLPI con reloj fijo (B-17), el contraste de los campos (B-34), el perfil de la cuenta de servicio (B-35), el limitador de ritmo (B-36), el endurecimiento de contenedores (B-33) y las denegaciones sin rastro (B-25).
 4. **Una falla de método se detectó a tiempo.** La primera medición de rendimiento (10 vueltas) dio 6 de 9 páginas sobre 800 ms; con las 20 vueltas de la medición original cumple, tres veces seguidas. Se conservó la corrida que no cumple como evidencia.
+
+### 3.1.5 Pruebas de ataque dirigidas: hombre en el medio e inyección SQL (09/11/2026)
+
+Esta ronda corresponde a la **fase de evidencias y auditoría** del cronograma del capítulo II (la fase que produce las cifras de seguridad con evidencia reproducible), y repite sobre el *stack* actual los dos ataques que la actividad del curso pide demostrar para las propiedades de confidencialidad, autenticidad e integridad. El detalle está en el Entregable 5 de Desarrollo Seguro (`docs/Desarrollo Seguro/5-Pruebas-de-ataque-MitM-y-SQLi.md`).
+
+| Prueba definida | Meta | Resultado | Veredicto |
+|---|---|---|---|
+| Inyección SQL, sqlmap nivel 5 (8 objetivos, `Host`, segundo orden) | 0 inyectables | 0 en 7 objetivos con veredicto; el de segundo orden heredó el 0 de `F6-04` (cortado por tiempo aquí) | Cumple |
+| Inyección SQL, cargas manuales por el WAF | bloqueadas | 5 de 5 con 403 (OWASP CRS) | Cumple |
+| Inyección SQL, cargas manuales al ORM | tratadas como dato | 200 sin error de base de datos; 404 por validación de longitud; 26 tablas intactas | Cumple |
+| MitM: interceptor con certificado falso | rechazado por un cliente que valida | rechazado (error de certificado); solo un cliente comprometido (`-k`) lo acepta | Cumple |
+| MitM: degradación de TLS | rechazada | `TLS 1.1` rechazado; el borde solo ofrece 1.2 y 1.3 | Cumple |
+| MitM: despojo de TLS | redirección + HSTS | puerto 80 → 301; HSTS de un año | Cumple |
+| MitM: robo de la cookie de sesión | Secure + HttpOnly + SameSite | los tres atributos presentes | Cumple |
+| MitM: captura del tramo externo | credencial no en claro | 0 apariciones de la contraseña centinela (va en TLS) | Cumple |
+
+**Análisis por prueba.** La integridad frente a la inyección se sostiene en dos capas independientes: el cortafuegos detiene las cargas evidentes (403) y, aun sin él, el ORM parametrizado de Django trata la carga como un dato literal, de modo que ningún `DROP TABLE` ni `UNION` tiene efecto. La autenticidad y la confidencialidad frente al hombre en el medio se sostienen en la validación del certificado por el cliente, en que no se puede degradar ni despojar el cifrado y en que la credencial viaja dentro de TLS. La única debilidad es de cifrado **interno** entre contenedores (B-30, B-32), aceptada y mitigada por el aislamiento de red.
+
+**Comparación con trabajos previos.** Frente al Entregable 2 (25/10/2026), que ya había medido 0 inyecciones con sqlmap y un TLS sólido con testssl, esta ronda **añade la demostración activa del hombre en el medio** (certificado falso rechazado, anti-*downgrade*, anti-*strip*, captura del tramo externo), que antes solo estaba implícita en el inventario de TLS. El resultado de inyección coincide con el previo (0 inyectables), lo que confirma la postura entre dos estados del sistema separados por dos semanas y por los cambios de las sesiones recientes (CRUD de usuarios, consulta de tickets).
 
 ## 3.2 Comparación con otros trabajos previos
 
@@ -131,6 +150,10 @@ Cada resultado esperado se mide con un indicador, una meta y una evidencia que c
 | La auditoría no se altera | Cadena válida tras restaurar y tras la carga | válida | válida (secuencia 414; 603 y 6 586 registros) | `disponibilidad/F7-05-RESPALDO-Y-RESTAURACION` |
 | Cada rol ve lo que debe | Celdas de autorización distintas de lo esperado | 0 | 0 de 440 | `autorizacion/matriz-authz.csv` |
 | No hay inyección SQL | Parámetros inyectables | 0 | 0 en 8 objetivos (nivel 5) | `vulnerabilidades/F6-04-SQLMAP-NIVEL5` |
+| No hay inyección SQL (stack actual) | Parámetros inyectables | 0 | 0 en 7 de 8 objetivos; cargas manuales bloqueadas o literales | `vulnerabilidades/DS5-SQLI-NIVEL5`, `DS5-SQLI-MANUAL` |
+| El interceptor es detectado | Cliente que valida que acepta un certificado falso | 0 | 0 (rechazado); solo `-k` lo acepta | `vulnerabilidades/DS5-MITM-INTERCEPTACION` |
+| No se puede degradar ni despojar el cifrado | TLS < 1.2 aceptado / puerto 80 sin redirección | 0 / 0 | 0 / 0; HSTS de un año | `vulnerabilidades/DS5-MITM-INTERCEPTACION` |
+| La credencial no viaja en claro (tramo externo) | Apariciones de la contraseña en el tramo navegador↔WAF | 0 | 0 | `vulnerabilidades/DS5-MITM-INTERCEPTACION` |
 | La aplicación resiste al escáner activo | Alertas FAIL de ZAP | 0 | 0 en tres posiciones | `vulnerabilidades/F6-09-ZAP-DIRECTO` |
 | El tráfico externo va cifrado | Saludos TLS 1.3 / vulnerabilidades de TLS | 10 de 10 / 0 | 10 de 10 / 0 | `trafico/ENTREGA3-CAPTURA-WEB-Y-POSTGRES` |
 | Los secretos internos no viajan en claro | Peticiones con `App-Token` legible entre el worker y GLPI | 0 | 382 (**no cumple**, B-32) | `trafico/F7-04-CAPTURA-TRAFICO` |
@@ -160,6 +183,8 @@ El problema que el SRS plantea es que, en la pyme ficticia, **las solicitudes de
 **Verificaciones de coherencia hechas:** (1) cada objetivo tiene un resultado y una evidencia; (2) cada resultado esperado tiene un indicador con meta; (3) cada indicador cita su evidencia; (4) la secuencia del cronograma es la que el método exige, sin pruebas antes de que exista lo que prueban; (5) los resultados que **no** cumplen se reportan, no se omiten.
 
 **Una incoherencia que se encontró y se corrigió:** el documento de evidencias declaraba cumplido un criterio de aceptación (CA-12) con un marcador sin reemplazar (B-02). El verificador de la entrega ahora falla ante cualquier marcador y ante cualquier criterio «cumple» sin archivo de evidencia, y su prueba rechazó dos rutas mal escritas durante la misma redacción de la entrega.
+
+**Actualización del 09/11/2026.** Las pruebas de ataque dirigidas (MitM e inyección SQL) mantienen la cadena de coherencia: atacan las propiedades de confidencialidad, autenticidad e integridad del **planteamiento**, con el vocabulario del **marco** (STRIDE, OWASP), sobre los objetivos de seguridad, con la **metodología** de evidencia reproducible y control positivo, en la **fase de evidencias** del cronograma, y con **indicadores** verificables (tabla 3.3). El resultado obtenido (0 inyectables, interceptación detectada) confirma los resultados esperados sin abrir hallazgos nuevos.
 
 ## 3.5 Limitaciones y trabajo pendiente
 
