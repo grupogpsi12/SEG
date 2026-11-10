@@ -164,6 +164,8 @@ services:
     <<: *app
     networks: [app, admin_net]
     secrets: [django_secret_key, db_password, supabase_ca_crt, admin_servicio_token]
+    depends_on:
+      admin-usuarios: { condition: service_healthy }
     healthcheck:  # RNF-01: /salud verifica tambien Supabase
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/salud', headers={'Host': '${APP_DOMINIO:-app.localhost}'}), timeout=5)"]
       # RNF-01: Supabase caido se detecta en menos de 2 minutos (2 fallos x 30 s; medido 24/10/2026)

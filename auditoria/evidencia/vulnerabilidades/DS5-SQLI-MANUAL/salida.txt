@@ -1,0 +1,25 @@
+sesión de técnico creada
+== A) a través del WAF: el CRS bloquea las cargas obvias (403) o la app las trata como dato (200)
+   [403] documento=1' OR '1'='1
+OK    no hay 500 ni fuga para «1' OR '1'='1»
+   [403] documento=1; DROP TABLE app.solicitud--
+OK    no hay 500 ni fuga para «1; DROP TABLE app.solicitud--»
+   [403] documento=' UNION SELECT null,version()--
+OK    no hay 500 ni fuga para «' UNION SELECT null,version()--»
+   [403] documento=1) OR (1=1
+OK    no hay 500 ni fuga para «1) OR (1=1»
+   [403] documento=admin'--
+OK    no hay 500 ni fuga para «admin'--»
+== B) directo a la aplicación (sin WAF): el ORM parametrizado trata la carga como literal
+   [200] documento=' OR '1'='1
+OK    la app responde sin error de base de datos para «' OR '1'='1»
+   [200] documento=1' OR '1'='1
+OK    la app responde sin error de base de datos para «1' OR '1'='1»
+   [200] documento='||version()
+OK    la app responde sin error de base de datos para «'||version()»
+   [404] documento='; DROP TABLE app.cuenta-- (supera 20 caracteres)
+OK    una carga sobredimensionada la rechaza la validación (404), sin tocar la BD
+== integridad: las tablas siguen ahí y la cadena de auditoría es válida
+   tablas en el esquema app: 26
+OK    ninguna tabla fue eliminada (DROP TABLE no tuvo efecto)
+fallos: 0

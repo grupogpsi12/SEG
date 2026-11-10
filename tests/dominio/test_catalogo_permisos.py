@@ -302,7 +302,9 @@ def test_matriz_rol_tipo_sujeto_del_registro_pendiente(
 @pytest.mark.parametrize("rel", RELACIONES)
 def test_matriz_rol_sujeto_de_la_emision_directa_RF_13_RF_15(rol: Rol, rel: Relacion) -> None:
     actor = Actor("u", "c", frozenset({rol}))
-    assert puede_emitir_directo(actor, rel) is (rol is Rol.RRHH and rel is not Relacion.SI_MISMO)
+    assert puede_emitir_directo(
+        actor, rel
+    ) is (rol in (Rol.RRHH, Rol.ADMINISTRADOR) and rel is not Relacion.SI_MISMO)
 
 
 @pytest.mark.parametrize("rol", list(Rol))
@@ -332,8 +334,8 @@ def test_relacion_con_el_sujeto() -> None:
 def test_visibilidad_por_rol() -> None:
     for r in Rol:
         roles = frozenset({r})
-        assert puede_ver_restringidos(roles) is (r is Rol.RRHH)
-        assert puede_ver_dashboard(roles) is (r in TECNICOS)
-        assert puede_consultar_auditoria(roles) is (r is Rol.AUDITOR)
+        assert puede_ver_restringidos(roles) is (r in (Rol.RRHH, Rol.ADMINISTRADOR))
+        assert puede_ver_dashboard(roles) is (r in TECNICOS or r is Rol.ADMINISTRADOR)
+        assert puede_consultar_auditoria(roles) is (r in (Rol.AUDITOR, Rol.ADMINISTRADOR))
         assert puede_reintentar_emision(roles) is (r is Rol.ADMINISTRADOR)
         assert puede_decidir(Actor("u", "c", roles)) is (r is Rol.RRHH)

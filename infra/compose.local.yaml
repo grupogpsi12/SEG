@@ -67,6 +67,8 @@ services:
     environment:
       <<: *base-local
       JML_DB_USUARIO: app_backend
+    depends_on:
+      postgres: { condition: service_healthy }
     networks: [app, pg_net]
 
 secrets:

@@ -41,10 +41,15 @@ def texto(r: Any) -> str:
     return bytes(r.content).decode()
 
 
-@pytest.mark.parametrize("usuario", ["u-rrhh", "u-col", "u-jefe", "u-aud", "u-admin"])
+@pytest.mark.parametrize("usuario", ["u-rrhh", "u-col", "u-jefe", "u-aud"])
 def test_CA_15_solo_los_roles_tecnicos_entran(mundo: Mundo, usuario: str) -> None:
     for ruta in RUTAS:
         assert como(usuario).get(ruta).status_code == 403, ruta
+
+
+def test_el_administrador_ve_todas_las_consultas(mundo: Mundo) -> None:
+    for ruta in RUTAS:
+        assert como("u-admin").get(ruta).status_code == 200, ruta
 
 
 def test_el_menu_muestra_el_dashboard_solo_a_tecnicos(mundo: Mundo) -> None:

@@ -4,6 +4,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho (con evidencia) · `[-]
 Cada ítem tiene un **criterio de verificación** (✔). No se marca `[x]` sin evidencia.
 Ítem activo: **2.2** (necesita Docker: instalación pendiente del equipo, ver `docs/estado.md`). Estado general y traspaso: **`docs/estado.md`**.
 
+Subítem completado de esta sesión: **corregir catálogo y permisos de demostración**.
+✔ Verificación: `Ingreso` aparece en Nueva solicitud; `admin` puede consultar todo y emitir
+cualquier tipo de solicitud; las rutas de administración de usuarios no muestran un error de
+servicio cuando `admin-usuarios` está disponible; pruebas web y de autorización en verde.
+
 **Regla de orden:** primero el núcleo (Fase 1), completo y congelado en el **Hito N**; después los adaptadores (Fases 2 a 4) y la entrega (Fase 5). Ningún adaptador, vista, contenedor o migración se escribe antes del Hito N, salvo el repositorio base (0.1) y los spikes que alimentan los puertos (0.3).
 
 ## Fase 0 — Aprobación y pruebas técnicas (spikes)
@@ -415,6 +420,10 @@ Estado ítem por ítem: `auditoria/estado-auditoria.md` (única fuente de qué s
   - **Decisiones del equipo:** CRUD de usuarios con servicio interno; «crear ticket de usuario» como acceso directo al ingreso de RRHH; avance visible en Mis solicitudes; enlaces solo para quien puede abrirlos.
   - **Criterio:** cero 4xx en el recorrido por roles; `service_role` solo en `admin-usuarios`; `import-linter` en verde; RNF-06 cumplido.
   - **Pendiente humano:** probar una cuenta real en Supabase desde la web y abrir el panel central de GLPI con sesión.
+
+- [ ] **DS-5 Entrega de Desarrollo Seguro: pruebas de ataque MitM y SQL Injection** (09/11/2026). Actividad del curso: controles de confidencialidad, autenticidad e integridad, con pruebas mínimas de MitM (hombre en el medio) e inyección SQL. Entregable 5, con el formato de los cuatro anteriores.
+  - **Pasos:** (a) SQL Injection con sqlmap nivel 5 sobre el stack actual (8 objetivos, cabecera Host, segundo orden) más payloads manuales; control positivo contra la app sembrada. (b) MitM: inventario TLS del borde (testssl), redirección 80→443 + HSTS (anti-SSL-strip), atributos de la cookie de sesión, captura de los tres tramos (navegador↔WAF cifrado; worker↔GLPI interno; GLPI↔MariaDB), e intento activo de interceptación con un proxy que presenta un certificado falso (el cliente lo rechaza). (c) Registrar evidencia con el protocolo. (d) Escribir `docs/Desarrollo Seguro/5-Pruebas-de-ataque-MitM-y-SQLi.md` y su PDF. (e) Actualizar README, estado y entrega.
+  - **Criterio:** 0 parámetros inyectables; la cadena de auditoría íntegra tras sqlmap; el cliente que valida rechaza el certificado del interceptor; ningún secreto ni dato sensible viaja en claro fuera de la red interna; `verificar-entrega.py` en verde.
 
 ## Orden de recorte (SRS §14)
 

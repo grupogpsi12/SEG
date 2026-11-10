@@ -172,7 +172,9 @@ infra/scripts/secretos.sh cifrar administracion supabase_service_role db_passwor
 
 **Crear una cuenta:**
 
-Solo quien tiene `secrets/supabase_service_role` (no se comparte):
+Solo quien tiene `secrets/supabase_service_role` (no se comparte). Si falta, la pantalla de
+Administración muestra que el servicio de cuentas no está disponible; no es posible crear,
+desactivar ni eliminar cuentas sin esa clave:
 
 ```bash
 docker compose $C run --rm admin-usuarios crear --correo persona@andina.example --rol rrhh --colaborador col-006

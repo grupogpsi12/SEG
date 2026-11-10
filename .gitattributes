@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+# Videos de demostración: binarios, no normalizar
+*.mp4 binary

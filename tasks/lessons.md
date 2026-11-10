@@ -255,4 +255,7 @@ Patrones que no deben repetirse. Formato: **error** → regla → cómo detectar
 - **Un filtro de salida esconde el dato que importa.** `lint-imports | tail -1` imprimió una línea vacía y un contrato roto llegó a un commit. Se filtra por `Contracts:` y se lee.
 - **Un script que prepara el entorno no se corre sin leerlo.** `preparar-entorno.sh` truncaba `infra/.env` antes de validar. Se escribe a un temporal y se renombra.
 - **Una prueba puede gastar el límite de la siguiente.** El control de `/ingreso` agotó los 5 intentos y `pruebas.sh` falló a continuación.
-
+- **Ocultar Ingreso para el Administrador de la demo.** El alcance académico de ADR-037 permite al
+  Administrador emitir todos los eventos, incluido Ingreso; la separación de funciones de
+  producción no se debe aplicar silenciosamente a la demo. Detectar: prueba web que compruebe
+  `/solicitudes/nueva/ING` y pruebas de autorización para dashboard, cuentas, fichas y auditoría.

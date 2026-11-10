@@ -54,6 +54,12 @@ def id_de_la_unica(cliente: Client) -> str:
     return pagina[inicio : inicio + 15]
 
 
+def test_el_administrador_ve_ingreso_en_el_catalogo(mundo: Mundo) -> None:
+    pagina = texto(como("u-admin").get("/solicitudes/nueva"))
+    assert "/solicitudes/nueva/ING" in pagina
+    assert "Ingreso" in pagina
+
+
 # --- acceso -----------------------------------------------------------------------------------
 
 
@@ -346,18 +352,18 @@ def test_el_ingreso_no_acepta_equipo_sin_tipo(mundo: Mundo) -> None:
     assert "tipo_equipo" in texto(r)
 
 
-def test_el_administrador_no_ve_el_ingreso_ni_su_soporte(mundo: Mundo) -> None:
-    """Invariante 12: el soporte solo lo sube RRHH. Un ingreso nunca es excepcion del
-    Administrador (la persona aun no existe, luego no es de RRHH: S-08), asi que la interfaz no
-    le ofrece el formulario ni el campo del PDF (auditoria del 12/10/2026)."""
+def test_el_administrador_ve_el_ingreso_y_su_soporte(mundo: Mundo) -> None:
+    """ADR-037: la demostración permite al Administrador emitir el flujo completo."""
     admin = como("u-admin")
-    assert "/solicitudes/nueva/ING" not in texto(admin.get("/solicitudes/nueva"))
+    assert "/solicitudes/nueva/ING" in texto(admin.get("/solicitudes/nueva"))
     assert "/solicitudes/nueva/VAC" in texto(admin.get("/solicitudes/nueva"))
-    assert admin.get("/solicitudes/nueva/ING").status_code == 403
-    assert "soporte_pdf" not in texto(como("u-admin").get("/solicitudes/nueva/RET"))
+    assert admin.get("/solicitudes/nueva/ING").status_code == 200
+    assert "soporte_pdf" in texto(admin.get("/solicitudes/nueva/ING"))
+    emitida = admin.post("/solicitudes/nueva/ING", ingreso())
+    assert (emitida.status_code, emitida["Location"]) == (302, "/solicitudes")
 
 
-def test_el_administrador_emite_por_excepcion_solo_sobre_rrhh(mundo: Mundo) -> None:
+def test_el_administrador_emite_cualquier_evento(mundo: Mundo) -> None:
     admin = como("u-admin")
     base = {
         "fecha_efectiva": fecha(10),
@@ -365,7 +371,7 @@ def test_el_administrador_emite_por_excepcion_solo_sobre_rrhh(mundo: Mundo) -> N
         "justificacion": "Rosa está de viaje y no puede emitirla",
     }
     ajena = admin.post("/solicitudes/nueva/VAC", base | {"documento_del_colaborador": "10203040"})
-    assert ajena.status_code == 403  # el sujeto no es de RRHH: no es una excepcion valida
+    assert ajena.status_code == 302
     propia = admin.post("/solicitudes/nueva/VAC", base | {"documento_del_colaborador": "70000001"})
     assert propia.status_code == 302
 
